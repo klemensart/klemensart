@@ -29,27 +29,17 @@ export async function POST(req: NextRequest) {
     return new NextResponse("OK");
   }
 
-  // merchant_oid'den workshopId'yi çıkar
-  // Format: {workshopId_32char_no_hyphens}-{timestamp}
-  const workshopShort = merchant_oid.split("-")[0]; // ilk 32 char
-  const workshopId =
-    workshopShort.replace(
-      /^(.{8})(.{4})(.{4})(.{4})(.{12})$/,
-      "$1-$2-$3-$4-$5"
-    );
-
   const supabase = createAdminClient();
 
-  // Kullanıcıyı email'e göre bul
-  const { data: users, error: userErr } = await supabase.auth.admin.listUsers();
-  if (userErr) {
-    console.error("Kullanıcı listesi alınamadı:", userErr);
-    return new NextResponse("FAILED", { status: 500 });
-  }
+  // merchant_oid'e karşılık gelen workshop_id ve user_id'yi payment_intents'ten al
+  const { data: intent, error: intentErr } = await supabase
+    .from("payment_intents")
+    .select("workshop_id, user_id")
+    .eq("merchant_oid", merchant_oid)
+    .single();
 
-  const user = users.users.find((u) => u.email === email);
-  if (!user) {
-    console.error("Kullanıcı bulunamadı:", email);
+  if (intentErr || !intent) {
+    console.error("payment_intent bulunamadı:", merchant_oid, intentErr);
     return new NextResponse("FAILED", { status: 404 });
   }
 
@@ -58,8 +48,8 @@ export async function POST(req: NextRequest) {
   expiresAt.setMonth(expiresAt.getMonth() + 6);
 
   const { error: insertErr } = await supabase.from("purchases").insert({
-    user_id: user.id,
-    workshop_id: workshopId,
+    user_id: intent.user_id,
+    workshop_id: intent.workshop_id,
     purchased_at: new Date().toISOString(),
     expires_at: expiresAt.toISOString(),
   });
@@ -69,6 +59,9 @@ export async function POST(req: NextRequest) {
     return new NextResponse("FAILED", { status: 500 });
   }
 
-  console.log(`✅ Ödeme kaydedildi: ${email} → workshop ${workshopId}`);
+  // Kullanılan intent'i sil
+  await supabase.from("payment_intents").delete().eq("merchant_oid", merchant_oid);
+
+  console.log(`✅ Ödeme kaydedildi: ${merchant_oid} → workshop ${intent.workshop_id}`);
   return new NextResponse("OK");
 }

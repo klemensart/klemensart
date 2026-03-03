@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac, randomBytes } from "crypto";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 export async function POST(req: NextRequest) {
   // Kullanıcı oturum kontrolü
@@ -29,9 +30,9 @@ export async function POST(req: NextRequest) {
     req.headers.get("x-real-ip") ||
     "127.0.0.1";
 
-  // merchant_oid: workshopId (kısa) + timestamp — callback'te parse edilecek
-  const workshopShort = workshopId.replace(/-/g, ""); // 32 char UUID
-  const merchant_oid = `${workshopShort}-${Date.now()}`;
+  // merchant_oid: KLM + timestamp + 4 rastgele alfanumerik karakter
+  const random4 = randomBytes(2).toString("hex").toUpperCase(); // örn: AB12
+  const merchant_oid = `KLM${Date.now()}${random4}`;
 
   const email = user.email;
   const payment_amount = String(amount); // kuruş cinsinden
@@ -102,6 +103,14 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+
+  // merchant_oid → workshopId eşlemesini sakla (callback'te kullanılacak)
+  const admin = createAdminClient();
+  await admin.from("payment_intents").insert({
+    merchant_oid,
+    workshop_id: workshopId,
+    user_id: user.id,
+  });
 
   return NextResponse.json({ token: data.token, merchant_oid });
 }
