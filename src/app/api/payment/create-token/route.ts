@@ -35,10 +35,11 @@ export async function POST(req: NextRequest) {
   const merchant_oid = `KLM${Date.now()}${random4}`;
 
   const email = user.email;
-  const payment_amount = String(amount); // kuruş cinsinden
+  // payment_amount kesinlikle tam sayı string olmalı (örn: "29900", "9900")
+  const payment_amount = String(Math.round(parseInt(String(amount), 10)));
 
-  // Sepet: [[ürün adı, birim fiyat (TL string), adet]]
-  const basketArr = [[workshopTitle, (amount / 100).toFixed(2), 1]];
+  // Sepet: [[ürün adı, birim fiyat TL (string), adet (int)]]
+  const basketArr = [[workshopTitle, (parseInt(String(amount), 10) / 100).toFixed(2), 1]];
   const user_basket = Buffer.from(JSON.stringify(basketArr)).toString("base64");
 
   const no_installment = "0";
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
   const merchant_ok_url = "https://klemensart.com/club/odeme/basarili";
   const merchant_fail_url = "https://klemensart.com/club/odeme/basarisiz";
 
-  // PayTR hash
+  // PayTR hash — sıra kesinlikle değiştirilmemeli
   const hashStr =
     merchant_id +
     user_ip +
@@ -65,6 +66,20 @@ export async function POST(req: NextRequest) {
   const paytr_token = createHmac("sha256", merchant_key + merchant_salt)
     .update(hashStr)
     .digest("base64");
+
+  console.log("[PayTR] Hash parametreleri:", {
+    merchant_id,
+    user_ip,
+    merchant_oid,
+    email,
+    payment_amount,
+    user_basket,
+    no_installment,
+    max_installment,
+    currency,
+    test_mode,
+    paytr_token,
+  });
 
   const params = new URLSearchParams({
     merchant_id,
@@ -94,10 +109,19 @@ export async function POST(req: NextRequest) {
     body: params.toString(),
   });
 
-  const data = (await paytrRes.json()) as { status: string; token?: string; reason?: string };
+  const rawText = await paytrRes.text();
+  console.log("[PayTR] API yanıtı (raw):", rawText);
+
+  let data: { status: string; token?: string; reason?: string };
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    console.error("[PayTR] JSON parse hatası, ham yanıt:", rawText);
+    return NextResponse.json({ error: "PayTR geçersiz yanıt döndürdü" }, { status: 500 });
+  }
 
   if (data.status !== "success") {
-    console.error("PayTR token hatası:", data.reason);
+    console.error("[PayTR] Token hatası:", { reason: data.reason, merchant_oid, payment_amount });
     return NextResponse.json(
       { error: data.reason || "Ödeme başlatılamadı" },
       { status: 400 }
