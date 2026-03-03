@@ -1,0 +1,39 @@
+---
+title: "Konuşma Devam Ediyor"
+description: "Lord Byron’ın Don Juan’ı, romantik edebiyatın yalnızlık ve ötekilik kavramlarını sorgulayan, ironik ve diyalog odaklı bir anlatı."
+author: "Cansu Kul"
+authorIg: "@cansu.jlz"
+authorEmail: "cansumedia@gmail.com"
+date: "2026-02-07"
+category: "Kültür & Sanat"
+tags: ["Kültür & Sanat"]
+image: "/yazilar/Gemini_Generated_Image_ap82ymap82ymap82.webp"
+readTime: "4 dk"
+slug: "konusma-devam-ediyor"
+---
+
+Romantiklere göre yalnızlık, ayrıcalıklı bir ötekilik, bir doğayla temas etme alanıydı ve pek çok anlamda anlatının başlayabilmesinin ön koşulu olarak görülürdü. Bugün bu kavram, konuşmanın sürdüğü ama anlamın gerçekten karşılık bulmadığı anlarda ortaya çıkan bir ‘arıza’ haline gelmiş durumda; artık kovalanan _Moby Dick_’ten[4](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-4-6178 "Herman Melville’in Moby-Dick’inde beyaz balina, mutlak iyilik ve kötülük kavramlarına ilişkin pek çok yoruma açık olmakla birlikte, peşine düşüldükçe anlam kazanan, ulaşılması imkânsız bir hedef ve takıntı figürü olarak okunur.") değil, kimseye sesini duyuramayan 52 Hertz balinasından[5](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-5-6178 "Hertz balinası, 1980’lerin sonlarında Kuzey Pasifik’te keşfedilen, diğer balinalardan farklı bir frekansta seslenen ve bu nedenle çağrısına karşılık alamadığı düşünülen, bu sebeple “yalnız balina” olarak anılan balina.") bahsediyoruz.
+
+![Don Juan'ın Ölümü ve Alva Dükü'nün Aşağılanması Siyasi Alegori Gravürü, 1578.](/yazilar/01_Don_Juanin_Olumu-400x266.webp)
+
+Siyasi bir alegori olarak Don Juan’ın ölümü ve Alva’nın aşağılanması sahnesi, 1578.
+
+Bazıları söz konusu ‘arıza’yı baştan ciddiye almayı reddetmiştir. On dokuzuncu yüzyılın en belalı figürlerinden Lord Byron[6](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-6-6178 "Lord Byron (George Gordon Byron), İngiliz Romantik şair. Şiirleri ve yaşam tarzıyla Romantizmin en tartışmalı ve etkili figürlerinden biri olarak kabul edilir.") için, Lady Caroline Lamb’in meşhur teşhisi hâlâ geçerlidir: “Çılgın, kötü ve onu tanımak tehlikeli.” Pek çok kadın gibi Lamb de ona fena halde tutulmuş, Byron’ı hem “kötü” ilan etmiş hem de peşinden koşmaktan kendini alamamıştır. Çanakkale Boğazı’nı yüzerek geçen; üniversitede bir ayı besleyen; hakkındaki ensest söylentileriyle ve politik düşmanlarıyla mücadele etmek yerine onları kişisel anlatısının parçası haline getiren; dönemin soylu edebiyatçıları gibi devrimden yalnızca söz etmekle yetinmeden sakat bacağıyla cepheye inen biri için bu sıfatlar (ve hayranlar) şaşırtıcı değildir. Hakkında konuşulan, kendisi de konuşan bir figürdür Byron ve suskunluğu hiçbir zaman bir erdem olarak görmemiştir.
+
+Ancak Byron’ı gerçekten ayırt edici kılan, biyografik taşkınlıklarından ziyade yazıda izlediği yoldur. Çünkü şiirinde; ne doğayı ahlaki ve içsel bir sığınak olarak kuran Wordsworth[7](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-7-6178 "William Wordsworth, İngiliz Romantik şiirinin kurucu isimlerinden. Doğa, bireysel deneyim ve içsel sezgi temalarıyla tanınır.") gibi içe döner, ne de şiiri bilinç hallerinin, vizyonların ve trans deneyimlerinin alanı olarak düşünen Coleridge[8](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-8-6178 "Samuel Taylor Coleridge (1772–1834): İngiliz Romantik şair ve düşünür. Şiirlerinde hayal gücü, düş ve bilinç halleri önemli yer tutar.") gibi vecd anlarına yaslanır Byron.[9](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-9-6178 "Byron, Don Juan’ın ilk kantosunda İngiliz Romantik şairlerin kapalı ve süslü şiir anlayışını açıkça eleştirir.")
+
+Bugün edebiyatın -ve açıkçası geri kalan her şeyin- yalnızlıkla kurduğu ilişki, bu açıdan Byronvari bir çizgiye oturmalıdır; mesele inzivaya çekilmek ya da bütünlüğü bir iç mekan olarak inşa etmek değildir; mesele karşılık bulmak ya da bulmamaktır. Byron’ın _Don Juan_’ı, ‘arıza’nın hiç meydana gelmediği nadir metinlerden biridir; çünkü sohbet hiç kesilmez. Böylece yalnızlık daha en baştan yapısal olarak imkansız kılınır. Byron’ı çekici kılan tam da budur. Onunla sabaha kadar sohbet etmek isteriz ve sayfaları çevirmeye devam ettiğimiz sürece bıyık altından gülmeden edemeyiz.
+
+Bu durum, eserin daha ilk cümlesinde açıkça ilan edilir. Anlatıcı “Bir kahraman istiyorum” diye başlar ve ironisi hemen kendini gösterir: kahraman eksikliği yoktur, fazlası vardır. “Her ay, her yıl bir yenisi çıkıyordur” zaten.[10](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-10-6178 "“Bir kahraman istiyorum: ne garip istek benimki / Her ay her yıl bir yenisi çıkıyor oysa / Kendisi için okunan nağmeler eskitiyor gazeteleri.” Lord Byron, Don Juan, çev. Halil Köksel, Yapı Kredi Yayınları.") Byron, anlatısını bir diyalog, hatta zaman zaman bir dedikodu alanı olarak kurar. Don Juan’ı da bu yüzden çağırmıştır kahramanı olarak. Kahramanın tanınırlığı okuyucuyu başından konuşmaya dahil eder.[11](https://www.klemensart.com/konusma-devam-ediyor/#easy-footnote-bottom-11-6178 "“Eski dostumuz Don Juan’ı bundan seçeceğim ya / Görmüştük hepimiz o pantomimde şeytana yollandığını, biraz vakitsizce.” Lord Byron, Don Juan, çev. Halil Köksel, Yapı Kredi Yayınları.") Bu, aynı zamanda, romantik bireyselliği ve ötekilik iddiasını bilinçli biçimde dışarıda bırakan bir tercihtir. Çünkü Byron, Don Juan’ı içsel bir yalnızlıktan doğurmaz; kolektif bir temsilden alır ve anlatının spot ışıkları altına yerleştirir. Anlatıcı ise onunla sahneden sahneye dolaşan, görünmez olmayı reddeden bir talk show yıldızıdır.
+
+![Jean-Baptiste Mauzaisse Lord Byron Portresi Romantik Dönem Yağlı Boya Tablo](/yazilar/02-Lord_Byron_George-200x300.webp)
+
+Jean-Baptiste Mauzaisse’nin Lord Byron’ı
+
+Don Juan’ın en ayırt edici yanı, anlattığı hikaye değil, konuşma biçimidir. Zaten edebiyatı da böyle tarif etmez miyiz? Anlatıcı, sahnenin ortasında durur; okurla konuşur, söz keser, yön değiştirir, kendi cümlelerini sabote eder. Kimi okurlar bu tavrı hafiflik, dağınıklık ya da ciddiyetsizlik olarak okumuştur. Oysa bu yaklaşım olsa olsa Shakespeare’in sahnesindeki soytarıları akla getirir; güya budalalıklarından ciddiye alınmayan, tam da bu sebepten en tehlikeli doğruları söyleyebilenleri… Onların bilgeliği suskunluktan değil, kıvrak zekaları ve sivri dilleriyle konuşmanın aşırılığından doğar. Tıpkı günümüzün hakiki ifade özgürlüğünün hâlâ bir tek delilere mahsus olması gibi.
+
+Metnin kendine has akrobasisiyle sık sık sapması; konudan konuya atlaması, tonun değişmesi ve okurun yerleşmesini engellemesi bir kontrol kaybı değil, bir kontrol biçimidir. Anlatı, okurun bir duyguya, bir tona ya da bir iç sese yerleşmesine kasten izin vermez. Yoğunluk oluşur oluşmaz yön değiştirir. Bu, aylakça ve çapkın bir savrulma değildir; Byron anlatısının refleksidir. Metin, okurla arasındaki ilişkisel mesafenin kapanmasına izin vermez ve böylece ilişkiyi diri tutar. Yalnızlık bastırılmaz; zaten baştan, içeride yaşanacak bir şey olarak kurulmamıştır.
+
+Byron’ın biyografisi tercihini daha da anlaşılır kılar. Zamanlama manidardır; _Don Juan_, Byron’ın İngiltere’den sürgün edildiği dönemde yazılır; ama onun sürgün anlatısı, alışıldık bir dışlanma ve inziva anlatısı değildir; yerinden edilmişliğin sürekliliğidir. Don Juan’ın bitmek bilmeyen dolaşımı, romantik edebiyatın “yalnız gezgin” figürünü çağırır gibi yapar; fakat burada dolaşmak, doğayla baş başa kalmanın ya da evrenin yüceliğinin içine çekilmenin yolu değildir; insanlıkla temasın kesilmemesi için bir zorunluluktur. Bu, güncel yalnızlık anlatılarında sıkça gördüğümüz şeyden farklıdır çünkü bir an bile kendi kendine konuşmaz.
+
+Don Juan’ın radikalliği tam da burada yatar. Byron, elbette yalnızlığı reddetmez ama onu yazının gerekliliği olmaktan çıkarır. Bu devrim değildir ama tam da bu yüzden ikna edicidir. Metin hâlâ konuşuyorsa, yalnızlık daha başlamamıştır.

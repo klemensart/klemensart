@@ -1,0 +1,286 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-coral: #FF6D60;
+  --color-warm-50: #FFF8F5;
+  --color-warm-100: #FAF3EE;
+  --color-warm-200: #F0E4D9;
+  --color-warm-300: #DEC9B4;
+  --color-warm-900: #2C2319;
+  --font-sans: var(--font-jakarta);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(28px, -22px) scale(1.06); }
+}
+
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-22px, 18px) scale(0.95); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce-y {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+.blob-a { animation: float-a 14s ease-in-out infinite; }
+.blob-b { animation: float-b 18s ease-in-out infinite; }
+.spin-slow { animation: spin-slow 32s linear infinite; }
+.bounce-slow { animation: bounce-y 2.5s ease-in-out infinite; }
+
+.fade-up   { animation: fade-up 0.75s ease-out both; }
+.fade-up-1 { animation: fade-up 0.75s ease-out 0.1s  both; }
+.fade-up-2 { animation: fade-up 0.75s ease-out 0.22s both; }
+.fade-up-3 { animation: fade-up 0.75s ease-out 0.36s both; }
+.fade-up-4 { animation: fade-up 0.75s ease-out 0.5s  both; }
+
+/* ── Article prose styles ── */
+.prose-klemens {
+  font-size: 18px;
+  line-height: 1.82;
+  color: inherit;
+}
+.prose-klemens p {
+  margin-bottom: 1.75rem;
+}
+.prose-klemens h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.25;
+}
+.prose-klemens h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+  line-height: 1.35;
+}
+
+/* ── Spot paragraf (ilk anlamlı paragraf) ── */
+.prose-klemens p.spot-quote {
+  border: none;
+  border-left: 3px solid #FF6D60;
+  padding: 0.125rem 0 0.125rem 1.5rem;
+  margin: 0 0 2rem;
+  font-family: var(--font-jakarta);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: #57534e;
+  text-align: left;
+  background: none;
+}
+
+/* ── Uyarı kutusu (⚠️ ile başlayan paragraflar) ── */
+.prose-klemens .warning-box {
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: #44403c;
+  line-height: 1.6;
+}
+
+/* ── Kaynakça bölümü ── */
+.prose-klemens .kaynakca-section {
+  border-top: 1px solid #e8e0d8;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+}
+.prose-klemens .kaynakca-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: inherit;
+  margin-bottom: 1rem;
+}
+.prose-klemens .kaynakca-section p {
+  font-size: 0.875rem;
+  color: #78716c;
+  line-height: 1.65;
+  text-align: left;
+  margin-bottom: 0.6rem;
+}
+
+/* ── Yazı içi alıntı (pull-quote stili) ── */
+.prose-klemens .inline-quote {
+  position: relative;
+  border: none;
+  background: none;
+  border-radius: 0;
+  padding: 2.5rem 2rem;
+  margin: 3rem auto;
+  text-align: center;
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.85;
+  color: #78716c;
+  max-width: 480px;
+}
+.prose-klemens .inline-quote::before,
+.prose-klemens .inline-quote::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: #FF6D60;
+  margin: 0 auto;
+}
+.prose-klemens .inline-quote::before {
+  margin-bottom: 2rem;
+}
+.prose-klemens .inline-quote::after {
+  margin-top: 2rem;
+}
+.prose-klemens .inline-quote p {
+  margin-bottom: 0;
+}
+.prose-klemens .inline-quote .quote-attribution {
+  display: block;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FF6D60;
+  margin-top: 1rem;
+}
+.prose-klemens img {
+  width: 100%;
+  border-radius: 1rem;
+  margin: 1.5rem 0 2rem;
+  object-fit: cover;
+}
+.prose-klemens strong {
+  font-weight: 600;
+}
+.prose-klemens hr {
+  border: none;
+  border-top: 1px solid currentColor;
+  opacity: 0.12;
+  margin: 3rem 0;
+}
+.prose-klemens ul,
+.prose-klemens ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+.prose-klemens li {
+  margin-bottom: 0.5rem;
+}
+
+/* ── Durak block ── */
+.prose-klemens .durak-block {
+  margin: 3.5rem 0 1.75rem;
+}
+.prose-klemens .durak-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #2C2319;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+}
+.prose-klemens .durak-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* ── Öneri block ── */
+.prose-klemens .oneri-block {
+  border-left: 5px solid #FF6D60;
+  background: rgba(255, 248, 240, 0.5);
+  border-radius: 0 1rem 1rem 0;
+  padding: 1.4rem 1.75rem;
+  margin: 1.5rem 0 2.25rem;
+}
+.prose-klemens .oneri-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 0.75rem !important;
+}
+.prose-klemens .oneri-block ul {
+  padding-left: 0 !important;
+  list-style: none !important;
+  margin-bottom: 0 !important;
+}
+.prose-klemens .oneri-block li {
+  padding: 0.25rem 0;
+  margin-bottom: 0 !important;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.prose-klemens .oneri-block a {
+  color: #FF6D60;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  display: inline;
+}
+.prose-klemens .oneri-block a:hover {
+  background: #FF6D60;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(255, 109, 96, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Image captions: paragraph containing only <em> right after an image */
+.prose-klemens img + p,
+.prose-klemens p:has(> em:only-child) {
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  opacity: 0.65;
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+}
+
+/* YouTube embed */
+.youtube-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  margin: 2.5rem 0;
+}
+.youtube-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}

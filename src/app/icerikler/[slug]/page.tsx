@@ -1,0 +1,153 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { categories, getCategoryBySlug } from "@/lib/icerikler";
+import { getAllArticlesMetadata } from "@/lib/markdown";
+import ArticleCard from "@/components/ArticleCard";
+
+type Params = { slug: string };
+
+// Colour and style config per category — all classes fully written so Tailwind picks them up
+const categoryStyles: Record<
+  string,
+  { badgeClass: string; accentBg: string; backHover: string }
+> = {
+  "odak": {
+    badgeClass: "bg-coral/10 text-coral",
+    accentBg:   "bg-coral",
+    backHover:  "hover:text-coral",
+  },
+  "kultur-sanat": {
+    badgeClass: "bg-amber-50 text-amber-700",
+    accentBg:   "bg-amber-400",
+    backHover:  "hover:text-amber-600",
+  },
+  "ilham-verenler": {
+    badgeClass: "bg-sky-50 text-sky-700",
+    accentBg:   "bg-sky-400",
+    backHover:  "hover:text-sky-600",
+  },
+  "kent-yasam": {
+    badgeClass: "bg-emerald-50 text-emerald-700",
+    accentBg:   "bg-emerald-500",
+    backHover:  "hover:text-emerald-600",
+  },
+};
+
+export function generateStaticParams(): Params[] {
+  return categories.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const cat = getCategoryBySlug(slug);
+  if (!cat) return { title: "Bulunamadı — Klemens" };
+  return {
+    title: `${cat.title} — Klemens`,
+    description: cat.description,
+  };
+}
+
+export default async function CategoryPage({
+
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { slug } = await params;
+  const category = getCategoryBySlug(slug);
+  if (!category) notFound();
+
+  const allArticles = await getAllArticlesMetadata();
+  const filtered = allArticles; // tüm makaleler — ileride kategoriye göre filtrelenecek
+  const style = categoryStyles[slug] ?? categoryStyles["odak"];
+
+  return (
+    <main className="min-h-screen bg-warm-50">
+
+      {/* Category hero */}
+      <section className="pt-32 pb-16 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Back link */}
+          <Link
+            href="/icerikler"
+            className={`inline-flex items-center gap-2 text-sm font-medium text-warm-900/40 mb-8 transition-colors ${style.backHover}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M19 12H5M12 5l-7 7 7 7" />
+            </svg>
+            Tüm İçerikler
+          </Link>
+
+          {/* Category badge */}
+          <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6 ${style.badgeClass}`}>
+            {category.title}
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-bold text-warm-900 leading-tight mb-5">
+            {category.title}
+          </h1>
+          <p className="text-lg text-warm-900/55 max-w-xl leading-relaxed mb-5">
+            {category.description}
+          </p>
+          <p className="text-sm text-warm-900/30 font-medium">
+            {filtered.length} yazı
+          </p>
+
+          {/* Other category links */}
+          <div className="flex flex-wrap gap-3 mt-10">
+            <Link
+              href="/icerikler"
+              className="px-5 py-2.5 bg-warm-50 text-warm-900/55 rounded-full text-sm font-semibold border border-warm-200 hover:bg-warm-100 transition-colors"
+            >
+              Tümü
+            </Link>
+            {categories
+              .filter((c) => c.slug !== slug)
+              .map((cat) => (
+                <Link
+                  key={cat.slug}
+                  href={`/icerikler/${cat.slug}`}
+                  className="px-5 py-2.5 bg-warm-50 text-warm-900/55 rounded-full text-sm font-semibold border border-warm-200 hover:bg-warm-100 transition-colors"
+                >
+                  {cat.title}
+                </Link>
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Articles grid */}
+      <section className="py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map((article) => (
+                <ArticleCard key={article.slug} article={article} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-24 text-center">
+              <p className="text-warm-900/30 text-lg">Bu kategoride henüz yazı yok.</p>
+              <Link
+                href="/icerikler"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-coral"
+              >
+                Tüm yazılara dön
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+    </main>
+  );
+}

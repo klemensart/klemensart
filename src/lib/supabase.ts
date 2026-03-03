@@ -1,0 +1,14 @@
+import { createBrowserClient } from "@supabase/ssr";
+
+const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+/**
+ * Client-side Supabase client.
+ * Kullan: "use client" bileşenlerinde (Navbar, GirisPage, ProfilPage…)
+ */
+export function createClient() {
+  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { flowType: "implicit" },
+  });
+}
