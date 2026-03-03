@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const merchant_ok_url = "https://klemensart.com/club/odeme/basarili";
   const merchant_fail_url = "https://klemensart.com/club/odeme/basarisiz";
 
-  // PayTR hash — sıra kesinlikle değiştirilmemeli
+  // PayTR hash — merchant_salt string'in SONUNA eklenir, HMAC key sadece merchant_key
   const hashStr =
     merchant_id +
     user_ip +
@@ -61,9 +61,10 @@ export async function POST(req: NextRequest) {
     no_installment +
     max_installment +
     currency +
-    test_mode;
+    test_mode +
+    merchant_salt;
 
-  const paytr_token = createHmac("sha256", merchant_key + merchant_salt)
+  const paytr_token = createHmac("sha256", merchant_key)
     .update(hashStr)
     .digest("base64");
 
