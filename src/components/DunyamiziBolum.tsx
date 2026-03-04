@@ -26,14 +26,14 @@ const nodes: NodeDef[] = [
     label: "Atölyeler",
     tooltip: "Canlı Zoom seansları",
     desc: "Uzman rehberliğinde küçük gruplarla Zoom atölyeleri",
-    href: "#hizmetler",
+    href: "/atolyeler",
     x: 158, y: 118, floatDur: 9, floatDelay: 0,
   },
   {
     label: "Testler & Oyunlar",
     tooltip: "Sanat zevkinizi keşfedin",
     desc: "İç dünyanızla sanat zevklerinizi buluşturun",
-    href: "#hizmetler",
+    href: "/testler",
     x: 422, y: 88, floatDur: 11, floatDelay: 2.2,
   },
   {

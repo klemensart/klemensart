@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const services = [
   {
     icon: (
@@ -11,6 +13,7 @@ const services = [
     description:
       "Sanat tarihi, sinema, felsefe ve psikoloji alanlarında uzman rehberliğinde küçük gruplarla derinlemesine keşif seansları.",
     accent: "text-coral bg-coral/10",
+    href: "/atolyeler",
   },
   {
     icon: (
@@ -25,6 +28,7 @@ const services = [
     description:
       "İç dünyanız ile sanat zevkleriniz arasındaki bağı keşfedin. Kişisel reçeteler ve önerilerle dolu bir yolculuk.",
     accent: "text-amber-600 bg-amber-50",
+    href: "/testler",
   },
   {
     icon: (
@@ -38,6 +42,7 @@ const services = [
     description:
       "Özenle hazırlanmış tematik bültenler. Sanat, kültür ve düşünce dünyasından seçkiler her hafta e-posta kutunuza gelir.",
     accent: "text-sky-600 bg-sky-50",
+    href: "#bulten",
   },
   {
     icon: (
@@ -51,6 +56,7 @@ const services = [
     description:
       "Sinema, sanat tarihi ve felsefe üzerine insani, erişilebilir yazılar. Bilmek için değil, hissetmek ve anlamak için.",
     accent: "text-emerald-600 bg-emerald-50",
+    href: "/icerikler",
   },
 ];
 
@@ -71,9 +77,10 @@ export default function Hizmetler() {
         {/* Cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {services.map((s) => (
-            <div
+            <Link
               key={s.title}
-              className="group relative flex flex-col p-8 rounded-3xl bg-warm-50 border border-warm-100 hover:border-warm-300/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/[0.06] transition-all duration-300 cursor-pointer"
+              href={s.href}
+              className="group relative flex flex-col p-8 rounded-3xl bg-warm-50 border border-warm-100 hover:border-warm-300/60 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/[0.06] transition-all duration-300 no-underline"
             >
               {/* Icon */}
               <div className={`inline-flex p-3 rounded-2xl mb-6 self-start ${s.accent}`}>
@@ -98,7 +105,7 @@ export default function Hizmetler() {
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

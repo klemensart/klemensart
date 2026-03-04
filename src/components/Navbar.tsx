@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 const navLinks = [
-  { label: "Atölyeler",  href: "#hizmetler"          },
-  { label: "Testler",    href: "/testler/gorsel-algi" },
+  { label: "Atölyeler",  href: "/atolyeler"           },
+  { label: "Testler",    href: "/testler" },
   { label: "Etkinlikler",href: "#etkinlikler"         },
   { label: "Hakkımızda", href: "/hakkimizda"          },
 ];

@@ -1,4 +1,10 @@
-const kesfetLinks = ["Atölyeler", "Testler ve Oyunlar", "E-bülten", "İçerikler", "Etkinlikler"];
+const kesfetLinks = [
+  { label: "Atölyeler",        href: "/atolyeler" },
+  { label: "Testler ve Oyunlar", href: "#"        },
+  { label: "E-bülten",         href: "#bulten"    },
+  { label: "İçerikler",        href: "#"          },
+  { label: "Etkinlikler",      href: "/etkinlikler" },
+];
 const kurumLinks = ["Hakkımızda", "Yaklaşım", "İletişim", "Gizlilik Politikası", "Kullanım Koşulları"];
 
 const socials = [
@@ -66,9 +72,9 @@ export default function Footer() {
             <p className="text-white text-sm font-semibold mb-5">Keşfet</p>
             <ul className="space-y-3">
               {kesfetLinks.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-white/40 text-sm hover:text-coral transition-colors">
-                    {link}
+                <li key={link.label}>
+                  <a href={link.href} className="text-white/40 text-sm hover:text-coral transition-colors">
+                    {link.label}
                   </a>
                 </li>
               ))}

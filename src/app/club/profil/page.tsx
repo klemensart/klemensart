@@ -534,7 +534,7 @@ export default function ProfilPage() {
                   <p style={{ fontSize: 15, margin: "16px 0 4px", color: B.dark }}>Henüz içeriğin bulunmuyor.</p>
                   <p style={{ fontSize: 13 }}>Atölyelere göz atmak ister misin?</p>
                   <Link
-                    href="/#hizmetler"
+                    href="/atolyeler"
                     style={{
                       display: "inline-flex", alignItems: "center", gap: 6,
                       marginTop: 20, padding: "11px 22px",

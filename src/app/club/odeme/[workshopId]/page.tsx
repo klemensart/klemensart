@@ -40,6 +40,19 @@ export default function OdemePage() {
         return;
       }
 
+      // Atölye tarihini kontrol et
+      const { data: workshopData } = await supabase
+        .from("workshops")
+        .select("next_session_date")
+        .eq("id", workshopId)
+        .single();
+
+      if (workshopData?.next_session_date && new Date(workshopData.next_session_date) <= new Date()) {
+        setErrorMsg("Bu atölyenin kayıt dönemi sona ermiştir.");
+        setStatus("error");
+        return;
+      }
+
       try {
         const res = await fetch("/api/payment/create-token", {
           method: "POST",

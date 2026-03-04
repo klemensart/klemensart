@@ -37,7 +37,7 @@ export default function Hero() {
           {/* CTAs */}
           <div className="fade-up-3 mt-10 flex flex-col sm:flex-row gap-4">
             <a
-              href="#hizmetler"
+              href="/atolyeler"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 hover:shadow-lg hover:shadow-coral/20 active:scale-95 transition-all duration-200"
             >
               Keşfetmeye Başla

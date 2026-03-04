@@ -1,197 +1,125 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { createClient } from "@/lib/supabase";
 
-type Mood = "İlham" | "Katharsis" | "Avangard" | "Melankoli" | "Rönesans" | "Aura";
-type Category = "Atölyeler" | "Seminerler" | "Söyleşiler" | "Sergiler";
-
-type Event = {
-  id: number;
-  category: Category;
-  mood: Mood;
+type EventRow = {
+  id: string;
   title: string;
-  description: string;
-  dateNum: string;
-  dateMonth: string;
-  dateDay: string;
-  time: string;
-  location: string;
-  capacity: string;
-  format: "Zoom" | "Yüz yüze";
+  description: string | null;
+  ai_comment: string | null;
+  event_type: string | null;
+  venue: string | null;
+  address: string | null;
+  event_date: string | null;
+  source_url: string | null;
+  source_name: string | null;
+  price_info: string | null;
+  is_klemens_event: boolean;
 };
 
-const moodStyles: Record<Mood, { bg: string; text: string; border: string }> = {
-  İlham:    { bg: "bg-amber-50",   text: "text-amber-700",  border: "border-amber-200"  },
-  Katharsis: { bg: "bg-violet-50",  text: "text-violet-700", border: "border-violet-200" },
-  Avangard:  { bg: "bg-emerald-50", text: "text-emerald-700",border: "border-emerald-200"},
-  Melankoli: { bg: "bg-blue-50",    text: "text-blue-700",   border: "border-blue-200"   },
-  Rönesans:  { bg: "bg-rose-50",    text: "text-rose-700",   border: "border-rose-200"   },
-  Aura:      { bg: "bg-orange-50",  text: "text-orange-700", border: "border-orange-200" },
+const TYPE_LABELS: Record<string, string> = {
+  sergi: "Sergi",
+  konser: "Konser",
+  tiyatro: "Tiyatro",
+  soylesi: "Söyleşi",
+  festival: "Festival",
+  "film-festivali": "Film Festivali",
 };
 
-const categoryColors: Record<Category, string> = {
-  Atölyeler: "bg-coral/10 text-coral",
-  Seminerler: "bg-amber-100 text-amber-700",
-  Söyleşiler: "bg-emerald-100 text-emerald-700",
-  Sergiler:   "bg-violet-100 text-violet-700",
+const TYPE_COLORS: Record<string, string> = {
+  sergi:            "bg-coral/10 text-coral",
+  konser:           "bg-amber-100 text-amber-700",
+  tiyatro:          "bg-violet-100 text-violet-700",
+  soylesi:          "bg-emerald-100 text-emerald-700",
+  festival:         "bg-sky-100 text-sky-700",
+  "film-festivali": "bg-rose-100 text-rose-700",
 };
 
-const events: Event[] = [
-  {
-    id: 1,
-    category: "Atölyeler",
-    mood: "Katharsis",
-    title: "Sinema ve Psikoloji: Bergman Filmleri",
-    description: "Ingmar Bergman'ın başyapıtları üzerinden bilinçdışı, maske ve varoluş kavramları. İzleyici olarak kendimizle yüzleştiğimiz anlar.",
-    dateNum: "15", dateMonth: "Mar", dateDay: "Cumartesi",
-    time: "15:00 — 17:00",
-    location: "Zoom",
-    capacity: "8 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 2,
-    category: "Seminerler",
-    mood: "İlham",
-    title: "Renk ve Duygu: Soyut Ekspresyonizm",
-    description: "Rothko, Pollock ve de Kooning'in eserlerinde renk, duygu ve anlam ilişkisi. Tual önünde ne hissediyoruz, neden?",
-    dateNum: "22", dateMonth: "Mar", dateDay: "Cumartesi",
-    time: "14:00 — 16:00",
-    location: "Zoom",
-    capacity: "12 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 3,
-    category: "Söyleşiler",
-    mood: "Avangard",
-    title: "Sanatın Sınırları: Fluxus ve Kavramsal Sanat",
-    description: "Bir nesne ne zaman sanat eseri olur? Fluxus hareketi ve kavramsal sanatın kışkırtıcı soruları etrafında bir sohbet.",
-    dateNum: "29", dateMonth: "Mar", dateDay: "Cumartesi",
-    time: "16:00 — 17:30",
-    location: "Zoom",
-    capacity: "20 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 4,
-    category: "Atölyeler",
-    mood: "Melankoli",
-    title: "Varoluşçuluk ve Sanat: Camus'dan Bacon'a",
-    description: "Varoluşçu felsefenin 20. yüzyıl sanatına yansımaları. Anlamsızlıkla yüzleşen sanatçıların tuvalleri bize ne söyler?",
-    dateNum: "5", dateMonth: "Nis", dateDay: "Cumartesi",
-    time: "15:00 — 17:30",
-    location: "Zoom",
-    capacity: "10 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 5,
-    category: "Sergiler",
-    mood: "Rönesans",
-    title: "İstanbul Modern: Koleksiyon Turu",
-    description: "İstanbul Modern'in kalıcı koleksiyonundan seçilmiş eserler eşliğinde rehberli bir keşif. Türk modernizminin kısa tarihi.",
-    dateNum: "12", dateMonth: "Nis", dateDay: "Cumartesi",
-    time: "11:00 — 13:00",
-    location: "İstanbul Modern, Karaköy",
-    capacity: "15 kişilik",
-    format: "Yüz yüze",
-  },
-  {
-    id: 6,
-    category: "Seminerler",
-    mood: "Aura",
-    title: "Walter Benjamin ve Sanatın Aurası",
-    description: "'Sanat Eserinin Mekanik Yeniden Üretim Çağında' metnini birlikte okuyoruz. Özgünlük, kopya ve dijital çağda aura ne anlama geliyor?",
-    dateNum: "19", dateMonth: "Nis", dateDay: "Cumartesi",
-    time: "15:00 — 17:00",
-    location: "Zoom",
-    capacity: "12 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 7,
-    category: "Söyleşiler",
-    mood: "İlham",
-    title: "Fotoğraf ve Bellek: Nan Goldin Üzerine",
-    description: "Nan Goldin'in günlük-fotoğrafçılık anlayışı ve kişisel tarihin belgelenmesi. Bir fotoğraf ne zaman sanat, ne zaman tanıklık olur?",
-    dateNum: "26", dateMonth: "Nis", dateDay: "Cumartesi",
-    time: "14:00 — 15:30",
-    location: "Zoom",
-    capacity: "20 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 8,
-    category: "Atölyeler",
-    mood: "Katharsis",
-    title: "Tragedyadan Sinemaya: Antik Dramın İzleri",
-    description: "Yunan tragedyasının modern sinemadaki yankıları. Arınma, kader ve trajik kahraman kavramlarını filmler üzerinden keşfediyoruz.",
-    dateNum: "10", dateMonth: "May", dateDay: "Cumartesi",
-    time: "15:00 — 17:30",
-    location: "Zoom",
-    capacity: "8 kişilik",
-    format: "Zoom",
-  },
-  {
-    id: 9,
-    category: "Sergiler",
-    mood: "Melankoli",
-    title: "Pera Müzesi: Oryantalizm Sergisi",
-    description: "Pera Müzesi'nin oryantalizm koleksiyonuna rehberli bir bakış. Doğu'nun Batılı gözle nasıl kurgulandığını ve bu mirasın günümüzdeki izlerini tartışıyoruz.",
-    dateNum: "17", dateMonth: "May", dateDay: "Cumartesi",
-    time: "11:00 — 13:00",
-    location: "Pera Müzesi, Beyoğlu",
-    capacity: "12 kişilik",
-    format: "Yüz yüze",
-  },
-];
+type Filter = "Tümü" | "Atölyeler" | "Sergi" | "Konser" | "Tiyatro" | "Söyleşi" | "Festival";
+const FILTERS: Filter[] = ["Tümü", "Atölyeler", "Sergi", "Konser", "Tiyatro", "Söyleşi", "Festival"];
 
-const filters = ["Tümü", "Atölyeler", "Seminerler", "Söyleşiler", "Sergiler"] as const;
-type Filter = (typeof filters)[number];
+const FILTER_TO_TYPE: Partial<Record<Filter, string>> = {
+  Sergi: "sergi", Konser: "konser", Tiyatro: "tiyatro",
+  Söyleşi: "soylesi", Festival: "festival",
+};
+
+function fmtDate(iso: string | null) {
+  if (!iso) return { num: "—", month: "—", time: "" };
+  const d = new Date(iso);
+  return {
+    num:   d.toLocaleDateString("tr-TR", { day: "numeric" }),
+    month: d.toLocaleDateString("tr-TR", { month: "short" }).toUpperCase(),
+    time:  d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }),
+  };
+}
 
 export default function EtkinliklerPage() {
-  const [active, setActive] = useState<Filter>("Tümü");
+  const [filter, setFilter] = useState<Filter>("Tümü");
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = active === "Tümü" ? events : events.filter((e) => e.category === active);
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const supabase = createClient();
+
+      let q = supabase
+        .from("events")
+        .select("id,title,description,ai_comment,event_type,venue,address,event_date,source_url,source_name,price_info,is_klemens_event")
+        .eq("status", "approved")
+        .order("event_date", { ascending: true });
+
+      if (filter === "Atölyeler") {
+        q = q.eq("is_klemens_event", true);
+      } else if (filter !== "Tümü") {
+        q = q.eq("event_type", FILTER_TO_TYPE[filter] ?? filter.toLowerCase());
+      }
+
+      const { data } = await q;
+      setEvents((data ?? []) as EventRow[]);
+      setLoading(false);
+    };
+    load();
+  }, [filter]);
 
   return (
     <>
       <Navbar />
-
       <main className="bg-warm-50 min-h-screen">
+
         {/* ── Hero ── */}
-        <section className="pt-32 pb-16 px-6 text-center">
+        <section className="pt-32 pb-14 px-6 text-center">
           <div className="max-w-2xl mx-auto">
-            <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-6">
-              Takvim
-            </p>
+            <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-5">Takvim</p>
             <h1
-              className="text-5xl sm:text-6xl font-bold leading-tight text-warm-900 mb-6"
+              className="text-5xl sm:text-6xl font-bold leading-tight text-warm-900 mb-5"
               style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
             >
               Kültür &amp; Sanat<br />Takvimi
             </h1>
-            <p className="text-warm-900/50 text-lg leading-relaxed italic"
-              style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}>
+            <p
+              className="text-warm-900/45 text-lg leading-relaxed italic"
+              style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
+            >
               Ruhunuzun aradığı o karşılaşma belki de bu akşamdır...
             </p>
           </div>
         </section>
 
         {/* ── Filters ── */}
-        <section className="px-6 pb-12">
-          <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-3">
-            {filters.map((f) => (
+        <section className="px-6 pb-10">
+          <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-2">
+            {FILTERS.map((f) => (
               <button
                 key={f}
-                onClick={() => setActive(f)}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                  active === f
-                    ? "bg-coral border-coral text-white shadow-md shadow-coral/20"
-                    : "bg-white border-warm-200 text-warm-900/60 hover:border-warm-900/30 hover:text-warm-900"
+                onClick={() => setFilter(f)}
+                className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
+                  filter === f
+                    ? "bg-coral border-coral text-white shadow-sm shadow-coral/20"
+                    : "bg-white border-warm-200 text-warm-900/55 hover:border-warm-300 hover:text-warm-900"
                 }`}
               >
                 {f}
@@ -200,96 +128,103 @@ export default function EtkinliklerPage() {
           </div>
         </section>
 
-        {/* ── Grid ── */}
-        <section className="px-6 pb-24">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((e) => {
-              const mood = moodStyles[e.mood];
-              const catColor = categoryColors[e.category];
-              return (
-                <article
-                  key={e.id}
-                  className="group bg-white rounded-3xl border border-warm-100 overflow-hidden hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/8 transition-all duration-300 cursor-pointer flex flex-col"
-                >
-                  {/* Image placeholder */}
-                  <div className="relative bg-warm-100 h-44 flex-shrink-0 overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span
-                        className="text-4xl opacity-20 select-none"
-                        style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
-                      >
-                        {e.dateNum}
-                      </span>
-                    </div>
-                    {/* Date badge */}
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 text-center shadow-sm">
-                      <div className="text-coral text-[10px] font-bold tracking-widest uppercase">{e.dateMonth}</div>
-                      <div className="text-warm-900 text-2xl font-bold leading-none">{e.dateNum}</div>
-                      <div className="text-warm-900/40 text-[10px] font-medium">{e.dateDay}</div>
-                    </div>
-                    {/* Mood badge */}
-                    <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold border ${mood.bg} ${mood.text} ${mood.border}`}>
-                      {e.mood}
-                    </div>
-                  </div>
+        {/* ── List ── */}
+        <section className="px-6 pb-28">
+          <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-warm-100 overflow-hidden">
 
-                  {/* Content */}
-                  <div className="p-6 flex flex-col flex-1">
-                    {/* Category + format */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${catColor}`}>
-                        {e.category === "Atölyeler" ? "Atölye" : e.category === "Seminerler" ? "Seminer" : e.category === "Söyleşiler" ? "Söyleşi" : "Sergi"}
-                      </span>
-                      <span className="text-xs text-warm-900/35 font-medium">{e.format}</span>
-                    </div>
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <div className="w-5 h-5 border-2 border-coral border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : events.length === 0 ? (
+              <div className="text-center py-20 text-warm-900/30">
+                <p className="text-base">Bu kategoride yaklaşan etkinlik bulunmuyor.</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-warm-100">
+                {events.map((e) => {
+                  const date  = fmtDate(e.event_date);
+                  const type  = e.event_type ?? "";
+                  const badge = TYPE_COLORS[type] ?? "bg-warm-100 text-warm-900/50";
+                  const label = TYPE_LABELS[type] ?? type;
 
-                    <h2 className="text-warm-900 font-bold text-lg leading-snug mb-2 group-hover:text-coral transition-colors duration-200">
-                      {e.title}
-                    </h2>
-                    <p className="text-warm-900/55 text-sm leading-relaxed flex-1 mb-4">
-                      {e.description}
-                    </p>
+                  const meta = [
+                    e.venue,
+                    date.time ? date.time : null,
+                    e.price_info,
+                  ].filter(Boolean).join(" · ");
 
-                    {/* Meta */}
-                    <div className="flex items-center gap-1.5 text-xs text-warm-900/40 font-medium mb-5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-                      </svg>
-                      {e.time}
-                      <span className="mx-1">·</span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {e.location}
-                      <span className="mx-1">·</span>
-                      {e.capacity}
-                    </div>
-
-                    {/* CTA */}
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-1.5 text-coral text-sm font-semibold hover:gap-3 transition-all duration-200"
+                  return (
+                    <li
+                      key={e.id}
+                      className="group flex items-start gap-5 px-7 py-5 hover:bg-warm-50/70 transition-colors duration-150"
                     >
-                      İncele
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                      {/* ── Date block ── */}
+                      <div className="relative flex-shrink-0 w-11 text-center pt-0.5">
+                        {e.is_klemens_event && (
+                          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-white" />
+                        )}
+                        <div className="text-[10px] font-bold text-coral tracking-widest leading-none mb-0.5">
+                          {date.month}
+                        </div>
+                        <div className="text-2xl font-bold text-warm-900 leading-none">
+                          {date.num}
+                        </div>
+                      </div>
 
-          {/* Empty state */}
-          {filtered.length === 0 && (
-            <div className="text-center py-20 text-warm-900/30">
-              <p className="text-lg">Bu kategoride yaklaşan etkinlik bulunmuyor.</p>
-            </div>
-          )}
+                      {/* ── Content ── */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-bold text-warm-900 leading-snug group-hover:text-coral transition-colors duration-150 truncate">
+                          {e.title}
+                        </p>
+                        {meta && (
+                          <p className="text-xs text-warm-900/45 font-medium mt-0.5 truncate">
+                            {meta}
+                          </p>
+                        )}
+                        {e.ai_comment && (
+                          <p className="text-xs text-warm-900/40 italic mt-1 line-clamp-2 leading-relaxed">
+                            {e.ai_comment}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* ── Right: badge + CTA ── */}
+                      <div className="flex-shrink-0 flex flex-col items-end gap-2 pt-0.5">
+                        {label && (
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold whitespace-nowrap ${badge}`}>
+                            {label}
+                          </span>
+                        )}
+                        {e.is_klemens_event ? (
+                          <a
+                            href="/atolyeler"
+                            className="px-4 py-1.5 bg-coral text-white text-xs font-semibold rounded-full hover:opacity-90 transition-opacity whitespace-nowrap"
+                          >
+                            Kayıt Ol
+                          </a>
+                        ) : e.source_url ? (
+                          <a
+                            href={e.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-xs font-semibold text-coral hover:gap-2 transition-all duration-150 whitespace-nowrap"
+                          >
+                            Detay
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                              <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                          </a>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </section>
       </main>
-
       <Footer />
     </>
   );

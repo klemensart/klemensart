@@ -18,12 +18,15 @@ type NodeDef = {
 };
 
 const nodes: NodeDef[] = [
-  { label: "Rönesans",  x: 68,  y: 148, floatDur: 9,  floatDelay: 0,   ta: "start",  labelDy: -16 },
-  { label: "Bilinç",    x: 342, y: 118, floatDur: 11, floatDelay: 2.2, ta: "middle", labelDy: -17 },
-  { label: "Katharsis", x: 412, y: 268, floatDur: 10, floatDelay: 1,   ta: "end",    labelDy: -16 },
-  { label: "Avangard",  x: 365, y: 452, floatDur: 12, floatDelay: 3,   ta: "end",    labelDy:  26 },
-  { label: "Melankoli", x: 75,  y: 478, floatDur: 8,  floatDelay: 1.5, ta: "start",  labelDy:  26 },
-  { label: "Aura",      x: 240, y: 308, floatDur: 10, floatDelay: 0.8, ta: "middle", labelDy: -20, size: "lg" },
+  { label: "Rönesans",  x: 68,  y: 148, floatDur: 9,   floatDelay: 0,   ta: "start",  labelDy: -16 },
+  { label: "Bilinç",    x: 342, y: 118, floatDur: 11,  floatDelay: 2.2, ta: "middle", labelDy: -17 },
+  { label: "Katharsis", x: 412, y: 268, floatDur: 10,  floatDelay: 1,   ta: "end",    labelDy: -16 },
+  { label: "Avangard",  x: 365, y: 452, floatDur: 12,  floatDelay: 3,   ta: "end",    labelDy:  26 },
+  { label: "Sanat",     x: 75,  y: 478, floatDur: 8,   floatDelay: 1.5, ta: "start",  labelDy:  26 },
+  { label: "Aura",      x: 240, y: 308, floatDur: 10,  floatDelay: 0.8, ta: "middle", labelDy: -20, size: "lg" },
+  { label: "Psikoloji", x: 190, y: 88,  floatDur: 9.5, floatDelay: 0.7, ta: "middle", labelDy: -17 },
+  { label: "Sinema",    x: 100, y: 292, floatDur: 10.5,floatDelay: 2.8, ta: "start",  labelDy: -16 },
+  { label: "Felsefe",   x: 200, y: 502, floatDur: 8.5, floatDelay: 1.8, ta: "middle", labelDy:  26 },
 ];
 
 type ConnDef = {
@@ -36,6 +39,7 @@ type ConnDef = {
 };
 
 const connections: ConnDef[] = [
+  // Original connections
   { a: 0, b: 1, coral: false, delay: 0,   dur: 7,  bend:  0.14 },
   { a: 1, b: 2, coral: true,  delay: 1.5, dur: 9,  bend: -0.18 },
   { a: 2, b: 3, coral: false, delay: 3,   dur: 8,  bend:  0.2  },
@@ -44,6 +48,10 @@ const connections: ConnDef[] = [
   { a: 5, b: 0, coral: false, delay: 4,   dur: 9,  bend: -0.15 },
   { a: 1, b: 5, coral: false, delay: 1.2, dur: 11, bend:  0.1  },
   { a: 2, b: 5, coral: false, delay: 2.8, dur: 8,  bend: -0.11 },
+  // New nodes → hub
+  { a: 6, b: 5, coral: false, delay: 0.5, dur: 8,  bend:  0.12 },
+  { a: 7, b: 5, coral: true,  delay: 3.5, dur: 8,  bend: -0.14 },
+  { a: 8, b: 5, coral: false, delay: 1.8, dur: 9,  bend:  0.1  },
 ];
 
 /** Quadratic bezier with a perpendicular control-point offset — produces organic, non-mechanical curves */
