@@ -1,9 +1,12 @@
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getAdminRole } from "@/lib/admin-check";
-import AdminShell from "./AdminShell";
 
-export default async function AdminLayout({
+/**
+ * Server component — sadece admin rolüne sahip kullanıcılara izin verir.
+ * Editor'ler /admin'e yönlendirilir.
+ */
+export default async function AdminOnlyGuard({
   children,
 }: {
   children: React.ReactNode;
@@ -13,12 +16,10 @@ export default async function AdminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Giriş yapmamış → login sayfasına yönlendir
   if (!user) redirect("/club/giris");
 
-  // Rol kontrolü — admin veya editor olmalı
   const role = await getAdminRole(user.id);
-  if (!role) redirect("/");
+  if (role !== "admin") redirect("/admin");
 
-  return <AdminShell role={role}>{children}</AdminShell>;
+  return <>{children}</>;
 }

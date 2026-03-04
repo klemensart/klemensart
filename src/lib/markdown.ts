@@ -1,10 +1,6 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
-
-const contentDir = path.join(process.cwd(), "src/content/icerikler");
+import { createAdminClient } from "./supabase-admin";
 
 export type ArticleMeta = {
   title: string;
@@ -25,6 +21,8 @@ export type ParsedArticle = {
   contentHtml: string;
 };
 
+/* ──────────────── markdown processing helpers ──────────────── */
+
 function extractYouTubeId(url: string): string | null {
   const m = url.match(/[?&]v=([\w-]+)/) ?? url.match(/youtu\.be\/([\w-]+)/);
   return m ? m[1] : null;
@@ -40,30 +38,24 @@ function processWarningBoxes(rawHtml: string): string {
 
 function processBlockquotes(rawHtml: string): string {
   // Step 1: ilk uygun <p>'yi spot-quote yap
-  // Hem attribute'lu hem attribute'suz <p> tag'lerini tara.
-  // Atlama koşulları:
-  //   a) Zaten class'ı olan paragraflar (warning-box, oneri-title vs.)
-  //   b) Text içeriği ⚠️ (U+26A0) ile başlayanlar (processWarningBoxes kaçırırsa backup)
-  let html = rawHtml;
+  let htmlOut = rawHtml;
   const pRegex = /<p([^>]*)>([\s\S]*?)<\/p>/g;
   let m: RegExpExecArray | null;
   while ((m = pRegex.exec(rawHtml)) !== null) {
-    const attrs = m[1];   // örn: ' class="warning-box"' veya ''
+    const attrs = m[1];
     const inner = m[2];
-    // class attribute'u olan paragrafları atla
     if (attrs.includes("class=")) continue;
-    // Text içeriği ⚠️ ile başlıyorsa atla (güvenlik ağı)
     const textOnly = inner.replace(/<[^>]+>/g, "").trimStart();
     if (textOnly.startsWith("\u26A0")) continue;
     const stripped = inner.replace(/["""'']/g, "");
-    html = rawHtml.slice(0, m.index)
+    htmlOut = rawHtml.slice(0, m.index)
       + `<p class="spot-quote">${stripped}</p>`
       + rawHtml.slice(m.index + m[0].length);
-    break; // Sadece tek paragraf — duruyoruz
+    break;
   }
 
-  // Step 2: TÜM blockquote'lar (ilki dahil) → inline-quote
-  return html.replace(
+  // Step 2: TÜM blockquote'lar → inline-quote
+  return htmlOut.replace(
     /<blockquote>([\s\S]*?)<\/blockquote>/g,
     (_, inner) => {
       const withAttribution = inner.replace(
@@ -76,7 +68,6 @@ function processBlockquotes(rawHtml: string): string {
 }
 
 function processKaynakca(rawHtml: string): string {
-  // <p><strong>Kaynakça</strong></p> ile başlayan bölümü sarmalayarak özel stil uygula
   return rawHtml.replace(
     /<p><strong>Kaynakça<\/strong><\/p>([\s\S]*)$/,
     (_, rest) =>
@@ -114,13 +105,8 @@ function processYouTubeEmbeds(rawHtml: string): string {
   });
 }
 
-export async function getArticleBySlug(slug: string): Promise<ParsedArticle | null> {
-  const filePath = path.join(contentDir, `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
-
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  const { data, content } = matter(fileContents);
-
+/** Markdown content → processed HTML (tüm özel bloklar dahil) */
+export async function markdownToHtml(content: string): Promise<string> {
   // 1. Pre-process: extract custom blocks before remark runs
   const { content: withOneriTokens, blocks: oneriBlocks } = extractOneriBlocks(content);
   const mdWithDurak = extractDurakBlocks(withOneriTokens);
@@ -139,38 +125,90 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
     contentHtml = contentHtml.replace(`<p>${token}</p>`, blockHtml).replace(token, blockHtml);
   }
 
-  // 4. Post-process pipeline:
-  //    Warning boxes ÖNCE çalışır → ⚠️ paragrafları <p class="warning-box"> olur
-  //    Spot tespiti SONRA çalışır → <p> regex attribute'lu tag'leri atlar,
-  //    warning-box paragraflar otomatik hariç tutulur
+  // 4. Post-process pipeline
   contentHtml = processWarningBoxes(contentHtml);
   contentHtml = processYouTubeEmbeds(processBlockquotes(contentHtml));
   contentHtml = processKaynakca(contentHtml);
+
+  return contentHtml;
+}
+
+/* ──────────────── Supabase data functions ──────────────── */
+
+export async function getArticleBySlug(slug: string): Promise<ParsedArticle | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const content: string = data.content ?? "";
+
+  // Markdown → HTML (tüm özel bloklar korunuyor)
+  const contentHtml = await markdownToHtml(content);
 
   // Auto-calculate read time from word count (200 words/min, min 1 dk)
   const wordCount = content.trim().split(/\s+/).length;
   const minutes = Math.max(1, Math.round(wordCount / 200));
   const readTime = `${minutes} dk`;
 
-  return {
-    meta: { ...(data as ArticleMeta), readTime },
-    contentHtml,
+  const meta: ArticleMeta = {
+    title: data.title ?? "",
+    description: data.description ?? "",
+    author: data.author ?? "",
+    authorIg: data.author_ig ?? undefined,
+    authorEmail: data.author_email ?? undefined,
+    date: data.date ?? "",
+    category: data.category ?? "",
+    tags: data.tags ?? [],
+    image: data.image ?? "",
+    readTime,
+    slug: data.slug,
   };
+
+  return { meta, contentHtml };
 }
 
-export function getAllArticleSlugs(): string[] {
-  if (!fs.existsSync(contentDir)) return [];
-  return fs
-    .readdirSync(contentDir)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""));
+export async function getAllArticleSlugs(): Promise<string[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("slug")
+    .eq("status", "published");
+
+  if (error || !data) return [];
+  return data.map((row) => row.slug);
 }
 
 export async function getAllArticlesMetadata(): Promise<ArticleMeta[]> {
-  const slugs = getAllArticleSlugs();
-  const results = await Promise.all(slugs.map(getArticleBySlug));
-  return results
-    .filter((a): a is ParsedArticle => a !== null)
-    .map((a) => a.meta)
-    .sort((a, b) => (a.date < b.date ? 1 : -1)); // en yeni üstte
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+    .eq("status", "published")
+    .order("date", { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    const wordCount = (row.content ?? "").trim().split(/\s+/).length;
+    const minutes = Math.max(1, Math.round(wordCount / 200));
+    return {
+      title: row.title ?? "",
+      description: row.description ?? "",
+      author: row.author ?? "",
+      authorIg: row.author_ig ?? undefined,
+      authorEmail: row.author_email ?? undefined,
+      date: row.date ?? "",
+      category: row.category ?? "",
+      tags: row.tags ?? [],
+      image: row.image ?? "",
+      readTime: `${minutes} dk`,
+      slug: row.slug,
+    };
+  });
 }

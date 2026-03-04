@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getArticleBySlug, getAllArticleSlugs } from "@/lib/markdown";
+import { getArticleBySlug } from "@/lib/markdown";
 import ArticleReader from "@/components/ArticleReader";
 
-type Params = { slug: string };
+// Dynamic rendering — yazılar artık Supabase'den geliyor
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams(): Params[] {
-  return getAllArticleSlugs().map((slug) => ({ slug }));
-}
+type Params = { slug: string };
 
 export async function generateMetadata({
   params,
