@@ -167,10 +167,11 @@ html {
   margin-top: 1rem;
 }
 .prose-klemens img {
-  width: 100%;
+  max-width: 100%;
   border-radius: 1rem;
-  margin: 1.5rem 0 2rem;
+  margin: 1.5rem auto 0.5rem;
   object-fit: cover;
+  display: block;
 }
 .prose-klemens strong {
   font-weight: 600;
@@ -256,14 +257,37 @@ html {
   transform: translateY(-1px);
 }
 
+/* ── Links — coral double underline ── */
+.prose-klemens a:not(.oneri-block a) {
+  color: #FF6D60;
+  text-decoration: underline;
+  text-decoration-style: double;
+  text-decoration-color: #FF6D60;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s;
+}
+.prose-klemens a:not(.oneri-block a):hover {
+  text-decoration-color: #e5564b;
+  text-decoration-thickness: 2px;
+}
+
+/* ── Highlight — coral background ── */
+.prose-klemens mark {
+  background: rgba(255, 109, 96, 0.2);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0.05em 0.15em;
+}
+
 /* Image captions: paragraph containing only <em> right after an image */
 .prose-klemens img + p,
 .prose-klemens p:has(> em:only-child) {
   text-align: center;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
+  font-style: italic;
   line-height: 1.6;
-  opacity: 0.65;
-  margin-top: -1rem;
+  color: #78716c;
+  margin-top: 0;
   margin-bottom: 2rem;
 }
 

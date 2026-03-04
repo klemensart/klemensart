@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = new Set([
   "image/jpeg",
   "image/jpg",
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   if (file.size > MAX_SIZE) {
     return NextResponse.json(
-      { error: "Dosya boyutu 5MB'dan büyük olamaz" },
+      { error: "Dosya boyutu 10MB'dan büyük olamaz" },
       { status: 400 }
     );
   }

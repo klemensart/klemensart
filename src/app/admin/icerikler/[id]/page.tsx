@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import TiptapEditor from "@/components/admin/TiptapEditor";
+import { useAdminRole } from "@/components/admin/AdminRoleContext";
 
 const CATEGORIES = [
   { slug: "Odak", label: "Odak" },
@@ -79,13 +81,8 @@ function isImageFile(file: File): boolean {
   return /^image\/(jpeg|jpg|png|webp|gif)$/.test(file.type);
 }
 
-/* ── Icons ── */
-const ImageIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <circle cx="8.5" cy="8.5" r="1.5" />
-    <path d="m21 15-5-5L5 21" />
-  </svg>
+const Spinner = () => (
+  <span className="inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
 );
 
 const UploadIcon = () => (
@@ -94,10 +91,6 @@ const UploadIcon = () => (
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
   </svg>
-);
-
-const Spinner = () => (
-  <span className="inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
 );
 
 export default function AdminArticleEditPage() {
@@ -111,19 +104,16 @@ export default function AdminArticleEditPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [slugManual, setSlugManual] = useState(false);
-
-  // Upload state
   const [uploading, setUploading] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const contentFileRef = useRef<HTMLInputElement>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const coverFileRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
+  const role = useAdminRole();
+  const isAdminRole = role === "admin";
 
-  // Preview state
-  const [contentTab, setContentTab] = useState<"write" | "preview">("write");
-  const [previewHtml, setPreviewHtml] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
+  // Source mode toggle for custom markdown blocks
+  const [sourceMode, setSourceMode] = useState(false);
 
   // Fetch existing article
   useEffect(() => {
@@ -167,63 +157,37 @@ export default function AdminArticleEditPage() {
     });
   };
 
-  /* ── Insert image markdown at cursor position ── */
-  const insertImageAtCursor = useCallback(
-    (url: string, fileName: string) => {
-      const ta = contentRef.current;
-      const md = `![${fileName}](${url})`;
-      if (ta) {
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const before = form.content.slice(0, start);
-        const after = form.content.slice(end);
-        const newContent = `${before}\n${md}\n${after}`;
-        setForm((prev) => ({ ...prev, content: newContent }));
-        // Restore cursor after the inserted text
-        requestAnimationFrame(() => {
-          const pos = start + md.length + 2;
-          ta.setSelectionRange(pos, pos);
-          ta.focus();
-        });
-      } else {
-        setForm((prev) => ({
-          ...prev,
-          content: prev.content + `\n${md}\n`,
-        }));
-      }
-    },
-    [form.content]
-  );
-
-  /* ── Upload for content textarea ── */
-  const handleContentUpload = async (file: File) => {
+  /* ── Image upload handler for TipTap ── */
+  const handleEditorImageUpload = async (
+    file: File
+  ): Promise<string | null> => {
     if (!isImageFile(file)) {
       setMsg("Hata: Sadece jpg, png, webp ve gif formatları kabul edilir");
-      return;
+      return null;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setMsg("Hata: Dosya boyutu 5MB'dan büyük olamaz");
-      return;
+    if (file.size > 10 * 1024 * 1024) {
+      setMsg("Hata: Dosya boyutu 10MB'dan büyük olamaz");
+      return null;
     }
     setUploading(true);
     setMsg("");
     const result = await uploadFile(file, form.slug || "genel");
+    setUploading(false);
     if ("error" in result) {
       setMsg(`Hata: ${result.error}`);
-    } else {
-      insertImageAtCursor(result.url, file.name);
+      return null;
     }
-    setUploading(false);
+    return result.url;
   };
 
-  /* ── Upload for cover image ── */
+  /* ── Cover image upload ── */
   const handleCoverUpload = async (file: File) => {
     if (!isImageFile(file)) {
       setMsg("Hata: Sadece jpg, png, webp ve gif formatları kabul edilir");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setMsg("Hata: Dosya boyutu 5MB'dan büyük olamaz");
+    if (file.size > 10 * 1024 * 1024) {
+      setMsg("Hata: Dosya boyutu 10MB'dan büyük olamaz");
       return;
     }
     setUploadingCover(true);
@@ -237,45 +201,22 @@ export default function AdminArticleEditPage() {
     setUploadingCover(false);
   };
 
-  /* ── Drag & Drop handlers ── */
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file && isImageFile(file)) {
-      handleContentUpload(file);
-    }
-  };
-
-  /* ── Preview fetch ── */
-  const fetchPreview = async () => {
-    setPreviewLoading(true);
+  const deleteArticle = async () => {
+    setDeleting(true);
     try {
-      const res = await fetch("/api/admin/preview", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: form.content }),
+      const res = await fetch(`/api/admin/articles/${id}`, {
+        method: "DELETE",
       });
       if (res.ok) {
-        const { html } = await res.json();
-        setPreviewHtml(html);
+        router.push("/admin/icerikler");
+      } else {
+        const data = await res.json();
+        setMsg(data.error || "Silme hatası");
+        setShowDeleteModal(false);
       }
     } finally {
-      setPreviewLoading(false);
+      setDeleting(false);
     }
-  };
-
-  const switchToPreview = () => {
-    setContentTab("preview");
-    fetchPreview();
   };
 
   const save = async (status?: string) => {
@@ -553,109 +494,57 @@ export default function AdminArticleEditPage() {
           />
         </div>
 
-        {/* Content with tabs */}
+        {/* Content — TipTap WYSIWYG / Source toggle */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-medium text-warm-900/50">
+              İçerik
+            </label>
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setContentTab("write")}
+                onClick={() => setSourceMode(false)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                  contentTab === "write"
+                  !sourceMode
                     ? "bg-warm-900 text-white"
                     : "bg-warm-100 text-warm-900/50 hover:text-warm-900/70"
                 }`}
               >
-                Yazım
+                Editör
               </button>
               <button
                 type="button"
-                onClick={switchToPreview}
+                onClick={() => setSourceMode(true)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-                  contentTab === "preview"
+                  sourceMode
                     ? "bg-warm-900 text-white"
                     : "bg-warm-100 text-warm-900/50 hover:text-warm-900/70"
                 }`}
               >
-                Önizleme
+                Kaynak
               </button>
             </div>
-            {contentTab === "write" && (
-              <div className="flex items-center gap-2">
-                {uploading && (
-                  <span className="flex items-center gap-1.5 text-xs text-coral">
-                    <Spinner /> Görsel yükleniyor...
-                  </span>
-                )}
-                <input
-                  ref={contentFileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleContentUpload(file);
-                    e.target.value = "";
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => contentFileRef.current?.click()}
-                  disabled={uploading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-warm-100 text-warm-900/60 rounded-lg hover:bg-warm-200 transition disabled:opacity-50"
-                >
-                  <ImageIcon />
-                  Görsel Ekle
-                </button>
-              </div>
-            )}
           </div>
 
-          {contentTab === "write" ? (
-            <div className="relative">
-              <textarea
-                ref={contentRef}
-                value={form.content}
-                onChange={(e) => set("content", e.target.value)}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                placeholder="Yazı içeriğini markdown formatında yazın... Görsel sürükleyip bırakabilirsiniz."
-                rows={20}
-                className={
-                  inputCls +
-                  " resize-y font-mono text-[13px] leading-relaxed" +
-                  (dragOver ? " ring-2 ring-coral/40 border-coral" : "")
-                }
-              />
-              {dragOver && (
-                <div className="absolute inset-0 bg-coral/5 rounded-xl flex items-center justify-center pointer-events-none">
-                  <div className="bg-white/90 px-4 py-2 rounded-xl text-sm font-medium text-coral shadow-sm">
-                    Görseli bırakın
-                  </div>
-                </div>
-              )}
-            </div>
+          {sourceMode ? (
+            <textarea
+              value={form.content}
+              onChange={(e) => set("content", e.target.value)}
+              placeholder="Markdown içerik..."
+              rows={20}
+              className={
+                inputCls +
+                " resize-y font-mono text-[13px] leading-relaxed min-h-[400px]"
+              }
+            />
           ) : (
-            <div
-              className="w-full bg-white border border-warm-200 rounded-xl px-6 py-5 text-sm min-h-[480px] overflow-y-auto prose prose-warm max-w-none
-                prose-headings:text-warm-900 prose-headings:font-bold
-                prose-p:text-warm-900/80 prose-p:leading-relaxed
-                prose-a:text-coral prose-a:no-underline hover:prose-a:underline
-                prose-img:rounded-xl prose-img:max-w-full
-                prose-blockquote:border-l-coral prose-blockquote:text-warm-900/60
-                prose-strong:text-warm-900"
-            >
-              {previewLoading ? (
-                <div className="flex items-center justify-center py-12 text-warm-900/30">
-                  <Spinner /> <span className="ml-2">Önizleme yükleniyor...</span>
-                </div>
-              ) : previewHtml ? (
-                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-              ) : (
-                <p className="text-warm-900/30">İçerik boş</p>
-              )}
-            </div>
+            <TiptapEditor
+              content={form.content}
+              onChange={(md) => set("content", md)}
+              onUploadImage={handleEditorImageUpload}
+              uploading={uploading}
+              placeholder="Yazı içeriğini yazın... Görsel yapıştırabilir veya sürükleyebilirsiniz."
+            />
           )}
         </div>
 
@@ -703,7 +592,49 @@ export default function AdminArticleEditPage() {
           >
             Geri Dön
           </button>
+          {/* Delete — admin only, not for new articles */}
+          {isAdminRole && !isNew && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="ml-auto px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition"
+            >
+              Sil
+            </button>
+          )}
         </div>
+
+        {/* Delete confirmation modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+              <h3 className="text-lg font-bold text-warm-900 mb-2">
+                Yazıyı Sil
+              </h3>
+              <p className="text-sm text-warm-900/60 mb-1">
+                Bu yazıyı kalıcı olarak silmek istediğinize emin misiniz?
+              </p>
+              <p className="text-sm font-medium text-warm-900 mb-6">
+                &ldquo;{form.title}&rdquo;
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium text-warm-900/60 hover:text-warm-900 transition"
+                >
+                  Vazgeç
+                </button>
+                <button
+                  onClick={deleteArticle}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 transition disabled:opacity-50"
+                >
+                  {deleting ? "Siliniyor..." : "Evet, Sil"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

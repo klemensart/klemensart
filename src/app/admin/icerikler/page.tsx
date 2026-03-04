@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAdminRole } from "@/components/admin/AdminRoleContext";
 
 type Article = {
   id: string;
@@ -23,9 +24,13 @@ function fmtDate(iso: string | null) {
 }
 
 export default function AdminIceriklerPage() {
+  const role = useAdminRole();
+  const isAdminRole = role === "admin";
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Article | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchArticles = async () => {
     setLoading(true);
@@ -41,6 +46,22 @@ export default function AdminIceriklerPage() {
   useEffect(() => {
     fetchArticles();
   }, []);
+
+  const deleteArticle = async (id: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/articles/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setArticles((prev) => prev.filter((a) => a.id !== id));
+        setDeleteTarget(null);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Silme hatası");
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const toggleStatus = async (id: string, current: string) => {
     setToggling(id);
@@ -138,20 +159,37 @@ export default function AdminIceriklerPage() {
                     {fmtDate(a.date)}
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleStatus(a.id, a.status);
-                      }}
-                      disabled={toggling === a.id}
-                      className="text-xs font-medium px-3 py-1.5 rounded-lg bg-warm-100 text-warm-900/60 hover:bg-warm-200 transition disabled:opacity-50"
-                    >
-                      {toggling === a.id
-                        ? "..."
-                        : a.status === "published"
-                        ? "Taslağa Al"
-                        : "Yayınla"}
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStatus(a.id, a.status);
+                        }}
+                        disabled={toggling === a.id}
+                        className="text-xs font-medium px-3 py-1.5 rounded-lg bg-warm-100 text-warm-900/60 hover:bg-warm-200 transition disabled:opacity-50"
+                      >
+                        {toggling === a.id
+                          ? "..."
+                          : a.status === "published"
+                          ? "Taslağa Al"
+                          : "Yayınla"}
+                      </button>
+                      {isAdminRole && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteTarget(a);
+                          }}
+                          title="Sil"
+                          className="p-1.5 rounded-lg text-warm-900/30 hover:text-red-600 hover:bg-red-50 transition"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -159,6 +197,39 @@ export default function AdminIceriklerPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-warm-900 mb-2">
+              Yazıyı Sil
+            </h3>
+            <p className="text-sm text-warm-900/60 mb-1">
+              Bu yazıyı kalıcı olarak silmek istediğinize emin misiniz?
+            </p>
+            <p className="text-sm font-medium text-warm-900 mb-6">
+              &ldquo;{deleteTarget.title}&rdquo;
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium text-warm-900/60 hover:text-warm-900 transition"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={() => deleteArticle(deleteTarget.id)}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {deleting ? "Siliniyor..." : "Evet, Sil"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

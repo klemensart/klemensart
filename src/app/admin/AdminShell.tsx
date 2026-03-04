@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AdminRoleProvider } from "@/components/admin/AdminRoleContext";
 
 type NavItem = {
   href: string;
@@ -161,7 +162,9 @@ export default function AdminShell({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 ml-64">{children}</main>
+      <main className="flex-1 ml-64">
+        <AdminRoleProvider value={role}>{children}</AdminRoleProvider>
+      </main>
     </div>
   );
 }
