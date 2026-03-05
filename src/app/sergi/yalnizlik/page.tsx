@@ -70,8 +70,6 @@ export default function YalnizlikSergiPage() {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const raycasterRef = useRef(new THREE.Raycaster());
-  const mouseRef = useRef(new THREE.Vector2());
   const artMeshesRef = useRef<THREE.Mesh[]>([]);
   const frameIdRef = useRef<number | null>(null);
   const keysRef = useRef<Record<string, boolean>>({});
@@ -86,8 +84,8 @@ export default function YalnizlikSergiPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const pinchDistRef = useRef(0);
-  const touchStartPosRef = useRef({ x: 0, y: 0 });
-  const touchStartTimeRef = useRef(0);
+  const nearestArtIndexRef = useRef<number | null>(null);
+  const [nearestArt, setNearestArt] = useState<Artwork | null>(null);
 
   function playFootstep(ctx: AudioContext) {
     const now = ctx.currentTime;
@@ -379,11 +377,17 @@ export default function YalnizlikSergiPage() {
       const euler = new THREE.Euler(pitchRef.current, yawRef.current, 0, "YXZ");
       camera.quaternion.setFromEuler(euler);
 
-      // FOV zoom when close to artwork
+      // FOV zoom when close to artwork + proximity detection
       let minDist = Infinity;
-      for (const m of artMeshes) {
-        const d = camera.position.distanceTo(m.position);
-        if (d < minDist) minDist = d;
+      let closestIdx: number | null = null;
+      for (let mi = 0; mi < artMeshes.length; mi++) {
+        const d = camera.position.distanceTo(artMeshes[mi].position);
+        if (d < minDist) { minDist = d; closestIdx = mi; }
+      }
+      const newNearest = minDist < 4 ? closestIdx : null;
+      if (newNearest !== nearestArtIndexRef.current) {
+        nearestArtIndexRef.current = newNearest;
+        setNearestArt(newNearest !== null ? ARTWORKS[newNearest] : null);
       }
       const targetFov = minDist < 2 ? 50 : minDist < 4 ? 50 + (minDist - 2) * 5 : 60;
       camera.fov += (targetFov - camera.fov) * 0.05;
@@ -435,22 +439,6 @@ export default function YalnizlikSergiPage() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
 
-    // Click on artwork
-    const onClick = (e: MouseEvent) => {
-      if (!mountRef.current) return;
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycasterRef.current.setFromCamera(mouseRef.current, camera);
-      const intersects = raycasterRef.current.intersectObjects(artMeshesRef.current);
-
-      if (intersects.length > 0) {
-        const idx = intersects[0].object.userData.index;
-        setSelectedArt(ARTWORKS[idx]);
-      }
-    };
-    renderer.domElement.addEventListener("click", onClick);
 
     // Touch support
     const getTouchDist = (e: TouchEvent) => {
@@ -464,8 +452,6 @@ export default function YalnizlikSergiPage() {
       if (e.touches.length === 1) {
         isDraggingRef.current = true;
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        touchStartPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        touchStartTimeRef.current = performance.now();
       } else if (e.touches.length === 2) {
         isDraggingRef.current = false;
         pinchDistRef.current = getTouchDist(e);
@@ -491,26 +477,7 @@ export default function YalnizlikSergiPage() {
         pinchDistRef.current = newDist;
       }
     };
-    const onTouchEnd = (e: TouchEvent) => {
-      // Detect tap: finger moved < 10px AND duration < 300ms
-      if (e.changedTouches.length === 1 && pinchDistRef.current === 0) {
-        const t = e.changedTouches[0];
-        const dx = t.clientX - touchStartPosRef.current.x;
-        const dy = t.clientY - touchStartPosRef.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const duration = performance.now() - touchStartTimeRef.current;
-        if (dist < 10 && duration < 300) {
-          const rect = renderer.domElement.getBoundingClientRect();
-          mouseRef.current.x = ((t.clientX - rect.left) / rect.width) * 2 - 1;
-          mouseRef.current.y = -((t.clientY - rect.top) / rect.height) * 2 + 1;
-          raycasterRef.current.setFromCamera(mouseRef.current, camera);
-          const intersects = raycasterRef.current.intersectObjects(artMeshesRef.current);
-          if (intersects.length > 0) {
-            const idx = intersects[0].object.userData.index;
-            setSelectedArt(ARTWORKS[idx]);
-          }
-        }
-      }
+    const onTouchEnd = () => {
       isDraggingRef.current = false;
       pinchDistRef.current = 0;
     };
@@ -784,6 +751,50 @@ export default function YalnizlikSergiPage() {
           </div>
         </div>
       )}
+
+      {/* Proximity overlay */}
+      <div style={{
+        position: "absolute", bottom: 90, left: 0, right: 0,
+        display: "flex", flexDirection: "column", alignItems: "center",
+        pointerEvents: "none", zIndex: 25,
+        opacity: nearestArt ? 1 : 0,
+        transition: "opacity 0.4s ease",
+      }}>
+        <div style={{
+          color: "#fff", fontSize: 18, fontWeight: 600, letterSpacing: 2,
+          textShadow: "0 2px 8px rgba(0,0,0,0.7)",
+          marginBottom: 12,
+        }}>
+          {nearestArt?.title}
+        </div>
+        <button
+          onClick={() => { if (nearestArt) setSelectedArt(nearestArt); }}
+          style={{
+            pointerEvents: nearestArt ? "auto" : "none",
+            background: "#FF6D60",
+            color: "#fff",
+            border: "none",
+            borderRadius: 24,
+            padding: "10px 28px",
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: 1,
+            cursor: "pointer",
+            boxShadow: "0 4px 16px rgba(255,109,96,0.4)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}
+          onMouseOver={(e) => {
+            (e.target as HTMLElement).style.transform = "scale(1.05)";
+            (e.target as HTMLElement).style.boxShadow = "0 6px 20px rgba(255,109,96,0.5)";
+          }}
+          onMouseOut={(e) => {
+            (e.target as HTMLElement).style.transform = "scale(1)";
+            (e.target as HTMLElement).style.boxShadow = "0 4px 16px rgba(255,109,96,0.4)";
+          }}
+        >
+          Keşfet
+        </button>
+      </div>
 
       {/* Artwork detail panel */}
       {selectedArt && (
