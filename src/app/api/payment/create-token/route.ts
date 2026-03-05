@@ -47,8 +47,10 @@ export async function POST(req: NextRequest) {
   const currency = "TL";
   const test_mode = "1"; // Canlıya geçince "0" yap
 
-  const merchant_ok_url = "https://klemensart.com/club/odeme/basarili";
-  const merchant_fail_url = "https://klemensart.com/club/odeme/basarisiz";
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.vercel.app";
+  const merchant_ok_url = `${BASE_URL}/club/odeme/basarili`;
+  const merchant_fail_url = `${BASE_URL}/club/odeme/basarisiz`;
+  const merchant_notify_url = `${BASE_URL}/api/payment/callback`;
 
   // PayTR hash — merchant_salt string'in SONUNA eklenir, HMAC key sadece merchant_key
   const hashStr =
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
     user_phone: "05000000000",
     merchant_ok_url,
     merchant_fail_url,
+    merchant_notify_url,
     timeout_limit: "30",
     currency,
     test_mode,
