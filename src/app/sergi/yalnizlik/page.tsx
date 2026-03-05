@@ -26,7 +26,7 @@ const ARTWORKS: Artwork[] = [
     info: "Efes, MÖ 10. yüzyılda kurulan ve antik dünyanın en büyük şehirlerinden biri olan İyon kentidir. Artemis Tapınağı ile dünyanın yedi harikasından birine ev sahipliği yapmıştır.",
     color: "#8B6914",
     accent: "#D4A843",
-    image: "/sergi/yalnizlik/eser1.jpg"
+    image: "/assets/sergi/yalnizlik/eser1.jpg"
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ const ARTWORKS: Artwork[] = [
     info: "Apollon Tapınağı, antik çağın en büyük tapınaklarından biridir. 120 adet 20 metre yüksekliğindeki İon sütunuyla inşa edilmiş, kehanet merkezi olarak kullanılmıştır.",
     color: "#4A6741",
     accent: "#7BA370",
-    image: "/sergi/yalnizlik/eser2.jpg"
+    image: "/assets/sergi/yalnizlik/eser2.jpg"
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ const ARTWORKS: Artwork[] = [
     info: "Patara, Likya Birliği'nin başkenti ve antik dünyanın önemli liman şehirlerinden biriydi. Noel Baba olarak bilinen Aziz Nikolaos'un doğum yeridir.",
     color: "#8B4513",
     accent: "#CD853F",
-    image: "/sergi/yalnizlik/eser3.jpg"
+    image: "/assets/sergi/yalnizlik/eser3.jpg"
   },
   {
     id: 4,
@@ -59,7 +59,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias, antik dönemde heykeltraşlık okuluyla ünlüydü. 2017'de UNESCO Dünya Mirası listesine alınmış olup, stadyumu antik dünyanın en iyi korunmuş örneklerinden biridir.",
     color: "#5B3A6B",
     accent: "#9B6BB0",
-    image: "/sergi/yalnizlik/eser4.jpg"
+    image: "/assets/sergi/yalnizlik/eser4.jpg"
   }
 ];
 
