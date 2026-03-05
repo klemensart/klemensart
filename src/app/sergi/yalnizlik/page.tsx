@@ -85,6 +85,7 @@ export default function YalnizlikSergiPage() {
   const [showIntro, setShowIntro] = useState(true);
   const pinchDistRef = useRef(0);
   const nearestArtIndexRef = useRef<number | null>(null);
+  const dragEndTimeRef = useRef(0);
   const [nearestArt, setNearestArt] = useState<Artwork | null>(null);
 
   function playFootstep(ctx: AudioContext) {
@@ -374,6 +375,25 @@ export default function YalnizlikSergiPage() {
         }
       }
 
+      // Snap assist — soft yaw towards nearest artwork
+      if (!isDraggingRef.current && performance.now() - dragEndTimeRef.current > 500) {
+        let snapDist = Infinity;
+        let snapIdx = -1;
+        for (let si = 0; si < artMeshes.length; si++) {
+          const sd = camera.position.distanceTo(artMeshes[si].position);
+          if (sd < snapDist) { snapDist = sd; snapIdx = si; }
+        }
+        if (snapDist < 5 && snapIdx >= 0) {
+          const toArt = new THREE.Vector3().subVectors(artMeshes[snapIdx].position, camera.position);
+          const targetYaw = Math.atan2(toArt.x, toArt.z);
+          // Shortest angle difference
+          let diff = targetYaw - yawRef.current;
+          while (diff > Math.PI) diff -= 2 * Math.PI;
+          while (diff < -Math.PI) diff += 2 * Math.PI;
+          yawRef.current += diff * 0.02;
+        }
+      }
+
       const euler = new THREE.Euler(pitchRef.current, yawRef.current, 0, "YXZ");
       camera.quaternion.setFromEuler(euler);
 
@@ -433,7 +453,7 @@ export default function YalnizlikSergiPage() {
         lastMouseRef.current = { x: e.clientX, y: e.clientY };
       }
     };
-    const onMouseUp = () => { isDraggingRef.current = false; };
+    const onMouseUp = () => { isDraggingRef.current = false; dragEndTimeRef.current = performance.now(); };
 
     renderer.domElement.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mousemove", onMouseMove);
@@ -480,6 +500,7 @@ export default function YalnizlikSergiPage() {
     const onTouchEnd = () => {
       isDraggingRef.current = false;
       pinchDistRef.current = 0;
+      dragEndTimeRef.current = performance.now();
     };
 
     // Block Safari gesture zoom
