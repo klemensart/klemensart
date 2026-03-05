@@ -82,6 +82,16 @@ const SERILER: SeriesWorkshop[] = [
     imgSquare: "/images/workshops/ronesans-atolyesi-square.png",
     imgPosition: "center 20%",
   },
+  {
+    slug: "kapsamli-sanat-tarihi",
+    workshopId: SLUG_TO_ATOLYE["kapsamli-sanat-tarihi"].id,
+    title: "Kapsamlı Sanat Tarihi Atölyesi",
+    description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık kapsamlı program.",
+    duration: "10 Hafta",
+    price: "6.000 TL",
+    imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.png",
+    imgPosition: "center center",
+  },
 ];
 
 function computeStatus(nextSessionDate: string | null | undefined): Status {

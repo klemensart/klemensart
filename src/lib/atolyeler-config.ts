@@ -35,6 +35,14 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     imgSquare: "/images/workshops/ronesans-atolyesi-square.png",
     targetDate: "2025-12-11T20:30:00+03:00",
   },
+  "kapsamli-sanat-tarihi": {
+    id: "75468e8b-5de7-4f69-95f2-c8132778cf6a",
+    price: 600000,
+    forSale: false,
+    imgCover: "/images/workshops/kapsamli-sanat-tarihi-cover.png",
+    imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.png",
+    targetDate: "2026-01-28T20:30:00+03:00",
+  },
 };
 
 // Reverse: workshopId → slug
