@@ -375,18 +375,50 @@ export default function YalnizlikSergiPage() {
         }
       }
 
-      // Snap assist — soft yaw towards nearest artwork
+      // Snap assist — soft yaw towards nearest artwork in view
       if (!isDraggingRef.current && performance.now() - dragEndTimeRef.current > 500) {
-        let snapDist = Infinity;
-        let snapIdx = -1;
+        const lookDir = new THREE.Vector3();
+        camera.getWorldDirection(lookDir);
+        lookDir.y = 0;
+        lookDir.normalize();
+
+        // Determine if user is moving (WASD/arrows)
+        const moveDir = new THREE.Vector3();
+        if (keysRef.current["w"] || keysRef.current["arrowup"]) moveDir.addScaledVector(dir, 1);
+        if (keysRef.current["s"] || keysRef.current["arrowdown"]) moveDir.addScaledVector(dir, -1);
+        if (keysRef.current["a"] || keysRef.current["arrowleft"]) moveDir.addScaledVector(right, -1);
+        if (keysRef.current["d"] || keysRef.current["arrowright"]) moveDir.addScaledVector(right, 1);
+        const isMoving = moveDir.lengthSq() > 0;
+        if (isMoving) moveDir.normalize();
+
+        const maxAngle = Math.PI / 3; // 60 degrees
+        let bestDist = Infinity;
+        let bestIdx = -1;
+
         for (let si = 0; si < artMeshes.length; si++) {
-          const sd = camera.position.distanceTo(artMeshes[si].position);
-          if (sd < snapDist) { snapDist = sd; snapIdx = si; }
+          const toArt = new THREE.Vector3().subVectors(artMeshes[si].position, camera.position);
+          toArt.y = 0;
+          const sd = toArt.length();
+          if (sd >= 5) continue;
+          toArt.normalize();
+
+          // Must be within ±60° of look direction
+          const lookAngle = Math.acos(Math.min(1, Math.max(-1, lookDir.dot(toArt))));
+          if (lookAngle > maxAngle) continue;
+
+          // If moving, prefer artworks aligned with movement direction
+          let score = sd;
+          if (isMoving) {
+            const moveAngle = Math.acos(Math.min(1, Math.max(-1, moveDir.dot(toArt))));
+            if (moveAngle < maxAngle) score *= 0.5; // prioritize movement-aligned
+          }
+
+          if (score < bestDist) { bestDist = score; bestIdx = si; }
         }
-        if (snapDist < 5 && snapIdx >= 0) {
-          const toArt = new THREE.Vector3().subVectors(artMeshes[snapIdx].position, camera.position);
+
+        if (bestIdx >= 0) {
+          const toArt = new THREE.Vector3().subVectors(artMeshes[bestIdx].position, camera.position);
           const targetYaw = Math.atan2(toArt.x, toArt.z);
-          // Shortest angle difference
           let diff = targetYaw - yawRef.current;
           while (diff > Math.PI) diff -= 2 * Math.PI;
           while (diff < -Math.PI) diff += 2 * Math.PI;
