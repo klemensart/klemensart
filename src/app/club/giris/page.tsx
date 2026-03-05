@@ -1,18 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
-type Tab = "giris" | "kayit";
-
 export default function GirisPage() {
-  const router = useRouter();
   const supabase = createClient();
 
-  const [tab,      setTab]      = useState<Tab>("giris");
   const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState<string | null>(null);
   const [success,  setSuccess]  = useState<string | null>(null);
@@ -34,39 +28,24 @@ export default function GirisPage() {
       setError(error.message);
       setGoogleLoading(false);
     }
-    // Hata yoksa Google sayfasına yönlendirme başlar, loading kalır
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     reset();
     setLoading(true);
 
-    if (tab === "giris") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(
-          error.message === "Invalid login credentials"
-            ? "E-posta veya şifre hatalı."
-            : error.message
-        );
-      } else {
-        router.push("/club/profil");
-        router.refresh();
-      }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${location.origin}/auth/callback` },
+    });
+
+    if (error) {
+      setError(error.message);
     } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${location.origin}/club/profil` },
-      });
-      if (error) {
-        setError(error.message);
-      } else {
-        setSuccess(
-          "Hesabın oluşturuldu! Lütfen e-postanı kontrol et ve bağlantıya tıklayarak hesabını doğrula."
-        );
-      }
+      setSuccess(
+        "Giriş bağlantısı e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin."
+      );
     }
 
     setLoading(false);
@@ -91,29 +70,12 @@ export default function GirisPage() {
               Klemens Club&apos;a Hoş Geldiniz
             </h1>
             <p className="text-sm text-warm-900/45 leading-relaxed">
-              Sanat, kültür ve düşünce dünyasının kapıları açılıyor.
+              Giriş yapın veya yeni üye olun — tek adımda.
             </p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b border-warm-100">
-            {(["giris", "kayit"] as Tab[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); reset(); }}
-                className={`flex-1 py-3.5 text-sm font-semibold transition-colors ${
-                  tab === t
-                    ? "text-coral border-b-2 border-coral"
-                    : "text-warm-900/40 hover:text-warm-900/60"
-                }`}
-              >
-                {t === "giris" ? "Giriş Yap" : "Kayıt Ol"}
-              </button>
-            ))}
-          </div>
-
           {/* Form */}
-          <form onSubmit={handleSubmit} className="px-8 py-8 flex flex-col gap-4">
+          <form onSubmit={handleMagicLink} className="px-8 py-8 flex flex-col gap-4">
 
             {/* Error / Success */}
             {error && (
@@ -140,22 +102,9 @@ export default function GirisPage() {
                 placeholder="ornek@mail.com"
                 className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 text-sm placeholder:text-warm-900/30 focus:outline-none focus:border-coral focus:bg-white transition-colors"
               />
-            </div>
-
-            {/* Şifre */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-warm-900/50 uppercase tracking-wide">
-                Şifre
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={tab === "kayit" ? "En az 6 karakter" : "••••••••"}
-                minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 text-sm placeholder:text-warm-900/30 focus:outline-none focus:border-coral focus:bg-white transition-colors"
-              />
+              <p className="text-xs text-warm-900/35 leading-relaxed mt-1">
+                Kayıtlı veya yeni — e-posta adresinizi girin, size giriş linki gönderelim.
+              </p>
             </div>
 
             {/* Submit */}
@@ -164,9 +113,7 @@ export default function GirisPage() {
               disabled={loading}
               className="w-full py-3.5 bg-coral text-white font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-all duration-150 mt-1"
             >
-              {loading
-                ? "Bekleyin..."
-                : tab === "giris" ? "Giriş Yap" : "Hesap Oluştur"}
+              {loading ? "Gönderiliyor..." : "Giriş Linki Al"}
             </button>
 
             {/* Divider */}
@@ -193,8 +140,13 @@ export default function GirisPage() {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
               )}
-              {googleLoading ? "Yönlendiriliyor..." : "Google ile Giriş Yap"}
+              {googleLoading ? "Yönlendiriliyor..." : "Google ile Devam Et"}
             </button>
+
+            {/* Google notu */}
+            <p className="text-xs text-warm-900/30 text-center mt-2 leading-relaxed">
+              Aynı e-posta adresli Google hesabınızla giriş yaparsanız satın almalarınız otomatik taşınır.
+            </p>
 
           </form>
 

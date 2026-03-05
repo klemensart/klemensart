@@ -18,8 +18,12 @@ export default function AuthCallback() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === "SIGNED_IN") {
+        // Satın alma taşıma — başarısız olsa bile profil'e yönlendir
+        try {
+          await fetch("/api/auth/migrate-purchases", { method: "POST" });
+        } catch {}
         router.replace("/club/profil");
       } else if (event === "SIGNED_OUT") {
         router.replace("/club/giris");
