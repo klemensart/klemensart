@@ -54,6 +54,9 @@ type DbSession = {
   duration: string | null;
   is_published: boolean;
   pdf_url: string | null;
+  session_date: string | null;
+  zoom_url: string | null;
+  status: string | null; // 'upcoming' | 'live' | 'completed'
 };
 type DbSingleVideo = {
   id: string;
@@ -84,6 +87,11 @@ function formatExpiry(dateStr: string) {
       day: "numeric", month: "long", year: "numeric",
     }) + "'e kadar"
   );
+}
+function isWithinOneHour(sessionDate: string | null): boolean {
+  if (!sessionDate) return false;
+  const diff = new Date(sessionDate).getTime() - Date.now();
+  return diff > 0 && diff <= 60 * 60 * 1000;
 }
 
 /* ─── Video Modal ─── */
@@ -215,10 +223,21 @@ function SessionList({
   zoomLink: string | null;
   onPlay: (bunnyId: string, title: string) => void;
 }) {
+  // Find next upcoming or live session for banner
+  const bannerSession = sessions.find(s => s.status === "live") ??
+    sessions.find(s => s.status === "upcoming" && s.session_date);
+
+  const bannerDate = bannerSession?.session_date ?? nextSession;
+  const bannerZoom = bannerSession?.zoom_url ?? zoomLink;
+  const showBanner = isLive && bannerDate;
+
   return (
     <div style={{ marginTop: 12 }}>
+      {/* Pulsing dot keyframe */}
+      <style>{`@keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
+
       {/* Next live session banner */}
-      {isLive && nextSession && (
+      {showBanner && (
         <div style={{
           padding: "14px 16px", background: "#F1F8E9", borderRadius: 12, marginBottom: 14,
           display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -227,18 +246,20 @@ function SessionList({
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {I.calendar("#2E7D32", 16)}
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#2E7D32", letterSpacing: "0.04em" }}>SONRAKİ CANLI OTURUM</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#2E7D32", letterSpacing: "0.04em" }}>
+                {bannerSession?.status === "live" ? "CANLI OTURUM" : "SONRAKİ CANLI OTURUM"}
+              </div>
               <div style={{ fontSize: 14, color: B.dark, marginTop: 2 }}>
-                {new Date(nextSession).toLocaleString("tr-TR", {
+                {new Date(bannerDate).toLocaleString("tr-TR", {
                   day: "numeric", month: "long", year: "numeric",
                   hour: "2-digit", minute: "2-digit",
                 })}
               </div>
             </div>
           </div>
-          {zoomLink && (
+          {bannerZoom && (
             <a
-              href={zoomLink}
+              href={bannerZoom}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -255,45 +276,126 @@ function SessionList({
       )}
 
       {/* Session rows */}
-      {sessions.map((s) => (
-        <div
-          key={s.session_number}
-          onClick={() => s.is_published && s.bunny_video_id && onPlay(s.bunny_video_id, s.title)}
-          style={{
-            display: "flex", alignItems: "center", gap: 12, padding: "11px 14px",
-            background: s.is_published ? B.cream : "transparent",
-            borderRadius: 10, marginBottom: 4,
-            cursor: s.is_published && s.bunny_video_id ? "pointer" : "default",
-            opacity: s.is_published ? 1 : 0.45,
-          }}
-        >
-          {/* Play / lock icon */}
-          <div style={{
-            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-            background: s.is_published ? B.coral : B.light,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            {s.is_published ? I.play("#fff", 12) : I.lock(B.warm, 12)}
-          </div>
+      {sessions.map((s) => {
+        const isUpcoming = s.status === "upcoming";
+        const isLiveSession = s.status === "live";
+        const isCompleted = s.status === "completed";
+        const hasStatus = isUpcoming || isLiveSession || isCompleted;
+        const sessionZoom = s.zoom_url ?? zoomLink;
 
-          {/* Title + duration */}
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: B.dark }}>{s.title}</div>
-            <div style={{ fontSize: 12, color: B.warm, display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-              {I.clock(B.warm, 11)} {s.duration ?? "—"}
+        // For upcoming/live: no video click
+        // For completed with is_published: video click (same as before)
+        // For null status: original behavior
+        const canPlayVideo = hasStatus
+          ? isCompleted && s.is_published && !!s.bunny_video_id
+          : s.is_published && !!s.bunny_video_id;
+
+        const rowOpacity = isUpcoming ? 0.7 : (hasStatus ? 1 : (s.is_published ? 1 : 0.45));
+        const rowBg = isLiveSession ? "#F1F8E9" : (canPlayVideo || isUpcoming ? B.cream : "transparent");
+
+        return (
+          <div
+            key={s.session_number}
+            onClick={() => canPlayVideo && onPlay(s.bunny_video_id!, s.title)}
+            style={{
+              display: "flex", alignItems: "center", gap: 12, padding: "11px 14px",
+              background: rowBg, borderRadius: 10, marginBottom: 4,
+              cursor: canPlayVideo ? "pointer" : "default",
+              opacity: rowOpacity,
+            }}
+          >
+            {/* Icon box */}
+            <div style={{
+              width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+              background: isLiveSession ? "#2E7D32"
+                : isUpcoming ? B.light
+                : (isCompleted && s.is_published) ? B.coral
+                : s.is_published ? B.coral : B.light,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {isUpcoming
+                ? I.calendar(B.warm, 12)
+                : isLiveSession
+                  ? I.play("#fff", 12)
+                  : s.is_published ? I.play("#fff", 12) : I.lock(B.warm, 12)
+              }
+            </div>
+
+            {/* Title + subtitle */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: B.dark, display: "flex", alignItems: "center", gap: 6 }}>
+                {s.title}
+                {isLiveSession && (
+                  <span style={{
+                    width: 8, height: 8, borderRadius: "50%", background: "#4CAF50",
+                    display: "inline-block", flexShrink: 0,
+                    animation: "livePulse 1.5s ease-in-out infinite",
+                  }} />
+                )}
+              </div>
+              <div style={{ fontSize: 12, color: B.warm, display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                {(isUpcoming || isLiveSession) && s.session_date ? (
+                  <>
+                    {I.calendar(B.warm, 11)}{" "}
+                    {new Date(s.session_date).toLocaleString("tr-TR", {
+                      day: "numeric", month: "long", year: "numeric",
+                      hour: "2-digit", minute: "2-digit",
+                    })}
+                  </>
+                ) : (
+                  <>{I.clock(B.warm, 11)} {s.duration ?? "—"}</>
+                )}
+              </div>
+            </div>
+
+            {/* Right side */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              {/* PDF for completed/published */}
+              {s.pdf_url && (isCompleted || (!hasStatus && s.is_published)) && <PdfButton url={s.pdf_url} />}
+
+              {isLiveSession && sessionZoom ? (
+                <a
+                  href={sessionZoom}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    background: "#2E7D32", color: "#fff", border: "none",
+                    borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600,
+                    cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+                    textDecoration: "none",
+                  }}
+                >
+                  Katıl {I.arrow("#fff", 11)}
+                </a>
+              ) : isUpcoming ? (
+                isWithinOneHour(s.session_date) && sessionZoom ? (
+                  <a
+                    href={sessionZoom}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      background: "#2E7D32", color: "#fff", border: "none",
+                      borderRadius: 8, padding: "5px 12px", fontSize: 11, fontWeight: 600,
+                      cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+                      textDecoration: "none",
+                    }}
+                  >
+                    Katıl {I.arrow("#fff", 10)}
+                  </a>
+                ) : (
+                  <span style={{ fontSize: 11, color: B.warm, fontStyle: "italic" }}>Yakında</span>
+                )
+              ) : (isCompleted && s.is_published && s.bunny_video_id) || (!hasStatus && s.is_published && s.bunny_video_id) ? (
+                <span style={{ fontSize: 12, color: B.coral, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>İzle {I.arrow(B.coral, 12)}</span>
+              ) : !hasStatus ? (
+                <span style={{ fontSize: 11, color: B.warm, fontStyle: "italic" }}>Yakında</span>
+              ) : null}
             </div>
           </div>
-
-          {/* Right labels */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {s.pdf_url && <PdfButton url={s.pdf_url} />}
-            {s.is_published && s.bunny_video_id
-              ? <span style={{ fontSize: 12, color: B.coral, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>İzle {I.arrow(B.coral, 12)}</span>
-              : <span style={{ fontSize: 11, color: B.warm, fontStyle: "italic" }}>Yakında</span>
-            }
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -404,7 +506,7 @@ export default function ProfilPage() {
     if (wsIds.length > 0) {
       const { data: sRaw } = await sb
         .from("workshop_sessions")
-        .select("workshop_id, session_number, title, bunny_video_id, duration, is_published, pdf_url")
+        .select("workshop_id, session_number, title, bunny_video_id, duration, is_published, pdf_url, session_date, zoom_url, status")
         .in("workshop_id", wsIds)
         .order("session_number", { ascending: true });
       allSessions = (sRaw ?? []) as DbSession[];
