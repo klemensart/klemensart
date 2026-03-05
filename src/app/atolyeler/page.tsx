@@ -302,23 +302,19 @@ function SeriesKart({ w, status }: { w: SeriesWorkshop; status: Status }) {
 
 /* ─── Tekli Oturum kartı ──────────────────────── */
 
-type SingleVideo = {
+type DbSingleVideoCard = {
+  id: string;
   title: string;
-  duration: string;
-  gradient: string;
+  description: string | null;
+  duration: string | null;
+  card_image_url: string | null;
+  cover_image_url: string | null;
+  is_published: boolean;
 };
 
-const TEKLI: SingleVideo[] = [
-  { title: "Caravaggio'nun Işık Devrimi", duration: "35 dk", gradient: "135deg, #3d2b1f 0%, #7a4a30 100%" },
-  { title: "Frida Kahlo: Acının Sanatı", duration: "40 dk", gradient: "135deg, #2d1a2e 0%, #7b3f72 100%" },
-  { title: "Bauhaus: Tasarımın Doğuşu", duration: "30 dk", gradient: "135deg, #1a2a3a 0%, #2e5a8e 100%" },
-  { title: "Van Gogh: Delilik mi Deha mı?", duration: "45 dk", gradient: "135deg, #1f2a1a 0%, #4a7c3f 100%" },
-  { title: "Osmanlı Minyatürlerini Okumak", duration: "35 dk", gradient: "135deg, #2a2215 0%, #8a6d32 100%" },
-  { title: "Banksy ve Sokak Sanatı", duration: "30 dk", gradient: "135deg, #1a1a1a 0%, #4a4a4a 100%" },
-];
-
-function TekliKart({ v }: { v: SingleVideo }) {
+function TekliKart({ v }: { v: DbSingleVideoCard }) {
   const [hovered, setHovered] = useState(false);
+  const imgSrc = v.card_image_url ?? v.cover_image_url;
 
   return (
     <article
@@ -330,44 +326,66 @@ function TekliKart({ v }: { v: SingleVideo }) {
         transform: hovered ? "translateY(-2px)" : "translateY(0)",
         transition: "box-shadow 0.2s, transform 0.2s",
         cursor: "default",
+        opacity: v.is_published ? 1 : 0.7,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Placeholder görsel */}
+      {/* Görsel */}
       <div
         style={{
-          height: 90,
-          background: `linear-gradient(${v.gradient})`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          height: 120,
           position: "relative",
+          overflow: "hidden",
+          background: B.light,
         }}
       >
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.15)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "rgba(255,255,255,0.7)",
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
-        </div>
+        {imgSrc ? (
+          <Image
+            src={imgSrc}
+            alt={v.title}
+            fill
+            quality={85}
+            unoptimized
+            sizes="(max-width: 600px) 100vw, 300px"
+            style={{ objectFit: "cover", objectPosition: "center center" }}
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: `linear-gradient(135deg, ${B.light} 0%, #e8e2dc 100%)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: B.warm,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </div>
+          </div>
+        )}
         <span
           style={{
             position: "absolute",
             top: 8,
             right: 10,
-            background: "rgba(0,0,0,0.4)",
-            color: "#fff",
+            background: v.is_published ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.4)",
+            color: v.is_published ? "rgba(255,255,255,0.7)" : "#fff",
             fontSize: 9,
             fontWeight: 700,
             padding: "2px 8px",
@@ -375,7 +393,7 @@ function TekliKart({ v }: { v: SingleVideo }) {
             letterSpacing: "0.06em",
           }}
         >
-          YAKINDA
+          {v.is_published ? "KAYITLAR KAPANDI" : "YAKINDA"}
         </span>
       </div>
 
@@ -384,10 +402,17 @@ function TekliKart({ v }: { v: SingleVideo }) {
         <h3 style={{ fontSize: 14, fontWeight: 700, color: B.dark, margin: "0 0 8px", lineHeight: 1.35 }}>
           {v.title}
         </h3>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, color: B.warm }}>
-          <ClockIcon />
-          <span style={{ fontSize: 12 }}>{v.duration}</span>
-        </div>
+        {v.duration && (
+          <div style={{ display: "flex", alignItems: "center", gap: 5, color: B.warm }}>
+            <ClockIcon />
+            <span style={{ fontSize: 12 }}>{v.duration}</span>
+          </div>
+        )}
+        {v.description && (
+          <p style={{ color: B.warm, fontSize: 12, lineHeight: 1.5, margin: "6px 0 0" }}>
+            {v.description}
+          </p>
+        )}
       </div>
     </article>
   );
@@ -406,8 +431,12 @@ export default function AtolyelerPage() {
     return map;
   });
 
+  const [tekliVideolar, setTekliVideolar] = useState<DbSingleVideoCard[]>([]);
+
   useEffect(() => {
     const supabase = createClient();
+
+    // Workshop statuses
     const ids = SERILER.map((w) => w.workshopId);
     supabase
       .from("workshops")
@@ -425,6 +454,15 @@ export default function AtolyelerPage() {
           }
           return next;
         });
+      });
+
+    // Tekli videolar
+    supabase
+      .from("single_videos")
+      .select("id, title, description, duration, card_image_url, cover_image_url, is_published")
+      .order("created_at", { ascending: true })
+      .then(({ data }) => {
+        if (data) setTekliVideolar(data as DbSingleVideoCard[]);
       });
   }, []);
 
@@ -532,49 +570,9 @@ export default function AtolyelerPage() {
               marginBottom: 28,
             }}
           >
-            {TEKLI.map((v) => (
-              <TekliKart key={v.title} v={v} />
+            {tekliVideolar.map((v) => (
+              <TekliKart key={v.id} v={v} />
             ))}
-          </div>
-
-          {/* Bilgi banner */}
-          <div
-            style={{
-              background: "#fff",
-              border: `1px solid ${B.light}`,
-              borderRadius: 14,
-              padding: "20px 24px",
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-            }}
-          >
-            <span
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: B.light,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: B.coral,
-                flexShrink: 0,
-                fontSize: 16,
-              }}
-            >
-              ✦
-            </span>
-            <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.65, margin: 0 }}>
-              Tekli oturumlar yakında yayında.{" "}
-              <a
-                href="#bulten"
-                style={{ color: B.coral, fontWeight: 700, textDecoration: "none" }}
-              >
-                Bültene katılın
-              </a>
-              {" "}ve haberdar olun.
-            </p>
           </div>
         </section>
       </main>
