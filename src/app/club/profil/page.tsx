@@ -64,6 +64,7 @@ type DbSingleVideo = {
   description: string | null;
   bunny_video_id: string;
   duration: string | null;
+  pdf_url: string | null;
 };
 type WorkshopItem = {
   workshopId: string;
@@ -490,7 +491,7 @@ export default function ProfilPage() {
         single_video_id,
         expires_at,
         single_videos (
-          id, title, description, bunny_video_id, duration
+          id, title, description, bunny_video_id, duration, pdf_url
         )
       `)
       .eq("user_id", userId)
@@ -760,8 +761,11 @@ export default function ProfilPage() {
                               {expiresAt    && <span style={{ display: "flex", alignItems: "center", gap: 4 }}>{I.calendar(B.warm, 11)} {formatExpiry(expiresAt)}</span>}
                             </div>
                           </div>
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: B.coral, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            {I.play("#fff", 12)}
+                          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                            {vid.pdf_url && <PdfButton url={vid.pdf_url} />}
+                            <div style={{ width: 36, height: 36, borderRadius: 10, background: B.coral, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              {I.play("#fff", 12)}
+                            </div>
                           </div>
                         </div>
                       ))}
