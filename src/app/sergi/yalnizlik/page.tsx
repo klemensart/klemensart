@@ -418,7 +418,7 @@ export default function YalnizlikSergiPage() {
 
         if (bestIdx >= 0) {
           const toArt = new THREE.Vector3().subVectors(artMeshes[bestIdx].position, camera.position);
-          const targetYaw = Math.atan2(toArt.x, toArt.z);
+          const targetYaw = Math.atan2(-toArt.x, -toArt.z);
           let diff = targetYaw - yawRef.current;
           while (diff > Math.PI) diff -= 2 * Math.PI;
           while (diff < -Math.PI) diff += 2 * Math.PI;
