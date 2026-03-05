@@ -85,6 +85,7 @@ export default function YalnizlikSergiPage() {
   const [ambientOn, setAmbientOn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const pinchDistRef = useRef(0);
 
   function playFootstep(ctx: AudioContext) {
     const now = ctx.currentTime;
@@ -450,26 +451,53 @@ export default function YalnizlikSergiPage() {
     renderer.domElement.addEventListener("click", onClick);
 
     // Touch support
+    const getTouchDist = (e: TouchEvent) => {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
     const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
       if (e.touches.length === 1) {
         isDraggingRef.current = true;
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else if (e.touches.length === 2) {
+        isDraggingRef.current = false;
+        pinchDistRef.current = getTouchDist(e);
       }
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (isDraggingRef.current && e.touches.length === 1) {
+      e.preventDefault();
+      if (e.touches.length === 1 && isDraggingRef.current) {
         const dx = e.touches[0].clientX - lastMouseRef.current.x;
         const dy = e.touches[0].clientY - lastMouseRef.current.y;
         yawRef.current += dx * 0.004;
         pitchRef.current += dy * 0.004;
         pitchRef.current = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, pitchRef.current));
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else if (e.touches.length === 2 && pinchDistRef.current > 0) {
+        const newDist = getTouchDist(e);
+        const delta = (newDist - pinchDistRef.current) * 0.02;
+        const dir = new THREE.Vector3();
+        camera.getWorldDirection(dir);
+        dir.y = 0;
+        dir.normalize();
+        camera.position.addScaledVector(dir, delta);
+        pinchDistRef.current = newDist;
       }
     };
-    const onTouchEnd = () => { isDraggingRef.current = false; };
+    const onTouchEnd = () => {
+      isDraggingRef.current = false;
+      pinchDistRef.current = 0;
+    };
 
-    renderer.domElement.addEventListener("touchstart", onTouchStart);
-    renderer.domElement.addEventListener("touchmove", onTouchMove);
+    // Block Safari gesture zoom
+    const onGestureStart = (e: Event) => { e.preventDefault(); };
+    document.addEventListener("gesturestart", onGestureStart, { passive: false });
+
+    renderer.domElement.addEventListener("touchstart", onTouchStart, { passive: false });
+    renderer.domElement.addEventListener("touchmove", onTouchMove, { passive: false });
     renderer.domElement.addEventListener("touchend", onTouchEnd);
 
     return () => {
@@ -478,6 +506,7 @@ export default function YalnizlikSergiPage() {
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("gesturestart", onGestureStart);
       cancelAnimationFrame(frameIdRef.current!);
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
@@ -556,7 +585,7 @@ export default function YalnizlikSergiPage() {
   return (
     <div style={{ width: "100%", height: "100vh", background: "#ffffff", position: "relative", overflow: "hidden" }}>
       {/* 3D Canvas */}
-      <div ref={mountRef} style={{ width: "100%", height: "100%", cursor: "grab" }} />
+      <div ref={mountRef} style={{ width: "100%", height: "100%", cursor: "grab", touchAction: "none" }} />
 
       {/* Vignette overlay */}
       <div style={{
