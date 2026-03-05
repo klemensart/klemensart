@@ -74,6 +74,8 @@ export default function EtkinliklerPage() {
 
       if (filter === "Atölyeler") {
         q = q.eq("is_klemens_event", true);
+      } else if (filter === "Festival") {
+        q = q.in("event_type", ["festival", "film-festivali"]);
       } else if (filter !== "Tümü") {
         q = q.eq("event_type", FILTER_TO_TYPE[filter] ?? filter.toLowerCase());
       }
@@ -151,7 +153,6 @@ export default function EtkinliklerPage() {
                   const meta = [
                     e.venue,
                     date.time ? date.time : null,
-                    e.price_info,
                   ].filter(Boolean).join(" · ");
 
                   return (
