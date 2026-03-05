@@ -86,6 +86,8 @@ export default function YalnizlikSergiPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const pinchDistRef = useRef(0);
+  const touchStartPosRef = useRef({ x: 0, y: 0 });
+  const touchStartTimeRef = useRef(0);
 
   function playFootstep(ctx: AudioContext) {
     const now = ctx.currentTime;
@@ -462,6 +464,8 @@ export default function YalnizlikSergiPage() {
       if (e.touches.length === 1) {
         isDraggingRef.current = true;
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        touchStartPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        touchStartTimeRef.current = performance.now();
       } else if (e.touches.length === 2) {
         isDraggingRef.current = false;
         pinchDistRef.current = getTouchDist(e);
@@ -472,13 +476,13 @@ export default function YalnizlikSergiPage() {
       if (e.touches.length === 1 && isDraggingRef.current) {
         const dx = e.touches[0].clientX - lastMouseRef.current.x;
         const dy = e.touches[0].clientY - lastMouseRef.current.y;
-        yawRef.current += dx * 0.004;
-        pitchRef.current += dy * 0.004;
+        yawRef.current += dx * 0.003;
+        pitchRef.current += dy * 0.003;
         pitchRef.current = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, pitchRef.current));
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       } else if (e.touches.length === 2 && pinchDistRef.current > 0) {
         const newDist = getTouchDist(e);
-        const delta = (newDist - pinchDistRef.current) * 0.02;
+        const delta = (newDist - pinchDistRef.current) * 0.014;
         const dir = new THREE.Vector3();
         camera.getWorldDirection(dir);
         dir.y = 0;
@@ -487,7 +491,26 @@ export default function YalnizlikSergiPage() {
         pinchDistRef.current = newDist;
       }
     };
-    const onTouchEnd = () => {
+    const onTouchEnd = (e: TouchEvent) => {
+      // Detect tap: finger moved < 10px AND duration < 300ms
+      if (e.changedTouches.length === 1 && pinchDistRef.current === 0) {
+        const t = e.changedTouches[0];
+        const dx = t.clientX - touchStartPosRef.current.x;
+        const dy = t.clientY - touchStartPosRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const duration = performance.now() - touchStartTimeRef.current;
+        if (dist < 10 && duration < 300) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          mouseRef.current.x = ((t.clientX - rect.left) / rect.width) * 2 - 1;
+          mouseRef.current.y = -((t.clientY - rect.top) / rect.height) * 2 + 1;
+          raycasterRef.current.setFromCamera(mouseRef.current, camera);
+          const intersects = raycasterRef.current.intersectObjects(artMeshesRef.current);
+          if (intersects.length > 0) {
+            const idx = intersects[0].object.userData.index;
+            setSelectedArt(ARTWORKS[idx]);
+          }
+        }
+      }
       isDraggingRef.current = false;
       pinchDistRef.current = 0;
     };
