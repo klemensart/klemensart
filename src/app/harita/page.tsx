@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase";
 
 /* ───────── Types ───────── */
 
-type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi";
+type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi" | "edebiyat" | "gastronomi";
 
 type CulturePlace = {
   lat: number;
@@ -54,6 +54,8 @@ const TYPE_COLORS: Record<PlaceType, string> = {
   konser: "#9B6BB0",
   tiyatro: "#4CAF50",
   tarihi: "#FFB300",
+  edebiyat: "#8B5CF6",
+  gastronomi: "#E91E63",
 };
 
 const TYPE_LABELS: Record<PlaceType, string> = {
@@ -62,6 +64,8 @@ const TYPE_LABELS: Record<PlaceType, string> = {
   konser: "Konser",
   tiyatro: "Tiyatro",
   tarihi: "Tarihi",
+  edebiyat: "Edebiyat",
+  gastronomi: "Gastronomi",
 };
 
 const TYPE_SVGS: Record<PlaceType, string> = {
@@ -70,6 +74,8 @@ const TYPE_SVGS: Record<PlaceType, string> = {
   konser: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
   tiyatro: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v4a8 8 0 0 1-8 8H8a8 8 0 0 1-6-3"/><circle cx="10" cy="9" r="1"/><circle cx="16" cy="9" r="1"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>`,
   tarihi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 21V11l4-4 4 4 4-4 4 4v10"/><path d="M9 21v-4h6v4"/><path d="M3 11h18"/></svg>`,
+  edebiyat: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>`,
+  gastronomi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`,
 };
 
 const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
@@ -79,40 +85,87 @@ const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
   { key: "konser", label: "Konser" },
   { key: "tiyatro", label: "Tiyatro" },
   { key: "tarihi", label: "Tarihi" },
+  { key: "edebiyat", label: "Edebiyat" },
+  { key: "gastronomi", label: "Gastronomi" },
 ];
 
 const PLACES: CulturePlace[] = [
-  { lat: 39.9381, lng: 32.8645, type: "müze", name: "Anadolu Medeniyetleri Müzesi", desc: "Paleolitik Çağ'dan Osmanlı'ya Anadolu'nun binlerce yıllık tarihi. 1997 Avrupa Yılın Müzesi ödüllü." },
-  { lat: 39.9370, lng: 32.8640, type: "müze", name: "Erimtan Arkeoloji ve Sanat Müzesi", desc: "Ankara Kalesi eteklerinde arkeoloji ve sanat koleksiyonu. Özel sergiler ve etkinlikler." },
-  { lat: 39.9385, lng: 32.8650, type: "müze", name: "Rahmi M. Koç Müzesi", desc: "Tarihi Çengelhan'da sanayi, ulaşım ve iletişim tarihine dair interaktif sergiler." },
-  { lat: 39.9390, lng: 32.8550, type: "müze", name: "Etnografya Müzesi", desc: "Selçuklu'dan Cumhuriyet'e Türk kültürü. Atatürk'ün ilk defnedildiği yer." },
-  { lat: 39.9400, lng: 32.8530, type: "müze", name: "Devlet Resim ve Heykel Müzesi", desc: "1927'den beri Türk resim sanatı. 6 salonda eserler, 3 güzel sanatlar galerisi." },
-  { lat: 39.9254, lng: 32.8369, type: "müze", name: "Anıtkabir ve Atatürk Müzesi", desc: "Mustafa Kemal Atatürk'ün anıt mezarı. Kurtuluş Savaşı belgeleri ve kişisel eşyalar." },
-  { lat: 39.9430, lng: 32.8540, type: "müze", name: "Kurtuluş Savaşı Müzesi (I. TBMM)", desc: "Birinci Meclis binası. Cumhuriyet'in temellerinin atıldığı tarihi mekan." },
-  { lat: 39.9425, lng: 32.8545, type: "müze", name: "Cumhuriyet Müzesi (II. TBMM)", desc: "İkinci Meclis binası. İlk anayasaların yazıldığı, kritik kararların alındığı yer." },
-  { lat: 39.9383, lng: 32.8655, type: "müze", name: "Gökyay Vakfı Satranç Müzesi", desc: "110 ülkeden 723 satranç takımı. Tematik bölümler ve eğitim atölyeleri." },
-  { lat: 39.8673, lng: 32.7495, type: "müze", name: "Altın Köşk Müzesi", desc: "Türkiye'nin ilk mimarlık ve mobilya müzesi. 1000 form ve motiften esinlenmiş tasarım." },
-  { lat: 39.9415, lng: 32.8535, type: "müze", name: "PTT Pul Müzesi", desc: "Neo-klasik binada posta tarihi. Osmanlı'dan Cumhuriyet'e pullar ve haberleşme eserleri." },
-  { lat: 39.9350, lng: 32.8520, type: "müze", name: "Vakıf Eserleri Müzesi", desc: "Cami ve mescitlerden toplanan halı, kilim, Kur'an-ı Kerim ve şamdanlar." },
-  { lat: 39.9360, lng: 32.8610, type: "müze", name: "SOKUM - Somut Olmayan Kültürel Miras Müzesi", desc: "Karagöz-Hacivat, meddah, ebru, kına geceleri. Türkiye'nin ilk somut olmayan miras müzesi." },
-  { lat: 39.9395, lng: 32.8480, type: "galeri", name: "CerModern", desc: "Eski TCDD atölyelerinde çağdaş sanat. Sergiler, atölyeler, film gösterimleri ve konserler." },
-  { lat: 39.9210, lng: 32.8560, type: "galeri", name: "Galeri Nev", desc: "Türk çağdaş sanatının öncü galerilerinden." },
-  { lat: 39.9147, lng: 32.8107, type: "konser", name: "CSO Ada Ankara", desc: "Cumhurbaşkanlığı Senfoni Orkestrası'nın evi. Ziraat Ana Salon ve Bankkart Mavi Salon." },
-  { lat: 39.8673, lng: 32.7495, type: "konser", name: "Bilkent Konser Salonu", desc: "Türkiye'nin akustik açıdan en iyi salonlarından biri." },
-  { lat: 39.9110, lng: 32.8020, type: "konser", name: "Congresium", desc: "Büyük ölçekli konser ve etkinliklere ev sahipliği yapan merkez." },
-  { lat: 39.9180, lng: 32.8590, type: "konser", name: "Atatürk Kültür Merkezi", desc: "Çankaya Belediyesi. Mavi Salon ve Kırmızı Salon'da tiyatro, opera, konser." },
-  { lat: 39.9420, lng: 32.8543, type: "tiyatro", name: "Ankara Devlet Tiyatrosu", desc: "Türkiye'nin en köklü tiyatro kurumlarından biri." },
-  { lat: 39.9200, lng: 32.8540, type: "tiyatro", name: "Ankara Devlet Opera ve Balesi", desc: "Opera, bale ve müzikal gösterileri." },
-  { lat: 39.9408, lng: 32.8644, type: "tarihi", name: "Ankara Kalesi", desc: "MÖ 5. yüzyıldan. Galatlar, Romalılar, Selçuklular. Panoramik şehir manzarası." },
-  { lat: 39.9395, lng: 32.8680, type: "tarihi", name: "Hamamönü", desc: "Restore edilmiş Osmanlı evleri, sanat atölyeleri, kafeler. Sanat Sokağı ve el sanatları.", minZoom: 14 },
-  { lat: 39.9410, lng: 32.8630, type: "tarihi", name: "Hacı Bayram Camii", desc: "15. yüzyıl. Augustus Tapınağı'nın hemen yanında, Ankara'nın en önemli camileri." },
-  { lat: 39.9412, lng: 32.8632, type: "tarihi", name: "Augustus Tapınağı", desc: "Roma İmparatoru Augustus döneminden. Res Gestae kitabesi dünya tarihinin önemli belgeleri." },
-  { lat: 39.9440, lng: 32.8600, type: "tarihi", name: "Roma Hamamı", desc: "3. yüzyıl Roma dönemi hamamı kalıntıları. Palaestra, frigidarium ve caldarium bölümleri." },
-  { lat: 39.9388, lng: 32.8670, type: "tarihi", name: "Taceddin Dergahı (Mehmet Akif Ersoy Müzesi)", desc: "İstiklal Marşı'nın yazıldığı ev. Mehmet Akif Ersoy'un yaşadığı mekan.", minZoom: 14 },
-  { lat: 39.9400, lng: 32.8660, type: "tarihi", name: "Pilavoğlu Hanı", desc: "Tarihi han. Kafeler, sanat galerileri ve butik dükkanlar.", minZoom: 15 },
-  { lat: 39.9405, lng: 32.8645, type: "tarihi", name: "Samanpazarı (Antikacılar)", desc: "Ankara'nın antikacılar caddesi. Nostalji meraklıları için hazine.", minZoom: 15 },
-  { lat: 39.9392, lng: 32.8675, type: "tarihi", name: "Sanat Sokağı", desc: "Hamamönü'nde sanat kursları, ressam atölyeleri ve el sanatları dükkanları.", minZoom: 15 },
-  { lat: 39.9398, lng: 32.8668, type: "tarihi", name: "Karacabey Hamamı", desc: "Hamamönü'ne adını veren tarihi hamam. Osmanlı dönemi sosyal merkezi.", minZoom: 15 },
+  /* ── MÜZELER ── */
+  { lat: 39.9381, lng: 32.8645, type: "müze", name: "Anadolu Medeniyetleri Müzesi", desc: "1921 kurulan, Paleolitik'ten Osmanlı'ya 1 milyon+ eser. 1997 Avrupa Yılın Müzesi." },
+  { lat: 39.9430, lng: 32.8540, type: "müze", name: "I. TBMM Binası (Kurtuluş Savaşı Müzesi)", desc: "23 Nisan 1920'de açılan Meclis, Milli Mücadele'nin yönetildiği bina." },
+  { lat: 39.9425, lng: 32.8545, type: "müze", name: "II. TBMM Binası (Cumhuriyet Müzesi)", desc: "1924-1960 parlamento binası. Mimar Vedat Tek tasarımı." },
+  { lat: 39.9254, lng: 32.8369, type: "müze", name: "Anıtkabir ve Kurtuluş Savaşı Müzesi", desc: "Emin Onat ve Orhan Arda tasarımı, Atatürk'ün anıt mezarı." },
+  { lat: 39.9390, lng: 32.8550, type: "müze", name: "Ankara Etnografya Müzesi", desc: "1930 açılış, Türk-İslam halk kültürü. 1938-53 Atatürk'ün geçici kabri." },
+  { lat: 39.9385, lng: 32.8650, type: "müze", name: "Çengelhan Rahmi M. Koç Müzesi", desc: "1522 yapımı handa sanayi ve teknoloji tarihi." },
+  { lat: 39.9370, lng: 32.8640, type: "müze", name: "Erimtan Arkeoloji ve Sanat Müzesi", desc: "2015 açılış, MÖ 3000'den Bizans'a eserler." },
+  { lat: 39.9392, lng: 32.8538, type: "müze", name: "Ziraat Bankası Müzesi", desc: "Giulio Mongeri tasarımı 1929 binada, Türkiye'nin ilk banka müzesi." },
+  { lat: 39.9428, lng: 32.8532, type: "müze", name: "Türkiye İş Bankası İktisadi Bağımsızlık Müzesi", desc: "Mongeri tasarımı binada ekonomi tarihi." },
+  { lat: 39.9415, lng: 32.8535, type: "müze", name: "PTT Pul Müzesi", desc: "Clemens Holzmeister tasarımı binada filateli ve haberleşme tarihi." },
+  { lat: 39.9383, lng: 32.8655, type: "müze", name: "Gökyay Vakfı Satranç Müzesi", desc: "110 ülkeden 700+ satranç takımı, Guinness rekoru." },
+  { lat: 39.9740, lng: 32.9598, type: "müze", name: "Altınköy Açık Hava Müzesi", desc: "1930'lar Anadolu köy yaşamı, 500 dönümlük alan." },
+  { lat: 39.9022, lng: 32.7986, type: "müze", name: "MTA Tabiat Tarihi Müzesi", desc: "1968 kurulan, dinozor fosillerinden meteoritlere." },
+  { lat: 39.9031, lng: 32.6387, type: "müze", name: "Etimesgut Türk Tarih Müzesi", desc: "İskitlerden Cumhuriyet'e 200+ heykel, Orhun Yazıtları replikaları." },
+  { lat: 39.8947, lng: 32.8610, type: "müze", name: "Pembe Köşk (İsmet İnönü Müze Evi)", desc: "2. Cumhurbaşkanı'nın 48 yıl yaşadığı ev." },
+  { lat: 39.8895, lng: 32.8649, type: "müze", name: "Çankaya Köşkü (Atatürk Müze Köşkü)", desc: "1921-1932 Atatürk'ün ikameti, devrimlerin planlandığı yer." },
+  { lat: 39.9360, lng: 32.8610, type: "müze", name: "Somut Olmayan Kültürel Miras Müzesi", desc: "Karagöz, meddahlık, ebru. Türkiye'nin ilk SOKÜM müzesi." },
+  { lat: 40.1709, lng: 31.9178, type: "müze", name: "Beypazarı Yaşayan Müze", desc: "19. yy Abbaszade Konağı'nda halk kültürü deneyimi." },
+  { lat: 40.1685, lng: 31.9195, type: "müze", name: "Türk Hamam Müzesi", desc: "Türkiye'nin ilk hamam müzesi. Roma'dan Osmanlı'ya yıkanma kültürü." },
+
+  /* ── EDEBİYAT ── */
+  { lat: 39.9426, lng: 32.8709, type: "edebiyat", name: "Kelime Müzesi", desc: "2022, Türkiye'nin ilk dil müzesi. Kelimelerin kökenlerini sanatsal anlatım." },
+  { lat: 39.8769, lng: 32.8491, type: "edebiyat", name: "Cin Ali Müzesi", desc: "Rasim Kaygusuz'un kült karakterine adanmış pedagojik müze." },
+  { lat: 39.9388, lng: 32.8670, type: "edebiyat", name: "Mehmet Akif Ersoy Müze Evi (Taceddin Dergahı)", desc: "İstiklal Marşı'nın yazıldığı mekan." },
+  { lat: 39.9398, lng: 32.8648, type: "edebiyat", name: "Ahmet Hamdi Tanpınar Edebiyat Müze Kütüphanesi", desc: "El yazmaları ve nadir eserler." },
+  { lat: 39.9245, lng: 32.8006, type: "edebiyat", name: "Cumhurbaşkanlığı Millet Kütüphanesi", desc: "2020, Selçuklu-Osmanlı-çağdaş mimari sentezi, dev kültür kompleksi." },
+
+  /* ── GALERİLER ── */
+  { lat: 39.9400, lng: 32.8530, type: "galeri", name: "Ankara Devlet Resim ve Heykel Müzesi", desc: "1927, Osman Hamdi Bey'den günümüze Türk plastik sanatları." },
+  { lat: 39.9395, lng: 32.8480, type: "galeri", name: "CerModern", desc: "2010, eski TCDD atölyelerinde uluslararası çağdaş sanat merkezi." },
+  { lat: 39.7930, lng: 32.6970, type: "galeri", name: "Müze Evliyagil", desc: "2015, çağdaş Türk sanatı, açık hava heykel bahçesi." },
+  { lat: 39.8900, lng: 32.8587, type: "galeri", name: "Galeri Siyah Beyaz", desc: "1984'ten beri, Ankara'nın en köklü özel galerisi." },
+  { lat: 39.8893, lng: 32.8508, type: "galeri", name: "Doğan Taşdelen Çağdaş Sanatlar Merkezi", desc: "Kamuya ait en kapsamlı sanat galerisi." },
+
+  /* ── KONSER ── */
+  { lat: 39.9147, lng: 32.8107, type: "konser", name: "CSO Ada Ankara", desc: "2020, fütüristik küre formlu müzik kampüsü." },
+  { lat: 39.8673, lng: 32.7495, type: "konser", name: "Bilkent Konser Salonu", desc: "1994, Türkiye'nin ilk özel akademik senfoni salonu." },
+
+  /* ── TİYATRO ── */
+  { lat: 39.9352, lng: 32.8534, type: "tiyatro", name: "Büyük Tiyatro (Opera Sahnesi)", desc: "1933 Şevki Balmumcu / 1948 Paul Bonatz, anıtsal sahne." },
+  { lat: 39.9386, lng: 32.8531, type: "tiyatro", name: "Küçük Tiyatro", desc: "1930 yapımı Mimar Kemaleddin eseri, 1947'den beri aktif." },
+  { lat: 39.9040, lng: 32.8595, type: "tiyatro", name: "Şinasi Sahnesi", desc: "1988'den beri kült oyunların prömiyeri." },
+  { lat: 39.9039, lng: 32.8593, type: "tiyatro", name: "Akün Sahnesi", desc: "1975 sinema, 2002'de tiyatroya dönüştürüldü." },
+
+  /* ── TARİHİ & ARKEOLOJİK ── */
+  { lat: 39.9408, lng: 32.8644, type: "tarihi", name: "Ankara Kalesi", desc: "MÖ 2. binyıl, Galat-Roma-Selçuklu-Osmanlı katmanları." },
+  { lat: 39.6550, lng: 31.9940, type: "tarihi", name: "Gordion Antik Kenti ve Midas Tümülüsü", desc: "2023 UNESCO, MÖ 12. yy Frigya başkenti." },
+  { lat: 39.9367, lng: 32.8653, type: "tarihi", name: "Arslanhane Camii", desc: "2023 UNESCO, 1290 Selçuklu şaheseri." },
+  { lat: 39.9412, lng: 32.8632, type: "tarihi", name: "Augustus Tapınağı", desc: "MÖ 25-20, Res Gestae'nin en iyi korunmuş kopyası." },
+  { lat: 39.9440, lng: 32.8600, type: "tarihi", name: "Roma Hamamı", desc: "MS 3. yy, İmparator Caracalla dönemi." },
+  { lat: 39.9433, lng: 32.8562, type: "tarihi", name: "Julianus Sütunu", desc: "MS 362, 15m korint başlıklı Roma sütunu." },
+  { lat: 39.9395, lng: 32.8680, type: "tarihi", name: "Hamamönü Tarihi Evleri", desc: "19. yy Osmanlı sivil mimarisi, restore edilmiş kültür bölgesi." },
+  { lat: 39.9410, lng: 32.8630, type: "tarihi", name: "Hacı Bayram Veli Camii", desc: "1427-28, Augustus Tapınağı bitişiğinde." },
+  { lat: 39.9398, lng: 32.8668, type: "tarihi", name: "Tarihi Karacabey Hamamı", desc: "1440, 580+ yıldır kesintisiz hizmet." },
+  { lat: 39.9381, lng: 32.8733, type: "tarihi", name: "Ulucanlar Cezaevi Müzesi", desc: "1925-2006, Nazım Hikmet'in yattığı koğuşlar." },
+  { lat: 39.5315, lng: 32.5589, type: "tarihi", name: "Gavurkale", desc: "MÖ 13. yy Hitit kabartmaları." },
+  { lat: 40.0667, lng: 31.6667, type: "tarihi", name: "Juliopolis Antik Kenti", desc: "Helenistik-Roma-Bizans, kaya mezarları." },
+  { lat: 40.3193, lng: 32.4649, type: "tarihi", name: "Alicin Manastırı", desc: "Erken Hristiyanlık inziva merkezi, Sümela benzeri." },
+  { lat: 39.7743, lng: 32.6835, type: "tarihi", name: "Tulumtaş Mağarası", desc: "5 milyon yıllık karstik oluşum." },
+  { lat: 39.5878, lng: 32.1312, type: "tarihi", name: "Sakarya Meydan Muharebesi Tarihi Milli Parkı", desc: "1921, 137 bin hektar." },
+  { lat: 40.1675, lng: 31.9211, type: "tarihi", name: "Beypazarı Tarihi Konakları", desc: "Osmanlı-Türk sivil mimarisinin en iyi korunmuş dokusu." },
+  { lat: 40.3575, lng: 32.5475, type: "tarihi", name: "Mahkeme Ağacın Kaya Yerleşimleri", desc: "Roma dönemi yeraltı kiliseleri." },
+  { lat: 40.0972, lng: 33.4083, type: "tarihi", name: "Kalecik Kalesi", desc: "Galat ve Roma izleri, Kızılırmak vadisine hakim." },
+  { lat: 39.9523, lng: 32.8261, type: "tarihi", name: "Akköprü", desc: "1222, Selçuklu dönemi, 7 kemerli taş köprü." },
+  { lat: 40.1849, lng: 31.3501, type: "tarihi", name: "Nasuh Paşa Hanı", desc: "1599, 43 odalı Osmanlı ticaret hanı." },
+  { lat: 40.2197, lng: 32.2448, type: "tarihi", name: "İnönü Mağaraları", desc: "Hitit'ten Bizans'a çok katlı kaya yerleşimleri." },
+
+  /* ── GASTRONOMİ ── */
+  { lat: 39.9380, lng: 32.8630, type: "gastronomi", name: "Tarihi Boğaziçi Lokantası", desc: "1956, meşhur Ankara Tavası, bakır tencerelerde." },
+  { lat: 39.9420, lng: 32.8540, type: "gastronomi", name: "Tarihi Ulus Hali", desc: "1937, Robert Oerley tasarımı, geleneksel hal kültürü." },
+  { lat: 39.9360, lng: 32.8030, type: "gastronomi", name: "AOÇ Merkez Lokantası", desc: "1925 kurulan çiftlikte tarihi gastronomi kampüsü." },
+  { lat: 39.9380, lng: 32.8640, type: "gastronomi", name: "Zenger Paşa Konağı", desc: "18. yy konak, müze-restoran, yöresel mutfak." },
+  { lat: 40.1680, lng: 31.9210, type: "gastronomi", name: "Beypazarı Taş Fırınları ve Alaaddin Sokak", desc: "Coğrafi işaretli Beypazarı Kurusu." },
+  { lat: 40.1070, lng: 33.4180, type: "gastronomi", name: "Kalecik Karası Üzüm Bağları", desc: "MÖ 2000'den beri bağcılık, şarap rotası." },
+  { lat: 40.2620, lng: 33.0160, type: "gastronomi", name: "Çubuk Turşu Köyü", desc: "15. yy'dan beri coğrafi işaretli Çubuk Turşusu üretimi." },
 ];
 
 const ROUTES: Route[] = [
@@ -397,7 +450,7 @@ export default function HaritaPage() {
 
       if (!mapContainerRef.current) return;
 
-      const ankaraBounds = Leaf.latLngBounds([39.6, 32.2], [40.2, 33.4]);
+      const ankaraBounds = Leaf.latLngBounds([39.4, 31.5], [40.5, 33.8]);
       const map = Leaf.map(mapContainerRef.current, {
         center: [39.935, 32.860],
         zoom: 13,
