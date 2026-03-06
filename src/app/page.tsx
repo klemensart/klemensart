@@ -14,10 +14,10 @@ export default function Home() {
     <main>
       <Navbar />
       <Hero />
+      <HaritaBanner />
       <Hizmetler />
       <DunyamiziBolum />
       <IceriklerSection />
-      <HaritaBanner />
       <Manifesto />
       <Etkinlikler />
       <Bulten />

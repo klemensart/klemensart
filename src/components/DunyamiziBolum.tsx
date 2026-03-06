@@ -159,7 +159,7 @@ export default function DunyamiziBolum() {
 
         {/* ── Section header ── */}
         <div className="text-center mb-14">
-          <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4">Harita</p>
+          <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4">Site Haritası</p>
           <h2 className="text-4xl md:text-5xl font-bold text-warm-900 leading-tight mb-4">
             Dünyamızı Keşfet
           </h2>
