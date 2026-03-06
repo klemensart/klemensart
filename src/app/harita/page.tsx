@@ -347,7 +347,7 @@ export default function HaritaPage() {
     if (bottomPad > 0) {
       setTimeout(() => {
         const point = map.latLngToContainerPoint(targetLatLng);
-        const offset = point.add([0, -bottomPad / 2]);
+        const offset = point.add([0, bottomPad / 2]);
         const newLatLng = map.containerPointToLatLng(offset);
         map.panTo(newLatLng, { duration: 0.3 });
       }, 550);
