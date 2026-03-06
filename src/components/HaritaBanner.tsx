@@ -89,8 +89,8 @@ export default function HaritaBanner() {
 
     /* ── Ankara silhouette (barely visible, breathing) ── */
     const ankaraPulse = Math.sin(frameRef.current * 0.008);
-    const ankaraStroke = 0.03 + 0.02 * ankaraPulse;
-    const ankaraFill = 0.015 + 0.01 * ankaraPulse;
+    const ankaraStroke = 0.10 + 0.05 * ankaraPulse;
+    const ankaraFill = 0.04 + 0.025 * ankaraPulse;
     const aPad = 0.12;
     const aW = w * (1 - 2 * aPad);
     const aH = h * (1 - 2 * aPad);
