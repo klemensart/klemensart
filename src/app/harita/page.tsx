@@ -214,6 +214,11 @@ export default function HaritaPage() {
   const [activeStopIndex, setActiveStopIndex] = useState(0);
   const [showRouteList, setShowRouteList] = useState(true);
 
+  // Mobile panel drag state
+  const [panelPct, setPanelPct] = useState(40); // percent of viewport
+  const dragStartYRef = useRef(0);
+  const dragStartPctRef = useRef(40);
+
   // Fetch events for selected place
   const fetchEvents = useCallback(async (placeName: string) => {
     setEventsLoading(true);
@@ -247,8 +252,15 @@ export default function HaritaPage() {
     routeLayersRef.current = [];
   }, []);
 
+  // Compute mobile bottom padding for fitBounds
+  const getMobilePanelPx = useCallback(() => {
+    if (typeof window === "undefined") return 0;
+    const isMob = window.innerWidth <= 640;
+    return isMob ? Math.round(window.innerHeight * panelPct / 100) + 20 : 0;
+  }, [panelPct]);
+
   // Draw route on map
-  const drawRoute = useCallback((route: Route, stopIdx: number) => {
+  const drawRoute = useCallback((route: Route, stopIdx: number, fit?: boolean) => {
     const map = mapRef.current;
     const Leaf = leafletRef.current;
     if (!map || !Leaf) return;
@@ -293,16 +305,24 @@ export default function HaritaPage() {
       routeLayersRef.current.push(marker);
     });
 
-    // Fit bounds
-    map.fitBounds(polyline.getBounds(), { padding: [60, 60], maxZoom: 16 });
-  }, [clearRouteLayers]);
+    // Fit bounds with mobile panel padding
+    if (fit !== false) {
+      const bottomPad = getMobilePanelPx();
+      map.fitBounds(polyline.getBounds(), {
+        paddingTopLeft: [60, 60],
+        paddingBottomRight: [60, 60 + bottomPad],
+        maxZoom: 16,
+      });
+    }
+  }, [clearRouteLayers, getMobilePanelPx]);
 
   // Select a route
   const selectRoute = useCallback((route: Route) => {
     setActiveRoute(route);
     setActiveStopIndex(0);
     setShowRouteList(false);
-    drawRoute(route, 0);
+    setPanelPct(40);
+    drawRoute(route, 0, true);
   }, [drawRoute]);
 
   // Deselect route
@@ -313,13 +333,26 @@ export default function HaritaPage() {
     setShowRouteList(true);
   }, [clearRouteLayers]);
 
-  // When active stop changes, redraw & fly to
+  // When active stop changes, redraw & fly to (offset for mobile panel)
   useEffect(() => {
     if (!activeRoute || !mapRef.current) return;
-    drawRoute(activeRoute, activeStopIndex);
+    drawRoute(activeRoute, activeStopIndex, false);
+    const map = mapRef.current;
     const stop = activeRoute.stops[activeStopIndex];
-    mapRef.current.flyTo([stop.lat, stop.lng], 16, { duration: 0.5 });
-  }, [activeStopIndex, activeRoute, drawRoute]);
+    const bottomPad = getMobilePanelPx();
+    // Fly to stop, offset upward by half the panel height in pixels
+    const targetLatLng = [stop.lat, stop.lng] as [number, number];
+    map.flyTo(targetLatLng, 16, { duration: 0.5 });
+    // After fly completes, nudge so marker is above panel
+    if (bottomPad > 0) {
+      setTimeout(() => {
+        const point = map.latLngToContainerPoint(targetLatLng);
+        const offset = point.add([0, -bottomPad / 2]);
+        const newLatLng = map.containerPointToLatLng(offset);
+        map.panTo(newLatLng, { duration: 0.3 });
+      }, 550);
+    }
+  }, [activeStopIndex, activeRoute, drawRoute, getMobilePanelPx]);
 
   // Switch mode
   const switchMode = useCallback((newMode: MapMode) => {
@@ -937,7 +970,7 @@ export default function HaritaPage() {
         </div>
       )}
 
-      {/* Mobile: Story bottom sheet */}
+      {/* Mobile: Story bottom sheet (draggable) */}
       {mode === "routes" && activeRoute && activeStop && (
         <div
           className="mobile-panel"
@@ -945,14 +978,41 @@ export default function HaritaPage() {
             position: "absolute", left: 0, right: 0, bottom: 0, zIndex: 25,
             background: "rgba(18,18,18,0.97)", backdropFilter: "blur(12px)",
             borderTop: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "16px 16px 0 0", maxHeight: "55vh",
-            overflowY: "auto", padding: "20px 16px 28px",
+            borderRadius: "16px 16px 0 0",
+            height: `${panelPct}vh`,
+            overflowY: "auto",
+            transition: dragStartYRef.current ? "none" : "height 0.3s ease",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-            <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)" }} />
+          {/* Drag handle */}
+          <div
+            style={{ padding: "12px 16px 8px", cursor: "grab", touchAction: "none" }}
+            onTouchStart={(e) => {
+              dragStartYRef.current = e.touches[0].clientY;
+              dragStartPctRef.current = panelPct;
+            }}
+            onTouchMove={(e) => {
+              if (!dragStartYRef.current) return;
+              const dy = dragStartYRef.current - e.touches[0].clientY;
+              const deltaPct = (dy / window.innerHeight) * 100;
+              const next = Math.max(30, Math.min(70, dragStartPctRef.current + deltaPct));
+              setPanelPct(Math.round(next));
+            }}
+            onTouchEnd={() => {
+              // Snap to nearest: 30, 40, 70
+              const snaps = [30, 40, 70];
+              const closest = snaps.reduce((a, b) => Math.abs(b - panelPct) < Math.abs(a - panelPct) ? b : a);
+              setPanelPct(closest);
+              dragStartYRef.current = 0;
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)" }} />
+            </div>
           </div>
-          {renderStoryContent(true)}
+          <div style={{ padding: "0 16px 28px", overflowY: "auto", height: "calc(100% - 40px)" }}>
+            {renderStoryContent(true)}
+          </div>
         </div>
       )}
 
