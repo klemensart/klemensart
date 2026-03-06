@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   const no_installment = "0";
   const max_installment = "12";
   const currency = "TL";
-  const test_mode = "1"; // Canlıya geçince "0" yap
+  const test_mode = "0";
 
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.vercel.app";
   const merchant_ok_url = `${BASE_URL}/club/odeme/basarili`;
@@ -92,7 +92,6 @@ export async function POST(req: NextRequest) {
     payment_amount,
     paytr_token,
     user_basket,
-    debug_on: "1",
     no_installment,
     max_installment,
     user_name: user.user_metadata?.full_name || email,
