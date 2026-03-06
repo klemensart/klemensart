@@ -2,31 +2,6 @@
 
 import { useEffect, useRef, useCallback } from "react";
 
-/* ── Colours matching the /harita map types ── */
-const PALETTE = [
-  "#3B82F6", // müze — blue
-  "#FF6D60", // galeri — coral
-  "#8B5CF6", // konser — purple
-  "#F59E0B", // tarihi — amber
-  "#7C3AED", // edebiyat — violet
-  "#10B981", // gastronomi — emerald
-  "#FF6D60", // coral accent
-  "#3B82F6", // blue accent
-];
-
-type Dot = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  r: number;
-  color: string;
-  pulse: number;      // current pulse phase (radians)
-  pulseSpeed: number;  // radians per frame
-  glowing: boolean;    // currently in glow state
-  glowTimer: number;   // frames until next glow toggle
-};
-
 /* ── Static map pins — fixed cultural landmarks ── */
 const PINS = [
   { nx: 0.20, ny: 0.24, color: "#3B82F6", label: "müze" },
@@ -37,30 +12,6 @@ const PINS = [
   { nx: 0.82, ny: 0.66, color: "#10B981", label: "gastronomi" },
 ];
 
-const DESKTOP_COUNT = 28;
-const MOBILE_COUNT = 14;
-const CONNECT_DIST = 0.28;  // fraction of canvas diagonal
-const SPEED = 0.15;         // px per frame — very slow
-
-function createDots(count: number, w: number, h: number): Dot[] {
-  const pad = 0.08;
-  return Array.from({ length: count }, () => {
-    const angle = Math.random() * Math.PI * 2;
-    return {
-      x: w * (pad + Math.random() * (1 - 2 * pad)),
-      y: h * (pad + Math.random() * (1 - 2 * pad)),
-      vx: Math.cos(angle) * SPEED * (0.5 + Math.random() * 0.5),
-      vy: Math.sin(angle) * SPEED * (0.5 + Math.random() * 0.5),
-      r: 2 + Math.random() * 2,
-      color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
-      pulse: Math.random() * Math.PI * 2,
-      pulseSpeed: 0.015 + Math.random() * 0.01,
-      glowing: false,
-      glowTimer: 120 + Math.floor(Math.random() * 300),
-    };
-  });
-}
-
 function hexToRgb(hex: string) {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -68,7 +19,6 @@ function hexToRgb(hex: string) {
 
 export default function HaritaBanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dotsRef = useRef<Dot[]>([]);
   const rafRef = useRef<number>(0);
   const frameRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
@@ -80,14 +30,10 @@ export default function HaritaBanner() {
     if (!ctx) return;
 
     const { w, h } = sizeRef.current;
-    const dots = dotsRef.current;
-    const diag = Math.sqrt(w * w + h * h);
-    const maxDist = diag * CONNECT_DIST;
-
     ctx.clearRect(0, 0, w, h);
     frameRef.current++;
 
-    /* ── Coordinate grid (very faint) ── */
+    /* ── Coordinate grid ── */
     ctx.strokeStyle = "rgba(255,255,255,0.04)";
     ctx.lineWidth = 0.5;
     for (let i = 1; i <= 4; i++) {
@@ -108,104 +54,25 @@ export default function HaritaBanner() {
     ctx.fillText("32.8°E", w * 0.33, h - 6);
     ctx.fillText("32.9°E", w * 0.67, h - 6);
 
-    /* ── Update positions ── */
-    for (const d of dots) {
-      d.x += d.vx;
-      d.y += d.vy;
-
-      // Soft bounce off edges
-      const pad = 20;
-      if (d.x < pad)     { d.x = pad;     d.vx = Math.abs(d.vx); }
-      if (d.x > w - pad) { d.x = w - pad; d.vx = -Math.abs(d.vx); }
-      if (d.y < pad)     { d.y = pad;     d.vy = Math.abs(d.vy); }
-      if (d.y > h - pad) { d.y = h - pad; d.vy = -Math.abs(d.vy); }
-
-      // Pulse phase
-      d.pulse += d.pulseSpeed;
-
-      // Glow timer
-      d.glowTimer--;
-      if (d.glowTimer <= 0) {
-        d.glowing = !d.glowing;
-        d.glowTimer = d.glowing
-          ? 40 + Math.floor(Math.random() * 60)   // glow duration
-          : 200 + Math.floor(Math.random() * 400); // rest duration
-      }
-    }
-
-    /* ── Draw connections ── */
-    for (let i = 0; i < dots.length; i++) {
-      for (let j = i + 1; j < dots.length; j++) {
-        const dx = dots[i].x - dots[j].x;
-        const dy = dots[i].y - dots[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > maxDist) continue;
-
-        const alpha = (1 - dist / maxDist) * 0.12;
-        ctx.beginPath();
-        ctx.moveTo(dots[i].x, dots[i].y);
-
-        // Slight curve for organic feel
-        const mx = (dots[i].x + dots[j].x) / 2;
-        const my = (dots[i].y + dots[j].y) / 2;
-        const nx = -(dots[i].y - dots[j].y);
-        const ny = dots[i].x - dots[j].x;
-        const len = Math.sqrt(nx * nx + ny * ny) || 1;
-        const bend = 0.06;
-        ctx.quadraticCurveTo(
-          mx + (nx / len) * dist * bend,
-          my + (ny / len) * dist * bend,
-          dots[j].x,
-          dots[j].y,
-        );
-
-        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-      }
-    }
-
-    /* ── Draw dots ── */
-    for (const d of dots) {
-      const [cr, cg, cb] = hexToRgb(d.color);
-      const pulseFactor = 0.5 + 0.5 * Math.sin(d.pulse);
-      const baseAlpha = 0.6 + pulseFactor * 0.35;
-      const r = d.r * (0.9 + pulseFactor * 0.15);
-
-      // Glow
-      if (d.glowing) {
-        const glowR = r * 5;
-        const grad = ctx.createRadialGradient(d.x, d.y, r, d.x, d.y, glowR);
-        grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.2)`);
-        grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, glowR, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-      }
-
-      // Core dot
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${cr},${cg},${cb},${baseAlpha})`;
-      ctx.fill();
-    }
-
-    /* ── Static pins + labels ── */
-    const pinR = Math.max(5, w * 0.013);
-    const labelFs = Math.max(8, Math.round(w * 0.02));
+    /* ── Pins ── */
+    const pinR = Math.max(8, w * 0.022);
+    const labelFs = Math.max(10, Math.round(w * 0.026));
     ctx.font = `${labelFs}px sans-serif`;
+
     for (let p = 0; p < PINS.length; p++) {
       const pin = PINS[p];
       const px = pin.nx * w;
       const py = pin.ny * h;
       const [cr, cg, cb] = hexToRgb(pin.color);
-      const pa = 0.45 + 0.15 * Math.sin(frameRef.current * 0.012 + p * 1.1);
+      const pulse = Math.sin(frameRef.current * 0.01 + p * 1.05);
+      const pa = 0.55 + 0.2 * pulse;
+      const scale = 1 + 0.08 * pulse;
+      const r = pinR * scale;
 
       // Glow
-      const gr = pinR * 4;
-      const grad = ctx.createRadialGradient(px, py, pinR, px, py, gr);
-      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${pa * 0.25})`);
+      const gr = r * 4.5;
+      const grad = ctx.createRadialGradient(px, py, r, px, py, gr);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${pa * 0.3})`);
       grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
       ctx.beginPath();
       ctx.arc(px, py, gr, 0, Math.PI * 2);
@@ -214,29 +81,29 @@ export default function HaritaBanner() {
 
       // Pin body (circle)
       ctx.beginPath();
-      ctx.arc(px, py, pinR, 0, Math.PI * 2);
+      ctx.arc(px, py, r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa})`;
       ctx.fill();
 
       // Pin tail (triangle pointing down)
       ctx.beginPath();
-      ctx.moveTo(px - pinR * 0.5, py + pinR * 0.7);
-      ctx.lineTo(px, py + pinR * 2);
-      ctx.lineTo(px + pinR * 0.5, py + pinR * 0.7);
+      ctx.moveTo(px - r * 0.5, py + r * 0.7);
+      ctx.lineTo(px, py + r * 2.2);
+      ctx.lineTo(px + r * 0.5, py + r * 0.7);
       ctx.closePath();
       ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa})`;
       ctx.fill();
 
       // Inner dot
       ctx.beginPath();
-      ctx.arc(px, py, pinR * 0.3, 0, Math.PI * 2);
+      ctx.arc(px, py, r * 0.3, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(13,13,13,${pa * 0.7})`;
       ctx.fill();
 
       // Label
       ctx.textAlign = "left";
-      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa * 0.55})`;
-      ctx.fillText(pin.label, px + pinR + 5, py + labelFs * 0.35);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa * 0.6})`;
+      ctx.fillText(pin.label, px + r + 6, py + labelFs * 0.35);
     }
 
     rafRef.current = requestAnimationFrame(draw);
@@ -257,21 +124,11 @@ export default function HaritaBanner() {
       canvas.style.height = `${h}px`;
       const ctx = canvas.getContext("2d");
       if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const isMobile = w < 500;
-      const count = isMobile ? MOBILE_COUNT : DESKTOP_COUNT;
-
-      // Re-create dots if size changed significantly or first init
-      const prev = sizeRef.current;
-      if (Math.abs(prev.w - w) > 50 || Math.abs(prev.h - h) > 50 || dotsRef.current.length === 0) {
-        dotsRef.current = createDots(count, w, h);
-      }
       sizeRef.current = { w, h };
     };
 
     resize();
     window.addEventListener("resize", resize);
-
     rafRef.current = requestAnimationFrame(draw);
 
     return () => {
@@ -307,21 +164,15 @@ export default function HaritaBanner() {
           </a>
         </div>
 
-        {/* Canvas animation */}
+        {/* Canvas */}
         <div
           className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/5"
           style={{ background: "#0d0d0d" }}
         >
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full"
-          />
-          {/* Vignette */}
+          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at center, transparent 40%, #0d0d0d 100%)",
-            }}
+            style={{ background: "radial-gradient(ellipse at center, transparent 40%, #0d0d0d 100%)" }}
           />
         </div>
       </div>
