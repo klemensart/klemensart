@@ -48,3 +48,7 @@ migrate-users.mjs
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Geçici - tahmin oyunu henüz yayınlanmayacak
+src/app/oyun/sanat-tahmini/
+public/images/oyun/
