@@ -433,6 +433,46 @@ const ROUTES: Route[] = [
   },
 ];
 
+/* ───────── Route SVG Icons ───────── */
+
+const ROUTE_ICON_PATHS: Record<number, string> = {
+  1: '<path d="M5 7h11 M5 17h11 M5 7v10"/><path d="M16 7c2.5 0 4 2.2 4 5s-1.5 5-4 5"/>',
+  2: '<path d="M12 3l7 4v4c0 5.5-3 9.5-7 12-4-2.5-7-6.5-7-12V7z"/>',
+  3: '<path d="M6 4h12 M6 20h12 M9 4v16 M15 4v16"/>',
+  4: '<path d="M4 12h16 M7 12c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8.5" cy="16" r="2"/><circle cx="15.5" cy="16" r="2"/><path d="M10.5 16h3"/>',
+  5: '<path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z M15 5l4 4"/>',
+  6: '<circle cx="12" cy="12" r="3.5"/><path d="M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5.6 5.6l2.1 2.1 M16.3 16.3l2.1 2.1 M5.6 18.4l2.1-2.1 M16.3 7.7l2.1-2.1"/>',
+  7: '<path d="M4 18l5-10 3 4 3-6 5 12H4z"/>',
+  8: '<path d="M4 17l2-10 4 5 2-6 2 6 4-5 2 10H4z"/>',
+  9: '<path d="M12 3C8 8.5 6 11.5 6 14a6 6 0 0 0 12 0c0-2.5-2-5.5-6-11z"/>',
+  10: '<path d="M3 20V10h7v10 M14 20V4h7v16"/><path d="M5 13h3 M5 16h3 M16 7h3 M16 11h3 M16 15h3"/>',
+  11: '<path d="M2 16h20 M5 16c0-5 3-9 7-9s7 4 7 9"/>',
+  12: '<circle cx="9" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/><path d="M7 8l-3-3 M17 8l3-3 M11.5 12h1"/>',
+  13: '<path d="M13 2L6 13h5l-2 9 7-11h-5z"/>',
+};
+
+function renderRouteIcon(id: number, color: string, size = 24) {
+  const bgSize = size + 8;
+  return (
+    <div
+      style={{
+        width: bgSize, height: bgSize, borderRadius: "50%",
+        background: `${color}1A`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0, transition: "background 0.2s",
+      }}
+      onMouseOver={(e) => { e.currentTarget.style.background = `${color}33`; }}
+      onMouseOut={(e) => { e.currentTarget.style.background = `${color}1A`; }}
+    >
+      <svg
+        width={size} height={size} viewBox="0 0 24 24" fill="none"
+        stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+        dangerouslySetInnerHTML={{ __html: ROUTE_ICON_PATHS[id] || "" }}
+      />
+    </div>
+  );
+}
+
 /* ───────── Component ───────── */
 
 export default function HaritaPage() {
@@ -879,7 +919,7 @@ export default function HaritaPage() {
           display: "flex", alignItems: "center", gap: 8, marginBottom: compact ? 12 : 16,
           paddingBottom: compact ? 10 : 12, borderBottom: `1px solid ${activeRoute.color}30`,
         }}>
-          <span style={{ fontSize: compact ? 18 : 22 }}>{activeRoute.icon}</span>
+          {renderRouteIcon(activeRoute.id, activeRoute.color, compact ? 16 : 20)}
           <span style={{ color: activeRoute.color, fontSize: compact ? 12 : 13, fontWeight: 600, letterSpacing: 1 }}>
             {activeRoute.title}
           </span>
@@ -1237,7 +1277,7 @@ export default function HaritaPage() {
                 onMouseOver={(e) => { if (!isNightLocked) (e.currentTarget).style.background = "rgba(255,255,255,0.07)"; }}
                 onMouseOut={(e) => { (e.currentTarget).style.background = "rgba(255,255,255,0.03)"; }}
               >
-                <span style={{ fontSize: 24, lineHeight: 1 }}>{route.icon}</span>
+                {renderRouteIcon(route.id, route.color, 22)}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
                     {route.title}
@@ -1310,7 +1350,7 @@ export default function HaritaPage() {
                   opacity: isNightLocked ? 0.4 : 1,
                 }}
               >
-                <span style={{ fontSize: 20, lineHeight: 1 }}>{route.icon}</span>
+                {renderRouteIcon(route.id, route.color, 18)}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: "#fff", fontSize: 13, fontWeight: 600, marginBottom: 3 }}>
                     {route.title}

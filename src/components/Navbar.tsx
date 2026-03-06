@@ -5,11 +5,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
-const navLinks = [
-  { label: "Atölyeler",  href: "/atolyeler"           },
-  { label: "Testler",    href: "/testler" },
-  { label: "Etkinlikler",href: "#etkinlikler"         },
-  { label: "Hakkımızda", href: "/hakkimizda"          },
+const navLinks: { label: string; href: string; badge?: string }[] = [
+  { label: "Atölyeler",   href: "/atolyeler" },
+  { label: "Testler",     href: "/testler" },
+  { label: "Etkinlikler", href: "#etkinlikler" },
+  { label: "Harita",      href: "/harita",     badge: "Yeni" },
+  { label: "Hakkımızda",  href: "/hakkimizda" },
 ];
 
 function getInitials(email: string) {
@@ -72,9 +73,14 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-warm-900/60 hover:text-warm-900 transition-colors"
+              className="text-sm font-medium text-warm-900/60 hover:text-warm-900 transition-colors flex items-center gap-1.5"
             >
               {link.label}
+              {link.badge && (
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-coral text-white rounded-full animate-pulse leading-none">
+                  {link.badge}
+                </span>
+              )}
             </a>
           ))}
         </div>
@@ -133,10 +139,15 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-warm-900/70 py-1"
+              className="text-sm font-medium text-warm-900/70 py-1 flex items-center gap-1.5"
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
+              {link.badge && (
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-coral text-white rounded-full animate-pulse leading-none">
+                  {link.badge}
+                </span>
+              )}
             </a>
           ))}
 

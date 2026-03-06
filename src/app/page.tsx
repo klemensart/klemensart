@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import Hizmetler from "@/components/Hizmetler";
 import DunyamiziBolum from "@/components/DunyamiziBolum";
 import IceriklerSection from "@/components/IceriklerSection";
+import HaritaBanner from "@/components/HaritaBanner";
 import Manifesto from "@/components/Manifesto";
 import Etkinlikler from "@/components/Etkinlikler";
 import Bulten from "@/components/Bulten";
@@ -16,6 +17,7 @@ export default function Home() {
       <Hizmetler />
       <DunyamiziBolum />
       <IceriklerSection />
+      <HaritaBanner />
       <Manifesto />
       <Etkinlikler />
       <Bulten />
