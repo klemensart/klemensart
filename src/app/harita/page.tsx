@@ -64,6 +64,14 @@ const TYPE_LABELS: Record<PlaceType, string> = {
   tarihi: "Tarihi",
 };
 
+const TYPE_SVGS: Record<PlaceType, string> = {
+  müze: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/><path d="M10 10h1"/><path d="M14 10h-1"/></svg>`,
+  galeri: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><path d="M17 3a2.5 2.5 0 0 1 0 5"/><path d="M3 19.5C3 10 13.5 12 13.5 6.5"/><path d="M5.5 19.5 3 22"/><path d="M18.5 19.5 21 22"/><path d="M12 19.5a7.5 7.5 0 0 0-7.5 0h15a7.5 7.5 0 0 0-7.5 0z"/></svg>`,
+  konser: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  tiyatro: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v4a8 8 0 0 1-8 8H8a8 8 0 0 1-6-3"/><circle cx="10" cy="9" r="1"/><circle cx="16" cy="9" r="1"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>`,
+  tarihi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 21V11l4-4 4 4 4-4 4 4v10"/><path d="M9 21v-4h6v4"/><path d="M3 11h18"/></svg>`,
+};
+
 const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
   { key: "all", label: "Tümü" },
   { key: "müze", label: "Müzeler" },
@@ -389,16 +397,21 @@ export default function HaritaPage() {
 
       if (!mapContainerRef.current) return;
 
+      const ankaraBounds = Leaf.latLngBounds([39.6, 32.2], [40.2, 33.4]);
       const map = Leaf.map(mapContainerRef.current, {
         center: [39.935, 32.860],
         zoom: 13,
         zoomControl: false,
+        maxBounds: ankaraBounds,
+        maxBoundsViscosity: 1.0,
+        minZoom: 10,
+        maxZoom: 18,
       });
       mapRef.current = map;
 
       Leaf.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-        maxZoom: 19,
+        maxZoom: 18,
       }).addTo(map);
 
       Leaf.control.zoom({ position: "bottomleft" }).addTo(map);
@@ -440,19 +453,26 @@ export default function HaritaPage() {
 
     filtered.forEach((place) => {
       const color = TYPE_COLORS[place.type];
-      const size = 14;
+      const svg = TYPE_SVGS[place.type];
+      const showLabel = currentZoom >= 15;
+      const labelHtml = showLabel
+        ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6);pointer-events:none;">${place.name}</div>`
+        : "";
       const icon = Leaf.divIcon({
-        className: "",
-        iconSize: [size * 2 + 12, size * 2 + 12],
-        iconAnchor: [size + 6, size + 6],
-        html: `<div style="
-          width:${size}px;height:${size}px;border-radius:50%;
-          background:${color};
-          box-shadow:0 0 ${size}px ${color},0 0 ${size * 2}px ${color}80;
-          position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-          transition:transform 0.2s;cursor:pointer;
-          animation:pulse-marker 2s infinite;
-        "></div>`,
+        className: "culture-marker",
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        html: `<div style="position:relative;">
+          <div class="marker-circle" style="
+            width:36px;height:36px;border-radius:50%;
+            background:${color};
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 2px 8px rgba(0,0,0,0.4),0 0 12px ${color}50;
+            cursor:pointer;transition:transform 0.2s;
+            animation:marker-glow 3s infinite;
+            --glow-color:${color};
+          ">${svg}</div>${labelHtml}
+        </div>`,
       });
 
       const marker = Leaf.marker([place.lat, place.lng], { icon });
@@ -624,11 +644,12 @@ export default function HaritaPage() {
   return (
     <div style={{ width: "100%", height: "100vh", background: "#1a1a1a", position: "relative", overflow: "hidden" }}>
       <style>{`
-        @keyframes pulse-marker {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
+        @keyframes marker-glow {
+          0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 12px var(--glow-color, #4A9EFF)50; }
+          50% { box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 20px var(--glow-color, #4A9EFF)80; }
         }
         .leaflet-container { background: #1a1a1a !important; }
+        .culture-marker .marker-circle:hover { transform: scale(1.17); }
       `}</style>
 
       {/* Map */}
