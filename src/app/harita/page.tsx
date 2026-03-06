@@ -42,6 +42,8 @@ type Route = {
   color: string;
   desc: string;
   stops: RouteStop[];
+  fx?: "xray" | "grayscale" | "noir" | "neon" | "rock";
+  nightOnly?: boolean;
 };
 
 type MapMode = "explore" | "routes";
@@ -353,6 +355,82 @@ const ROUTES: Route[] = [
       { lat: 39.5900, lng: 32.1600, name: "Polatlı Duatepe Anıtı", story: "Dönüş yolunda — 1921 Sakarya Muharebesi'nde Türk ordusunun karşı taarruza geçtiği ilk tepe. Metin Yurdanur'un devasa anıtlarıyla taçlandırılmış zafer noktası." },
     ],
   },
+  {
+    id: 9,
+    title: "Görünmez Şehir: Kayıp Sular",
+    icon: "\u{1F4A7}",
+    duration: "~2 saat \u{1F463}",
+    color: "#00BCD4",
+    desc: "Ankara'nın yeraltına hapsedilen kayıp nehirleri",
+    fx: "xray",
+    stops: [
+      { lat: 39.9550, lng: 32.8200, name: "Akköprü", story: "Yeraltına hapsedilen Ankara Çayı ve İncesu Deresi'nin nihayet yeryüzüne çıkıp birleşerek altından aktığı 800 yıllık Selçuklu köprüsü. 1222 yapımı 7 kemerli taş yapı, kayıp suların son tanığı." },
+      { lat: 39.9420, lng: 32.8530, name: "Bentderesi (Kayıp Vadi)", story: "1950'lere kadar şelalelerin aktığı, Roma köprülerinin bulunduğu vadinin üzeri beton ve asfaltla kapatıldı. Bugün Bentderesi Caddesi'nin altında hâlâ su akıyor — şehrin en büyük sırrı." },
+      { lat: 39.9150, lng: 32.8580, name: "Kavaklıdere Su Kaynağı", story: "Semt adını gerçekten burada akan dereden aldı. Kavak ağaçlarının gölgesindeki dere bugün Kuğulu Park'ın altından besleniyor. Parkın kuğuları farkında olmadan kayıp bir nehrin üzerinde yüzüyor." },
+      { lat: 39.9440, lng: 32.8600, name: "Roma Hamamı Hipokost Sistemi", story: "Antik çağda kentin sıcak su ve buhar döngüsünü sağlayan yeraltı dehliz ağı. Romalılar Ankara'nın sularını sadece içmedi, mühendislik harikasına dönüştürdü. Hipokost kanalları hâlâ zeminin altında." },
+    ],
+  },
+  {
+    id: 10,
+    title: "Betonun Şiiri: Brütalist Ankara",
+    icon: "\u{1F6F8}",
+    duration: "~3 saat \u{1F4F8}",
+    color: "#90A4AE",
+    desc: "Fotoğrafçılar için brütalist mimari turu",
+    fx: "grayscale",
+    stops: [
+      { lat: 39.9170, lng: 32.8620, name: "Cinnah 19", story: "1957'de inşa edilen, altından havuz geçen asimetrik apartman. Uzay çağı estetiğiyle Ankara'nın ilk avangart sivil yapısı. Bilimkurgu filmlerinden fırlamış gibi — fotoğrafçıların gizli cenneti." },
+      { lat: 39.8910, lng: 32.7870, name: "ODTÜ Mimarlık Fakültesi", story: "Altuğ ve Behruz Çinici tasarımı. Çıplak betonun Türkiye'deki en heykelsi temsilcisi — dev geometrik formlar, gölge oyunları, brutalizmin şiiri. Le Corbusier Ankara'ya gelseydi burayı kıskanırdı." },
+      { lat: 39.9210, lng: 32.8540, name: "Kızılay Emek İşhanı", story: "1959, Türkiye'nin ilk modern gökdeleni. Rasyonalist mimari ve cam giydirme cephe — dönemin 'geleceğin şehri' vizyonunun Ankara'daki somut hali." },
+      { lat: 39.9130, lng: 32.8600, name: "Türk Dil Kurumu Binası", story: "Mimar Cengiz Bektaş'ın ödüllü başyapıtı. İç avlu, su ögeleri ve geometrik ışık oyunları — modernizmin Anadolu topraklarında kök salması. Beton burada şiire dönüşüyor." },
+    ],
+  },
+  {
+    id: 11,
+    title: "Ankara Noir: Sis, Cinayet ve Daktilo",
+    icon: "\u{1F575}\uFE0F",
+    duration: "~2.5 saat \u{1F463}",
+    color: "#37474F",
+    desc: "Ankara'nın karanlık ve gizemli yüzü",
+    fx: "noir",
+    stops: [
+      { lat: 39.9415, lng: 32.8530, name: "Rüzgarlı Sokak", story: "Eski matbaaların, gazetecilerin ve bürokratik sırların bir zamanlar kalbinin attığı melankolik cadde. Gece lambaları altında gölgeler uzar, daktilo sesleri yankılanırdı. Ankara noir'ın doğum yeri." },
+      { lat: 39.9430, lng: 32.8700, name: "Ulucanlar Cezaevi — Dar Ağacı Avlusu", story: "Siyasi ve edebi tarihin en ağır bedellerinin ödendiği yer. Bu avluda son nefesler verildi, son mektuplar yazıldı. Duvarlar hâlâ fısıldıyor." },
+      { lat: 39.9350, lng: 32.8750, name: "Cebeci Asri Mezarlığı", story: "Sisli sabahların en ürpertici adresi. Faili meçhul cinayetlere kurban giden aydınlar, yazarlar, siyasetçiler burada yatıyor. Her mezar taşı bir çözülmemiş hikaye." },
+      { lat: 39.9410, lng: 32.8560, name: "İtfaiye Meydanı (Hergelen Meydanı)", story: "Eski Ankara'nın bitpazarı. Kayıp eşyaların, sahte kimliklerin ve şehrin karanlık hafızasının toplandığı asırlık meydan. Her Pazar sabahı burada bir sır satılır." },
+    ],
+  },
+  {
+    id: 12,
+    title: "Gece Vardiyası: 03:00'ten Sonra Bozkır",
+    icon: "\u{1F989}",
+    duration: "~Gece turu \u{1F319}",
+    color: "#FF9800",
+    desc: "Gece kuşları için — 23:00'te açılır",
+    fx: "neon",
+    nightOnly: true,
+    stops: [
+      { lat: 39.9350, lng: 32.8100, name: "AOÇ Sabaha Karşı Kokoreç", story: "Gece yarısından sonra tüm şehir arabalarına atlayıp buraya gelir. Odun ateşinde kokoreç, semaver çayı, yıldızların altında. Ankara'nın en demokratik sofrası — CEO ile taksi şoförü aynı sırada." },
+      { lat: 39.9230, lng: 32.8650, name: "Esat Caddesi Aspava Savaşları", story: "Saat 04:00, neon tabelalar yanıyor. Gece kulübü çıkışı soslu dürüm döner, ikram salata, semaverde çay. Ankara'nın uykusuz gastronomi ritüelinin en yoğun yaşandığı sokak." },
+      { lat: 39.9410, lng: 32.8560, name: "İtfaiye Meydanı Gece Çorbacıları", story: "Gündüzleri bitpazarı olan sokaklar gece yarısı kepenk açar. Taksiciler ve bürokratlar yan yana kelle paça içer. Salaş plastik sandalyeler, buğulu camlar, huzur." },
+      { lat: 39.9500, lng: 32.7400, name: "Şaşmaz Sanayi Gece Köftecileri", story: "Şehrin en büyük oto sanayi sitesinin ıssız sokaklarında gece yarısı beliren seyyar ateşler. İnanılmaz bir kalabalık nereden geldi bilinmez. Mangal dumanı, köfte kokusu, sanayi estetiği." },
+    ],
+  },
+  {
+    id: 13,
+    title: "Bozkırın Distorsiyonu: 90'lar Rock",
+    icon: "\u{1F3B8}",
+    duration: "~2 saat \u{1F463}+\u{1F3B5}",
+    color: "#F44336",
+    desc: "Ankara rock ve metal alt kültürünün izinde",
+    fx: "rock",
+    stops: [
+      { lat: 39.9200, lng: 32.8540, name: "Kızılay SSK İşhanı", story: "1980'ler ve 90'lar. Bu işhanının bodrum katları ve pasajları Ankara rock ve heavy metal alt kültürünün doğum yeri. Kasetçiler, fanzin dağıtıcıları, deri ceketli gençler. Pentagram, Mezarkabul buralarda filizlendi." },
+      { lat: 39.9130, lng: 32.8590, name: "Tunalı Pasajları", story: "Ertuğ ve Kuğulu pasajları — sokak müzisyenlerinin, ilk stüdyoların yuvası. Şebnem Ferah'ın, Athena'nın, Dr. Skull'ın temellerinin atıldığı kült yeraltı ağı. Her pasaj kapısı bir portal." },
+      { lat: 39.9210, lng: 32.8530, name: "Zafer Çarşısı Sahafları", story: "İnternet öncesi dönemde isyankar gençliğin korsan kaset, fanzin ve yasaklı kitap avına çıktığı efsanevi çarşı. Burada bir kaset bulmak, bugün Spotify'da playlist yapmaktan daha heyecanlıydı." },
+      { lat: 39.9220, lng: 32.8550, name: "Sakarya Caddesi", story: "Salaş birahaneler, canlı müzik barları, korsan kasetçiler. Bozkırın gençliği gece gündüz demeden burada müzik yarattı. Ankara rock'ının ana caddesi — her köşede bir anı, her birahane bir efsane." },
+    ],
+  },
 ];
 
 /* ───────── Component ───────── */
@@ -367,6 +445,10 @@ export default function HaritaPage() {
   const markersRef = useRef<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const routeLayersRef = useRef<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tileLayerRef = useRef<any>(null);
+  const fxStyleRef = useRef<HTMLStyleElement | null>(null);
+  const noiseOverlayRef = useRef<HTMLDivElement | null>(null);
 
   // Explore mode state
   const [activeFilter, setActiveFilter] = useState<PlaceType | "all">("all");
@@ -422,6 +504,61 @@ export default function HaritaPage() {
     routeLayersRef.current = [];
   }, []);
 
+  // Apply / clear map visual effects for special routes
+  const applyMapEffect = useCallback((fx?: string) => {
+    clearMapEffect();
+    if (!fx) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
+    const tilePane = container.querySelector(".leaflet-tile-pane") as HTMLElement | null;
+    if (!tilePane) return;
+
+    // Inject CSS keyframes once
+    if (!fxStyleRef.current) {
+      const s = document.createElement("style");
+      s.textContent = `
+        @keyframes waterFlow { to { stroke-dashoffset: -64; } }
+        .water-flow path { animation: waterFlow 1.5s linear infinite; }
+        .water-glow path { filter: drop-shadow(0 0 6px #00E5FF); }
+        @keyframes neonPulse { 0%,100%{box-shadow:0 0 8px #FF980080;} 50%{box-shadow:0 0 20px #FF9800cc;} }
+      `;
+      document.head.appendChild(s);
+      fxStyleRef.current = s;
+    }
+
+    tilePane.style.transition = "filter 0.5s, opacity 0.5s";
+
+    if (fx === "xray") {
+      tilePane.style.opacity = "0.3";
+    } else if (fx === "grayscale") {
+      tilePane.style.filter = "grayscale(1) contrast(1.3)";
+    } else if (fx === "noir") {
+      tilePane.style.filter = "sepia(0.3)";
+      // noise overlay
+      const noise = document.createElement("div");
+      noise.style.cssText = `position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0.06;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");`;
+      container.appendChild(noise);
+      noiseOverlayRef.current = noise;
+    } else if (fx === "rock") {
+      tilePane.style.filter = "hue-rotate(30deg) saturate(0.5)";
+    }
+    // "neon" has no tile effect, only marker glow — handled in drawRoute
+  }, []);
+
+  const clearMapEffect = useCallback(() => {
+    const container = mapContainerRef.current;
+    if (!container) return;
+    const tilePane = container.querySelector(".leaflet-tile-pane") as HTMLElement | null;
+    if (tilePane) {
+      tilePane.style.opacity = "";
+      tilePane.style.filter = "";
+    }
+    if (noiseOverlayRef.current) {
+      noiseOverlayRef.current.remove();
+      noiseOverlayRef.current = null;
+    }
+  }, []);
+
   // Compute mobile bottom padding for fitBounds
   const getMobilePanelPx = useCallback(() => {
     if (typeof window === "undefined") return 0;
@@ -437,20 +574,45 @@ export default function HaritaPage() {
 
     clearRouteLayers();
 
-    // Draw polyline
     const latLngs = route.stops.map((s) => [s.lat, s.lng] as [number, number]);
-    const polyline = Leaf.polyline(latLngs, {
-      color: route.color,
-      weight: 3,
-      opacity: 0.7,
-      dashArray: "8, 8",
-    }).addTo(map);
-    routeLayersRef.current.push(polyline);
+    const fx = route.fx;
 
-    // Draw numbered markers
+    // Draw polyline — style varies by fx
+    if (fx === "xray") {
+      // Glow underline
+      const glow = Leaf.polyline(latLngs, { color: "#00BCD4", weight: 10, opacity: 0.25, className: "water-glow" }).addTo(map);
+      routeLayersRef.current.push(glow);
+      // Animated flowing line
+      const flow = Leaf.polyline(latLngs, { color: "#00E5FF", weight: 3, opacity: 0.9, dashArray: "12, 20", className: "water-flow" }).addTo(map);
+      routeLayersRef.current.push(flow);
+    } else if (fx === "noir") {
+      const line = Leaf.polyline(latLngs, { color: "#ffffff", weight: 2, opacity: 0.3, dashArray: "6, 10" }).addTo(map);
+      routeLayersRef.current.push(line);
+    } else if (fx === "rock") {
+      // Zigzag polyline: insert offset midpoints
+      const zigzag: [number, number][] = [];
+      for (let i = 0; i < latLngs.length; i++) {
+        zigzag.push(latLngs[i]);
+        if (i < latLngs.length - 1) {
+          const midLat = (latLngs[i][0] + latLngs[i + 1][0]) / 2 + (Math.random() - 0.5) * 0.003;
+          const midLng = (latLngs[i][1] + latLngs[i + 1][1]) / 2 + (Math.random() - 0.5) * 0.003;
+          zigzag.push([midLat, midLng]);
+        }
+      }
+      const line = Leaf.polyline(zigzag, { color: "#F44336", weight: 4, opacity: 0.7 }).addTo(map);
+      routeLayersRef.current.push(line);
+    } else {
+      // Default polyline
+      const polyline = Leaf.polyline(latLngs, { color: route.color, weight: 3, opacity: 0.7, dashArray: "8, 8" }).addTo(map);
+      routeLayersRef.current.push(polyline);
+    }
+
+    // Draw numbered markers — neon glow for fx=neon
+    const isNeon = fx === "neon";
     route.stops.forEach((stop, i) => {
       const isActive = i === stopIdx;
       const size = isActive ? 32 : 26;
+      const neonGlow = isNeon ? `0 0 14px ${route.color}, 0 0 28px ${route.color}80` : "";
       const icon = Leaf.divIcon({
         className: "",
         iconSize: [size, size],
@@ -463,8 +625,9 @@ export default function HaritaPage() {
           color:${isActive ? "#fff" : route.color};
           font-weight:700;font-size:${isActive ? 14 : 12}px;
           cursor:pointer;
-          box-shadow:${isActive ? `0 0 12px ${route.color}80` : "none"};
+          box-shadow:${isNeon ? neonGlow : (isActive ? `0 0 12px ${route.color}80` : "none")};
           transition:all 0.2s;
+          ${isNeon ? "animation:neonPulse 2s ease-in-out infinite;" : ""}
         ">${i + 1}</div>`,
       });
       const marker = Leaf.marker([stop.lat, stop.lng], { icon });
@@ -478,7 +641,7 @@ export default function HaritaPage() {
     // Fit bounds with mobile panel padding
     if (fit !== false) {
       const bottomPad = getMobilePanelPx();
-      map.fitBounds(polyline.getBounds(), {
+      map.fitBounds(Leaf.latLngBounds(latLngs), {
         paddingTopLeft: [60, 60],
         paddingBottomRight: [60, 60 + bottomPad],
         maxZoom: 16,
@@ -492,16 +655,18 @@ export default function HaritaPage() {
     setActiveStopIndex(0);
     setShowRouteList(false);
     setPanelPct(40);
+    applyMapEffect(route.fx);
     drawRoute(route, 0, true);
-  }, [drawRoute]);
+  }, [drawRoute, applyMapEffect]);
 
   // Deselect route
   const deselectRoute = useCallback(() => {
     clearRouteLayers();
+    clearMapEffect();
     setActiveRoute(null);
     setActiveStopIndex(0);
     setShowRouteList(true);
-  }, [clearRouteLayers]);
+  }, [clearRouteLayers, clearMapEffect]);
 
   // When active stop changes, redraw & fly to (offset for mobile panel)
   useEffect(() => {
@@ -530,6 +695,7 @@ export default function HaritaPage() {
     // Clean up current mode
     if (mode === "routes") {
       clearRouteLayers();
+      clearMapEffect();
       setActiveRoute(null);
       setActiveStopIndex(0);
       setShowRouteList(true);
@@ -542,7 +708,7 @@ export default function HaritaPage() {
     if (mapRef.current) {
       mapRef.current.flyTo([39.935, 32.860], 13, { duration: 0.5 });
     }
-  }, [mode, clearRouteLayers]);
+  }, [mode, clearRouteLayers, clearMapEffect]);
 
   // Initialize map (dynamic import)
   useEffect(() => {
@@ -571,7 +737,7 @@ export default function HaritaPage() {
       });
       mapRef.current = map;
 
-      Leaf.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      tileLayerRef.current = Leaf.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
         maxZoom: 18,
       }).addTo(map);
@@ -1052,29 +1218,33 @@ export default function HaritaPage() {
             ROTALAR
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {ROUTES.map((route) => (
+            {ROUTES.map((route) => {
+              const isNightLocked = route.nightOnly && (() => { const h = new Date().getHours(); return h >= 5 && h < 23; })();
+              return (
               <button
                 key={route.id}
-                onClick={() => selectRoute(route)}
+                onClick={() => !isNightLocked && selectRoute(route)}
                 style={{
                   display: "flex", alignItems: "flex-start", gap: 12,
                   padding: "14px", borderRadius: 10,
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.06)",
                   borderLeft: `3px solid ${route.color}`,
-                  cursor: "pointer", textAlign: "left",
+                  cursor: isNightLocked ? "not-allowed" : "pointer", textAlign: "left",
                   transition: "all 0.2s",
+                  opacity: isNightLocked ? 0.4 : 1,
                 }}
-                onMouseOver={(e) => { (e.currentTarget).style.background = "rgba(255,255,255,0.07)"; }}
+                onMouseOver={(e) => { if (!isNightLocked) (e.currentTarget).style.background = "rgba(255,255,255,0.07)"; }}
                 onMouseOut={(e) => { (e.currentTarget).style.background = "rgba(255,255,255,0.03)"; }}
               >
                 <span style={{ fontSize: 24, lineHeight: 1 }}>{route.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
                     {route.title}
+                    {isNightLocked && <span style={{ marginLeft: 6 }}>{"\u{1F512}"}</span>}
                   </div>
-                  <div style={{ color: "#888", fontSize: 11, marginBottom: 6, lineHeight: 1.4 }}>
-                    {route.desc}
+                  <div style={{ color: isNightLocked ? "#FF9800" : "#888", fontSize: 11, marginBottom: 6, lineHeight: 1.4 }}>
+                    {isNightLocked ? "Gece Kuşları İçin — 23:00'te Açılır" : route.desc}
                   </div>
                   <div style={{ display: "flex", gap: 8, color: "#666", fontSize: 10 }}>
                     <span>{route.stops.length} durak</span>
@@ -1083,7 +1253,8 @@ export default function HaritaPage() {
                   </div>
                 </div>
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -1123,32 +1294,41 @@ export default function HaritaPage() {
             ROTALAR
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {ROUTES.map((route) => (
+            {ROUTES.map((route) => {
+              const isNightLocked = route.nightOnly && (() => { const h = new Date().getHours(); return h >= 5 && h < 23; })();
+              return (
               <button
                 key={route.id}
-                onClick={() => selectRoute(route)}
+                onClick={() => !isNightLocked && selectRoute(route)}
                 style={{
                   display: "flex", alignItems: "flex-start", gap: 10,
                   padding: "12px", borderRadius: 10,
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.06)",
                   borderLeft: `3px solid ${route.color}`,
-                  cursor: "pointer", textAlign: "left",
+                  cursor: isNightLocked ? "not-allowed" : "pointer", textAlign: "left",
+                  opacity: isNightLocked ? 0.4 : 1,
                 }}
               >
                 <span style={{ fontSize: 20, lineHeight: 1 }}>{route.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: "#fff", fontSize: 13, fontWeight: 600, marginBottom: 3 }}>
                     {route.title}
+                    {isNightLocked && <span style={{ marginLeft: 4, fontSize: 11 }}>{"\u{1F512}"}</span>}
                   </div>
-                  <div style={{ display: "flex", gap: 6, color: "#666", fontSize: 10 }}>
-                    <span>{route.stops.length} durak</span>
-                    <span>&middot;</span>
-                    <span>{route.duration}</span>
-                  </div>
+                  {isNightLocked ? (
+                    <div style={{ color: "#FF9800", fontSize: 10, marginBottom: 3 }}>23:00&apos;te Açılır</div>
+                  ) : (
+                    <div style={{ display: "flex", gap: 6, color: "#666", fontSize: 10 }}>
+                      <span>{route.stops.length} durak</span>
+                      <span>&middot;</span>
+                      <span>{route.duration}</span>
+                    </div>
+                  )}
                 </div>
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
