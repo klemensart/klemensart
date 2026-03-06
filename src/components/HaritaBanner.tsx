@@ -27,85 +27,15 @@ type Dot = {
   glowTimer: number;   // frames until next glow toggle
 };
 
-/* ── Ankara skyline silhouette drawer ── */
-function traceSkyline(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const baseY = h * 0.90;
-  const peak = h * 0.42;
-  const px = (n: number) => n * w;
-  const py = (n: number) => baseY - n * peak;
-
-  ctx.moveTo(0, baseY);
-
-  // Low left buildings
-  ctx.lineTo(px(0.04), py(0.06));
-  ctx.lineTo(px(0.07), py(0.13));
-  ctx.lineTo(px(0.09), py(0.08));
-
-  // Ankara Kalesi — crenellated castle walls
-  ctx.lineTo(px(0.11), py(0.16));
-  ctx.lineTo(px(0.13), py(0.38));
-  ctx.lineTo(px(0.15), py(0.33));
-  ctx.lineTo(px(0.16), py(0.40));
-  ctx.lineTo(px(0.17), py(0.33));
-  ctx.lineTo(px(0.18), py(0.43));
-  ctx.lineTo(px(0.19), py(0.35));
-  ctx.lineTo(px(0.21), py(0.39));
-  ctx.lineTo(px(0.23), py(0.20));
-  ctx.lineTo(px(0.26), py(0.12));
-
-  // Low buildings
-  ctx.lineTo(px(0.29), py(0.08));
-  ctx.lineTo(px(0.31), py(0.15));
-  ctx.lineTo(px(0.33), py(0.10));
-
-  // Kocatepe Camii — left minaret
-  ctx.lineTo(px(0.355), py(0.10));
-  ctx.lineTo(px(0.36), py(0.52));
-  ctx.lineTo(px(0.365), py(0.10));
-
-  // Main dome (smooth curve)
-  ctx.lineTo(px(0.38), py(0.18));
-  ctx.quadraticCurveTo(px(0.425), py(0.60), px(0.47), py(0.18));
-
-  // Right minaret
-  ctx.lineTo(px(0.485), py(0.10));
-  ctx.lineTo(px(0.49), py(0.52));
-  ctx.lineTo(px(0.495), py(0.10));
-
-  // Gap
-  ctx.lineTo(px(0.52), py(0.06));
-  ctx.lineTo(px(0.54), py(0.13));
-  ctx.lineTo(px(0.56), py(0.08));
-
-  // Anıtkabir — flat-roofed rectangular monument
-  ctx.lineTo(px(0.58), py(0.10));
-  ctx.lineTo(px(0.59), py(0.35));
-  ctx.lineTo(px(0.67), py(0.35));
-  ctx.lineTo(px(0.68), py(0.10));
-
-  // Buildings
-  ctx.lineTo(px(0.71), py(0.08));
-  ctx.lineTo(px(0.73), py(0.17));
-  ctx.lineTo(px(0.76), py(0.10));
-
-  // Atakule — thin tower with observation disc
-  ctx.lineTo(px(0.785), py(0.10));
-  ctx.lineTo(px(0.785), py(0.48));
-  ctx.lineTo(px(0.775), py(0.53));
-  ctx.lineTo(px(0.78), py(0.56));
-  ctx.lineTo(px(0.79), py(0.72));
-  ctx.lineTo(px(0.80), py(0.56));
-  ctx.lineTo(px(0.805), py(0.53));
-  ctx.lineTo(px(0.795), py(0.48));
-  ctx.lineTo(px(0.795), py(0.10));
-
-  // Fade out right
-  ctx.lineTo(px(0.83), py(0.14));
-  ctx.lineTo(px(0.87), py(0.08));
-  ctx.lineTo(px(0.91), py(0.10));
-  ctx.lineTo(px(0.95), py(0.04));
-  ctx.lineTo(w, baseY);
-}
+/* ── Static map pins — fixed cultural landmarks ── */
+const PINS = [
+  { nx: 0.20, ny: 0.24, color: "#3B82F6", label: "müze" },
+  { nx: 0.52, ny: 0.16, color: "#FF6D60", label: "galeri" },
+  { nx: 0.35, ny: 0.56, color: "#8B5CF6", label: "konser" },
+  { nx: 0.73, ny: 0.36, color: "#F59E0B", label: "tarihi" },
+  { nx: 0.14, ny: 0.74, color: "#7C3AED", label: "edebiyat" },
+  { nx: 0.82, ny: 0.66, color: "#10B981", label: "gastronomi" },
+];
 
 const DESKTOP_COUNT = 28;
 const MOBILE_COUNT = 14;
@@ -157,26 +87,26 @@ export default function HaritaBanner() {
     ctx.clearRect(0, 0, w, h);
     frameRef.current++;
 
-    /* ── Ankara skyline silhouette (bottom half, breathing) ── */
-    const skyPulse = Math.sin(frameRef.current * 0.01); // ~10s cycle at 60fps
-    const skyStrokeA = 0.115 + 0.035 * skyPulse;        // 0.08 – 0.15
-    const skyFillA = 0.04 + 0.02 * skyPulse;            // 0.02 – 0.06
-
-    // Filled shape (skyline + bottom rectangle)
-    ctx.beginPath();
-    traceSkyline(ctx, w, h);
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(255,109,96,${skyFillA})`;
-    ctx.fill();
-
-    // Stroke only along the skyline top edge
-    ctx.beginPath();
-    traceSkyline(ctx, w, h);
-    ctx.strokeStyle = `rgba(255,109,96,${skyStrokeA})`;
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    /* ── Coordinate grid (very faint) ── */
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.lineWidth = 0.5;
+    for (let i = 1; i <= 4; i++) {
+      const gy = h * (i / 5);
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+    }
+    for (let i = 1; i <= 5; i++) {
+      const gx = w * (i / 6);
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke();
+    }
+    const coordFs = Math.max(8, Math.round(w * 0.02));
+    ctx.font = `${coordFs}px monospace`;
+    ctx.fillStyle = "rgba(255,255,255,0.07)";
+    ctx.textAlign = "left";
+    ctx.fillText("39.9°N", 6, h * 0.2 - 4);
+    ctx.fillText("39.8°N", 6, h * 0.6 - 4);
+    ctx.textAlign = "center";
+    ctx.fillText("32.8°E", w * 0.33, h - 6);
+    ctx.fillText("32.9°E", w * 0.67, h - 6);
 
     /* ── Update positions ── */
     for (const d of dots) {
@@ -259,6 +189,54 @@ export default function HaritaBanner() {
       ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${cr},${cg},${cb},${baseAlpha})`;
       ctx.fill();
+    }
+
+    /* ── Static pins + labels ── */
+    const pinR = Math.max(5, w * 0.013);
+    const labelFs = Math.max(8, Math.round(w * 0.02));
+    ctx.font = `${labelFs}px sans-serif`;
+    for (let p = 0; p < PINS.length; p++) {
+      const pin = PINS[p];
+      const px = pin.nx * w;
+      const py = pin.ny * h;
+      const [cr, cg, cb] = hexToRgb(pin.color);
+      const pa = 0.45 + 0.15 * Math.sin(frameRef.current * 0.012 + p * 1.1);
+
+      // Glow
+      const gr = pinR * 4;
+      const grad = ctx.createRadialGradient(px, py, pinR, px, py, gr);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${pa * 0.25})`);
+      grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+      ctx.beginPath();
+      ctx.arc(px, py, gr, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Pin body (circle)
+      ctx.beginPath();
+      ctx.arc(px, py, pinR, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa})`;
+      ctx.fill();
+
+      // Pin tail (triangle pointing down)
+      ctx.beginPath();
+      ctx.moveTo(px - pinR * 0.5, py + pinR * 0.7);
+      ctx.lineTo(px, py + pinR * 2);
+      ctx.lineTo(px + pinR * 0.5, py + pinR * 0.7);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa})`;
+      ctx.fill();
+
+      // Inner dot
+      ctx.beginPath();
+      ctx.arc(px, py, pinR * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(13,13,13,${pa * 0.7})`;
+      ctx.fill();
+
+      // Label
+      ctx.textAlign = "left";
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pa * 0.55})`;
+      ctx.fillText(pin.label, px + pinR + 5, py + labelFs * 0.35);
     }
 
     rafRef.current = requestAnimationFrame(draw);
