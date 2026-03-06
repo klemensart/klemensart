@@ -27,15 +27,85 @@ type Dot = {
   glowTimer: number;   // frames until next glow toggle
 };
 
-/* ── Simplified Ankara province silhouette (normalised 0-1) ── */
-const ANKARA_SHAPE: [number, number][] = [
-  [0.38, 0.06], [0.46, 0.03], [0.55, 0.05], [0.64, 0.02],
-  [0.74, 0.08], [0.82, 0.14], [0.90, 0.24], [0.95, 0.36],
-  [0.96, 0.48], [0.92, 0.58], [0.85, 0.68], [0.76, 0.76],
-  [0.66, 0.84], [0.56, 0.92], [0.46, 0.96], [0.36, 0.93],
-  [0.26, 0.84], [0.18, 0.72], [0.10, 0.58], [0.06, 0.44],
-  [0.05, 0.32], [0.09, 0.22], [0.17, 0.14], [0.28, 0.09],
-];
+/* ── Ankara skyline silhouette drawer ── */
+function traceSkyline(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const baseY = h * 0.90;
+  const peak = h * 0.42;
+  const px = (n: number) => n * w;
+  const py = (n: number) => baseY - n * peak;
+
+  ctx.moveTo(0, baseY);
+
+  // Low left buildings
+  ctx.lineTo(px(0.04), py(0.06));
+  ctx.lineTo(px(0.07), py(0.13));
+  ctx.lineTo(px(0.09), py(0.08));
+
+  // Ankara Kalesi — crenellated castle walls
+  ctx.lineTo(px(0.11), py(0.16));
+  ctx.lineTo(px(0.13), py(0.38));
+  ctx.lineTo(px(0.15), py(0.33));
+  ctx.lineTo(px(0.16), py(0.40));
+  ctx.lineTo(px(0.17), py(0.33));
+  ctx.lineTo(px(0.18), py(0.43));
+  ctx.lineTo(px(0.19), py(0.35));
+  ctx.lineTo(px(0.21), py(0.39));
+  ctx.lineTo(px(0.23), py(0.20));
+  ctx.lineTo(px(0.26), py(0.12));
+
+  // Low buildings
+  ctx.lineTo(px(0.29), py(0.08));
+  ctx.lineTo(px(0.31), py(0.15));
+  ctx.lineTo(px(0.33), py(0.10));
+
+  // Kocatepe Camii — left minaret
+  ctx.lineTo(px(0.355), py(0.10));
+  ctx.lineTo(px(0.36), py(0.52));
+  ctx.lineTo(px(0.365), py(0.10));
+
+  // Main dome (smooth curve)
+  ctx.lineTo(px(0.38), py(0.18));
+  ctx.quadraticCurveTo(px(0.425), py(0.60), px(0.47), py(0.18));
+
+  // Right minaret
+  ctx.lineTo(px(0.485), py(0.10));
+  ctx.lineTo(px(0.49), py(0.52));
+  ctx.lineTo(px(0.495), py(0.10));
+
+  // Gap
+  ctx.lineTo(px(0.52), py(0.06));
+  ctx.lineTo(px(0.54), py(0.13));
+  ctx.lineTo(px(0.56), py(0.08));
+
+  // Anıtkabir — flat-roofed rectangular monument
+  ctx.lineTo(px(0.58), py(0.10));
+  ctx.lineTo(px(0.59), py(0.35));
+  ctx.lineTo(px(0.67), py(0.35));
+  ctx.lineTo(px(0.68), py(0.10));
+
+  // Buildings
+  ctx.lineTo(px(0.71), py(0.08));
+  ctx.lineTo(px(0.73), py(0.17));
+  ctx.lineTo(px(0.76), py(0.10));
+
+  // Atakule — thin tower with observation disc
+  ctx.lineTo(px(0.785), py(0.10));
+  ctx.lineTo(px(0.785), py(0.48));
+  ctx.lineTo(px(0.775), py(0.53));
+  ctx.lineTo(px(0.78), py(0.56));
+  ctx.lineTo(px(0.79), py(0.72));
+  ctx.lineTo(px(0.80), py(0.56));
+  ctx.lineTo(px(0.805), py(0.53));
+  ctx.lineTo(px(0.795), py(0.48));
+  ctx.lineTo(px(0.795), py(0.10));
+
+  // Fade out right
+  ctx.lineTo(px(0.83), py(0.14));
+  ctx.lineTo(px(0.87), py(0.08));
+  ctx.lineTo(px(0.91), py(0.10));
+  ctx.lineTo(px(0.95), py(0.04));
+  ctx.lineTo(w, baseY);
+}
 
 const DESKTOP_COUNT = 28;
 const MOBILE_COUNT = 14;
@@ -87,37 +157,25 @@ export default function HaritaBanner() {
     ctx.clearRect(0, 0, w, h);
     frameRef.current++;
 
-    /* ── Ankara silhouette (barely visible, breathing) ── */
-    const ankaraPulse = Math.sin(frameRef.current * 0.008);
-    const ankaraStroke = 0.10 + 0.05 * ankaraPulse;
-    const ankaraFill = 0.04 + 0.025 * ankaraPulse;
-    const aPad = 0.12;
-    const aW = w * (1 - 2 * aPad);
-    const aH = h * (1 - 2 * aPad);
-    const aOx = w * aPad;
-    const aOy = h * aPad;
-    const pts = ANKARA_SHAPE.map(([nx, ny]) => [aOx + nx * aW, aOy + ny * aH]);
-    const aN = pts.length;
+    /* ── Ankara skyline silhouette (bottom half, breathing) ── */
+    const skyPulse = Math.sin(frameRef.current * 0.01); // ~10s cycle at 60fps
+    const skyStrokeA = 0.115 + 0.035 * skyPulse;        // 0.08 – 0.15
+    const skyFillA = 0.04 + 0.02 * skyPulse;            // 0.02 – 0.06
+
+    // Filled shape (skyline + bottom rectangle)
     ctx.beginPath();
-    ctx.moveTo((pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2);
-    for (let i = 1; i < aN; i++) {
-      const next = (i + 1) % aN;
-      ctx.quadraticCurveTo(
-        pts[i][0], pts[i][1],
-        (pts[i][0] + pts[next][0]) / 2,
-        (pts[i][1] + pts[next][1]) / 2,
-      );
-    }
-    ctx.quadraticCurveTo(
-      pts[0][0], pts[0][1],
-      (pts[0][0] + pts[1][0]) / 2,
-      (pts[0][1] + pts[1][1]) / 2,
-    );
+    traceSkyline(ctx, w, h);
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
     ctx.closePath();
-    ctx.fillStyle = `rgba(255,109,96,${ankaraFill})`;
+    ctx.fillStyle = `rgba(255,109,96,${skyFillA})`;
     ctx.fill();
-    ctx.strokeStyle = `rgba(255,109,96,${ankaraStroke})`;
-    ctx.lineWidth = 1;
+
+    // Stroke only along the skyline top edge
+    ctx.beginPath();
+    traceSkyline(ctx, w, h);
+    ctx.strokeStyle = `rgba(255,109,96,${skyStrokeA})`;
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     /* ── Update positions ── */
