@@ -616,12 +616,12 @@ export default function HaritaPage() {
             >
               &larr; Ana Sayfa
             </Link>
-            <div style={{ marginTop: 8 }}>
-              <div style={{ fontSize: 11, letterSpacing: 4, color: "#FF6D60", marginBottom: 4 }}>KLEMENS</div>
-              <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: 4, color: "#fff" }}>
+            <div style={{ marginTop: 6 }}>
+              <div style={{ fontSize: 10, letterSpacing: 3, color: "#FF6D60", marginBottom: 2 }}>KLEMENS</div>
+              <div style={{ fontSize: 16, fontWeight: 300, letterSpacing: 3, color: "#fff" }}>
                 K&Uuml;LT&Uuml;R HARİTASI
               </div>
-              <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>Ankara</div>
+              <div style={{ fontSize: 10, color: "#666", marginTop: 1 }}>Ankara</div>
             </div>
           </div>
         </div>
@@ -629,21 +629,21 @@ export default function HaritaPage() {
         {/* Mode tabs + Filters */}
         <div style={{ padding: "0 20px 8px", pointerEvents: "auto" }}>
           {/* Mode switch */}
-          <div style={{ display: "flex", gap: 0, marginBottom: 10 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
             {(["explore", "routes"] as MapMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
                 style={{
-                  padding: "7px 18px",
-                  background: mode === m ? "rgba(255,109,96,0.2)" : "rgba(0,0,0,0.5)",
+                  padding: "7px 0",
+                  minWidth: 100,
+                  background: mode === m ? "rgba(255,109,96,0.25)" : "rgba(0,0,0,0.5)",
                   border: `1px solid ${mode === m ? "#FF6D60" : "rgba(255,255,255,0.08)"}`,
-                  borderRadius: m === "explore" ? "8px 0 0 8px" : "0 8px 8px 0",
-                  color: mode === m ? "#FF6D60" : "#666",
+                  borderRadius: 8,
+                  color: mode === m ? "#fff" : "#666",
                   fontSize: 13, fontWeight: 600, cursor: "pointer",
                   transition: "all 0.2s", letterSpacing: 0.5,
                   backdropFilter: "blur(8px)",
-                  marginRight: m === "explore" ? -1 : 0,
                 }}
               >
                 {m === "explore" ? "Keşfet" : "Rotalar"}
@@ -653,13 +653,13 @@ export default function HaritaPage() {
 
           {/* Filters (explore only) */}
           {mode === "explore" && (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 4 }}>
               {FILTER_OPTIONS.map((f) => (
                 <button
                   key={f.key}
                   onClick={() => setActiveFilter(f.key)}
                   style={{
-                    padding: "6px 14px",
+                    padding: "5px 12px",
                     borderRadius: 20,
                     border: `1px solid ${activeFilter === f.key
                       ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
@@ -670,12 +670,14 @@ export default function HaritaPage() {
                     color: activeFilter === f.key
                       ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
                       : "#999",
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: 600,
                     cursor: "pointer",
                     backdropFilter: "blur(8px)",
                     transition: "all 0.2s",
                     letterSpacing: 0.5,
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
                   }}
                 >
                   {f.key !== "all" && (
