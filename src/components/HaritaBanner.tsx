@@ -27,6 +27,16 @@ type Dot = {
   glowTimer: number;   // frames until next glow toggle
 };
 
+/* ── Simplified Ankara province silhouette (normalised 0-1) ── */
+const ANKARA_SHAPE: [number, number][] = [
+  [0.38, 0.06], [0.46, 0.03], [0.55, 0.05], [0.64, 0.02],
+  [0.74, 0.08], [0.82, 0.14], [0.90, 0.24], [0.95, 0.36],
+  [0.96, 0.48], [0.92, 0.58], [0.85, 0.68], [0.76, 0.76],
+  [0.66, 0.84], [0.56, 0.92], [0.46, 0.96], [0.36, 0.93],
+  [0.26, 0.84], [0.18, 0.72], [0.10, 0.58], [0.06, 0.44],
+  [0.05, 0.32], [0.09, 0.22], [0.17, 0.14], [0.28, 0.09],
+];
+
 const DESKTOP_COUNT = 28;
 const MOBILE_COUNT = 14;
 const CONNECT_DIST = 0.28;  // fraction of canvas diagonal
@@ -60,6 +70,7 @@ export default function HaritaBanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dotsRef = useRef<Dot[]>([]);
   const rafRef = useRef<number>(0);
+  const frameRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
 
   const draw = useCallback(() => {
@@ -74,6 +85,40 @@ export default function HaritaBanner() {
     const maxDist = diag * CONNECT_DIST;
 
     ctx.clearRect(0, 0, w, h);
+    frameRef.current++;
+
+    /* ── Ankara silhouette (barely visible, breathing) ── */
+    const ankaraPulse = Math.sin(frameRef.current * 0.008);
+    const ankaraStroke = 0.03 + 0.02 * ankaraPulse;
+    const ankaraFill = 0.015 + 0.01 * ankaraPulse;
+    const aPad = 0.12;
+    const aW = w * (1 - 2 * aPad);
+    const aH = h * (1 - 2 * aPad);
+    const aOx = w * aPad;
+    const aOy = h * aPad;
+    const pts = ANKARA_SHAPE.map(([nx, ny]) => [aOx + nx * aW, aOy + ny * aH]);
+    const aN = pts.length;
+    ctx.beginPath();
+    ctx.moveTo((pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2);
+    for (let i = 1; i < aN; i++) {
+      const next = (i + 1) % aN;
+      ctx.quadraticCurveTo(
+        pts[i][0], pts[i][1],
+        (pts[i][0] + pts[next][0]) / 2,
+        (pts[i][1] + pts[next][1]) / 2,
+      );
+    }
+    ctx.quadraticCurveTo(
+      pts[0][0], pts[0][1],
+      (pts[0][0] + pts[1][0]) / 2,
+      (pts[0][1] + pts[1][1]) / 2,
+    );
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,109,96,${ankaraFill})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255,109,96,${ankaraStroke})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     /* ── Update positions ── */
     for (const d of dots) {
