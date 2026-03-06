@@ -166,6 +166,72 @@ const PLACES: CulturePlace[] = [
   { lat: 40.1680, lng: 31.9210, type: "gastronomi", name: "Beypazarı Taş Fırınları ve Alaaddin Sokak", desc: "Coğrafi işaretli Beypazarı Kurusu." },
   { lat: 40.1070, lng: 33.4180, type: "gastronomi", name: "Kalecik Karası Üzüm Bağları", desc: "MÖ 2000'den beri bağcılık, şarap rotası." },
   { lat: 40.2620, lng: 33.0160, type: "gastronomi", name: "Çubuk Turşu Köyü", desc: "15. yy'dan beri coğrafi işaretli Çubuk Turşusu üretimi." },
+
+  /* ── EK MÜZELER ── */
+  { lat: 39.9350, lng: 32.8500, type: "müze", name: "Ankara Palas Müzesi", desc: "1928 yapımı Cumhuriyet konukevi, Şubat 2024'te müzeye dönüştürüldü." },
+  { lat: 39.9359, lng: 32.8546, type: "müze", name: "Vakıf Eserleri Müzesi", desc: "1927 yapımı Hukuk Mektebi binasında halı, kilim, vakıf eserleri." },
+  { lat: 39.9366, lng: 32.8433, type: "müze", name: "Direksiyon Binası (TCDD Milli Mücadele Müzesi)", desc: "1892, Atatürk'ün ilk karargahı." },
+  { lat: 39.9017, lng: 32.7713, type: "müze", name: "ODTÜ Bilim ve Teknoloji Müzesi", desc: "MÖ 3500'den bilgisayar devrimine teknoloji evrimi." },
+  { lat: 39.9690, lng: 32.8623, type: "müze", name: "Meteoroloji Müzesi", desc: "1908, Atatürk'ün 6 ay karargah kullandığı bina." },
+  { lat: 39.9320, lng: 32.8300, type: "müze", name: "Ankara Üniversitesi Oyuncak Müzesi", desc: "1990, Türkiye'nin ilk oyuncak müzesi." },
+  { lat: 39.8680, lng: 32.8190, type: "müze", name: "TRT Yayıncılık Tarihi Müzesi", desc: "Radyo ve TV tarihi, nostaljik stüdyolar." },
+  { lat: 39.9476, lng: 32.7052, type: "müze", name: "Hava Kuvvetleri Müzesi", desc: "1998, ilk uçaklardan savaş jetlerine." },
+  { lat: 39.9328, lng: 32.8464, type: "müze", name: "TCDD Açık Hava Buharlı Lokomotif Müzesi", desc: "Tarihi buharlı lokomotifler." },
+  { lat: 39.6200, lng: 32.1500, type: "müze", name: "Alagöz Karargâh Müzesi", desc: "Sakarya Muharebesi'nde Atatürk'ün cephe karargahı." },
+  { lat: 39.7850, lng: 32.3870, type: "müze", name: "Malıköy Tren İstasyonu Müzesi", desc: "Kurtuluş Savaşı lojistik merkezi." },
+  { lat: 39.9300, lng: 32.8700, type: "müze", name: "Haritacılık Müzesi", desc: "Osmanlı'dan Cumhuriyet'e haritacılık tekniklerinin evrimi." },
+  { lat: 40.4930, lng: 32.4750, type: "müze", name: "Çamlıdere Doğa ve Hayvan Müzesi", desc: "Türkiye'nin en kapsamlı doğa müzesi." },
+
+  /* ── EK GALERİLER ── */
+  { lat: 39.9371, lng: 32.8641, type: "galeri", name: "Pilavoğlu Han", desc: "16. yy, sanatçı atölyelerine dönüşmüş avlulu han." },
+  { lat: 39.8860, lng: 32.8530, type: "galeri", name: "Şefik Bursalı Müze Evi", desc: "Türk resim ustasının orijinal atölyesi." },
+  { lat: 39.8950, lng: 32.8340, type: "galeri", name: "Mustafa Ayaz Sanat Müzesi", desc: "Çağdaş Türk resmi, genç yeteneklere alan." },
+  { lat: 39.9340, lng: 32.8550, type: "galeri", name: "Hacettepe Sanat Müzesi", desc: "Çağdaş Türk resim ve heykel koleksiyonu." },
+  { lat: 39.8850, lng: 32.7480, type: "galeri", name: "Fikret Otyam Sanat Merkezi", desc: "Çağdaş sanat, dijital enstalasyonlar." },
+  { lat: 39.8830, lng: 32.8100, type: "galeri", name: "Zülfü Livaneli Kültür Merkezi", desc: "Sergiler, edebiyat söyleşileri, sanat filmi." },
+
+  /* ── EK KONSER ── */
+  { lat: 39.9340, lng: 32.8620, type: "konser", name: "Musiki Muallim Mektebi", desc: "1924, Cumhuriyet'in ilk müzik okulu." },
+  { lat: 39.8756, lng: 32.7521, type: "konser", name: "Bilkent Odeon", desc: "Antik amfitiyatro ilhamı, 4000 kişilik açık hava arena." },
+  { lat: 39.9350, lng: 32.8520, type: "konser", name: "CSO Tarihi Binası", desc: "1961-2020, kentin çoksesli müzik hafızası." },
+  { lat: 39.9360, lng: 32.8252, type: "konser", name: "MEB Şura Salonu", desc: "Senfonik konser, bale, festival merkezi." },
+
+  /* ── EK TİYATRO ── */
+  { lat: 39.9650, lng: 32.7600, type: "tiyatro", name: "İrfan Şahinbaş Atölye Sahnesi", desc: "Deneysel ve yenilikçi oyunlar." },
+  { lat: 39.8987, lng: 32.8575, type: "tiyatro", name: "Tatbikat Sahnesi", desc: "Avangart prodüksiyonlar, bağımsız performans." },
+  { lat: 39.8700, lng: 32.7400, type: "tiyatro", name: "Cüneyt Gökçer Sahnesi", desc: "Döner sahne teknolojisi, geniş kapasiteli." },
+
+  /* ── EK TARİHİ ── */
+  { lat: 39.9431, lng: 32.8600, type: "tarihi", name: "Antik Roma Tiyatrosu", desc: "MS 1-2. yy, Ankara Kalesi eteklerinde." },
+  { lat: 39.9370, lng: 32.8650, type: "tarihi", name: "Ahi Elvan Camii", desc: "1382, Selçuklu ahşap direkli cami." },
+  { lat: 39.9397, lng: 32.8583, type: "tarihi", name: "Suluhan (Hasanpaşa Hanı)", desc: "1508-1511, çifte avlulu Osmanlı ticaret hanı." },
+  { lat: 39.9375, lng: 32.8560, type: "tarihi", name: "Pirinç Han", desc: "18. yy, antikacılar ve sahafların mekanı." },
+  { lat: 39.9350, lng: 32.8430, type: "tarihi", name: "Tarihi Ankara Garı", desc: "1937, Art Deco, Şekip Akalın tasarımı." },
+  { lat: 39.9350, lng: 32.8260, type: "tarihi", name: "Gazi Üniversitesi Rektörlük Binası", desc: "1927-30, Mimar Kemaleddin eseri." },
+  { lat: 39.9297, lng: 32.8556, type: "tarihi", name: "DTCF Binası", desc: "1936, Bruno Taut tasarımı." },
+  { lat: 39.5900, lng: 32.1600, type: "tarihi", name: "Polatlı Duatepe Anıtı", desc: "Sakarya Muharebesi zafer noktası." },
+  { lat: 39.9350, lng: 32.8540, type: "tarihi", name: "Güven Anıtı ve Güvenpark", desc: "1935, bronz ve taş rölyef kompleksi." },
+  { lat: 39.9419, lng: 32.8547, type: "tarihi", name: "Ulus Zafer Anıtı", desc: "1927, Heinrich Krippel, tunç meydan heykeli." },
+  { lat: 40.2386, lng: 33.0331, type: "tarihi", name: "Çubuk-1 Barajı", desc: "1936, Türkiye'nin ilk betonarme barajı." },
+  { lat: 40.2140, lng: 32.2450, type: "tarihi", name: "Güdül Tarihi Kent (Cittaslow)", desc: "Sakin Şehir, otantik Osmanlı kasabası." },
+  { lat: 40.0900, lng: 32.6850, type: "tarihi", name: "Karalar Galat Mezarları", desc: "MÖ 1. yy, Kelt kökenli kral mezarları." },
+  { lat: 40.4333, lng: 32.4167, type: "tarihi", name: "Pelitçik Fosil Ormanı", desc: "20 milyon yıllık taşlaşmış ağaçlar." },
+  { lat: 40.4930, lng: 32.4700, type: "tarihi", name: "Şeyh Ali Semerkandi Türbesi", desc: "15. yy İslam alimi, manevi turizm." },
+  { lat: 39.9400, lng: 32.8550, type: "tarihi", name: "Zincirli Camii", desc: "17. yy, kırmızı tuğla ve ahşap tavan." },
+  { lat: 39.9895, lng: 33.1738, type: "tarihi", name: "Hasanoğlan Köy Enstitüsü", desc: "1941, aydınlanma projesi mirası." },
+
+  /* ── EK EDEBİYAT ── */
+  { lat: 39.9210, lng: 32.8560, type: "edebiyat", name: "Adnan Ötüken İl Halk Kütüphanesi", desc: "1922, Paul Bonatz binası." },
+  { lat: 39.9200, lng: 32.8550, type: "edebiyat", name: "Mülkiyeliler Birliği", desc: "1859 köklü, aydınların buluşma mekanı." },
+  { lat: 39.9070, lng: 32.8600, type: "edebiyat", name: "Kuğulu Park", desc: "1958, Sevgi Soysal'ın edebi mekanı." },
+  { lat: 39.9390, lng: 32.8670, type: "edebiyat", name: "Şairler ve Yazarlar Evi", desc: "Hamamönü'nde şiir dinletileri." },
+
+  /* ── EK GASTRONOMİ ── */
+  { lat: 39.9410, lng: 32.8555, type: "gastronomi", name: "Tarihi Merkez Efendi Fırını", desc: "Coğrafi işaretli Ankara Simidi." },
+  { lat: 39.9410, lng: 32.8560, type: "gastronomi", name: "Ali Uzun Şekercisi", desc: "1930'lar, akide şekeri ve lokum." },
+  { lat: 39.9420, lng: 32.8530, type: "gastronomi", name: "Tarihi Uludağ Kebapçısı", desc: "1950'ler, klasik esnaf lokantası." },
+  { lat: 40.0900, lng: 32.6850, type: "gastronomi", name: "Kazan Kavurması Lokantaları", desc: "Coğrafi işaretli Kazan Kavurması." },
+  { lat: 39.9150, lng: 32.8600, type: "gastronomi", name: "Aspava Gastronomi Kültürü", desc: "1970'ler, Ankara'ya özgü yeme-içme ritüeli." },
 ];
 
 const ROUTES: Route[] = [
@@ -450,7 +516,7 @@ export default function HaritaPage() {
 
       if (!mapContainerRef.current) return;
 
-      const ankaraBounds = Leaf.latLngBounds([39.4, 31.5], [40.5, 33.8]);
+      const ankaraBounds = Leaf.latLngBounds([39.4, 31.5], [40.6, 33.8]);
       const map = Leaf.map(mapContainerRef.current, {
         center: [39.935, 32.860],
         zoom: 13,
