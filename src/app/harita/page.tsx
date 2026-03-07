@@ -496,7 +496,9 @@ export default function HaritaPage() {
   const [panelEvents, setPanelEvents] = useState<SupabaseEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [currentZoom, setCurrentZoom] = useState(13);
+  const [tileStyle, setTileStyle] = useState<"voyager" | "dark">("dark");
   const [mapReady, setMapReady] = useState(false);
+  const isDark = tileStyle === "dark";
 
   // Mode state
   const [mode, setMode] = useState<MapMode>("explore");
@@ -800,6 +802,30 @@ export default function HaritaPage() {
     };
   }, []);
 
+  // Swap tile layer when tileStyle changes
+  useEffect(() => {
+    const map = mapRef.current;
+    const Leaf = leafletRef.current;
+    if (!map || !Leaf || !mapReady) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    const urls: Record<string, string> = {
+      voyager: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    };
+
+    tileLayerRef.current = Leaf.tileLayer(urls[tileStyle], {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      maxZoom: 18,
+    }).addTo(map);
+
+    // Keep tiles behind markers
+    tileLayerRef.current.setZIndex(0);
+  }, [tileStyle, mapReady]);
+
   // Manage explore markers based on filter + zoom (only in explore mode)
   useEffect(() => {
     const map = mapRef.current;
@@ -823,8 +849,11 @@ export default function HaritaPage() {
       const color = TYPE_COLORS[place.type];
       const svg = TYPE_SVGS[place.type];
       const showLabel = currentZoom >= 17;
+      const labelColor = isDark ? "#fff" : "#1a1a2e";
+      const labelShadow = isDark ? "0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6)" : "0 1px 3px rgba(255,255,255,0.8),0 0 6px rgba(255,255,255,0.4)";
+      const markerBorder = isDark ? "none" : "2px solid #fff";
       const labelHtml = showLabel
-        ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6);pointer-events:none;">${place.name}</div>`
+        ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:${labelColor};text-shadow:${labelShadow};pointer-events:none;">${place.name}</div>`
         : "";
       const icon = Leaf.divIcon({
         className: "culture-marker",
@@ -833,7 +862,7 @@ export default function HaritaPage() {
         html: `<div style="position:relative;">
           <div class="marker-circle" style="
             width:36px;height:36px;border-radius:50%;
-            background:${color};
+            background:${color};border:${markerBorder};box-sizing:border-box;
             display:flex;align-items:center;justify-content:center;
             box-shadow:0 2px 8px rgba(0,0,0,0.4),0 0 12px ${color}50;
             cursor:pointer;transition:transform 0.2s;
@@ -851,7 +880,7 @@ export default function HaritaPage() {
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [activeFilter, currentZoom, mapReady, selectPlace, mode]);
+  }, [activeFilter, currentZoom, mapReady, selectPlace, mode, isDark]);
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
@@ -1009,15 +1038,22 @@ export default function HaritaPage() {
     );
   };
 
+  const uiText = isDark ? "#fff" : "#1a1a2e";
+  const uiMuted = isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)";
+  const uiSubtle = isDark ? "#666" : "#888";
+  const uiContainerBg = isDark ? "#1a1a1a" : "#f2f2f2";
+
   return (
-    <div style={{ width: "100%", height: "100vh", background: "#1a1a1a", position: "relative", overflow: "hidden" }}>
+    <div style={{ width: "100%", height: "100vh", background: uiContainerBg, position: "relative", overflow: "hidden" }}>
       <style>{`
         @keyframes marker-glow {
           0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 12px var(--glow-color, #4A9EFF)50; }
           50% { box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 20px var(--glow-color, #4A9EFF)80; }
         }
-        .leaflet-container { background: #1a1a1a !important; }
-        .leaflet-tile-pane { filter: brightness(1.4) contrast(1.1); }
+        .leaflet-container { background: ${uiContainerBg} !important; }
+        .leaflet-tile-pane {
+          filter: ${tileStyle === "dark" ? "brightness(1.3)" : "none"};
+        }
         .culture-marker .marker-circle:hover { transform: scale(1.17); }
       `}</style>
 
@@ -1031,28 +1067,28 @@ export default function HaritaPage() {
             <Link
               href="/"
               style={{
-                color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 500,
+                color: uiMuted, fontSize: 13, fontWeight: 500,
                 textDecoration: "none", pointerEvents: "auto", transition: "color 0.2s",
               }}
               onMouseOver={(e) => { (e.target as HTMLElement).style.color = "#FF6D60"; }}
-              onMouseOut={(e) => { (e.target as HTMLElement).style.color = "rgba(255,255,255,0.5)"; }}
+              onMouseOut={(e) => { (e.target as HTMLElement).style.color = uiMuted; }}
             >
               &larr; Ana Sayfa
             </Link>
             <div style={{ marginTop: 6 }}>
               <div style={{ fontSize: 10, letterSpacing: 3, color: "#FF6D60", marginBottom: 2 }}>KLEMENS</div>
-              <div style={{ fontSize: 16, fontWeight: 300, letterSpacing: 3, color: "#fff" }}>
+              <div style={{ fontSize: 16, fontWeight: 300, letterSpacing: 3, color: uiText }}>
                 K&Uuml;LT&Uuml;R HARİTASI
               </div>
-              <div style={{ fontSize: 10, color: "#666", marginTop: 1 }}>Ankara</div>
+              <div style={{ fontSize: 10, color: uiSubtle, marginTop: 1 }}>Ankara</div>
             </div>
           </div>
         </div>
 
         {/* Mode tabs + Filters */}
         <div style={{ padding: "0 20px 8px", pointerEvents: "auto" }}>
-          {/* Mode switch */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          {/* Mode switch + Day/Night toggle */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12, alignItems: "center" }}>
             {(["explore", "routes"] as MapMode[]).map((m) => (
               <button
                 key={m}
@@ -1060,18 +1096,34 @@ export default function HaritaPage() {
                 style={{
                   padding: "7px 0",
                   minWidth: 100,
-                  background: mode === m ? "rgba(255,109,96,0.25)" : "rgba(0,0,0,0.5)",
-                  border: `1px solid ${mode === m ? "#FF6D60" : "rgba(255,255,255,0.08)"}`,
+                  background: isDark
+                    ? (mode === m ? "rgba(255,109,96,0.25)" : "rgba(0,0,0,0.5)")
+                    : (mode === m ? "#fff" : "#fff"),
+                  border: isDark
+                    ? `1px solid ${mode === m ? "#FF6D60" : "rgba(255,255,255,0.08)"}`
+                    : `1px solid ${mode === m ? "#FF6D60" : "#e0e0e0"}`,
+                  borderBottom: !isDark && mode === m ? "2px solid #FF6D60" : undefined,
                   borderRadius: 8,
-                  color: mode === m ? "#fff" : "#666",
+                  color: isDark
+                    ? (mode === m ? "#fff" : "#666")
+                    : (mode === m ? "#FF6D60" : "#374151"),
                   fontSize: 13, fontWeight: 600, cursor: "pointer",
                   transition: "all 0.2s", letterSpacing: 0.5,
                   backdropFilter: "blur(8px)",
+                  boxShadow: !isDark ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
                 }}
               >
                 {m === "explore" ? "Keşfet" : "Rotalar"}
               </button>
             ))}
+            <div style={{ marginLeft: "auto", display: "flex", gap: 2, alignItems: "center" }}>
+              <button onClick={() => setTileStyle("voyager")} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex", transition: "all 0.2s" }} title="Gündüz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={!isDark ? "#FF6D60" : "rgba(255,255,255,0.3)"} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              </button>
+              <button onClick={() => setTileStyle("dark")} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex", transition: "all 0.2s" }} title="Gece">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#FF6D60" : "rgba(0,0,0,0.25)"} strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              </button>
+            </div>
           </div>
 
           {/* Filters (explore only) */}
@@ -1084,15 +1136,25 @@ export default function HaritaPage() {
                   style={{
                     padding: "5px 12px",
                     borderRadius: 20,
-                    border: `1px solid ${activeFilter === f.key
-                      ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
-                      : "rgba(255,255,255,0.12)"}`,
-                    background: activeFilter === f.key
-                      ? (f.key === "all" ? "rgba(255,109,96,0.2)" : `${TYPE_COLORS[f.key as PlaceType]}20`)
-                      : "rgba(0,0,0,0.6)",
-                    color: activeFilter === f.key
-                      ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
-                      : "#999",
+                    border: isDark
+                      ? `1px solid ${activeFilter === f.key
+                          ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                          : "rgba(255,255,255,0.12)"}`
+                      : `${activeFilter === f.key ? "2px" : "1px"} solid ${activeFilter === f.key
+                          ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                          : "#e0e0e0"}`,
+                    background: isDark
+                      ? (activeFilter === f.key
+                          ? (f.key === "all" ? "rgba(255,109,96,0.2)" : `${TYPE_COLORS[f.key as PlaceType]}20`)
+                          : "rgba(0,0,0,0.6)")
+                      : "#fff",
+                    color: isDark
+                      ? (activeFilter === f.key
+                          ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                          : "#999")
+                      : (activeFilter === f.key
+                          ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                          : "#374151"),
                     fontSize: 11,
                     fontWeight: 600,
                     cursor: "pointer",
@@ -1101,11 +1163,12 @@ export default function HaritaPage() {
                     letterSpacing: 0.5,
                     whiteSpace: "nowrap",
                     flexShrink: 0,
+                    boxShadow: !isDark ? "0 1px 2px rgba(0,0,0,0.04)" : "none",
                   }}
                 >
                   {f.key !== "all" && (
                     <span style={{
-                      display: "inline-block", width: 8, height: 8, borderRadius: "50%",
+                      display: "inline-block", width: 6, height: 6, borderRadius: "50%",
                       background: TYPE_COLORS[f.key as PlaceType],
                       marginRight: 6, verticalAlign: "middle",
                     }} />
@@ -1122,16 +1185,19 @@ export default function HaritaPage() {
       {mode === "explore" && (
         <div style={{
           position: "absolute", bottom: 20, right: 20, zIndex: 10,
-          background: "rgba(0,0,0,0.7)", borderRadius: 10, padding: "10px 14px",
-          backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.08)",
+          background: isDark ? "rgba(0,0,0,0.7)" : "#fff",
+          borderRadius: 10, padding: "10px 14px",
+          backdropFilter: "blur(8px)",
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "#e0e0e0"}`,
+          boxShadow: isDark ? "none" : "0 2px 8px rgba(0,0,0,0.08)",
         }}>
           {(Object.keys(TYPE_COLORS) as PlaceType[]).map((t) => (
             <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: t === "tarihi" ? 0 : 6 }}>
               <span style={{
-                width: 8, height: 8, borderRadius: "50%", background: TYPE_COLORS[t],
+                width: 6, height: 6, borderRadius: "50%", background: TYPE_COLORS[t],
                 boxShadow: `0 0 6px ${TYPE_COLORS[t]}`,
               }} />
-              <span style={{ color: "#999", fontSize: 11 }}>{TYPE_LABELS[t]}</span>
+              <span style={{ color: isDark ? "#999" : "#374151", fontSize: 11 }}>{TYPE_LABELS[t]}</span>
             </div>
           ))}
         </div>
