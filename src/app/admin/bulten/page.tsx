@@ -300,6 +300,9 @@ export default function BultenGonderPage() {
   const [workshopParticipantCount, setWorkshopParticipantCount] = useState<number | null>(null);
   const [showWorkshopConfirm, setShowWorkshopConfirm] = useState(false);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [abandonedCount, setAbandonedCount] = useState<number | null>(null);
+  const [showAbandonedConfirm, setShowAbandonedConfirm] = useState(false);
+  const [loadingAbandoned, setLoadingAbandoned] = useState(false);
 
   // Stats
   type Campaign = { subject: string; sent: number; opened: number; clicked: number; bounced: number; lastSent: string };
@@ -411,7 +414,7 @@ export default function BultenGonderPage() {
 
   // ── Send newsletter ──
   const sendNewsletter = useCallback(
-    async (mode: "test" | "all" | "workshop") => {
+    async (mode: "test" | "all" | "workshop" | "abandoned") => {
       if (pageMode === "freetext") {
         if (!subject.trim()) {
           setMessage("Konu başlığı gerekli.");
@@ -446,7 +449,7 @@ export default function BultenGonderPage() {
                 subject: templateSubject || selectedTemplate!.defaultSubject,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
-                workshopId: mode === "workshop" ? selectedWorkshopId : undefined,
+                workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
               }
             : {
                 mode,
@@ -454,7 +457,7 @@ export default function BultenGonderPage() {
                 htmlContent,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
-                workshopId: mode === "workshop" ? selectedWorkshopId : undefined,
+                workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
               };
 
         const res = await fetch("/api/admin/newsletter/send", {
@@ -475,6 +478,7 @@ export default function BultenGonderPage() {
         setSending(false);
         setShowConfirm(false);
         setShowWorkshopConfirm(false);
+        setShowAbandonedConfirm(false);
       }
     },
     [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject, selectedWorkshopId]
@@ -518,6 +522,28 @@ export default function BultenGonderPage() {
       setLoadingParticipants(false);
     }
     setShowWorkshopConfirm(true);
+  };
+
+  const handleSendAbandoned = async () => {
+    if (!selectedWorkshopId) {
+      setMessage("Lütfen bir atölye seçin.");
+      return;
+    }
+    if (!selectedTemplate) {
+      setMessage("Lütfen bir şablon seçin.");
+      return;
+    }
+    setLoadingAbandoned(true);
+    try {
+      const res = await fetch(`/api/admin/workshops/abandoned?workshopId=${selectedWorkshopId}`);
+      const data = await res.json();
+      setAbandonedCount(data.count ?? 0);
+    } catch {
+      setAbandonedCount(null);
+    } finally {
+      setLoadingAbandoned(false);
+    }
+    setShowAbandonedConfirm(true);
   };
 
   const addLink = () => {
@@ -967,6 +993,35 @@ export default function BultenGonderPage() {
                     </div>
                   )}
 
+                  {/* Abandoned Checkout — only for YarimKalanKayit template */}
+                  {selectedTemplate?.name === "YarimKalanKayit" && workshops.length > 0 && (
+                    <div className="mt-4 border border-amber-200 rounded-xl p-4 bg-amber-50/50">
+                      <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">Yarım Kalan Kayıtlara Gönder</div>
+                      <p className="text-xs text-amber-600 mb-3">
+                        Ödeme sayfasına girip satın almayı tamamlamayan kullanıcılara hatırlatma gönderir.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <select
+                          value={selectedWorkshopId}
+                          onChange={(e) => setSelectedWorkshopId(e.target.value)}
+                          className="flex-1 border border-amber-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-amber-400 bg-white"
+                        >
+                          <option value="">Atölye seçin...</option>
+                          {workshops.map((w) => (
+                            <option key={w.id} value={w.id}>{w.title}</option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={handleSendAbandoned}
+                          disabled={sending || !selectedWorkshopId || loadingAbandoned}
+                          className="px-6 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {loadingAbandoned ? "Kontrol ediliyor..." : "Hatırlatma Gönder"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {message && (
                     <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
                       message.includes("gönderildi")
@@ -1141,6 +1196,56 @@ export default function BultenGonderPage() {
                 onClick={() => sendNewsletter("workshop")}
                 disabled={sending}
                 className="flex-1 py-3.5 text-sm font-semibold text-[#2D2926] hover:bg-[#2D2926]/5 transition-colors disabled:opacity-50"
+              >
+                {sending ? "Gönderiliyor..." : "Evet, Gönder"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Abandoned Checkout Confirmation Modal ── */}
+      {showAbandonedConfirm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl overflow-hidden">
+            <div className="px-8 pt-8 pb-0 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-amber-100 flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
+                Yarım Kalan Kayıtlara Gönder
+              </h3>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-2">
+                <span className="font-semibold text-[#2D2926]">
+                  {workshops.find((w) => w.id === selectedWorkshopId)?.title}
+                </span>
+              </p>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
+                Ödeme sayfasına girip satın almayı tamamlamayan{" "}
+                {abandonedCount !== null ? (
+                  <span className="font-semibold text-[#2D2926]">{abandonedCount} kişiye</span>
+                ) : (
+                  "kullanıcılara"
+                )}{" "}
+                hatırlatma gönderilecektir.
+                <br />
+                Bu işlem geri alınamaz. Onaylıyor musunuz?
+              </p>
+            </div>
+            <div className="flex border-t border-gray-100">
+              <button
+                onClick={() => setShowAbandonedConfirm(false)}
+                className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
+              >
+                İptal
+              </button>
+              <button
+                onClick={() => sendNewsletter("abandoned")}
+                disabled={sending}
+                className="flex-1 py-3.5 text-sm font-semibold text-amber-600 hover:bg-amber-50 transition-colors disabled:opacity-50"
               >
                 {sending ? "Gönderiliyor..." : "Evet, Gönder"}
               </button>

@@ -9,36 +9,36 @@ type Props = {
 };
 
 export default function YarimKalanKayit({
-  eventTitle = "Modern Sanatin Kirilma Noktalari",
+  eventTitle = "Modern Sanatın Kırılma Noktaları",
   registerUrl = "https://klemensart.com/kayit",
   contactEmail = "info@klemensart.com",
 }: Props) {
   return (
-    <KlemensLayout preview="Kayit sureci tamamlanmadi">
+    <KlemensLayout preview="Kayıt süreci tamamlanmadı">
       <Section style={content}>
-        <Text style={h1}>Kayit Sureceniz</Text>
+        <Text style={h1}>Kayıt Süreciniz</Text>
 
         <Text style={p}>
-          &ldquo;{eventTitle}&rdquo; icin baslattigniz kayit
-          islemi henuz tamamlanmadi.
+          &ldquo;{eventTitle}&rdquo; için başlattığınız kayıt
+          işlemi henüz tamamlanmadı.
         </Text>
 
         <Text style={p}>
-          Bu programdaki kontenjan sinirli ve yerler hizla doluyor.
-          Kaydnizi simdi tamamlayarak yerinizi garantiye
+          Bu programdaki kontenjan sınırlı ve yerler hızla doluyor.
+          Kaydınızı şimdi tamamlayarak yerinizi garantiye
           alabilirsiniz.
         </Text>
 
         <Text style={p}>
-          Odeme asamasinda teknik bir sorunla karsilastiysniz veya
+          Ödeme aşamasında teknik bir sorunla karşılaştıysanız veya
           herhangi bir sorunuz varsa, bize{" "}
           <span style={emailHighlight}>{contactEmail}</span>{" "}
-          adresinden ulasabilirsiniz. Yardimci olmaktan
-          memnuniyet duyariz.
+          adresinden ulaşabilirsiniz. Yardımcı olmaktan
+          memnuniyet duyarız.
         </Text>
       </Section>
 
-      <KlemensButton href={registerUrl}>Kaydi Tamamlayin</KlemensButton>
+      <KlemensButton href={registerUrl}>Kaydı Tamamlayın</KlemensButton>
     </KlemensLayout>
   );
 }

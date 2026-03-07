@@ -292,8 +292,131 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // ── Abandoned mode ──
+  if (mode === "abandoned") {
+    if (!workshopId) {
+      return NextResponse.json(
+        { error: "Atölye seçilmedi." },
+        { status: 400 }
+      );
+    }
+
+    // Get payment_intents for this workshop
+    const { data: intents, error: intentError } = await admin
+      .from("payment_intents")
+      .select("user_id")
+      .eq("workshop_id", workshopId);
+
+    if (intentError) {
+      return NextResponse.json(
+        { error: `Veritabanı hatası: ${intentError.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!intents || intents.length === 0) {
+      return NextResponse.json(
+        { error: "Bu atölye için yarım kalan kayıt bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    // Exclude users who already completed purchase
+    const { data: completedPurchases } = await admin
+      .from("purchases")
+      .select("user_id")
+      .eq("workshop_id", workshopId);
+
+    const completedSet = new Set((completedPurchases ?? []).map((p) => p.user_id));
+    const abandonedUserIds = [
+      ...new Set(
+        intents
+          .filter((i) => !completedSet.has(i.user_id))
+          .map((i) => i.user_id)
+      ),
+    ];
+
+    if (abandonedUserIds.length === 0) {
+      return NextResponse.json(
+        { error: "Yarım kalan kayıt bulunamadı (tümü satın almayı tamamlamış)." },
+        { status: 400 }
+      );
+    }
+
+    // Resolve emails
+    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
+      perPage: 1000,
+    });
+
+    if (usersError) {
+      return NextResponse.json(
+        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
+        { status: 500 }
+      );
+    }
+
+    const abandonedSet = new Set(abandonedUserIds);
+    const abandonedEmails = users
+      .filter((u) => abandonedSet.has(u.id) && u.email)
+      .map((u) => u.email!);
+
+    if (abandonedEmails.length === 0) {
+      return NextResponse.json(
+        { error: "Yarım kalan kayıtların e-posta adresi bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    const emails = abandonedEmails.map((email) => ({
+      from: FROM,
+      to: email,
+      subject: emailSubject,
+      html: emailHtml,
+    }));
+
+    let totalSent = 0;
+    const batchSize = 100;
+    const errors: string[] = [];
+    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
+
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      const { data, error } = await resend.batch.send(batch);
+      if (error) {
+        errors.push(error.message);
+      } else {
+        totalSent += batch.length;
+        const ids = data?.data ?? [];
+        batch.forEach((email, j) => {
+          logRows.push({
+            resend_email_id: ids[j]?.id || null,
+            subscriber_email: email.to as string,
+            subject: emailSubject,
+          });
+        });
+      }
+    }
+
+    if (logRows.length > 0) {
+      await admin.from("email_logs").insert(logRows);
+    }
+
+    if (errors.length > 0 && totalSent === 0) {
+      return NextResponse.json(
+        { error: `Gönderim hatası: ${errors[0]}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      message: `${totalSent} kişiye yarım kalan kayıt hatırlatması gönderildi.`,
+      sent: totalSent,
+      total: abandonedEmails.length,
+    });
+  }
+
   return NextResponse.json(
-    { error: "Geçersiz mod. 'test', 'all' veya 'workshop' kullanın." },
+    { error: "Geçersiz mod." },
     { status: 400 }
   );
 }
