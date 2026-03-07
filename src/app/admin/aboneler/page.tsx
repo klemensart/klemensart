@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import Papa from "papaparse";
 
 type Subscriber = {
   id: string;
@@ -16,6 +17,9 @@ export default function AbonelerPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadSubscribers = useCallback(async () => {
     setLoading(true);
@@ -64,6 +68,68 @@ export default function AbonelerPage() {
     }
   };
 
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setImportMsg("");
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const rows = results.data as Record<string, string>[];
+
+        const mapped = rows
+          .map((row) => {
+            const keys = Object.keys(row);
+            const emailKey = keys.find((k) =>
+              /^(email\s*address|email|e-mail|e-posta)$/i.test(k.trim())
+            );
+            const nameKey = keys.find((k) =>
+              /^(first\s*name|name|ad|isim|full\s*name)$/i.test(k.trim())
+            );
+            return {
+              email: emailKey ? row[emailKey]?.trim() : "",
+              name: nameKey ? row[nameKey]?.trim() : "",
+            };
+          })
+          .filter((s) => s.email);
+
+        if (mapped.length === 0) {
+          setImportMsg("CSV'de geçerli e-posta bulunamadı.");
+          setImporting(false);
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/admin/subscribers/import", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscribers: mapped }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setImportMsg(`${data.imported} abone başarıyla içe aktarıldı!`);
+            loadSubscribers();
+          } else {
+            setImportMsg(data.error || "İçe aktarma başarısız.");
+          }
+        } catch {
+          setImportMsg("Bağlantı hatası.");
+        } finally {
+          setImporting(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      },
+      error: () => {
+        setImportMsg("CSV okunamadı.");
+        setImporting(false);
+      },
+    });
+  };
+
   const exportCSV = () => {
     const header = "Email,İsim,Kayıt Tarihi,Durum,Kaynak";
     const rows = subscribers.map((s) =>
@@ -105,18 +171,49 @@ export default function AbonelerPage() {
             Toplam {total} abone &middot; {activeCount} aktif
           </p>
         </div>
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          CSV Dışa Aktar
-        </button>
+        <div className="flex gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleImportCSV}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            {importing ? "İçe Aktarılıyor..." : "CSV İçe Aktar"}
+          </button>
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            CSV Dışa Aktar
+          </button>
+        </div>
       </div>
+
+      {importMsg && (
+        <div className={`mb-4 p-4 rounded-xl text-sm font-medium ${
+          importMsg.includes("başarıyla")
+            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            : "bg-red-50 text-red-700 border border-red-200"
+        }`}>
+          {importMsg}
+        </div>
+      )}
 
       {/* Search */}
       <div className="mb-6">
