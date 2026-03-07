@@ -4,11 +4,40 @@ import { useState } from "react";
 
 export default function Bulten() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) setSubmitted(true);
+    if (!email.trim()) return;
+
+    setLoading(true);
+    setStatus("idle");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus("error");
+        setMessage(data.error || "Bir hata oluştu.");
+      } else {
+        setStatus("success");
+        setMessage(data.message);
+        setEmail("");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Bağlantı hatası. Lütfen tekrar deneyin.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,7 +59,14 @@ export default function Bulten() {
           özel okuma listeleri — doğrudan e-posta kutunuza.
         </p>
 
-        {!submitted ? (
+        {status === "success" ? (
+          <div className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-500/20 border border-emerald-400/30 rounded-full text-emerald-300 font-medium">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            {message}
+          </div>
+        ) : (
           <form
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
@@ -41,22 +77,21 @@ export default function Bulten() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e-posta adresiniz"
               required
-              className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:border-coral focus:bg-white/15 transition-all"
+              disabled={loading}
+              className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:border-coral focus:bg-white/15 transition-all disabled:opacity-50"
             />
             <button
               type="submit"
-              className="px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all whitespace-nowrap"
+              disabled={loading}
+              className="px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all whitespace-nowrap disabled:opacity-50"
             >
-              Abone Ol
+              {loading ? "Gönderiliyor..." : "Abone Ol"}
             </button>
           </form>
-        ) : (
-          <div className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 rounded-full text-white font-medium">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-            Harika! Sizi bültene ekledik.
-          </div>
+        )}
+
+        {status === "error" && (
+          <p className="mt-4 text-red-400 text-sm font-medium">{message}</p>
         )}
 
         <p className="mt-6 text-white/25 text-sm">
