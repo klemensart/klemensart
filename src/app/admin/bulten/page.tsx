@@ -34,79 +34,79 @@ type TemplateConfig = {
 const TEMPLATES: TemplateConfig[] = [
   {
     name: "DuyuruBulteni",
-    label: "Duyuru Bulteni",
-    description: "Genel duyuru ve kampanya e-postasi",
+    label: "Duyuru Bülteni",
+    description: "Genel duyuru ve kampanya e-postası",
     icon: "📢",
     defaultSubject: "Klemens Art'tan Yeni Duyuru",
     fields: [
-      { key: "headline", label: "Baslik", type: "text" },
+      { key: "headline", label: "Başlık", type: "text" },
       { key: "body1", label: "Birinci Paragraf", type: "textarea" },
-      { key: "body2", label: "Ikinci Paragraf", type: "textarea" },
+      { key: "body2", label: "İkinci Paragraf", type: "textarea" },
       { key: "buttonText", label: "Buton Metni", type: "text" },
       { key: "buttonUrl", label: "Buton URL", type: "url" },
     ],
     defaults: {
-      headline: "Yeni Bir Kesif Sizi Bekliyor",
-      body1: "Klemens Art olarak bu sezon, kultur ve dusunce dunyasini yeniden sekillendiren bir program hazirladik.",
-      body2: "Detaylari kesfetmek ve yerinizi ayirtmak icin asagidaki butona tiklayin.",
-      buttonText: "Detaylari Kesfedin",
+      headline: "Yeni Bir Keşif Sizi Bekliyor",
+      body1: "Klemens Art olarak bu sezon, kültür ve düşünce dünyasını yeniden şekillendiren bir program hazırladık.",
+      body2: "Detayları keşfetmek ve yerinizi ayırtmak için aşağıdaki butona tıklayın.",
+      buttonText: "Detayları Keşfedin",
       buttonUrl: "https://klemensart.com",
     },
   },
   {
     name: "HosGeldiniz",
-    label: "Hos Geldiniz",
-    description: "Yeni uyelere karsilama e-postasi",
+    label: "Hoş Geldiniz",
+    description: "Yeni üyelere karşılama e-postası",
     icon: "👋",
-    defaultSubject: "Klemens Art'a Hos Geldiniz",
+    defaultSubject: "Klemens Art'a Hoş Geldiniz",
     fields: [
-      { key: "name", label: "Isim (opsiyonel)", type: "text" },
+      { key: "name", label: "İsim (opsiyonel)", type: "text" },
     ],
     defaults: { name: "" },
   },
   {
     name: "SeminerHatirlatici",
-    label: "Seminer Hatirlatici",
-    description: "Etkinlik oncesi hatirlatma e-postasi",
+    label: "Seminer Hatırlatıcı",
+    description: "Etkinlik öncesi hatırlatma e-postası",
     icon: "🔔",
-    defaultSubject: "Hatirlatma: Yarin Bulusuyoruz",
+    defaultSubject: "Hatırlatma: Yarın Buluşuyoruz",
     fields: [
-      { key: "eventTitle", label: "Etkinlik Adi", type: "text" },
+      { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
       { key: "eventDate", label: "Tarih", type: "text" },
       { key: "eventTime", label: "Saat", type: "text" },
       { key: "zoomLink", label: "Zoom Linki", type: "url" },
       { key: "calendarUrl", label: "Takvim URL", type: "url" },
     ],
     defaults: {
-      eventTitle: "Caravaggio ve Karanligin Estetigi",
+      eventTitle: "Caravaggio ve Karanlığın Estetiği",
       eventDate: "9 Mart 2026, Pazartesi",
-      eventTime: "20:30 (TSI)",
+      eventTime: "20:30 (TSİ)",
       zoomLink: "https://zoom.us/j/123456789",
       calendarUrl: "https://klemensart.com/takvim",
     },
   },
   {
     name: "EtkinlikTesekkur",
-    label: "Etkinlik Tesekkur",
-    description: "Etkinlik sonrasi tesekkur ve kayit paylasimi",
+    label: "Etkinlik Teşekkür",
+    description: "Etkinlik sonrası teşekkür ve kayıt paylaşımı",
     icon: "🙏",
-    defaultSubject: "Tesekkurler — Kayit ve Bibliyografya",
+    defaultSubject: "Teşekkürler — Kayıt ve Bibliyografya",
     fields: [
-      { key: "eventTitle", label: "Etkinlik Adi", type: "text" },
-      { key: "replayUrl", label: "Kayit URL", type: "url" },
+      { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
+      { key: "replayUrl", label: "Kayıt URL", type: "url" },
       {
         key: "bibliography",
         label: "Bibliyografya",
         type: "array",
         itemFields: [
-          { key: "title", label: "Eser Adi", type: "text" },
+          { key: "title", label: "Eser Adı", type: "text" },
           { key: "author", label: "Yazar", type: "text" },
-          { key: "type", label: "Tur (Kitap/Film/vb.)", type: "text" },
+          { key: "type", label: "Tür (Kitap/Film/vb.)", type: "text" },
         ],
       },
     ],
     defaults: {
-      eventTitle: "Caravaggio ve Karanligin Estetigi",
+      eventTitle: "Caravaggio ve Karanlığın Estetiği",
       replayUrl: "https://klemensart.com/arsiv",
       bibliography: [
         { title: "Caravaggio: A Life Sacred and Profane", author: "Andrew Graham-Dixon", type: "Kitap" },
@@ -115,83 +115,83 @@ const TEMPLATES: TemplateConfig[] = [
   },
   {
     name: "AtolyeHazirlik",
-    label: "Atolye Hazirlik",
-    description: "Atolye oncesi hazirlik kiti ve program",
+    label: "Atölye Hazırlık",
+    description: "Atölye öncesi hazırlık kiti ve program",
     icon: "📚",
-    defaultSubject: "Atolye Hazirlik Kiti",
+    defaultSubject: "Atölye Hazırlık Kiti",
     fields: [
-      { key: "workshopTitle", label: "Atolye Adi", type: "text" },
-      { key: "instructorName", label: "Egitmen Adi", type: "text" },
-      { key: "contactEmail", label: "Iletisim E-posta", type: "email" },
+      { key: "workshopTitle", label: "Atölye Adı", type: "text" },
+      { key: "instructorName", label: "Eğitmen Adı", type: "text" },
+      { key: "contactEmail", label: "İletişim E-posta", type: "email" },
       {
         key: "weeks",
-        label: "Haftalik Program",
+        label: "Haftalık Program",
         type: "array",
         itemFields: [
           { key: "week", label: "Hafta", type: "text" },
           { key: "title", label: "Konu", type: "text" },
-          { key: "material", label: "On Materyal", type: "text" },
+          { key: "material", label: "Ön Materyal", type: "text" },
         ],
       },
     ],
     defaults: {
-      workshopTitle: "Modern Sanatin Kirilma Noktalari",
-      instructorName: "Klemens Art Egitmeni",
+      workshopTitle: "Modern Sanatın Kırılma Noktaları",
+      instructorName: "Klemens Art Eğitmeni",
       contactEmail: "info@klemensart.com",
       weeks: [
-        { week: "1. Hafta", title: "Empresyonizmden Soyut'a Gecis", material: "John Berger — Gorme Bicimleri" },
+        { week: "1. Hafta", title: "Empresyonizmden Soyut'a Geçiş", material: "John Berger — Görme Biçimleri" },
       ],
     },
   },
   {
     name: "AylikAjanda",
-    label: "Aylik Ajanda",
-    description: "Aylik etkinlik takvimi ve editor secimi",
+    label: "Aylık Ajanda",
+    description: "Aylık etkinlik takvimi ve editör seçimi",
     icon: "📅",
     defaultSubject: "Bu Ay Klemens Art'ta",
     fields: [
-      { key: "monthName", label: "Ay Adi", type: "text" },
-      { key: "editorialIntro", label: "Giris Yazisi", type: "textarea" },
+      { key: "monthName", label: "Ay Adı", type: "text" },
+      { key: "editorialIntro", label: "Giriş Yazısı", type: "textarea" },
       {
         key: "events",
         label: "Etkinlikler",
         type: "array",
         itemFields: [
           { key: "date", label: "Tarih", type: "text" },
-          { key: "title", label: "Baslik", type: "text" },
+          { key: "title", label: "Başlık", type: "text" },
           { key: "tag", label: "Etiket", type: "text" },
         ],
       },
-      { key: "editorPickTitle", label: "Editor Secimi — Baslik", type: "text" },
-      { key: "editorPickDescription", label: "Editor Secimi — Aciklama", type: "textarea" },
-      { key: "editorPickImageUrl", label: "Editor Secimi — Gorsel URL", type: "url" },
-      { key: "editorPickUrl", label: "Editor Secimi — Link", type: "url" },
+      { key: "editorPickTitle", label: "Editör Seçimi — Başlık", type: "text" },
+      { key: "editorPickDescription", label: "Editör Seçimi — Açıklama", type: "textarea" },
+      { key: "editorPickImageUrl", label: "Editör Seçimi — Görsel URL", type: "url" },
+      { key: "editorPickUrl", label: "Editör Seçimi — Link", type: "url" },
     ],
     defaults: {
       monthName: "Mart 2026",
-      editorialIntro: "Bu ay, karanligin ve isigin sanat tarihindeki dansini kesfediyoruz.",
+      editorialIntro: "Bu ay, karanlığın ve ışığın sanat tarihindeki dansını keşfediyoruz.",
       events: [
-        { date: "12 Mart, Carsamba", title: "Caravaggio ve Karanligin Estetigi", tag: "Seminer" },
+        { date: "12 Mart, Çarşamba", title: "Caravaggio ve Karanlığın Estetiği", tag: "Seminer" },
       ],
-      editorPickTitle: "Gorme Bicimleri — John Berger",
-      editorPickDescription: "Gorsel kulturun nasil insa edildigini sorgulayan bu kisa ve keskin kitap.",
+      editorPickTitle: "Görme Biçimleri — John Berger",
+      editorPickDescription: "Görsel kültürün nasıl inşa edildiğini sorgulayan bu kısa ve keskin kitap.",
       editorPickImageUrl: "",
       editorPickUrl: "https://klemensart.com",
     },
   },
   {
     name: "YarimKalanKayit",
-    label: "Yarim Kalan Kayit",
-    description: "Tamamlanmamis kayitlar icin hatirlatma",
+    label: "Yarım Kalan Kayıt",
+    description: "Tamamlanmamış kayıtlar için hatırlatma",
     icon: "⏳",
-    defaultSubject: "Kaydinizi Tamamlayin",
+    defaultSubject: "Kaydınızı Tamamlayın",
     fields: [
-      { key: "eventTitle", label: "Etkinlik Adi", type: "text" },
-      { key: "registerUrl", label: "Kayit URL", type: "url" },
-      { key: "contactEmail", label: "Iletisim E-posta", type: "email" },
+      { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
+      { key: "registerUrl", label: "Kayıt URL", type: "url" },
+      { key: "contactEmail", label: "İletişim E-posta", type: "email" },
     ],
     defaults: {
-      eventTitle: "Modern Sanatin Kirilma Noktalari",
+      eventTitle: "Modern Sanatın Kırılma Noktaları",
       registerUrl: "https://klemensart.com/kayit",
       contactEmail: "info@klemensart.com",
     },
@@ -335,7 +335,7 @@ export default function BultenGonderPage() {
       }),
       Highlight,
       Placeholder.configure({
-        placeholder: "E-bulten iceriginizi buraya yazin...",
+        placeholder: "E-bülten içeriğinizi buraya yazın...",
       }),
     ],
     onUpdate: ({ editor }) => {
@@ -414,16 +414,16 @@ export default function BultenGonderPage() {
     async (mode: "test" | "all" | "workshop") => {
       if (pageMode === "freetext") {
         if (!subject.trim()) {
-          setMessage("Konu basligi gerekli.");
+          setMessage("Konu başlığı gerekli.");
           return;
         }
         if (!htmlContent || htmlContent === "<p></p>") {
-          setMessage("Icerik bos olamaz.");
+          setMessage("İçerik boş olamaz.");
           return;
         }
       } else {
         if (!selectedTemplate) {
-          setMessage("Lutfen bir sablon secin.");
+          setMessage("Lütfen bir şablon seçin.");
           return;
         }
       }
@@ -467,10 +467,10 @@ export default function BultenGonderPage() {
         if (res.ok) {
           setMessage(data.message);
         } else {
-          setMessage(data.error || "Gonderim basarisiz.");
+          setMessage(data.error || "Gönderi başarısız.");
         }
       } catch {
-        setMessage("Baglanti hatasi.");
+        setMessage("Bağlantı hatası.");
       } finally {
         setSending(false);
         setShowConfirm(false);
@@ -496,15 +496,15 @@ export default function BultenGonderPage() {
 
   const handleSendWorkshop = async () => {
     if (!selectedWorkshopId) {
-      setMessage("Lutfen bir atolye secin.");
+      setMessage("Lütfen bir atölye seçin.");
       return;
     }
     // Validate content
     if (pageMode === "freetext") {
-      if (!subject.trim()) { setMessage("Konu basligi gerekli."); return; }
-      if (!htmlContent || htmlContent === "<p></p>") { setMessage("Icerik bos olamaz."); return; }
+      if (!subject.trim()) { setMessage("Konu başlığı gerekli."); return; }
+      if (!htmlContent || htmlContent === "<p></p>") { setMessage("İçerik boş olamaz."); return; }
     } else {
-      if (!selectedTemplate) { setMessage("Lutfen bir sablon secin."); return; }
+      if (!selectedTemplate) { setMessage("Lütfen bir şablon seçin."); return; }
     }
     setLoadingParticipants(true);
     try {
@@ -530,9 +530,9 @@ export default function BultenGonderPage() {
     <div className="p-10 max-w-7xl mx-auto bg-white min-h-screen">
       <style>{EDITOR_CSS}</style>
 
-      <h1 className="text-3xl font-serif text-gray-900 mb-1">E-Bulten Gonder</h1>
+      <h1 className="text-3xl font-serif text-gray-900 mb-1">E-Bülten Gönder</h1>
       <p className="text-gray-400 text-sm mb-6">
-        Icerik olusturun, onizleyin ve abonelerinize gonderin.
+        İçerik oluşturun, önizleyin ve abonelerinize gönderin.
       </p>
 
       {/* ── Mode Tabs ── */}
@@ -555,7 +555,7 @@ export default function BultenGonderPage() {
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
-          Hazir Sablon
+          Hazır Şablon
         </button>
       </div>
 
@@ -568,40 +568,40 @@ export default function BultenGonderPage() {
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="Konu basligi"
+              placeholder="Konu başlığı"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 mb-4 focus:outline-none focus:border-[#FF6D60] text-sm"
             />
 
             <div className="newsletter-editor border border-gray-200 rounded-xl overflow-hidden">
               {editor && (
                 <div className="flex items-center gap-0.5 flex-wrap bg-gray-50 border-b border-gray-200 px-2 py-1.5">
-                  <TBtn title="Baslik 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>
+                  <TBtn title="Başlık 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>
                     <span className="font-bold">H2</span>
                   </TBtn>
-                  <TBtn title="Baslik 3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })}>
+                  <TBtn title="Başlık 3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })}>
                     <span className="font-bold">H3</span>
                   </TBtn>
                   <div className="w-px h-5 bg-gray-200 mx-0.5" />
-                  <TBtn title="Kalin" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
+                  <TBtn title="Kalın" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}>
                     <span className="font-bold">B</span>
                   </TBtn>
-                  <TBtn title="Italik" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
+                  <TBtn title="İtalik" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}>
                     <span className="italic">I</span>
                   </TBtn>
                   <TBtn title="Vurgula" onClick={() => editor.chain().focus().toggleHighlight().run()} active={editor.isActive("highlight")}>
                     <span className="bg-yellow-200 px-0.5">H</span>
                   </TBtn>
                   <div className="w-px h-5 bg-gray-200 mx-0.5" />
-                  <TBtn title="Alinti" onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")}>
+                  <TBtn title="Alıntı" onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")}>
                     &ldquo;
                   </TBtn>
-                  <TBtn title="Sirali Liste" onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")}>
+                  <TBtn title="Sıralı Liste" onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")}>
                     1.
                   </TBtn>
                   <TBtn title="Liste" onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")}>
                     &bull;
                   </TBtn>
-                  <TBtn title="Ayrac" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+                  <TBtn title="Ayraç" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
                     &mdash;
                   </TBtn>
                   <div className="w-px h-5 bg-gray-200 mx-0.5" />
@@ -625,11 +625,11 @@ export default function BultenGonderPage() {
                 </div>
                 <div className="border border-gray-100 rounded-xl p-4 text-center">
                   <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
-                  <div className="text-xs text-[#8C857E] mt-1">Son 60 Gun Acan</div>
+                  <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
                 </div>
                 <div className="border border-gray-100 rounded-xl p-4 text-center">
                   <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
-                  <div className="text-xs text-[#8C857E] mt-1">60 Gundur Acmayan</div>
+                  <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
                 </div>
               </div>
             )}
@@ -642,9 +642,9 @@ export default function BultenGonderPage() {
                 className="w-4 h-4 accent-[#FF6D60] rounded"
               />
               <span className="text-sm text-gray-600">
-                Son 60 gunde acmayanlara <span className="font-medium">gonderme</span>
+                Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
                 {stats && stats.inactiveLast60Days > 0 && (
-                  <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kisi haric)</span>
+                  <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
                 )}
               </span>
             </label>
@@ -664,7 +664,7 @@ export default function BultenGonderPage() {
                   disabled={sending}
                   className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
-                  {sending ? "Gonderiyor..." : "Kendime Test Gonder"}
+                  {sending ? "Gönderiyor..." : "Kendime Test Gönder"}
                 </button>
               </div>
               <button
@@ -672,21 +672,21 @@ export default function BultenGonderPage() {
                 disabled={sending}
                 className="px-6 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50 whitespace-nowrap"
               >
-                Tum Abonelere Gonder
+                Tüm Abonelere Gönder
               </button>
             </div>
 
             {/* Workshop Targeting */}
             {workshops.length > 0 && (
               <div className="mt-4 border border-gray-200 rounded-xl p-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atolye Katilimcilarina Gonder</div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atölye Katılımcılarına Gönder</div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <select
                     value={selectedWorkshopId}
                     onChange={(e) => setSelectedWorkshopId(e.target.value)}
                     className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
                   >
-                    <option value="">Atolye secin...</option>
+                    <option value="">Atölye seçin...</option>
                     {workshops.map((w) => (
                       <option key={w.id} value={w.id}>{w.title}</option>
                     ))}
@@ -696,7 +696,7 @@ export default function BultenGonderPage() {
                     disabled={sending || !selectedWorkshopId || loadingParticipants}
                     className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
-                    {loadingParticipants ? "Kontrol ediliyor..." : "Katilimcilara Gonder"}
+                    {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
                   </button>
                 </div>
               </div>
@@ -704,7 +704,7 @@ export default function BultenGonderPage() {
 
             {message && (
               <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
-                message.includes("gonderildi") || message.includes("gönderildi")
+                message.includes("gönderildi")
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-red-50 text-red-700 border border-red-200"
               }`}>
@@ -715,7 +715,7 @@ export default function BultenGonderPage() {
 
           {/* ── Right: Live Preview ── */}
           <div>
-            <div className="text-xs text-gray-400 mb-2 font-medium">CANLI ONIZLEME</div>
+            <div className="text-xs text-gray-400 mb-2 font-medium">CANLI ÖNİZLEME</div>
             <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto">
               <div style={{ maxWidth: 600, margin: "0 auto", backgroundColor: "#ffffff" }}>
                 {/* Header */}
@@ -731,21 +731,21 @@ export default function BultenGonderPage() {
                 )}
                 <div
                   style={{ padding: "0 40px 32px 40px", fontSize: 16, lineHeight: "1.7", color: "#3d3833", fontFamily: "Georgia, serif" }}
-                  dangerouslySetInnerHTML={{ __html: htmlContent || '<p style="color:#b0a99f">Icerik burada gorunecek...</p>' }}
+                  dangerouslySetInnerHTML={{ __html: htmlContent || '<p style="color:#b0a99f">İçerik burada görünecek...</p>' }}
                 />
                 <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "0 40px" }} />
                 <div style={{ textAlign: "center", padding: "24px 40px 32px 40px" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: "#2D2926" }}>Klemens Art</div>
-                  <div style={{ fontSize: 11, color: "#8C857E", marginTop: 4 }}>Ankara, Turkiye</div>
+                  <div style={{ fontSize: 11, color: "#8C857E", marginTop: 4 }}>Ankara, Türkiye</div>
                   <div style={{ fontSize: 12, marginTop: 16 }}>
                     <span style={{ color: "#FF6D60" }}>Instagram</span>&nbsp;&middot;&nbsp;
                     <span style={{ color: "#FF6D60" }}>YouTube</span>&nbsp;&middot;&nbsp;
                     <span style={{ color: "#FF6D60" }}>Web</span>
                   </div>
                   <div style={{ fontSize: 11, color: "#b0a99f", marginTop: 16, lineHeight: "1.6" }}>
-                    Bu e-postayi klemensart.com uzerinden abone oldugunuz icin aliyorsunuz.
+                    Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
                     <br />
-                    <span style={{ color: "#8C857E", textDecoration: "underline" }}>Abonelikten cikmak icin tiklayin</span>
+                    <span style={{ color: "#8C857E", textDecoration: "underline" }}>Abonelikten çıkmak için tıklayın</span>
                   </div>
                 </div>
               </div>
@@ -786,7 +786,7 @@ export default function BultenGonderPage() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
                   </svg>
-                  Sablonlara Don
+                  Şablonlara Dön
                 </button>
                 <div className="text-sm text-gray-300">|</div>
                 <div className="text-sm font-medium text-gray-800">
@@ -802,7 +802,7 @@ export default function BultenGonderPage() {
                     type="text"
                     value={templateSubject}
                     onChange={(e) => setTemplateSubject(e.target.value)}
-                    placeholder="E-posta konusu"
+                    placeholder="E-posta konusu (isteğe bağlı)"
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 mb-4 focus:outline-none focus:border-[#FF6D60] text-sm"
                   />
 
@@ -823,7 +823,7 @@ export default function BultenGonderPage() {
                                     type="button"
                                     onClick={() => removeArrayItem(af.key, idx)}
                                     className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors text-xs"
-                                    title="Kaldir"
+                                    title="Kaldır"
                                   >
                                     ✕
                                   </button>
@@ -890,11 +890,11 @@ export default function BultenGonderPage() {
                       </div>
                       <div className="border border-gray-100 rounded-xl p-4 text-center">
                         <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
-                        <div className="text-xs text-[#8C857E] mt-1">Son 60 Gun Acan</div>
+                        <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
                       </div>
                       <div className="border border-gray-100 rounded-xl p-4 text-center">
                         <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
-                        <div className="text-xs text-[#8C857E] mt-1">60 Gundur Acmayan</div>
+                        <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
                       </div>
                     </div>
                   )}
@@ -907,9 +907,9 @@ export default function BultenGonderPage() {
                       className="w-4 h-4 accent-[#FF6D60] rounded"
                     />
                     <span className="text-sm text-gray-600">
-                      Son 60 gunde acmayanlara <span className="font-medium">gonderme</span>
+                      Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
                       {stats && stats.inactiveLast60Days > 0 && (
-                        <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kisi haric)</span>
+                        <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
                       )}
                     </span>
                   </label>
@@ -929,7 +929,7 @@ export default function BultenGonderPage() {
                         disabled={sending}
                         className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
                       >
-                        {sending ? "Gonderiyor..." : "Kendime Test Gonder"}
+                        {sending ? "Gönderiyor..." : "Kendime Test Gönder"}
                       </button>
                     </div>
                     <button
@@ -937,21 +937,21 @@ export default function BultenGonderPage() {
                       disabled={sending}
                       className="px-6 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50 whitespace-nowrap"
                     >
-                      Tum Abonelere Gonder
+                      Tüm Abonelere Gönder
                     </button>
                   </div>
 
                   {/* Workshop Targeting */}
                   {workshops.length > 0 && (
                     <div className="mt-4 border border-gray-200 rounded-xl p-4">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atolye Katilimcilarina Gonder</div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atölye Katılımcılarına Gönder</div>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <select
                           value={selectedWorkshopId}
                           onChange={(e) => setSelectedWorkshopId(e.target.value)}
                           className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
                         >
-                          <option value="">Atolye secin...</option>
+                          <option value="">Atölye seçin...</option>
                           {workshops.map((w) => (
                             <option key={w.id} value={w.id}>{w.title}</option>
                           ))}
@@ -961,7 +961,7 @@ export default function BultenGonderPage() {
                           disabled={sending || !selectedWorkshopId || loadingParticipants}
                           className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
                         >
-                          {loadingParticipants ? "Kontrol ediliyor..." : "Katilimcilara Gonder"}
+                          {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
                         </button>
                       </div>
                     </div>
@@ -969,7 +969,7 @@ export default function BultenGonderPage() {
 
                   {message && (
                     <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
-                      message.includes("gonderildi") || message.includes("gönderildi")
+                      message.includes("gönderildi")
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-red-50 text-red-700 border border-red-200"
                     }`}>
@@ -980,19 +980,19 @@ export default function BultenGonderPage() {
 
                 {/* ── Right: Template Preview ── */}
                 <div>
-                  <div className="text-xs text-gray-400 mb-2 font-medium">SABLON ONIZLEME</div>
+                  <div className="text-xs text-gray-400 mb-2 font-medium">ŞABLON ÖNİZLEME</div>
                   <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto">
                     {templatePreviewHtml ? (
                       <iframe
                         srcDoc={templatePreviewHtml}
-                        title="Sablon Onizleme"
+                        title="Şablon Önizleme"
                         className="w-full border-0"
                         style={{ minHeight: 600 }}
                         sandbox="allow-same-origin"
                       />
                     ) : (
                       <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
-                        Onizleme yukleniyor...
+                        Önizleme yükleniyor...
                       </div>
                     )}
                   </div>
@@ -1006,17 +1006,17 @@ export default function BultenGonderPage() {
       {/* ── Campaign History ── */}
       {stats && stats.campaigns.length > 0 && (
         <div className="mt-10 border-t border-gray-100 pt-8">
-          <h2 className="text-xl font-serif text-[#2D2926] mb-4">Gonderim Gecmisi</h2>
+          <h2 className="text-xl font-serif text-[#2D2926] mb-4">Gönderim Geçmişi</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-left text-gray-500">
                   <th className="py-3 pr-4 font-medium">Konu</th>
-                  <th className="py-3 pr-4 font-medium text-center">Gonderildi</th>
-                  <th className="py-3 pr-4 font-medium text-center">Acildi</th>
-                  <th className="py-3 pr-4 font-medium text-center">Tiklandi</th>
+                  <th className="py-3 pr-4 font-medium text-center">Gönderildi</th>
+                  <th className="py-3 pr-4 font-medium text-center">Açıldı</th>
+                  <th className="py-3 pr-4 font-medium text-center">Tıklandı</th>
                   <th className="py-3 pr-4 font-medium text-center">Bounce</th>
-                  <th className="py-3 font-medium text-center">Acilma Orani</th>
+                  <th className="py-3 font-medium text-center">Açılma Oranı</th>
                 </tr>
               </thead>
               <tbody>
@@ -1066,16 +1066,16 @@ export default function BultenGonderPage() {
                 </svg>
               </div>
               <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
-                Bulteni Gondermek Uzeresiniz
+                Bülteni Göndermek Üzeresiniz
               </h3>
               <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
-                Bu bulten veritabanindaki{" "}
+                Bu bülten veritabanındaki{" "}
                 {subscriberCount !== null && (
                   <span className="font-semibold text-[#2D2926]">{subscriberCount}</span>
                 )}{" "}
-                {subscriberCount !== null ? "" : "tum "}aktif abonenize gonderilecektir.
+                {subscriberCount !== null ? "" : "tüm "}aktif abonenize gönderilecektir.
                 <br />
-                Bu islem geri alinamaz. Onayliyor musunuz?
+                Bu işlem geri alınamaz. Onaylıyor musunuz?
               </p>
             </div>
             <div className="flex border-t border-gray-100">
@@ -1083,14 +1083,14 @@ export default function BultenGonderPage() {
                 onClick={() => setShowConfirm(false)}
                 className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
               >
-                Iptal
+                İptal
               </button>
               <button
                 onClick={() => sendNewsletter("all")}
                 disabled={sending}
                 className="flex-1 py-3.5 text-sm font-semibold text-[#FF6D60] hover:bg-[#FF6D60]/5 transition-colors disabled:opacity-50"
               >
-                {sending ? "Gonderiliyor..." : "Evet, Tumune Gonder"}
+                {sending ? "Gönderiliyor..." : "Evet, Tümüne Gönder"}
               </button>
             </div>
           </div>
@@ -1111,7 +1111,7 @@ export default function BultenGonderPage() {
                 </svg>
               </div>
               <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
-                Atolye Katilimcilarina Gonder
+                Atölye Katılımcılarına Gönder
               </h3>
               <p className="text-[#8C857E] text-sm leading-relaxed mb-2">
                 <span className="font-semibold text-[#2D2926]">
@@ -1121,13 +1121,13 @@ export default function BultenGonderPage() {
               <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
                 Bu e-posta{" "}
                 {workshopParticipantCount !== null ? (
-                  <span className="font-semibold text-[#2D2926]">{workshopParticipantCount} kisiye</span>
+                  <span className="font-semibold text-[#2D2926]">{workshopParticipantCount} kişiye</span>
                 ) : (
-                  "katilimcilara"
+                  "katılımcılara"
                 )}{" "}
-                gonderilecektir.
+                gönderilecektir.
                 <br />
-                Bu islem geri alinamaz. Onayliyor musunuz?
+                Bu işlem geri alınamaz. Onaylıyor musunuz?
               </p>
             </div>
             <div className="flex border-t border-gray-100">
@@ -1135,14 +1135,14 @@ export default function BultenGonderPage() {
                 onClick={() => setShowWorkshopConfirm(false)}
                 className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
               >
-                Iptal
+                İptal
               </button>
               <button
                 onClick={() => sendNewsletter("workshop")}
                 disabled={sending}
                 className="flex-1 py-3.5 text-sm font-semibold text-[#2D2926] hover:bg-[#2D2926]/5 transition-colors disabled:opacity-50"
               >
-                {sending ? "Gonderiliyor..." : "Evet, Gonder"}
+                {sending ? "Gönderiliyor..." : "Evet, Gönder"}
               </button>
             </div>
           </div>
