@@ -777,8 +777,8 @@ export default function HaritaPage() {
       });
       mapRef.current = map;
 
-      tileLayerRef.current = Leaf.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      tileLayerRef.current = Leaf.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
         maxZoom: 18,
       }).addTo(map);
 
@@ -822,7 +822,7 @@ export default function HaritaPage() {
     filtered.forEach((place) => {
       const color = TYPE_COLORS[place.type];
       const svg = TYPE_SVGS[place.type];
-      const showLabel = currentZoom >= 15;
+      const showLabel = currentZoom >= 17;
       const labelHtml = showLabel
         ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6);pointer-events:none;">${place.name}</div>`
         : "";

@@ -34,7 +34,7 @@ export default function HaritaBanner() {
     frameRef.current++;
 
     /* ── Coordinate grid ── */
-    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
     ctx.lineWidth = 0.5;
     for (let i = 1; i <= 4; i++) {
       const gy = h * (i / 5);
@@ -46,7 +46,7 @@ export default function HaritaBanner() {
     }
     const coordFs = Math.max(8, Math.round(w * 0.02));
     ctx.font = `${coordFs}px monospace`;
-    ctx.fillStyle = "rgba(255,255,255,0.07)";
+    ctx.fillStyle = "rgba(255,255,255,0.13)";
     ctx.textAlign = "left";
     ctx.fillText("39.9°N", 6, h * 0.2 - 4);
     ctx.fillText("39.8°N", 6, h * 0.6 - 4);
@@ -172,7 +172,7 @@ export default function HaritaBanner() {
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at center, transparent 40%, #0d0d0d 100%)" }}
+            style={{ background: "radial-gradient(ellipse at center, transparent 55%, #0d0d0d 100%)" }}
           />
         </div>
       </div>
