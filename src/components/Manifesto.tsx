@@ -66,10 +66,6 @@ export default function Manifesto() {
               Eserler, dönemler, akımlar — hepsi yalnızca daha iyi sorular sorabilmeniz için birer
               basamak.
             </p>
-            <p>
-              25&rsquo;inden 55&rsquo;ine kadar, meraklı ama akademik ortamda rahat hissetmeyen
-              tüm profesyoneller için tasarlandık. Burası sizin yeriniz.
-            </p>
           </div>
 
           {/* Stats */}

@@ -33,7 +33,7 @@ const CY = 270;
 const TEAM: TeamMember[] = [
   {
     id: "kerem",
-    name: "Kerem Hün",
+    name: "Kerem Hun",
     initials: "KH",
     role: "Kurucu & Kreatif Direktör",
     size: "large",
