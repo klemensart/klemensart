@@ -50,7 +50,7 @@ export default function KlemensNewsletter({
           )}
 
           {/* Dynamic Content */}
-          <Section style={contentSection} dangerouslySetInnerHTML={{ __html: htmlContent }} />
+          <div style={contentSection} dangerouslySetInnerHTML={{ __html: htmlContent }} />
 
           {/* Footer */}
           <Hr style={footerLine} />
