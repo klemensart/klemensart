@@ -777,8 +777,8 @@ export default function HaritaPage() {
       });
       mapRef.current = map;
 
-      tileLayerRef.current = Leaf.tileLayer("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
+      tileLayerRef.current = Leaf.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
         maxZoom: 18,
       }).addTo(map);
 
@@ -1017,6 +1017,7 @@ export default function HaritaPage() {
           50% { box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 20px var(--glow-color, #4A9EFF)80; }
         }
         .leaflet-container { background: #1a1a1a !important; }
+        .leaflet-tile-pane { filter: brightness(1.4) contrast(1.1); }
         .culture-marker .marker-circle:hover { transform: scale(1.17); }
       `}</style>
 
