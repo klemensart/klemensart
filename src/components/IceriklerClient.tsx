@@ -2,15 +2,9 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { categories } from "@/lib/icerikler";
+import { categoryStyles } from "@/lib/category-styles";
 import ArticleCard from "@/components/ArticleCard";
 import type { ArticleMeta } from "@/lib/markdown";
-
-const categoryAccent: Record<string, { active: string; inactive: string }> = {
-  "odak":           { active: "bg-coral border-coral text-white",           inactive: "hover:border-coral hover:text-coral" },
-  "kultur-sanat":   { active: "bg-amber-400 border-amber-400 text-white",   inactive: "hover:border-amber-400 hover:text-amber-600" },
-  "ilham-verenler": { active: "bg-sky-400 border-sky-400 text-white",       inactive: "hover:border-sky-400 hover:text-sky-600" },
-  "kent-yasam":     { active: "bg-emerald-500 border-emerald-500 text-white", inactive: "hover:border-emerald-500 hover:text-emerald-600" },
-};
 
 export default function IceriklerClient({ articles }: { articles: ArticleMeta[] }) {
   const searchParams = useSearchParams();
@@ -52,15 +46,15 @@ export default function IceriklerClient({ articles }: { articles: ArticleMeta[] 
             </button>
             {categories.map((cat) => {
               const isActive = aktifKategori === cat.title;
-              const accent = categoryAccent[cat.slug];
+              const cs = categoryStyles[cat.slug];
               return (
                 <button
                   key={cat.slug}
                   onClick={() => setKategori(cat.title)}
                   className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-150 ${
                     isActive
-                      ? accent.active
-                      : `bg-warm-50 border-warm-200 text-warm-900/60 ${accent.inactive}`
+                      ? cs.filterActive
+                      : `bg-warm-50 border-warm-200 text-warm-900/60 ${cs.filterInactive}`
                   }`}
                 >
                   {cat.title}

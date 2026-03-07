@@ -7,6 +7,7 @@ import {
   Text,
   Link,
   Hr,
+  Img,
   Font,
   Preview,
 } from "@react-email/components";
@@ -36,8 +37,12 @@ export default function KlemensNewsletter({
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Text style={brandName}>KLEMENS</Text>
-            <Text style={brandTagline}>art &amp; culture</Text>
+            <Img
+              src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon.PNG"
+              alt="Klemens Art"
+              width="160"
+              style={logoImg}
+            />
           </Section>
 
           <Hr style={headerLine} />
@@ -110,22 +115,11 @@ const header: React.CSSProperties = {
   padding: "40px 40px 0 40px",
 };
 
-const brandName: React.CSSProperties = {
-  fontSize: "28px",
-  fontWeight: 400,
-  letterSpacing: "6px",
-  color: "#2D2926",
-  margin: "0",
-  lineHeight: "1",
+const logoImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 auto",
 };
 
-const brandTagline: React.CSSProperties = {
-  fontSize: "11px",
-  letterSpacing: "3px",
-  color: "#8C857E",
-  textTransform: "uppercase" as const,
-  margin: "6px 0 0 0",
-};
 
 const headerLine: React.CSSProperties = {
   borderTop: "1px solid #e8e4df",

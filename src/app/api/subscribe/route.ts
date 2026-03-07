@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { render } from "@react-email/render";
+import BultenTesekkur from "@/emails/BultenTesekkur";
+import { sendThankYouEmail } from "@/lib/send-thank-you";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -30,6 +33,10 @@ export async function POST(req: NextRequest) {
         .from("subscribers")
         .update({ is_active: true })
         .eq("id", existing.id);
+
+      // Teşekkür maili (fire-and-forget)
+      sendBultenTesekkurEmail(trimmedEmail, name?.trim());
+
       return NextResponse.json({ message: "Tekrar hoş geldiniz! Aboneliğiniz yeniden aktif." });
     }
     return NextResponse.json({ message: "Zaten abonesiniz!" });
@@ -46,5 +53,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Teşekkür maili (fire-and-forget)
+  sendBultenTesekkurEmail(trimmedEmail, name?.trim());
+
   return NextResponse.json({ message: "Abone oldunuz!" });
+}
+
+function sendBultenTesekkurEmail(email: string, name?: string | null) {
+  (async () => {
+    try {
+      const html = await render(BultenTesekkur({ name: name || undefined }));
+      await sendThankYouEmail({
+        to: email,
+        subject: "E-Bültenimize Hoş Geldiniz — Klemens Art",
+        html,
+      });
+    } catch (err) {
+      console.error("[Subscribe] Tesekkur maili gonderilemedi:", err);
+    }
+  })();
 }

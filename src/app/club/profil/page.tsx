@@ -5,36 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import {
+  PlayIcon, LockIcon, ClockIcon, CalendarIcon, ChevronDownIcon,
+  FilmIcon, BookIcon, ChartIcon, HeartIcon, SettingsIcon,
+  VideoIcon, ArrowRightIcon, LogoutIcon, CloseIcon, DownloadIcon,
+} from "@/lib/icons";
 
 const BUNNY_LIB = "596471";
-
-/* ─── Brand ─── */
-const B = {
-  coral: "#FF6D60",
-  cream: "#FFFBF7",
-  dark:  "#2D2926",
-  warm:  "#8C857E",
-  light: "#F5F0EB",
-};
-
-/* ─── Icons ─── */
-const I = {
-  play:     (c = B.coral, s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c} stroke="none"><polygon points="6,3 20,12 6,21" /></svg>,
-  lock:     (c = B.warm,  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
-  clock:    (c = B.warm,  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>,
-  calendar: (c = B.warm,  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
-  chevron:  (c = B.warm,  s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>,
-  film:     (c = B.warm,  s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="2" width="20" height="20" rx="2.18" /><line x1="7" y1="2" x2="7" y2="22" /><line x1="17" y1="2" x2="17" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="2" y1="7" x2="7" y2="7" /><line x1="2" y1="17" x2="7" y2="17" /><line x1="17" y1="7" x2="22" y2="7" /><line x1="17" y1="17" x2="22" y2="17" /></svg>,
-  book:     (c = B.warm,  s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>,
-  chart:    (c = B.warm,  s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>,
-  heart:    (c = B.warm,  s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" /></svg>,
-  settings: (c = B.warm,  s = 18) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>,
-  video:    (c = B.warm,  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" /></svg>,
-  arrow:    (c = "#fff",  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
-  logout:   (c = B.warm,  s = 16) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>,
-  close:    (c = "#fff",  s = 20) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>,
-  download: (c = B.warm,  s = 14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>,
-};
 
 /* ─── DB Types ─── */
 type DbWorkshop = {
@@ -106,38 +83,26 @@ function VideoModal({ bunnyId, title, onClose }: { bunnyId: string; title: strin
   return (
     <div
       onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 1000,
-        background: "rgba(0,0,0,0.88)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "clamp(16px, 4vw, 40px)",
-      }}
+      className="fixed inset-0 z-[1000] bg-black/[0.88] flex items-center justify-center p-[clamp(16px,4vw,40px)]"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 900 }}
-      >
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-[900px]">
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ color: "#fff", fontWeight: 600, fontSize: 15, lineHeight: 1.4, flex: 1, paddingRight: 12 }}>
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-white font-semibold text-[15px] leading-snug flex-1 pr-3">
             {title}
           </span>
           <button
             onClick={onClose}
-            style={{
-              background: "rgba(255,255,255,0.12)", border: "none", borderRadius: 8,
-              padding: "6px 8px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}
+            className="bg-white/12 rounded-lg p-1.5 cursor-pointer flex items-center justify-center shrink-0"
           >
-            {I.close("#fff", 18)}
+            <CloseIcon size={18} className="text-white" />
           </button>
         </div>
         {/* 16:9 iframe */}
-        <div style={{ position: "relative", paddingTop: "56.25%", borderRadius: 12, overflow: "hidden", background: "#000" }}>
+        <div className="relative pt-[56.25%] rounded-xl overflow-hidden bg-black">
           <iframe
             src={`https://iframe.mediadelivery.net/embed/${BUNNY_LIB}/${bunnyId}?autoplay=true&preload=true`}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+            className="absolute inset-0 w-full h-full border-none"
             allow="autoplay; fullscreen"
             allowFullScreen
           />
@@ -148,22 +113,19 @@ function VideoModal({ bunnyId, title, onClose }: { bunnyId: string; title: strin
 }
 
 /* ─── Badge ─── */
+const badgeVariants = {
+  default: "bg-brand-light text-brand-dark",
+  live:    "bg-[#E8F5E9] text-[#2E7D32]",
+  expires: "bg-[#FFF8E1] text-[#F57F17]",
+  club:    "bg-brand-dark text-white",
+} as const;
+
 function Badge({ children, variant = "default" }: {
   children: React.ReactNode;
   variant?: "default" | "live" | "expires" | "club";
 }) {
-  const s: Record<string, React.CSSProperties> = {
-    default: { background: B.light,    color: B.dark    },
-    live:    { background: "#E8F5E9",  color: "#2E7D32" },
-    expires: { background: "#FFF8E1",  color: "#F57F17" },
-    club:    { background: B.dark,     color: "#fff"    },
-  };
   return (
-    <span style={{
-      ...s[variant], padding: "4px 12px", borderRadius: 20,
-      fontSize: 11, fontWeight: 600, letterSpacing: "0.06em",
-      display: "inline-flex", alignItems: "center", gap: 5,
-    }}>
+    <span className={`${badgeVariants[variant]} px-3 py-1 rounded-[20px] text-[11px] font-semibold tracking-[0.06em] inline-flex items-center gap-[5px]`}>
       {children}
     </span>
   );
@@ -173,15 +135,14 @@ function Badge({ children, variant = "default" }: {
 function ProgressBar({ completed, total }: { completed: number; total: number }) {
   const pct = total > 0 ? (completed / total) * 100 : 0;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-      <div style={{ flex: 1, height: 3, background: B.light, borderRadius: 2, overflow: "hidden" }}>
-        <div style={{
-          width: `${pct}%`, height: "100%",
-          background: pct === 100 ? "#4CAF50" : B.coral,
-          borderRadius: 2, transition: "width 0.6s ease",
-        }} />
+    <div className="flex items-center gap-2 mt-2">
+      <div className="flex-1 h-[3px] bg-brand-light rounded-sm overflow-hidden">
+        <div
+          className={`h-full rounded-sm transition-[width] duration-[600ms] ease-out ${pct === 100 ? "bg-[#4CAF50]" : "bg-coral"}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <span style={{ fontSize: 11, color: B.warm, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+      <span className="text-[11px] text-brand-warm whitespace-nowrap tabular-nums">
         {completed}/{total}
       </span>
     </div>
@@ -190,26 +151,15 @@ function ProgressBar({ completed, total }: { completed: number; total: number })
 
 /* ─── PDF Button ─── */
 function PdfButton({ url }: { url: string }) {
-  const [hovered, setHovered] = useState(false);
   return (
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: "inline-flex", alignItems: "center", gap: 4,
-        padding: "4px 9px", borderRadius: 7, border: "none",
-        background: hovered ? `${B.coral}18` : B.light,
-        color: hovered ? B.coral : B.warm,
-        fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
-        cursor: "pointer", textDecoration: "none", flexShrink: 0,
-        transition: "background 0.15s, color 0.15s",
-      }}
+      className="inline-flex items-center gap-1 px-[9px] py-1 rounded-[7px] bg-brand-light text-brand-warm text-[11px] font-semibold tracking-[0.04em] no-underline shrink-0 transition-[background,color] duration-150 hover:bg-coral/[0.09] hover:text-coral"
     >
-      {I.download(hovered ? B.coral : B.warm, 12)} PDF
+      <DownloadIcon size={12} /> PDF
     </a>
   );
 }
@@ -224,7 +174,6 @@ function SessionList({
   zoomLink: string | null;
   onPlay: (bunnyId: string, title: string) => void;
 }) {
-  // Find next upcoming or live session for banner
   const bannerSession = sessions.find(s => s.status === "live") ??
     sessions.find(s => s.status === "upcoming" && s.session_date);
 
@@ -233,24 +182,17 @@ function SessionList({
   const showBanner = isLive && bannerDate;
 
   return (
-    <div style={{ marginTop: 12 }}>
-      {/* Pulsing dot keyframe */}
-      <style>{`@keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
-
+    <div className="mt-3">
       {/* Next live session banner */}
       {showBanner && (
-        <div style={{
-          padding: "14px 16px", background: "#F1F8E9", borderRadius: 12, marginBottom: 14,
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          border: "1px solid #C5E1A5", flexWrap: "wrap", gap: 10,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {I.calendar("#2E7D32", 16)}
+        <div className="p-3.5 bg-[#F1F8E9] rounded-xl mb-3.5 flex justify-between items-center border border-[#C5E1A5] flex-wrap gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <CalendarIcon size={16} className="text-[#2E7D32]" />
             <div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "#2E7D32", letterSpacing: "0.04em" }}>
+              <div className="text-[11px] font-semibold text-[#2E7D32] tracking-[0.04em]">
                 {bannerSession?.status === "live" ? "CANLI OTURUM" : "SONRAKİ CANLI OTURUM"}
               </div>
-              <div style={{ fontSize: 14, color: B.dark, marginTop: 2 }}>
+              <div className="text-sm text-brand-dark mt-0.5">
                 {new Date(bannerDate).toLocaleString("tr-TR", {
                   day: "numeric", month: "long", year: "numeric",
                   hour: "2-digit", minute: "2-digit",
@@ -263,14 +205,9 @@ function SessionList({
               href={bannerZoom}
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                background: "#2E7D32", color: "#fff", border: "none",
-                borderRadius: 10, padding: "9px 18px", fontSize: 13, fontWeight: 600,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
-                textDecoration: "none",
-              }}
+              className="bg-[#2E7D32] text-white rounded-[10px] px-[18px] py-[9px] text-[13px] font-semibold flex items-center gap-1.5 no-underline"
             >
-              Katıl {I.arrow("#fff", 13)}
+              Katıl <ArrowRightIcon size={13} className="text-white" />
             </a>
           )}
         </div>
@@ -284,74 +221,59 @@ function SessionList({
         const hasStatus = isUpcoming || isLiveSession || isCompleted;
         const sessionZoom = s.zoom_url ?? zoomLink;
 
-        // For upcoming/live: no video click
-        // For completed with is_published: video click (same as before)
-        // For null status: original behavior
         const canPlayVideo = hasStatus
           ? isCompleted && s.is_published && !!s.bunny_video_id
           : s.is_published && !!s.bunny_video_id;
 
         const rowOpacity = isUpcoming ? 0.7 : (hasStatus ? 1 : (s.is_published ? 1 : 0.45));
-        const rowBg = isLiveSession ? "#F1F8E9" : (canPlayVideo || isUpcoming ? B.cream : "transparent");
+        const rowBg = isLiveSession ? "bg-[#F1F8E9]" : (canPlayVideo || isUpcoming ? "bg-cream" : "bg-transparent");
 
         return (
           <div
             key={s.session_number}
             onClick={() => canPlayVideo && onPlay(s.bunny_video_id!, s.title)}
-            style={{
-              display: "flex", alignItems: "center", gap: 12, padding: "11px 14px",
-              background: rowBg, borderRadius: 10, marginBottom: 4,
-              cursor: canPlayVideo ? "pointer" : "default",
-              opacity: rowOpacity,
-            }}
+            className={`flex items-center gap-3 px-3.5 py-[11px] rounded-[10px] mb-1 ${rowBg} ${canPlayVideo ? "cursor-pointer" : "cursor-default"}`}
+            style={{ opacity: rowOpacity }}
           >
             {/* Icon box */}
-            <div style={{
-              width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-              background: isLiveSession ? "#2E7D32"
-                : isUpcoming ? B.light
-                : (isCompleted && s.is_published) ? B.coral
-                : s.is_published ? B.coral : B.light,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
+            <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
+              isLiveSession ? "bg-[#2E7D32]"
+                : isUpcoming ? "bg-brand-light"
+                : s.is_published ? "bg-coral" : "bg-brand-light"
+            }`}>
               {isUpcoming
-                ? I.calendar(B.warm, 12)
+                ? <CalendarIcon size={12} className="text-brand-warm" />
                 : isLiveSession
-                  ? I.play("#fff", 12)
-                  : s.is_published ? I.play("#fff", 12) : I.lock(B.warm, 12)
+                  ? <PlayIcon size={12} className="text-white" />
+                  : s.is_published ? <PlayIcon size={12} className="text-white" /> : <LockIcon size={12} className="text-brand-warm" />
               }
             </div>
 
             {/* Title + subtitle */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: B.dark, display: "flex", alignItems: "center", gap: 6 }}>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-brand-dark flex items-center gap-1.5">
                 {s.title}
                 {isLiveSession && (
-                  <span style={{
-                    width: 8, height: 8, borderRadius: "50%", background: "#4CAF50",
-                    display: "inline-block", flexShrink: 0,
-                    animation: "livePulse 1.5s ease-in-out infinite",
-                  }} />
+                  <span className="w-2 h-2 rounded-full bg-[#4CAF50] inline-block shrink-0 live-pulse" />
                 )}
               </div>
-              <div style={{ fontSize: 12, color: B.warm, display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+              <div className="text-xs text-brand-warm flex items-center gap-1 mt-0.5">
                 {(isUpcoming || isLiveSession) && s.session_date ? (
                   <>
-                    {I.calendar(B.warm, 11)}{" "}
+                    <CalendarIcon size={11} className="text-brand-warm" />{" "}
                     {new Date(s.session_date).toLocaleString("tr-TR", {
                       day: "numeric", month: "long", year: "numeric",
                       hour: "2-digit", minute: "2-digit",
                     })}
                   </>
                 ) : (
-                  <>{I.clock(B.warm, 11)} {s.duration ?? "—"}</>
+                  <><ClockIcon size={11} className="text-brand-warm" /> {s.duration ?? "—"}</>
                 )}
               </div>
             </div>
 
             {/* Right side */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              {/* PDF for completed/published */}
+            <div className="flex items-center gap-1.5 shrink-0">
               {s.pdf_url && (isCompleted || (!hasStatus && s.is_published)) && <PdfButton url={s.pdf_url} />}
 
               {isLiveSession && sessionZoom ? (
@@ -360,14 +282,9 @@ function SessionList({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  style={{
-                    background: "#2E7D32", color: "#fff", border: "none",
-                    borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 600,
-                    cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-                    textDecoration: "none",
-                  }}
+                  className="bg-[#2E7D32] text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1 no-underline"
                 >
-                  Katıl {I.arrow("#fff", 11)}
+                  Katıl <ArrowRightIcon size={11} className="text-white" />
                 </a>
               ) : isUpcoming ? (
                 isWithinOneHour(s.session_date) && sessionZoom ? (
@@ -376,22 +293,17 @@ function SessionList({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    style={{
-                      background: "#2E7D32", color: "#fff", border: "none",
-                      borderRadius: 8, padding: "5px 12px", fontSize: 11, fontWeight: 600,
-                      cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-                      textDecoration: "none",
-                    }}
+                    className="bg-[#2E7D32] text-white rounded-lg px-3 py-[5px] text-[11px] font-semibold flex items-center gap-1 no-underline"
                   >
-                    Katıl {I.arrow("#fff", 10)}
+                    Katıl <ArrowRightIcon size={10} className="text-white" />
                   </a>
                 ) : (
-                  <span style={{ fontSize: 11, color: B.warm, fontStyle: "italic" }}>Yakında</span>
+                  <span className="text-[11px] text-brand-warm italic">Yakında</span>
                 )
               ) : (isCompleted && s.is_published && s.bunny_video_id) || (!hasStatus && s.is_published && s.bunny_video_id) ? (
-                <span style={{ fontSize: 12, color: B.coral, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>İzle {I.arrow(B.coral, 12)}</span>
+                <span className="text-xs text-coral font-semibold flex items-center gap-1">İzle <ArrowRightIcon size={12} className="text-coral" /></span>
               ) : !hasStatus ? (
-                <span style={{ fontSize: 11, color: B.warm, fontStyle: "italic" }}>Yakında</span>
+                <span className="text-[11px] text-brand-warm italic">Yakında</span>
               ) : null}
             </div>
           </div>
@@ -404,14 +316,14 @@ function SessionList({
 /* ─── Loca loading skeleton ─── */
 function LocaSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div className="flex flex-col gap-3">
       {[1, 2].map((k) => (
-        <div key={k} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
-          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: B.light }} />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ height: 14, background: B.light, borderRadius: 6, width: "65%" }} />
-              <div style={{ height: 3, background: B.light, borderRadius: 2 }} />
+        <div key={k} className="bg-white rounded-[14px] px-5 py-[18px] shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+          <div className="flex gap-3.5 items-center">
+            <div className="w-11 h-11 rounded-xl bg-brand-light" />
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="h-3.5 bg-brand-light rounded-md w-[65%]" />
+              <div className="h-[3px] bg-brand-light rounded-sm" />
             </div>
           </div>
         </div>
@@ -423,10 +335,10 @@ function LocaSkeleton() {
 /* ─── Tabs ─── */
 type TabId = "loca" | "tests" | "favorites" | "settings";
 const TABS: { id: TabId; label: string; icon: (active: boolean) => React.ReactElement }[] = [
-  { id: "loca",      label: "Loca",           icon: (a) => I.film(    a ? B.coral : B.warm, 16) },
-  { id: "tests",     label: "Test Geçmişi",   icon: (a) => I.chart(   a ? B.coral : B.warm, 16) },
-  { id: "favorites", label: "Favori Yazılar", icon: (a) => I.heart(   a ? B.coral : B.warm, 16) },
-  { id: "settings",  label: "Hesap",          icon: (a) => I.settings(a ? B.coral : B.warm, 16) },
+  { id: "loca",      label: "Loca",           icon: (a) => <FilmIcon     size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "tests",     label: "Test Geçmişi",   icon: (a) => <ChartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "favorites", label: "Favori Yazılar", icon: (a) => <HeartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "settings",  label: "Hesap",          icon: (a) => <SettingsIcon size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
 ];
 
 /* ═══════════════════════════════════
@@ -551,7 +463,7 @@ export default function ProfilPage() {
   /* ─── Guards ─── */
   if (loading) {
     return (
-      <main style={{ minHeight: "100vh", background: B.cream, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <main className="min-h-screen bg-cream flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin" />
       </main>
     );
@@ -565,7 +477,7 @@ export default function ProfilPage() {
   const totalWatchable = publishedCount + videos.length;
 
   return (
-    <div style={{ background: B.cream, minHeight: "100vh" }}>
+    <div className="bg-cream min-h-screen">
 
       {/* Video player modal */}
       {playingVideo && (
@@ -577,41 +489,32 @@ export default function ProfilPage() {
       )}
 
       {/* Profile header */}
-      <div style={{ padding: "80px clamp(20px,5vw,60px) 0" }}>
-        <div style={{ maxWidth: 780, margin: "0 auto" }}>
+      <div className="pt-20 px-[clamp(20px,5vw,60px)]">
+        <div className="max-w-[780px] mx-auto">
 
-          <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 36 }}>
-            <div style={{
-              width: 68, height: 68, borderRadius: "50%", flexShrink: 0,
-              background: B.coral, color: "#fff",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 24, fontWeight: 600, letterSpacing: "0.02em",
-            }}>
+          <div className="flex items-center gap-5 mb-9">
+            <div className="w-[68px] h-[68px] rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-2xl font-semibold tracking-[0.02em]">
               {initials}
             </div>
             <div>
-              <p style={{ fontSize: 14, color: B.warm, margin: "0 0 6px" }}>{user.email}</p>
+              <p className="text-sm text-brand-warm mb-1.5">{user.email}</p>
               <Badge variant="club">KLEMENS CLUB</Badge>
             </div>
           </div>
 
           {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: `1px solid ${B.light}`, overflowX: "auto" }}>
+          <div className="flex border-b border-brand-light overflow-x-auto">
             {TABS.map((tab) => {
               const active = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => { setActiveTab(tab.id); setExpandedWorkshop(null); }}
-                  style={{
-                    padding: "14px 20px", border: "none",
-                    borderBottom: active ? `2px solid ${B.coral}` : "2px solid transparent",
-                    background: "transparent", fontSize: 13,
-                    fontWeight: active ? 600 : 400,
-                    color: active ? B.coral : B.warm,
-                    cursor: "pointer", whiteSpace: "nowrap",
-                    display: "flex", alignItems: "center", gap: 7,
-                  }}
+                  className={`px-5 py-3.5 border-b-2 bg-transparent text-[13px] cursor-pointer whitespace-nowrap flex items-center gap-[7px] ${
+                    active
+                      ? "border-coral font-semibold text-coral"
+                      : "border-transparent font-normal text-brand-warm"
+                  }`}
                 >
                   {tab.icon(active)} {tab.label}
                 </button>
@@ -622,8 +525,8 @@ export default function ProfilPage() {
       </div>
 
       {/* Tab content */}
-      <div style={{ padding: "32px clamp(20px,5vw,60px) 80px" }}>
-        <div style={{ maxWidth: 780, margin: "0 auto" }}>
+      <div className="pt-8 px-[clamp(20px,5vw,60px)] pb-20">
+        <div className="max-w-[780px] mx-auto">
 
           {/* ══ LOCA ══ */}
           {activeTab === "loca" && (
@@ -632,39 +535,30 @@ export default function ProfilPage() {
                 <LocaSkeleton />
               ) : workshops.length === 0 && videos.length === 0 ? (
                 /* Empty state */
-                <div style={{ textAlign: "center", padding: "60px 0", color: B.warm }}>
-                  {I.film(B.light, 48)}
-                  <p style={{ fontSize: 15, margin: "16px 0 4px", color: B.dark }}>Henüz içeriğin bulunmuyor.</p>
-                  <p style={{ fontSize: 13 }}>Atölyelere göz atmak ister misin?</p>
+                <div className="text-center py-[60px] text-brand-warm">
+                  <FilmIcon size={48} className="text-brand-light mx-auto" />
+                  <p className="text-[15px] mt-4 mb-1 text-brand-dark">Henüz içeriğin bulunmuyor.</p>
+                  <p className="text-[13px]">Atölyelere göz atmak ister misin?</p>
                   <Link
                     href="/atolyeler"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      marginTop: 20, padding: "11px 22px",
-                      background: B.coral, color: "#fff",
-                      borderRadius: 10, fontSize: 13, fontWeight: 600,
-                      textDecoration: "none",
-                    }}
+                    className="inline-flex items-center gap-1.5 mt-5 px-[22px] py-[11px] bg-coral text-white rounded-[10px] text-[13px] font-semibold no-underline"
                   >
-                    Atölyelere Bak {I.arrow("#fff", 13)}
+                    Atölyelere Bak <ArrowRightIcon size={13} className="text-white" />
                   </Link>
                 </div>
               ) : (
                 <>
                   {/* Stats */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 36 }}>
+                  <div className="grid grid-cols-3 gap-3 mb-9">
                     {[
-                      { label: "Atölye",            value: workshops.length, icon: I.book(B.coral, 20)  },
-                      { label: "Tekil Video",        value: videos.length,   icon: I.video(B.coral, 20) },
-                      { label: "Toplam İzlenebilir", value: totalWatchable,  icon: I.play(B.coral, 18)  },
+                      { label: "Atölye",            value: workshops.length, icon: <BookIcon  size={20} className="text-coral" /> },
+                      { label: "Tekil Video",        value: videos.length,   icon: <VideoIcon size={20} className="text-coral" /> },
+                      { label: "Toplam İzlenebilir", value: totalWatchable,  icon: <PlayIcon  size={18} className="text-coral" /> },
                     ].map((s, idx) => (
-                      <div key={idx} style={{
-                        background: "#fff", borderRadius: 14, padding: "20px 16px",
-                        textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-                      }}>
-                        <div style={{ marginBottom: 6, display: "flex", justifyContent: "center" }}>{s.icon}</div>
-                        <div style={{ fontSize: 28, fontWeight: 700, color: B.dark, fontVariantNumeric: "tabular-nums" }}>{s.value}</div>
-                        <div style={{ fontSize: 12, color: B.warm, marginTop: 2 }}>{s.label}</div>
+                      <div key={idx} className="bg-white rounded-[14px] px-4 py-5 text-center shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+                        <div className="mb-1.5 flex justify-center">{s.icon}</div>
+                        <div className="text-[28px] font-bold text-brand-dark tabular-nums">{s.value}</div>
+                        <div className="text-xs text-brand-warm mt-0.5">{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -672,34 +566,28 @@ export default function ProfilPage() {
                   {/* Workshops */}
                   {workshops.length > 0 && (
                     <>
-                      <h3 style={{ fontSize: 11, fontWeight: 600, color: B.warm, letterSpacing: "0.1em", margin: "0 0 12px" }}>
+                      <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mb-3">
                         ATÖLYELERİM
                       </h3>
                       {workshops.map(({ workshopId, expiresAt, ws, sessions }) => {
                         const published = sessions.filter(s => s.is_published).length;
                         const expanded  = expandedWorkshop === workshopId;
                         return (
-                          <div key={workshopId} style={{
-                            background: "#fff", borderRadius: 14, marginBottom: 10,
-                            boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-                            border: expanded ? `1.5px solid ${B.coral}22` : "1.5px solid transparent",
-                            transition: "all 0.25s ease",
-                          }}>
+                          <div key={workshopId} className={`bg-white rounded-[14px] mb-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.03)] transition-all duration-[250ms] ${
+                            expanded ? "border-[1.5px] border-coral/[0.13]" : "border-[1.5px] border-transparent"
+                          }`}>
                             <div
                               onClick={() => setExpandedWorkshop(expanded ? null : workshopId)}
-                              style={{ padding: "18px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}
+                              className="px-5 py-[18px] cursor-pointer flex items-center gap-3.5"
                             >
-                              <div style={{
-                                width: 44, height: 44, minWidth: 44, borderRadius: 12,
-                                background: B.light, display: "flex", alignItems: "center", justifyContent: "center",
-                              }}>
-                                {I.film(B.coral, 20)}
+                              <div className="w-11 h-11 min-w-[44px] rounded-xl bg-brand-light flex items-center justify-center">
+                                <FilmIcon size={20} className="text-coral" />
                               </div>
-                              <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", gap: 6, marginBottom: 5, flexWrap: "wrap" }}>
+                              <div className="flex-1">
+                                <div className="flex gap-1.5 mb-[5px] flex-wrap">
                                   {ws.is_live && (
                                     <Badge variant="live">
-                                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#4CAF50", display: "inline-block" }} />
+                                      <span className="w-[5px] h-[5px] rounded-full bg-[#4CAF50] inline-block" />
                                       Canlı
                                     </Badge>
                                   )}
@@ -707,19 +595,19 @@ export default function ProfilPage() {
                                     <Badge variant="expires">{formatExpiry(expiresAt)}</Badge>
                                   )}
                                 </div>
-                                <h4 style={{ fontSize: 15, fontWeight: 600, color: B.dark, margin: "0 0 2px", fontFamily: "Georgia, serif" }}>
+                                <h4 className="text-[15px] font-semibold text-brand-dark mb-0.5 font-serif">
                                   {ws.title}
                                 </h4>
                                 <ProgressBar completed={published} total={ws.total_sessions} />
                               </div>
-                              <div style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s ease", flexShrink: 0 }}>
-                                {I.chevron(B.warm, 18)}
+                              <div className={`shrink-0 transition-transform duration-[250ms] ${expanded ? "rotate-180" : "rotate-0"}`}>
+                                <ChevronDownIcon size={18} className="text-brand-warm" />
                               </div>
                             </div>
 
                             {expanded && (
-                              <div style={{ padding: "0 20px 18px" }}>
-                                <div style={{ height: 1, background: B.light, marginBottom: 12 }} />
+                              <div className="px-5 pb-[18px]">
+                                <div className="h-px bg-brand-light mb-3" />
                                 <SessionList
                                   sessions={sessions}
                                   isLive={ws.is_live}
@@ -738,33 +626,29 @@ export default function ProfilPage() {
                   {/* Single videos */}
                   {videos.length > 0 && (
                     <>
-                      <h3 style={{ fontSize: 11, fontWeight: 600, color: B.warm, letterSpacing: "0.1em", margin: "28px 0 12px" }}>
+                      <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mt-7 mb-3">
                         TEKİL VİDEOLARIM
                       </h3>
                       {videos.map(({ videoId, expiresAt, vid }) => (
                         <div
                           key={videoId}
                           onClick={() => setPlayingVideo({ bunnyId: vid.bunny_video_id, title: vid.title })}
-                          style={{
-                            background: "#fff", borderRadius: 12, padding: "14px 18px", marginBottom: 8,
-                            boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-                            display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
-                          }}
+                          className="bg-white rounded-xl px-[18px] py-3.5 mb-2 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex items-center gap-3.5 cursor-pointer"
                         >
-                          <div style={{ width: 40, height: 40, minWidth: 40, borderRadius: 10, background: B.light, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            {I.video(B.coral, 18)}
+                          <div className="w-10 h-10 min-w-[40px] rounded-[10px] bg-brand-light flex items-center justify-center">
+                            <VideoIcon size={18} className="text-coral" />
                           </div>
-                          <div style={{ flex: 1 }}>
-                            <h4 style={{ fontSize: 14, fontWeight: 600, color: B.dark, margin: 0, fontFamily: "Georgia, serif" }}>{vid.title}</h4>
-                            <div style={{ display: "flex", gap: 14, fontSize: 12, color: B.warm, marginTop: 4, alignItems: "center", flexWrap: "wrap" }}>
-                              {vid.duration && <span style={{ display: "flex", alignItems: "center", gap: 4 }}>{I.clock(B.warm, 11)} {vid.duration}</span>}
-                              {expiresAt    && <span style={{ display: "flex", alignItems: "center", gap: 4 }}>{I.calendar(B.warm, 11)} {formatExpiry(expiresAt)}</span>}
+                          <div className="flex-1">
+                            <h4 className="text-sm font-semibold text-brand-dark font-serif">{vid.title}</h4>
+                            <div className="flex gap-3.5 text-xs text-brand-warm mt-1 items-center flex-wrap">
+                              {vid.duration && <span className="flex items-center gap-1"><ClockIcon size={11} className="text-brand-warm" /> {vid.duration}</span>}
+                              {expiresAt    && <span className="flex items-center gap-1"><CalendarIcon size={11} className="text-brand-warm" /> {formatExpiry(expiresAt)}</span>}
                             </div>
                           </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                          <div className="flex items-center gap-1.5 shrink-0">
                             {vid.pdf_url && <PdfButton url={vid.pdf_url} />}
-                            <div style={{ width: 36, height: 36, borderRadius: 10, background: B.coral, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              {I.play("#fff", 12)}
+                            <div className="w-9 h-9 rounded-[10px] bg-coral flex items-center justify-center">
+                              <PlayIcon size={12} className="text-white" />
                             </div>
                           </div>
                         </div>
@@ -778,29 +662,29 @@ export default function ProfilPage() {
 
           {/* ══ TEST GEÇMİŞİ ══ */}
           {activeTab === "tests" && (
-            <div style={{ textAlign: "center", padding: "60px 0", color: B.warm }}>
-              {I.chart(B.light, 48)}
-              <p style={{ fontSize: 15, fontWeight: 600, color: B.dark, marginTop: 16 }}>Test Geçmişi</p>
-              <p style={{ fontSize: 13 }}>Çözdüğün testler ve karakter analizlerin burada görünecek.</p>
-              <p style={{ fontSize: 12, fontStyle: "italic", marginTop: 8 }}>Yakında</p>
+            <div className="text-center py-[60px] text-brand-warm">
+              <ChartIcon size={48} className="text-brand-light mx-auto" />
+              <p className="text-[15px] font-semibold text-brand-dark mt-4">Test Geçmişi</p>
+              <p className="text-[13px]">Çözdüğün testler ve karakter analizlerin burada görünecek.</p>
+              <p className="text-xs italic mt-2">Yakında</p>
             </div>
           )}
 
           {/* ══ FAVORİ YAZILAR ══ */}
           {activeTab === "favorites" && (
-            <div style={{ textAlign: "center", padding: "60px 0", color: B.warm }}>
-              {I.heart(B.light, 48)}
-              <p style={{ fontSize: 15, fontWeight: 600, color: B.dark, marginTop: 16 }}>Favori Yazılar</p>
-              <p style={{ fontSize: 13 }}>Beğendiğin ve kaydettiğin içerikler burada listelenecek.</p>
-              <p style={{ fontSize: 12, fontStyle: "italic", marginTop: 8 }}>Yakında</p>
+            <div className="text-center py-[60px] text-brand-warm">
+              <HeartIcon size={48} className="text-brand-light mx-auto" />
+              <p className="text-[15px] font-semibold text-brand-dark mt-4">Favori Yazılar</p>
+              <p className="text-[13px]">Beğendiğin ve kaydettiğin içerikler burada listelenecek.</p>
+              <p className="text-xs italic mt-2">Yakında</p>
             </div>
           )}
 
           {/* ══ HESAP ══ */}
           {activeTab === "settings" && (
             <div>
-              <div style={{ background: "#fff", borderRadius: 14, padding: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.03)", marginBottom: 16 }}>
-                <h3 style={{ fontSize: 11, fontWeight: 600, color: B.warm, letterSpacing: "0.1em", margin: "0 0 16px" }}>HESAP BİLGİLERİ</h3>
+              <div className="bg-white rounded-[14px] p-6 shadow-[0_1px_4px_rgba(0,0,0,0.03)] mb-4">
+                <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mb-4">HESAP BİLGİLERİ</h3>
                 {[
                   {
                     label: "E-posta",
@@ -810,44 +694,33 @@ export default function ProfilPage() {
                   { label: "Giriş Yöntemi", value: isGoogle ? "Google" : "E-posta & Şifre", extra: undefined },
                   { label: "Üyelik Tarihi", value: joinedAt, extra: undefined },
                 ].map((row, i, arr) => (
-                  <div key={i} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "13px 0",
-                    borderBottom: i < arr.length - 1 ? `1px solid ${B.light}` : "none",
-                  }}>
+                  <div key={i} className={`flex justify-between items-center py-[13px] ${
+                    i < arr.length - 1 ? "border-b border-brand-light" : ""
+                  }`}>
                     <div>
-                      <div style={{ fontSize: 12, color: B.warm }}>{row.label}</div>
-                      <div style={{ fontSize: 14, color: B.dark, fontWeight: 500, marginTop: 2 }}>{row.value}</div>
+                      <div className="text-xs text-brand-warm">{row.label}</div>
+                      <div className="text-sm text-brand-dark font-medium mt-0.5">{row.value}</div>
                     </div>
                     {row.extra}
                   </div>
                 ))}
               </div>
 
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="flex gap-2.5">
                 <Link
                   href="/icerikler"
-                  style={{
-                    flex: 1, padding: "13px 0", background: B.dark, color: "#fff",
-                    borderRadius: 12, fontSize: 13, fontWeight: 600,
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                    textDecoration: "none",
-                  }}
+                  className="flex-1 py-[13px] bg-brand-dark text-white rounded-xl text-[13px] font-semibold flex items-center justify-center gap-1.5 no-underline"
                 >
-                  Yazıları Keşfet {I.arrow("#fff", 13)}
+                  Yazıları Keşfet <ArrowRightIcon size={13} className="text-white" />
                 </Link>
                 <button
                   onClick={handleSignOut}
                   disabled={signing}
-                  style={{
-                    flex: 1, padding: "13px 0", background: "#fff", color: B.warm,
-                    border: `1px solid ${B.light}`, borderRadius: 12, fontSize: 13, fontWeight: 500,
-                    cursor: signing ? "not-allowed" : "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                    opacity: signing ? 0.6 : 1,
-                  }}
+                  className={`flex-1 py-[13px] bg-white text-brand-warm border border-brand-light rounded-xl text-[13px] font-medium flex items-center justify-center gap-1.5 ${
+                    signing ? "cursor-not-allowed opacity-60" : "cursor-pointer opacity-100"
+                  }`}
                 >
-                  {I.logout(B.warm, 14)} {signing ? "Çıkış yapılıyor..." : "Çıkış Yap"}
+                  <LogoutIcon size={14} className="text-brand-warm" /> {signing ? "Çıkış yapılıyor..." : "Çıkış Yap"}
                 </button>
               </div>
             </div>

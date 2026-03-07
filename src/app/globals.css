@@ -7,6 +7,10 @@
   --color-warm-200: #F0E4D9;
   --color-warm-300: #DEC9B4;
   --color-warm-900: #2C2319;
+  --color-cream: #FFFBF7;
+  --color-brand-dark: #2D2926;
+  --color-brand-warm: #8C857E;
+  --color-brand-light: #F5F0EB;
   --font-sans: var(--font-jakarta);
 }
 
@@ -38,6 +42,12 @@ html {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(6px); }
 }
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.live-pulse { animation: livePulse 1.5s ease-in-out infinite; }
 
 .blob-a { animation: float-a 14s ease-in-out infinite; }
 .blob-b { animation: float-b 18s ease-in-out infinite; }

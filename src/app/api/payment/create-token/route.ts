@@ -70,20 +70,6 @@ export async function POST(req: NextRequest) {
     .update(hashStr)
     .digest("base64");
 
-  console.log("[PayTR] Token isteği:", {
-    merchant_id,
-    user_ip,
-    merchant_oid,
-    email,
-    payment_amount,
-    currency,
-    test_mode,
-    merchant_ok_url,
-    merchant_fail_url,
-    merchant_notify_url,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "TANIMLI DEĞİL (fallback kullanıldı)",
-  });
-
   const params = new URLSearchParams({
     merchant_id,
     user_ip,
@@ -113,7 +99,6 @@ export async function POST(req: NextRequest) {
   });
 
   const rawText = await paytrRes.text();
-  console.log("[PayTR] API yanıtı (raw):", rawText);
 
   let data: { status: string; token?: string; reason?: string };
   try {

@@ -7,6 +7,7 @@ import {
   Text,
   Link,
   Hr,
+  Img,
   Row,
   Column,
   Preview,
@@ -29,7 +30,12 @@ export function KlemensLayout({ preview, children }: Props) {
         <Container style={container}>
           {/* ── Header ── */}
           <Section style={header}>
-            <Text style={logo}>klemens</Text>
+            <Img
+              src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon.PNG"
+              alt="Klemens Art"
+              width="160"
+              style={logoImg}
+            />
           </Section>
 
           <Hr style={divider} />
@@ -117,14 +123,9 @@ const header: React.CSSProperties = {
   padding: "48px 40px 0 40px",
 };
 
-const logo: React.CSSProperties = {
-  fontSize: "26px",
-  fontWeight: 400,
-  letterSpacing: "5px",
-  color: "#FF6D60",
-  margin: "0",
-  lineHeight: "1",
-  fontFamily: "Georgia, 'Times New Roman', serif",
+const logoImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 auto",
 };
 
 const divider: React.CSSProperties = {

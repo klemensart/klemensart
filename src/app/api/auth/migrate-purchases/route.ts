@@ -47,9 +47,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 });
   }
 
-  console.log(
-    `[migrate-purchases] ${user.email}: ${data?.length ?? 0} purchases migrated from ${oldUser.id} to ${user.id}`
-  );
-
   return NextResponse.json({ migrated: data?.length ?? 0, from: oldUser.id });
 }

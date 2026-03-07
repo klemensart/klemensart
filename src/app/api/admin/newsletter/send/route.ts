@@ -5,6 +5,7 @@ import { isAdmin } from "@/lib/admin-check";
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import KlemensNewsletter from "@/emails/KlemensNewsletter";
+import { templateRegistry, TemplateName } from "@/lib/email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = "Klemens Art <info@klemensart.com>";
@@ -18,18 +19,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail, excludeInactive } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps } = await req.json();
 
-  if (!subject || !htmlContent) {
+  // Determine email HTML and subject based on mode
+  let emailHtml: string;
+  let emailSubject: string;
+
+  if (template && template in templateRegistry) {
+    // Template mode
+    const entry = templateRegistry[template as TemplateName];
+    emailHtml = await render(entry.component(templateProps || {}));
+    emailSubject = subject || entry.defaultSubject;
+  } else if (htmlContent) {
+    // Free-text mode (existing behavior)
+    if (!subject) {
+      return NextResponse.json(
+        { error: "Konu ve içerik gerekli." },
+        { status: 400 }
+      );
+    }
+    emailHtml = await render(
+      KlemensNewsletter({ subject, htmlContent })
+    );
+    emailSubject = subject;
+  } else {
     return NextResponse.json(
       { error: "Konu ve içerik gerekli." },
       { status: 400 }
     );
   }
-
-  const emailHtml = await render(
-    KlemensNewsletter({ subject, htmlContent })
-  );
 
   const admin = createAdminClient();
 
@@ -45,7 +63,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: testEmail,
-      subject,
+      subject: emailSubject,
       html: emailHtml,
     });
 
@@ -60,7 +78,7 @@ export async function POST(req: NextRequest) {
     await admin.from("email_logs").insert({
       resend_email_id: data?.id || null,
       subscriber_email: testEmail,
-      subject,
+      subject: emailSubject,
     });
 
     return NextResponse.json({
@@ -123,7 +141,7 @@ export async function POST(req: NextRequest) {
     const emails = filteredSubs.map((s) => ({
       from: FROM,
       to: s.email,
-      subject,
+      subject: emailSubject,
       html: emailHtml,
     }));
 
@@ -145,7 +163,7 @@ export async function POST(req: NextRequest) {
           logRows.push({
             resend_email_id: ids[j]?.id || null,
             subscriber_email: email.to as string,
-            subject,
+            subject: emailSubject,
           });
         });
       }

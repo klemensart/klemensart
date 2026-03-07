@@ -301,7 +301,6 @@ async function scrapeBiletix(): Promise<ScrapedEvent[]> {
           }
 
           if (events.length > 0) {
-            console.log(`[Biletix] Solr API başarılı: ${events.length} etkinlik`);
             return events;
           }
         }
@@ -312,7 +311,6 @@ async function scrapeBiletix(): Promise<ScrapedEvent[]> {
   }
 
   // ── Yol 2: HTML fallback (JS-rendered, sınırlı sonuç) ──
-  console.log("[Biletix] Solr API başarısız, HTML deneniyor...");
   const events: ScrapedEvent[] = [];
   const searchUrls = [
     "https://www.biletix.com/arama/ANKARA/tr",
@@ -737,7 +735,6 @@ async function scrapeBiletinial(): Promise<ScrapedEvent[]> {
       }
 
       if (events.length > 0) {
-        console.log(`[Biletinial] JSON API başarılı: ${events.length} etkinlik`);
         return events;
       }
     } catch (err) {
@@ -746,7 +743,6 @@ async function scrapeBiletinial(): Promise<ScrapedEvent[]> {
   }
 
   // ── Yol 2: HTML carousel fallback ──
-  console.log("[Biletinial] JSON API başarısız, HTML carousel deneniyor...");
   const events: ScrapedEvent[] = [];
   try {
     const res = await fetch("https://biletinial.com/tr-tr/sehrineozel/ankara", {
@@ -789,11 +785,6 @@ async function scrapeBiletinial(): Promise<ScrapedEvent[]> {
       });
     });
 
-    if (events.length > 0) {
-      console.log(`[Biletinial] HTML carousel: ${events.length} etkinlik`);
-    } else {
-      console.log("[Biletinial] HTML carousel boş — JS-rendered, veri alınamadı");
-    }
   } catch (err) {
     console.error("[Biletinial] HTML fallback hatası:", err);
   }
@@ -1056,9 +1047,6 @@ async function scrapeMobilet(): Promise<ScrapedEvent[]> {
       });
     }
 
-    if (events.length > 0) {
-      console.log(`[Mobilet] GraphQL başarılı: ${events.length} etkinlik`);
-    }
   } catch (err) {
     console.error("[Mobilet] GraphQL hatası:", err);
   }

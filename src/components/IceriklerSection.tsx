@@ -1,72 +1,41 @@
 import Link from "next/link";
 import { categories } from "@/lib/icerikler";
+import { categoryStyles } from "@/lib/category-styles";
+import { ArrowRightIcon } from "@/lib/icons";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import ArticleCard from "@/components/ArticleCard";
 
-type CategoryStyle = {
-  accentBg: string;
-  iconClass: string;
-  linkClass: string;
-  icon: React.ReactNode;
+const categoryIcons: Record<string, React.ReactNode> = {
+  "odak": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+      <path d="M11 8v6M8 11h6" />
+    </svg>
+  ),
+  "kultur-sanat": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    </svg>
+  ),
+  "ilham-verenler": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a5 5 0 1 0 5 5" />
+      <path d="M22 22s-1.5-5-9-5-9 5-9 5" />
+      <path d="M17 7h5M19 5v4" />
+    </svg>
+  ),
+  "kent-yasam": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
 };
-
-const categoryStyles: Record<string, CategoryStyle> = {
-  "odak": {
-    accentBg: "bg-coral",
-    iconClass: "text-coral bg-coral/10",
-    linkClass: "text-coral",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.35-4.35" />
-        <path d="M11 8v6M8 11h6" />
-      </svg>
-    ),
-  },
-  "kultur-sanat": {
-    accentBg: "bg-amber-400",
-    iconClass: "text-amber-600 bg-amber-50",
-    linkClass: "text-amber-600",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-        <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-        <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-        <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-      </svg>
-    ),
-  },
-  "ilham-verenler": {
-    accentBg: "bg-sky-400",
-    iconClass: "text-sky-600 bg-sky-50",
-    linkClass: "text-sky-600",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2a5 5 0 1 0 5 5" />
-        <path d="M22 22s-1.5-5-9-5-9 5-9 5" />
-        <path d="M17 7h5M19 5v4" />
-      </svg>
-    ),
-  },
-  "kent-yasam": {
-    accentBg: "bg-emerald-500",
-    iconClass: "text-emerald-600 bg-emerald-50",
-    linkClass: "text-emerald-600",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  },
-};
-
-const arrowIcon = (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <path d="M5 12h14M12 5l7 7-7 7" />
-  </svg>
-);
 
 export default async function IceriklerSection() {
   const allArticles = await getAllArticlesMetadata();
@@ -105,7 +74,7 @@ export default async function IceriklerSection() {
                 <div className="flex flex-col flex-1 p-7">
                   {/* Icon */}
                   <div className={`inline-flex p-3 rounded-2xl self-start mb-5 ${s.iconClass}`}>
-                    {s.icon}
+                    {categoryIcons[cat.slug]}
                   </div>
 
                   <h3 className="text-lg font-bold text-warm-900 mb-2.5">{cat.title}</h3>
@@ -114,7 +83,7 @@ export default async function IceriklerSection() {
                   {/* Link */}
                   <div className={`mt-6 flex items-center gap-1.5 text-sm font-semibold ${s.linkClass} group-hover:gap-3 transition-all duration-200`}>
                     Yazıları Gör
-                    {arrowIcon}
+                    <ArrowRightIcon />
                   </div>
                 </div>
               </Link>
@@ -130,7 +99,7 @@ export default async function IceriklerSection() {
               href="/icerikler"
               className="text-sm font-semibold text-warm-900/40 hover:text-coral flex items-center gap-1.5 transition-colors"
             >
-              Tümünü gör {arrowIcon}
+              Tümünü gör <ArrowRightIcon />
             </Link>
           </div>
 
@@ -148,7 +117,7 @@ export default async function IceriklerSection() {
             className="inline-flex items-center gap-2.5 px-8 py-4 bg-warm-900 text-white font-semibold rounded-full hover:bg-warm-900/85 active:scale-95 transition-all duration-200"
           >
             Tüm Yazıları Gör
-            {arrowIcon}
+            <ArrowRightIcon />
           </Link>
         </div>
 

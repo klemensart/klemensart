@@ -2,37 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { categories, getCategoryBySlug } from "@/lib/icerikler";
+import { categoryStyles } from "@/lib/category-styles";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import ArticleCard from "@/components/ArticleCard";
 
 type Params = { slug: string };
-
-// Colour and style config per category — all classes fully written so Tailwind picks them up
-const categoryStyles: Record<
-  string,
-  { badgeClass: string; accentBg: string; backHover: string }
-> = {
-  "odak": {
-    badgeClass: "bg-coral/10 text-coral",
-    accentBg:   "bg-coral",
-    backHover:  "hover:text-coral",
-  },
-  "kultur-sanat": {
-    badgeClass: "bg-amber-50 text-amber-700",
-    accentBg:   "bg-amber-400",
-    backHover:  "hover:text-amber-600",
-  },
-  "ilham-verenler": {
-    badgeClass: "bg-sky-50 text-sky-700",
-    accentBg:   "bg-sky-400",
-    backHover:  "hover:text-sky-600",
-  },
-  "kent-yasam": {
-    badgeClass: "bg-emerald-50 text-emerald-700",
-    accentBg:   "bg-emerald-500",
-    backHover:  "hover:text-emerald-600",
-  },
-};
 
 export function generateStaticParams(): Params[] {
   return categories.map((c) => ({ slug: c.slug }));
