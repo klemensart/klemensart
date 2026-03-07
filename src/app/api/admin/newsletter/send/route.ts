@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps, workshopId } = await req.json();
 
   // Determine email HTML and subject based on mode
   let emailHtml: string;
@@ -188,8 +188,112 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // ── Workshop mode ──
+  if (mode === "workshop") {
+    if (!workshopId) {
+      return NextResponse.json(
+        { error: "Atölye seçilmedi." },
+        { status: 400 }
+      );
+    }
+
+    // Get user_ids who purchased this workshop
+    const { data: purchases, error: purchaseError } = await admin
+      .from("purchases")
+      .select("user_id")
+      .eq("workshop_id", workshopId);
+
+    if (purchaseError) {
+      return NextResponse.json(
+        { error: `Veritabanı hatası: ${purchaseError.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!purchases || purchases.length === 0) {
+      return NextResponse.json(
+        { error: "Bu atölyeyi satın almış kimse bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    // Get unique user_ids
+    const userIds = [...new Set(purchases.map((p) => p.user_id))];
+
+    // Resolve emails via Supabase Auth admin
+    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
+      perPage: 1000,
+    });
+
+    if (usersError) {
+      return NextResponse.json(
+        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
+        { status: 500 }
+      );
+    }
+
+    const userIdSet = new Set(userIds);
+    const participantEmails = users
+      .filter((u) => userIdSet.has(u.id) && u.email)
+      .map((u) => u.email!);
+
+    if (participantEmails.length === 0) {
+      return NextResponse.json(
+        { error: "Katılımcıların e-posta adresi bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    const emails = participantEmails.map((email) => ({
+      from: FROM,
+      to: email,
+      subject: emailSubject,
+      html: emailHtml,
+    }));
+
+    let totalSent = 0;
+    const batchSize = 100;
+    const errors: string[] = [];
+    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
+
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      const { data, error } = await resend.batch.send(batch);
+      if (error) {
+        errors.push(error.message);
+      } else {
+        totalSent += batch.length;
+        const ids = data?.data ?? [];
+        batch.forEach((email, j) => {
+          logRows.push({
+            resend_email_id: ids[j]?.id || null,
+            subscriber_email: email.to as string,
+            subject: emailSubject,
+          });
+        });
+      }
+    }
+
+    if (logRows.length > 0) {
+      await admin.from("email_logs").insert(logRows);
+    }
+
+    if (errors.length > 0 && totalSent === 0) {
+      return NextResponse.json(
+        { error: `Gönderim hatası: ${errors[0]}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      message: `${totalSent} atölye katılımcısına e-posta gönderildi.`,
+      sent: totalSent,
+      total: participantEmails.length,
+    });
+  }
+
   return NextResponse.json(
-    { error: "Geçersiz mod. 'test' veya 'all' kullanın." },
+    { error: "Geçersiz mod. 'test', 'all' veya 'workshop' kullanın." },
     { status: 400 }
   );
 }

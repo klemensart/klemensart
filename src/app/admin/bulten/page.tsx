@@ -293,6 +293,14 @@ export default function BultenGonderPage() {
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [excludeInactive, setExcludeInactive] = useState(false);
 
+  // Workshop targeting
+  type Workshop = { id: string; title: string };
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [selectedWorkshopId, setSelectedWorkshopId] = useState("");
+  const [workshopParticipantCount, setWorkshopParticipantCount] = useState<number | null>(null);
+  const [showWorkshopConfirm, setShowWorkshopConfirm] = useState(false);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+
   // Stats
   type Campaign = { subject: string; sent: number; opened: number; clicked: number; bounced: number; lastSent: string };
   const [stats, setStats] = useState<{
@@ -308,6 +316,14 @@ export default function BultenGonderPage() {
       .then((d) => { if (d.campaigns) setStats(d); })
       .catch(() => {});
   }, [sending]);
+
+  // Fetch workshops for dropdown
+  useEffect(() => {
+    fetch("/api/admin/workshops")
+      .then((r) => r.json())
+      .then((d) => { if (d.workshops) setWorkshops(d.workshops); })
+      .catch(() => {});
+  }, []);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -395,7 +411,7 @@ export default function BultenGonderPage() {
 
   // ── Send newsletter ──
   const sendNewsletter = useCallback(
-    async (mode: "test" | "all") => {
+    async (mode: "test" | "all" | "workshop") => {
       if (pageMode === "freetext") {
         if (!subject.trim()) {
           setMessage("Konu basligi gerekli.");
@@ -430,6 +446,7 @@ export default function BultenGonderPage() {
                 subject: templateSubject || selectedTemplate!.defaultSubject,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
+                workshopId: mode === "workshop" ? selectedWorkshopId : undefined,
               }
             : {
                 mode,
@@ -437,6 +454,7 @@ export default function BultenGonderPage() {
                 htmlContent,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
+                workshopId: mode === "workshop" ? selectedWorkshopId : undefined,
               };
 
         const res = await fetch("/api/admin/newsletter/send", {
@@ -456,9 +474,10 @@ export default function BultenGonderPage() {
       } finally {
         setSending(false);
         setShowConfirm(false);
+        setShowWorkshopConfirm(false);
       }
     },
-    [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject]
+    [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject, selectedWorkshopId]
   );
 
   const handleSendAll = async () => {
@@ -473,6 +492,32 @@ export default function BultenGonderPage() {
       setSubscriberCount(null);
     }
     setShowConfirm(true);
+  };
+
+  const handleSendWorkshop = async () => {
+    if (!selectedWorkshopId) {
+      setMessage("Lutfen bir atolye secin.");
+      return;
+    }
+    // Validate content
+    if (pageMode === "freetext") {
+      if (!subject.trim()) { setMessage("Konu basligi gerekli."); return; }
+      if (!htmlContent || htmlContent === "<p></p>") { setMessage("Icerik bos olamaz."); return; }
+    } else {
+      if (!selectedTemplate) { setMessage("Lutfen bir sablon secin."); return; }
+    }
+    setLoadingParticipants(true);
+    try {
+      // Get participant count by doing a dry query via the workshops purchases
+      const res = await fetch(`/api/admin/workshops/participants?workshopId=${selectedWorkshopId}`);
+      const data = await res.json();
+      setWorkshopParticipantCount(data.count ?? 0);
+    } catch {
+      setWorkshopParticipantCount(null);
+    } finally {
+      setLoadingParticipants(false);
+    }
+    setShowWorkshopConfirm(true);
   };
 
   const addLink = () => {
@@ -630,6 +675,32 @@ export default function BultenGonderPage() {
                 Tum Abonelere Gonder
               </button>
             </div>
+
+            {/* Workshop Targeting */}
+            {workshops.length > 0 && (
+              <div className="mt-4 border border-gray-200 rounded-xl p-4">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atolye Katilimcilarina Gonder</div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedWorkshopId}
+                    onChange={(e) => setSelectedWorkshopId(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
+                  >
+                    <option value="">Atolye secin...</option>
+                    {workshops.map((w) => (
+                      <option key={w.id} value={w.id}>{w.title}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSendWorkshop}
+                    disabled={sending || !selectedWorkshopId || loadingParticipants}
+                    className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {loadingParticipants ? "Kontrol ediliyor..." : "Katilimcilara Gonder"}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {message && (
               <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
@@ -870,6 +941,32 @@ export default function BultenGonderPage() {
                     </button>
                   </div>
 
+                  {/* Workshop Targeting */}
+                  {workshops.length > 0 && (
+                    <div className="mt-4 border border-gray-200 rounded-xl p-4">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atolye Katilimcilarina Gonder</div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <select
+                          value={selectedWorkshopId}
+                          onChange={(e) => setSelectedWorkshopId(e.target.value)}
+                          className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
+                        >
+                          <option value="">Atolye secin...</option>
+                          {workshops.map((w) => (
+                            <option key={w.id} value={w.id}>{w.title}</option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={handleSendWorkshop}
+                          disabled={sending || !selectedWorkshopId || loadingParticipants}
+                          className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {loadingParticipants ? "Kontrol ediliyor..." : "Katilimcilara Gonder"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {message && (
                     <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
                       message.includes("gonderildi") || message.includes("gönderildi")
@@ -994,6 +1091,58 @@ export default function BultenGonderPage() {
                 className="flex-1 py-3.5 text-sm font-semibold text-[#FF6D60] hover:bg-[#FF6D60]/5 transition-colors disabled:opacity-50"
               >
                 {sending ? "Gonderiliyor..." : "Evet, Tumune Gonder"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Workshop Confirmation Modal ── */}
+      {showWorkshopConfirm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl overflow-hidden">
+            <div className="px-8 pt-8 pb-0 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-[#2D2926]/10 flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D2926" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
+                Atolye Katilimcilarina Gonder
+              </h3>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-2">
+                <span className="font-semibold text-[#2D2926]">
+                  {workshops.find((w) => w.id === selectedWorkshopId)?.title}
+                </span>
+              </p>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
+                Bu e-posta{" "}
+                {workshopParticipantCount !== null ? (
+                  <span className="font-semibold text-[#2D2926]">{workshopParticipantCount} kisiye</span>
+                ) : (
+                  "katilimcilara"
+                )}{" "}
+                gonderilecektir.
+                <br />
+                Bu islem geri alinamaz. Onayliyor musunuz?
+              </p>
+            </div>
+            <div className="flex border-t border-gray-100">
+              <button
+                onClick={() => setShowWorkshopConfirm(false)}
+                className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
+              >
+                Iptal
+              </button>
+              <button
+                onClick={() => sendNewsletter("workshop")}
+                disabled={sending}
+                className="flex-1 py-3.5 text-sm font-semibold text-[#2D2926] hover:bg-[#2D2926]/5 transition-colors disabled:opacity-50"
+              >
+                {sending ? "Gonderiliyor..." : "Evet, Gonder"}
               </button>
             </div>
           </div>
