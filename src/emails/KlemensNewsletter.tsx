@@ -60,16 +60,20 @@ export default function KlemensNewsletter({
             <Text style={footerAddress}>Ankara, Turkiye</Text>
 
             <Text style={socialLinks}>
-              <Link href="https://instagram.com/klemensart" style={socialLink}>
+              <Link href="https://instagram.com/klemens.art" style={socialLink}>
                 Instagram
               </Link>
               &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <Link href="https://youtube.com/@klemensart" style={socialLink}>
+              <Link href="https://www.youtube.com/@KlemensArt" style={socialLink}>
                 YouTube
               </Link>
               &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <Link href="https://klemensart.com" style={socialLink}>
-                Web
+              <Link href="https://x.com/KlemensArt" style={socialLink}>
+                X
+              </Link>
+              &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+              <Link href="https://www.linkedin.com/company/klemens-art" style={socialLink}>
+                LinkedIn
               </Link>
             </Text>
 

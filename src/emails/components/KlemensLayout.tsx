@@ -44,18 +44,23 @@ export function KlemensLayout({ preview, children }: Props) {
             {/* Social Icons */}
             <Row style={socialRow}>
               <Column style={socialCol}>
-                <Link href="https://facebook.com/klemensart" style={socialCircleLink}>
-                  <span style={socialCircle}>f</span>
-                </Link>
-              </Column>
-              <Column style={socialCol}>
-                <Link href="https://instagram.com/klemensart" style={socialCircleLink}>
+                <Link href="https://instagram.com/klemens.art" style={socialCircleLink}>
                   <span style={socialCircle}>in</span>
                 </Link>
               </Column>
               <Column style={socialCol}>
-                <Link href="https://x.com/klemensart" style={socialCircleLink}>
+                <Link href="https://x.com/KlemensArt" style={socialCircleLink}>
                   <span style={socialCircle}>x</span>
+                </Link>
+              </Column>
+              <Column style={socialCol}>
+                <Link href="https://www.youtube.com/@KlemensArt" style={socialCircleLink}>
+                  <span style={socialCircle}>yt</span>
+                </Link>
+              </Column>
+              <Column style={socialCol}>
+                <Link href="https://www.linkedin.com/company/klemens-art" style={socialCircleLink}>
+                  <span style={socialCircle}>li</span>
                 </Link>
               </Column>
             </Row>
@@ -134,7 +139,7 @@ const footer: React.CSSProperties = {
 };
 
 const socialRow: React.CSSProperties = {
-  width: "120px",
+  width: "160px",
   margin: "0 auto 20px auto",
 };
 
