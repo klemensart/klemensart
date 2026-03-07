@@ -483,30 +483,43 @@ export default function BultenGonderPage() {
 
       {/* ── Confirmation Modal ── */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              E-bulten gonderimini onayla
-            </h3>
-            <p className="text-gray-500 text-sm mb-6">
-              {subscriberCount !== null
-                ? `${subscriberCount} aktif aboneye e-bulten gonderilecek.`
-                : "Tum aktif abonelere e-bulten gonderilecek."}{" "}
-              Bu islem geri alinamaz. Emin misiniz?
-            </p>
-            <div className="flex gap-3 justify-end">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-8 pt-8 pb-0 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-[#FF6D60]/10 flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
+                Bülteni Göndermek Üzeresiniz
+              </h3>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
+                Bu bülten veritabanındaki{" "}
+                {subscriberCount !== null && (
+                  <span className="font-semibold text-[#2D2926]">{subscriberCount}</span>
+                )}{" "}
+                {subscriberCount !== null ? "" : "tüm "}aktif abonenize gönderilecektir.
+                <br />
+                Bu işlem geri alınamaz. Onaylıyor musunuz?
+              </p>
+            </div>
+            {/* Modal Actions */}
+            <div className="flex border-t border-gray-100">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
               >
-                Vazgec
+                İptal
               </button>
               <button
                 onClick={() => sendNewsletter("all")}
                 disabled={sending}
-                className="px-5 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50"
+                className="flex-1 py-3.5 text-sm font-semibold text-[#FF6D60] hover:bg-[#FF6D60]/5 transition-colors disabled:opacity-50"
               >
-                {sending ? "Gonderiyor..." : "Evet, Gonder"}
+                {sending ? "Gönderiliyor..." : "Evet, Tümüne Gönder"}
               </button>
             </div>
           </div>
