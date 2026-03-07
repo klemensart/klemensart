@@ -15,21 +15,27 @@ type Artwork = {
 
 const SOURCES = [
   { key: 'met', label: 'Met Museum' },
-  { key: 'rijks', label: 'Rijksmuseum' },
   { key: 'aic', label: 'Art Institute of Chicago' },
+  { key: 'cma', label: 'Cleveland Museum of Art' },
+  { key: 'smithsonian', label: 'Smithsonian' },
+  { key: 'harvard', label: 'Harvard Art Museums' },
+  { key: 'va', label: 'V&A Museum' },
 ];
 
 const MUSEUMS = [
   'Metropolitan Museum of Art',
-  'Rijksmuseum',
   'Art Institute of Chicago',
+  'Cleveland Museum of Art',
+  'Smithsonian Institution',
+  'Harvard Art Museums',
+  'Victoria and Albert Museum',
 ];
 
 export default function ArtworkArchivePage() {
   const [artistName, setArtistName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [sources, setSources] = useState<string[]>(['met', 'rijks', 'aic']);
+  const [sources, setSources] = useState<string[]>(['met', 'aic', 'cma', 'smithsonian', 'harvard', 'va']);
 
   // Artwork listing state
   const [artworks, setArtworks] = useState<Artwork[]>([]);

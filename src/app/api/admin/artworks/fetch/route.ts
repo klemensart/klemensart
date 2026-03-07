@@ -58,38 +58,6 @@ async function fetchMet(artistName: string): Promise<SourceResult> {
   return { found: artworks.length, artworks };
 }
 
-/* ── Rijksmuseum ────────────────────────────────────── */
-async function fetchRijks(artistName: string): Promise<SourceResult> {
-  const apiKey = process.env.RIJKSMUSEUM_API_KEY;
-  if (!apiKey) {
-    return { found: 0, artworks: [], error: "RIJKSMUSEUM_API_KEY tanımlı değil." };
-  }
-
-  const url = `https://www.rijksmuseum.nl/api/en/collection?key=${apiKey}&q=${encodeURIComponent(artistName)}&ps=20&imgonly=True`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    return { found: 0, artworks: [], error: "Rijksmuseum API araması başarısız oldu." };
-  }
-
-  const data = await res.json();
-  const artObjects: Record<string, unknown>[] = data.artObjects ?? [];
-
-  const artworks: Artwork[] = artObjects
-    .filter((obj) => obj.webImage && (obj.webImage as Record<string, unknown>).url)
-    .map((obj) => ({
-      artist_name: String(obj.principalOrFirstMaker || artistName),
-      artwork_title: String(obj.title || "Untitled"),
-      year: obj.dating
-        ? String((obj.dating as Record<string, unknown>).sortingDate || "")
-        : "",
-      medium: "",
-      image_url: String((obj.webImage as Record<string, unknown>).url),
-      museum: "Rijksmuseum",
-    }));
-
-  return { found: artworks.length, artworks };
-}
-
 /* ── Art Institute of Chicago ───────────────────────── */
 async function fetchAIC(artistName: string): Promise<SourceResult> {
   const url = `https://api.artic.edu/api/v1/artworks/search?q=${encodeURIComponent(artistName)}&limit=20&fields=id,title,artist_title,date_display,medium_display,image_id`;
@@ -115,7 +83,174 @@ async function fetchAIC(artistName: string): Promise<SourceResult> {
   return { found: artworks.length, artworks };
 }
 
+/* ── Cleveland Museum of Art ────────────────────────── */
+async function fetchCMA(artistName: string): Promise<SourceResult> {
+  const url = `https://openaccess-api.clevelandart.org/api/artworks/?artists=${encodeURIComponent(artistName)}&has_image=1&limit=20`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    return { found: 0, artworks: [], error: "CMA API araması başarısız oldu." };
+  }
+
+  const data = await res.json();
+  const items: Record<string, unknown>[] = data.data ?? [];
+
+  const artworks: Artwork[] = items
+    .filter((item) => {
+      const images = item.images as Record<string, unknown> | undefined;
+      return images?.web && (images.web as Record<string, unknown>).url;
+    })
+    .map((item) => {
+      const images = item.images as Record<string, Record<string, unknown>>;
+      const creators = item.creators as Array<Record<string, unknown>> | undefined;
+      const artistDisplay = creators?.[0]?.description
+        ? String(creators[0].description)
+        : artistName;
+      return {
+        artist_name: artistDisplay,
+        artwork_title: String(item.title || "Untitled"),
+        year: String(item.creation_date || ""),
+        medium: String(item.technique || ""),
+        image_url: String(images.web.url),
+        museum: "Cleveland Museum of Art",
+      };
+    });
+
+  return { found: artworks.length, artworks };
+}
+
+/* ── Smithsonian Institution ────────────────────────── */
+async function fetchSmithsonian(artistName: string): Promise<SourceResult> {
+  const apiKey = process.env.SMITHSONIAN_API_KEY;
+  if (!apiKey) {
+    return { found: 0, artworks: [], error: "SMITHSONIAN_API_KEY tanımlı değil." };
+  }
+
+  const url = `https://api.si.edu/openaccess/api/v1.0/category/art_design/search?q=${encodeURIComponent(artistName)}&rows=20&api_key=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    return { found: 0, artworks: [], error: "Smithsonian API araması başarısız oldu." };
+  }
+
+  const data = await res.json();
+  const rows: Record<string, unknown>[] = data.response?.rows ?? [];
+
+  const artworks: Artwork[] = [];
+  for (const row of rows) {
+    const content = row.content as Record<string, unknown> | undefined;
+    if (!content) continue;
+
+    const dnr = content.descriptiveNonRepeating as Record<string, unknown> | undefined;
+    const freetext = content.freetext as Record<string, Array<Record<string, string>>> | undefined;
+
+    // Check for image
+    const onlineMedia = dnr?.online_media as Record<string, unknown> | undefined;
+    const media = (onlineMedia?.media as Array<Record<string, unknown>> | undefined)?.[0];
+    if (!media) continue;
+
+    const imageUrl = String(media.content || media.thumbnail || "");
+    if (!imageUrl) continue;
+
+    // Extract artist name from freetext.name
+    const names = freetext?.name ?? [];
+    const artistEntry = names.find((n) =>
+      ["artist", "designer", "painter", "creator", "author"].some((role) =>
+        n.label?.toLowerCase().includes(role)
+      )
+    );
+    const artist = artistEntry?.content || artistName;
+
+    // Title
+    const titleObj = dnr?.title as Record<string, string> | undefined;
+    const title = titleObj?.content || String(row.title || "Untitled");
+
+    // Date
+    const dates = freetext?.date ?? [];
+    const year = dates[0]?.content || "";
+
+    // Medium
+    const physDesc = freetext?.physicalDescription ?? [];
+    const mediumEntry = physDesc.find((p) => p.label?.toLowerCase() === "medium");
+    const medium = mediumEntry?.content || "";
+
+    artworks.push({
+      artist_name: artist,
+      artwork_title: title,
+      year,
+      medium,
+      image_url: imageUrl,
+      museum: "Smithsonian Institution",
+    });
+  }
+
+  return { found: artworks.length, artworks };
+}
+
+/* ── Harvard Art Museums ────────────────────────────── */
+async function fetchHarvard(artistName: string): Promise<SourceResult> {
+  const apiKey = process.env.HARVARD_ART_MUSEUMS_API_KEY;
+  if (!apiKey) {
+    return { found: 0, artworks: [], error: "HARVARD_ART_MUSEUMS_API_KEY tanımlı değil." };
+  }
+
+  const url = `https://api.harvardartmuseums.org/object?person=${encodeURIComponent(artistName)}&hasimage=1&size=20&fields=id,title,primaryimageurl,people,dated,medium&apikey=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    return { found: 0, artworks: [], error: "Harvard API araması başarısız oldu." };
+  }
+
+  const data = await res.json();
+  const records: Record<string, unknown>[] = data.records ?? [];
+
+  const artworks: Artwork[] = records
+    .filter((r) => !!r.primaryimageurl)
+    .map((r) => {
+      const people = r.people as Array<Record<string, unknown>> | undefined;
+      const artist = people?.[0]?.name ? String(people[0].name) : artistName;
+      return {
+        artist_name: artist,
+        artwork_title: String(r.title || "Untitled"),
+        year: String(r.dated || ""),
+        medium: String(r.medium || ""),
+        image_url: String(r.primaryimageurl),
+        museum: "Harvard Art Museums",
+      };
+    });
+
+  return { found: artworks.length, artworks };
+}
+
+/* ── Victoria and Albert Museum ─────────────────────── */
+async function fetchVA(artistName: string): Promise<SourceResult> {
+  const url = `https://api.vam.ac.uk/v2/objects/search?q_actor=${encodeURIComponent(artistName)}&images_exist=1&page_size=20`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    return { found: 0, artworks: [], error: "V&A API araması başarısız oldu." };
+  }
+
+  const data = await res.json();
+  const records: Record<string, unknown>[] = data.records ?? [];
+
+  const artworks: Artwork[] = records
+    .filter((r) => !!(r._primaryImageId))
+    .map((r) => {
+      const maker = r._primaryMaker as Record<string, string> | undefined;
+      const artist = maker?.name || artistName;
+      return {
+        artist_name: artist,
+        artwork_title: String(r._primaryTitle || "Untitled"),
+        year: String(r._primaryDate || ""),
+        medium: String(r.objectType || ""),
+        image_url: `https://framemark.vam.ac.uk/collections/${r._primaryImageId}/full/!843,/0/default.jpg`,
+        museum: "Victoria and Albert Museum",
+      };
+    });
+
+  return { found: artworks.length, artworks };
+}
+
 /* ── POST handler ───────────────────────────────────── */
+const ALL_SOURCES = ["met", "aic", "cma", "smithsonian", "harvard", "va"];
+
 export async function POST(req: NextRequest) {
   // Auth check
   const userClient = await createServerSupabaseClient();
@@ -128,7 +263,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const artistName: string = body.artistName;
-  const sources: string[] = body.sources ?? ["met", "rijks", "aic"];
+  const sources: string[] = body.sources ?? ALL_SOURCES;
 
   if (!artistName || typeof artistName !== "string") {
     return NextResponse.json(
@@ -140,8 +275,11 @@ export async function POST(req: NextRequest) {
   // Run selected sources in parallel
   const fetchers: Record<string, () => Promise<SourceResult>> = {
     met: () => fetchMet(artistName),
-    rijks: () => fetchRijks(artistName),
     aic: () => fetchAIC(artistName),
+    cma: () => fetchCMA(artistName),
+    smithsonian: () => fetchSmithsonian(artistName),
+    harvard: () => fetchHarvard(artistName),
+    va: () => fetchVA(artistName),
   };
 
   const selectedFetchers = sources
