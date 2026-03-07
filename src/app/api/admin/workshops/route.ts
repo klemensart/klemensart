@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { ID_TO_SLUG } from "@/lib/atolyeler-config";
 
 export async function GET() {
   const userClient = await createServerSupabaseClient();
@@ -15,7 +16,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("workshops")
-    .select("id, title")
+    .select("id, title, description, next_session_date, zoom_link, is_live")
     .order("title");
 
   if (error) {
@@ -25,5 +26,13 @@ export async function GET() {
     );
   }
 
-  return NextResponse.json({ workshops: data ?? [] });
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.com";
+
+  const workshops = (data ?? []).map((w) => ({
+    ...w,
+    slug: ID_TO_SLUG[w.id] || null,
+    url: ID_TO_SLUG[w.id] ? `${BASE_URL}/atolyeler/${ID_TO_SLUG[w.id]}` : null,
+  }));
+
+  return NextResponse.json({ workshops });
 }

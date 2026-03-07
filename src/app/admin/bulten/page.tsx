@@ -294,7 +294,16 @@ export default function BultenGonderPage() {
   const [excludeInactive, setExcludeInactive] = useState(false);
 
   // Workshop targeting
-  type Workshop = { id: string; title: string };
+  type Workshop = {
+    id: string;
+    title: string;
+    description: string | null;
+    next_session_date: string | null;
+    zoom_link: string | null;
+    is_live: boolean;
+    slug: string | null;
+    url: string | null;
+  };
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [selectedWorkshopId, setSelectedWorkshopId] = useState("");
   const [workshopParticipantCount, setWorkshopParticipantCount] = useState<number | null>(null);
@@ -327,6 +336,94 @@ export default function BultenGonderPage() {
       .then((d) => { if (d.workshops) setWorkshops(d.workshops); })
       .catch(() => {});
   }, []);
+
+  // Auto-fill template fields when workshop is selected
+  useEffect(() => {
+    if (!selectedWorkshopId) return;
+    const w = workshops.find((ws) => ws.id === selectedWorkshopId);
+    if (!w) return;
+
+    // Freetext mode: only auto-fill subject if empty
+    if (pageMode === "freetext") {
+      if (!subject.trim() && w.title) {
+        setSubject(`${w.title} — Klemens Art`);
+      }
+      return;
+    }
+
+    if (!selectedTemplate) return;
+
+    const formatDate = (iso: string) => {
+      const d = new Date(iso);
+      const gun = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long" });
+      return gun;
+    };
+    const formatTime = (iso: string) => {
+      const d = new Date(iso);
+      return d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) + " (TSİ)";
+    };
+
+    // Map of template field keys → workshop data
+    const fieldMap: Record<string, string> = {};
+
+    // Title fields
+    if (w.title) {
+      fieldMap["eventTitle"] = w.title;
+      fieldMap["workshopTitle"] = w.title;
+    }
+
+    // Date/time fields
+    if (w.next_session_date) {
+      fieldMap["eventDate"] = formatDate(w.next_session_date);
+      fieldMap["eventTime"] = formatTime(w.next_session_date);
+    }
+
+    // Zoom link
+    if (w.zoom_link) {
+      fieldMap["zoomLink"] = w.zoom_link;
+    }
+
+    // Workshop URL for register/replay links
+    if (w.url) {
+      fieldMap["registerUrl"] = w.url;
+      fieldMap["replayUrl"] = w.url;
+      fieldMap["buttonUrl"] = w.url;
+    }
+
+    // Only fill fields that exist in the current template
+    const templateFieldKeys = new Set(
+      selectedTemplate.fields.flatMap((f) =>
+        f.type === "array" ? [] : [f.key]
+      )
+    );
+
+    const updates: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(fieldMap)) {
+      if (templateFieldKeys.has(key) && value) {
+        updates[key] = value;
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      setTemplateProps((prev) => ({ ...prev, ...updates }));
+    }
+
+    // Auto-fill subject with workshop title
+    if (w.title && selectedTemplate.defaultSubject) {
+      const subjectMap: Record<string, string> = {
+        SeminerHatirlatici: `Hatırlatma: ${w.title}`,
+        EtkinlikTesekkur: `Teşekkürler — ${w.title}`,
+        AtolyeHazirlik: `Atölye Hazırlık Kiti — ${w.title}`,
+        YarimKalanKayit: `Kaydınızı Tamamlayın — ${w.title}`,
+        DuyuruBulteni: `${w.title} — Klemens Art`,
+      };
+      const autoSubject = subjectMap[selectedTemplate.name];
+      if (autoSubject) {
+        setTemplateSubject(autoSubject);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedWorkshopId]);
 
   const editor = useEditor({
     immediatelyRender: false,
