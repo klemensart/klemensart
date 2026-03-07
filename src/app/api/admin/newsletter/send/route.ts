@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive } = await req.json();
 
   if (!subject || !htmlContent) {
     return NextResponse.json(
@@ -27,12 +27,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Render the React email template to HTML string
   const emailHtml = await render(
     KlemensNewsletter({ subject, htmlContent })
   );
 
-  // ── Test mode: send to single address ──
+  const admin = createAdminClient();
+
+  // ── Test mode ──
   if (mode === "test") {
     if (!testEmail) {
       return NextResponse.json(
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: FROM,
       to: testEmail,
       subject,
@@ -55,15 +56,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Log test email
+    await admin.from("email_logs").insert({
+      resend_email_id: data?.id || null,
+      subscriber_email: testEmail,
+      subject,
+    });
+
     return NextResponse.json({
       message: `Test e-postası ${testEmail} adresine gönderildi.`,
       sent: 1,
     });
   }
 
-  // ── All mode: send to all active subscribers ──
+  // ── All mode ──
   if (mode === "all") {
-    const admin = createAdminClient();
     const { data: subs, error: dbError } = await admin
       .from("subscribers")
       .select("email")
@@ -83,27 +90,70 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Use Resend Batch API — each subscriber gets their own email
-    const emails = subs.map((s) => ({
+    // Filter out subscribers who haven't opened in 60 days
+    let filteredSubs = subs;
+    if (excludeInactive) {
+      const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: recentLogs } = await admin
+        .from("email_logs")
+        .select("subscriber_email")
+        .gte("sent_at", sixtyDaysAgo)
+        .not("opened_at", "is", null);
+
+      const recentOpeners = new Set((recentLogs ?? []).map((l) => l.subscriber_email));
+
+      // Also include subscribers who have never received an email (new subscribers)
+      const { data: allLogs } = await admin
+        .from("email_logs")
+        .select("subscriber_email");
+      const everReceived = new Set((allLogs ?? []).map((l) => l.subscriber_email));
+
+      filteredSubs = subs.filter((s) =>
+        recentOpeners.has(s.email) || !everReceived.has(s.email)
+      );
+
+      if (filteredSubs.length === 0) {
+        return NextResponse.json(
+          { error: "Filtreye uyan aktif abone bulunamadı." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const emails = filteredSubs.map((s) => ({
       from: FROM,
       to: s.email,
       subject,
       html: emailHtml,
     }));
 
-    // Resend batch supports up to 100 emails per call
     let totalSent = 0;
     const batchSize = 100;
     const errors: string[] = [];
+    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
 
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
-      const { error } = await resend.batch.send(batch);
+      const { data, error } = await resend.batch.send(batch);
       if (error) {
         errors.push(error.message);
       } else {
         totalSent += batch.length;
+        // Resend batch returns array of { id } for each email
+        const ids = data?.data ?? [];
+        batch.forEach((email, j) => {
+          logRows.push({
+            resend_email_id: ids[j]?.id || null,
+            subscriber_email: email.to as string,
+            subject,
+          });
+        });
       }
+    }
+
+    // Bulk insert email logs
+    if (logRows.length > 0) {
+      await admin.from("email_logs").insert(logRows);
     }
 
     if (errors.length > 0 && totalSent === 0) {

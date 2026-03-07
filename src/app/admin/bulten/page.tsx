@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TiptapLink from "@tiptap/extension-link";
@@ -87,6 +87,23 @@ export default function BultenGonderPage() {
   const [message, setMessage] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+  const [excludeInactive, setExcludeInactive] = useState(false);
+
+  // Stats
+  type Campaign = { subject: string; sent: number; opened: number; clicked: number; bounced: number; lastSent: string };
+  const [stats, setStats] = useState<{
+    campaigns: Campaign[];
+    totalActive: number;
+    openedLast60Days: number;
+    inactiveLast60Days: number;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/newsletter/stats")
+      .then((r) => r.json())
+      .then((d) => { if (d.campaigns) setStats(d); })
+      .catch(() => {});
+  }, [sending]);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -133,6 +150,7 @@ export default function BultenGonderPage() {
             htmlContent,
             mode,
             testEmail: mode === "test" ? testEmail.trim() : undefined,
+            excludeInactive: mode === "all" ? excludeInactive : undefined,
           }),
         });
 
@@ -149,7 +167,7 @@ export default function BultenGonderPage() {
         setShowConfirm(false);
       }
     },
-    [subject, htmlContent, testEmail]
+    [subject, htmlContent, testEmail, excludeInactive]
   );
 
   const handleSendAll = async () => {
@@ -301,8 +319,42 @@ export default function BultenGonderPage() {
             <EditorContent editor={editor} />
           </div>
 
+          {/* Stats Cards */}
+          {stats && (
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              <div className="border border-gray-100 rounded-xl p-4 text-center">
+                <div className="text-2xl font-semibold text-[#2D2926]">{stats.totalActive}</div>
+                <div className="text-xs text-[#8C857E] mt-1">Aktif Abone</div>
+              </div>
+              <div className="border border-gray-100 rounded-xl p-4 text-center">
+                <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
+                <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
+              </div>
+              <div className="border border-gray-100 rounded-xl p-4 text-center">
+                <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
+                <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
+              </div>
+            </div>
+          )}
+
+          {/* Exclude inactive toggle */}
+          <label className="mt-4 flex items-center gap-2.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={excludeInactive}
+              onChange={(e) => setExcludeInactive(e.target.checked)}
+              className="w-4 h-4 accent-[#FF6D60] rounded"
+            />
+            <span className="text-sm text-gray-600">
+              Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
+              {stats && stats.inactiveLast60Days > 0 && (
+                <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
+              )}
+            </span>
+          </label>
+
           {/* Actions */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          <div className="mt-4 flex flex-col sm:flex-row gap-3">
             <div className="flex gap-2 flex-1">
               <input
                 type="email"
@@ -480,6 +532,57 @@ export default function BultenGonderPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Campaign History ── */}
+      {stats && stats.campaigns.length > 0 && (
+        <div className="mt-10 border-t border-gray-100 pt-8">
+          <h2 className="text-xl font-serif text-[#2D2926] mb-4">Gönderim Geçmişi</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 text-left text-gray-500">
+                  <th className="py-3 pr-4 font-medium">Konu</th>
+                  <th className="py-3 pr-4 font-medium text-center">Gönderildi</th>
+                  <th className="py-3 pr-4 font-medium text-center">Açıldı</th>
+                  <th className="py-3 pr-4 font-medium text-center">Tıklandı</th>
+                  <th className="py-3 pr-4 font-medium text-center">Bounce</th>
+                  <th className="py-3 font-medium text-center">Açılma Oranı</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.campaigns.map((c, i) => {
+                  const openRate = c.sent > 0 ? Math.round((c.opened / c.sent) * 100) : 0;
+                  return (
+                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="py-3 pr-4 text-gray-800">
+                        <div>{c.subject}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">
+                          {new Date(c.lastSent).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 text-center text-gray-600">{c.sent}</td>
+                      <td className="py-3 pr-4 text-center text-emerald-600 font-medium">{c.opened}</td>
+                      <td className="py-3 pr-4 text-center text-blue-600">{c.clicked}</td>
+                      <td className="py-3 pr-4 text-center text-red-400">{c.bounced}</td>
+                      <td className="py-3 text-center">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          openRate >= 40
+                            ? "bg-emerald-50 text-emerald-600"
+                            : openRate >= 20
+                              ? "bg-amber-50 text-amber-600"
+                              : "bg-gray-100 text-gray-500"
+                        }`}>
+                          %{openRate}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* ── Confirmation Modal ── */}
       {showConfirm && (
