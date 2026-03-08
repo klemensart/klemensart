@@ -54,17 +54,6 @@ const TEMPLATES: TemplateConfig[] = [
     },
   },
   {
-    name: "HosGeldiniz",
-    label: "Hoş Geldiniz",
-    description: "Yeni üyelere karşılama e-postası",
-    icon: "👋",
-    defaultSubject: "Klemens Art'a Hoş Geldiniz",
-    fields: [
-      { key: "name", label: "İsim (opsiyonel)", type: "text" },
-    ],
-    defaults: { name: "" },
-  },
-  {
     name: "SeminerHatirlatici",
     label: "Seminer Hatırlatıcı",
     description: "Etkinlik öncesi hatırlatma e-postası",
