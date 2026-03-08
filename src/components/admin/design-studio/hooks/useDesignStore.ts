@@ -16,6 +16,8 @@ export type CanvasObject = {
   fontStyle?: string; // "normal" | "bold" | "italic" | "bold italic"
   fill?: string;
   align?: string;
+  letterSpacing?: number;
+  lineHeight?: number;
   // image
   src?: string;
   // shape

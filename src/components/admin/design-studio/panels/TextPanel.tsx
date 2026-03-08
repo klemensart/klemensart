@@ -23,6 +23,7 @@ const FONT_GROUPS: FontGroup[] = [
   {
     label: "Sans-Serif — Modern",
     fonts: [
+      "Montserrat",
       "Plus Jakarta Sans",
       "Space Grotesk",
       "Sora",
@@ -246,6 +247,40 @@ export default function TextPanel() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Letter spacing */}
+          <div>
+            <label className="text-xs text-warm-900/60 mb-1 block">
+              Harf Aralığı: {selected.letterSpacing || 0}px
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={20}
+              step={1}
+              value={selected.letterSpacing || 0}
+              onChange={(e) => updateObject(selected.id, { letterSpacing: Number(e.target.value) })}
+              onMouseUp={() => pushHistory()}
+              className="w-full accent-coral"
+            />
+          </div>
+
+          {/* Line height */}
+          <div>
+            <label className="text-xs text-warm-900/60 mb-1 block">
+              Satır Aralığı: {(selected.lineHeight || 1.2).toFixed(1)}
+            </label>
+            <input
+              type="range"
+              min={0.8}
+              max={2.5}
+              step={0.05}
+              value={selected.lineHeight || 1.2}
+              onChange={(e) => updateObject(selected.id, { lineHeight: Number(e.target.value) })}
+              onMouseUp={() => pushHistory()}
+              className="w-full accent-coral"
+            />
           </div>
 
           {/* Opacity */}

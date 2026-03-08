@@ -106,6 +106,8 @@ export default function CanvasText({ obj }: { obj: CanvasObject }) {
       fontStyle={obj.fontStyle || "normal"}
       fill={obj.fill || "#000000"}
       align={obj.align || "left"}
+      letterSpacing={obj.letterSpacing || 0}
+      lineHeight={obj.lineHeight || 1.2}
       opacity={obj.opacity ?? 1}
       rotation={obj.rotation || 0}
       draggable

@@ -9,7 +9,7 @@ const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!url || !key) {
   console.error("NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli.");
-  console.error(".env.local dosyasını source edin: source .env.local");
+  console.error(".env.local dosyasını source edin: set -a && source .env.local && set +a");
   process.exit(1);
 }
 
@@ -17,18 +17,8 @@ const supabase = createClient(url, key, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-function spaceCategory(cat: string): string {
-  return cat
-    .toUpperCase()
-    .split("")
-    .map((ch) => {
-      if (ch === " ") return "  ";
-      if (ch === "&") return " & ";
-      return ch;
-    })
-    .join(" ")
-    .replace(/\s{3,}/g, "   ")
-    .trim();
+function formatCategory(cat: string): string {
+  return cat.toUpperCase();
 }
 
 async function main() {
@@ -53,11 +43,12 @@ async function main() {
   console.log(`  Görsel: ${article.image?.slice(0, 60)}...`);
   console.log();
 
-  const categorySpaced = spaceCategory(article.category || "Odak");
+  const category = formatCategory(article.category || "Odak");
 
   const canvasData = {
     backgroundColor: "#FFFBF7",
     objects: [
+      // Krem arka plan
       {
         type: "shape",
         x: 0,
@@ -69,62 +60,84 @@ async function main() {
         opacity: 1,
         rotation: 0,
       },
+      // Cover görseli
       {
         type: "image",
         x: 80,
-        y: 60,
+        y: 70,
         width: 920,
-        height: 620,
+        height: 640,
         src: article.image,
         opacity: 1,
         rotation: 0,
       },
+      // Kategori — Montserrat Bold, #ff6c5f, yüksek letter-spacing
       {
         type: "text",
         x: 80,
-        y: 750,
+        y: 790,
         width: 920,
-        text: categorySpaced,
-        fontSize: 28,
-        fontFamily: "Space Grotesk",
+        text: category,
+        fontSize: 26,
+        fontFamily: "Montserrat",
         fontStyle: "bold",
-        fill: "#FF6D60",
+        fill: "#ff6c5f",
         align: "left",
+        letterSpacing: 12,
+        lineHeight: 1.2,
         opacity: 1,
         rotation: 0,
       },
+      // Spot — Montserrat, #2c3e50, ferah satır aralığı
       {
         type: "text",
         x: 80,
-        y: 830,
+        y: 870,
         width: 920,
         text: article.description || article.title,
-        fontSize: 38,
-        fontFamily: "Cormorant Garamond",
+        fontSize: 36,
+        fontFamily: "Montserrat",
         fontStyle: "normal",
-        fill: "#2D2926",
+        fill: "#2c3e50",
         align: "left",
+        letterSpacing: 0,
+        lineHeight: 1.65,
         opacity: 1,
         rotation: 0,
       },
+      // Yazar — gövdenin hemen altında
       {
         type: "text",
         x: 80,
-        y: 1760,
+        y: 1400,
         width: 920,
         text: `— ${article.author || "Klemens Art"}`,
         fontSize: 26,
-        fontFamily: "Space Grotesk",
+        fontFamily: "Montserrat",
         fontStyle: "normal",
-        fill: "#8C857E",
+        fill: "#2c3e50",
         align: "left",
+        letterSpacing: 0,
+        lineHeight: 1.2,
         opacity: 1,
         rotation: 0,
       },
     ],
   };
 
-  // Designs tablosuna kaydet
+  // Eski story'yi sil (varsa)
+  const { data: existing } = await supabase
+    .from("designs")
+    .select("id")
+    .like("name", `Story — ${article.title}%`);
+
+  if (existing && existing.length > 0) {
+    const ids = existing.map((d: { id: string }) => d.id);
+    await supabase.from("designs").delete().in("id", ids);
+    console.log(`Eski ${ids.length} story silindi.`);
+  }
+
+  // Yeni story kaydet
   const { data: design, error: insertErr } = await supabase
     .from("designs")
     .insert({
@@ -135,7 +148,7 @@ async function main() {
       canvas_data: canvasData,
       thumbnail_url: null,
       is_template: false,
-      created_by: null, // script üzerinden, user yok
+      created_by: null,
     })
     .select("id")
     .single();

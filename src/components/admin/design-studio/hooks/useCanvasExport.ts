@@ -6,10 +6,12 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
     (format: "png" | "jpeg" = "png", quality = 1) => {
       const stage = stageRef.current;
       if (!stage) return null;
+      // pixelRatio compensates for display scaling so export is full resolution
+      const currentScale = stage.scaleX() || 1;
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
-        pixelRatio: 1,
+        pixelRatio: 1 / currentScale,
       });
       return uri;
     },
@@ -34,11 +36,14 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
     (maxSize = 400) => {
       const stage = stageRef.current;
       if (!stage) return null;
-      const scale = Math.min(maxSize / stage.width(), maxSize / stage.height());
+      const currentScale = stage.scaleX() || 1;
+      const realWidth = stage.width() / currentScale;
+      const realHeight = stage.height() / currentScale;
+      const thumbScale = Math.min(maxSize / realWidth, maxSize / realHeight);
       return stage.toDataURL({
         mimeType: "image/jpeg",
         quality: 0.7,
-        pixelRatio: scale,
+        pixelRatio: thumbScale / currentScale,
       });
     },
     [stageRef]
