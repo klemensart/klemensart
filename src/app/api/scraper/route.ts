@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import Anthropic from "@anthropic-ai/sdk";
+import { Agent, fetch as undiciFetch } from "undici";
 import { createAdminClient } from "@/lib/supabase-admin";
+
+// SSL sertifika zinciri eksik siteler için (csoadaankara.gov.tr)
+const insecureAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
 // ── Model ─────────────────────────────────────────────────────────────────────
 // Haiku kullanıyoruz — günlük bulk yorum üretimi için maliyet açısından ideal.
@@ -533,9 +537,11 @@ async function scrapeCSOAda(): Promise<ScrapedEvent[]> {
   ]);
 
   try {
-    const res = await fetch(url, {
+    // CSO Ada sertifika zinciri eksik — undici ile SSL doğrulamasını atla
+    const res = await undiciFetch(url, {
+      dispatcher: insecureAgent,
       headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return events;
 
@@ -570,7 +576,7 @@ async function scrapeCSOAda(): Promise<ScrapedEvent[]> {
       const venue = $el.find(".saloon").first().text().trim().replace(/^-\s*/, "");
 
       const href = $el.find("a.event_title_link").first().attr("href") ?? "";
-      const source_url = href.startsWith("http") ? href : `https://csoadaankara.gov.tr${href.startsWith("/") ? href : "/" + href}`;
+      const source_url = href.startsWith("http") ? href.replace(/^http:/, "https:") : `https://csoadaankara.gov.tr${href.startsWith("/") ? href : "/" + href}`;
       const imgSrc = $el.find(".event_img img").first().attr("src") ?? null;
 
       const inferredType = inferEventType(title, desc, url);
