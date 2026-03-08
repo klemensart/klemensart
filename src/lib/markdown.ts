@@ -37,25 +37,8 @@ function processWarningBoxes(rawHtml: string): string {
 }
 
 function processBlockquotes(rawHtml: string): string {
-  // Step 1: ilk uygun <p>'yi spot-quote yap
-  let htmlOut = rawHtml;
-  const pRegex = /<p([^>]*)>([\s\S]*?)<\/p>/g;
-  let m: RegExpExecArray | null;
-  while ((m = pRegex.exec(rawHtml)) !== null) {
-    const attrs = m[1];
-    const inner = m[2];
-    if (attrs.includes("class=")) continue;
-    const textOnly = inner.replace(/<[^>]+>/g, "").trimStart();
-    if (textOnly.startsWith("\u26A0")) continue;
-    const stripped = inner.replace(/["""'']/g, "");
-    htmlOut = rawHtml.slice(0, m.index)
-      + `<p class="spot-quote">${stripped}</p>`
-      + rawHtml.slice(m.index + m[0].length);
-    break;
-  }
-
-  // Step 2: TÜM blockquote'lar → inline-quote
-  return htmlOut.replace(
+  // TÜM blockquote'lar → inline-quote
+  return rawHtml.replace(
     /<blockquote>([\s\S]*?)<\/blockquote>/g,
     (_, inner) => {
       const withAttribution = inner.replace(

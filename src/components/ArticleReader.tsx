@@ -190,6 +190,24 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
           className="mx-auto px-6 mb-16"
           style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
         >
+          {/* Spot / Lead paragraph */}
+          {meta.description && (
+            <p
+              className={`spot-quote mb-8 ${darkMode ? "text-[#f5f0eb]/90" : "text-warm-900/90"}`}
+              style={{
+                fontSize: readingMode ? "23px" : "20px",
+                lineHeight: 1.6,
+                fontWeight: 500,
+                fontStyle: "italic",
+                borderLeft: "3px solid #FF6D60",
+                paddingLeft: "1.25rem",
+                transition: "font-size 0.35s ease",
+              }}
+            >
+              {meta.description}
+            </p>
+          )}
+
           <div
             className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
             style={{ fontSize: readingMode ? "21px" : "18px", transition: "font-size 0.35s ease" }}
