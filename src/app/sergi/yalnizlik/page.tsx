@@ -16,6 +16,33 @@ type Artwork = {
   image: string;
 };
 
+/* ── Sergi Mottosu ──
+ * "En Sessiz Zaman" — Theo Atay
+ *
+ * TR:
+ * Binlerce yıl öncesinin sesleri aniden kayboluyor, kuşların, ağaçların,
+ * doğanın ve benim sesimle karışıyor. Ve bu sessizlik anlarında, aramızda
+ * hiçbir fark olmadığını, bir ve aynı olduğumuzu hissediyorum. Aynı doğanın
+ * imgeleri olarak var olmaya ve yok olmaya devam ediyoruz.
+ *
+ * EN:
+ * The sounds of thousands of years ago suddenly disappear, mingling with the
+ * sounds of birds, trees, nature and me. And in such moments of silence, I
+ * feel that there is no difference between us, that we are one and the same.
+ * We continue to exist and disappear as images of the same nature.
+ */
+const EXHIBITION_MOTTO = {
+  title: { tr: "En Sessiz Zaman", en: "The Quietest Time" },
+  artist: "Theo Atay",
+  text: {
+    tr: "Binlerce yıl öncesinin sesleri aniden kayboluyor, kuşların, ağaçların, doğanın ve benim sesimle karışıyor. Ve bu sessizlik anlarında, aramızda hiçbir fark olmadığını, bir ve aynı olduğumuzu hissediyorum. Aynı doğanın imgeleri olarak var olmaya ve yok olmaya devam ediyoruz.",
+    en: "The sounds of thousands of years ago suddenly disappear, mingling with the sounds of birds, trees, nature and me. And in such moments of silence, I feel that there is no difference between us, that we are one and the same. We continue to exist and disappear as images of the same nature.",
+  },
+};
+
+// Suppress unused var warning until we integrate the motto into the UI
+void EXHIBITION_MOTTO;
+
 const ARTWORKS: Artwork[] = [
   {
     id: 1,
