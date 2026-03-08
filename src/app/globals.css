@@ -289,9 +289,8 @@ html {
   padding: 0.05em 0.15em;
 }
 
-/* Image captions: paragraph containing only <em> right after an image */
-.prose-klemens img + p,
-.prose-klemens p:has(> em:only-child) {
+/* Image captions: paragraph right after an image */
+.prose-klemens img + p {
   text-align: center;
   font-size: 0.875rem;
   font-style: italic;
