@@ -292,6 +292,7 @@ export default function BultenGonderPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [excludeInactive, setExcludeInactive] = useState(false);
+  const [skipAlreadySent, setSkipAlreadySent] = useState(true);
 
   // Workshop targeting
   type Workshop = {
@@ -604,6 +605,7 @@ export default function BultenGonderPage() {
                 subject: templateSubject || selectedTemplate!.defaultSubject,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
+                skipAlreadySent: mode === "all" ? skipAlreadySent : undefined,
                 workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
                 segmentId: mode === "segment" ? selectedSegmentId : undefined,
               }
@@ -613,6 +615,7 @@ export default function BultenGonderPage() {
                 htmlContent,
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
+                skipAlreadySent: mode === "all" ? skipAlreadySent : undefined,
                 workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
                 segmentId: mode === "segment" ? selectedSegmentId : undefined,
               };
@@ -639,7 +642,7 @@ export default function BultenGonderPage() {
         setShowSegmentConfirm(false);
       }
     },
-    [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject, selectedWorkshopId, selectedSegmentId]
+    [pageMode, subject, htmlContent, testEmail, excludeInactive, skipAlreadySent, selectedTemplate, templateProps, templateSubject, selectedWorkshopId, selectedSegmentId]
   );
 
   const handleSendAll = async () => {
@@ -1136,6 +1139,18 @@ export default function BultenGonderPage() {
             {/* ── Toplu Gönderim ── */}
             <div className="border border-gray-200 rounded-xl p-5">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Toplu Gönderim</div>
+
+              <label className="flex items-center gap-2.5 cursor-pointer select-none mb-3">
+                <input
+                  type="checkbox"
+                  checked={skipAlreadySent}
+                  onChange={(e) => setSkipAlreadySent(e.target.checked)}
+                  className="w-4 h-4 accent-[#FF6D60] rounded"
+                />
+                <span className="text-sm text-gray-600">
+                  Aynı konuyla daha önce mail alanları <span className="font-medium">atla</span>
+                </span>
+              </label>
 
               <label className="flex items-center gap-2.5 cursor-pointer select-none mb-4">
                 <input

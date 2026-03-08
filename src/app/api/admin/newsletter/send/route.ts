@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps, workshopId, segmentId } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive, skipAlreadySent, template, templateProps, workshopId, segmentId } = await req.json();
 
   // Determine email HTML and subject based on mode
   let emailHtml: string;
@@ -108,21 +108,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Skip subscribers who already received this exact subject
-    const { data: alreadySentLogs } = await admin
-      .from("email_logs")
-      .select("subscriber_email")
-      .eq("subject", emailSubject);
-    const alreadySentSet = new Set((alreadySentLogs ?? []).map((l) => l.subscriber_email));
+    // Optionally skip subscribers who already received this exact subject
+    let filteredSubs = subs;
+    let skippedCount = 0;
 
-    const skippedCount = alreadySentSet.size;
-    let filteredSubs = subs.filter((s) => !alreadySentSet.has(s.email));
+    if (skipAlreadySent) {
+      const { data: alreadySentLogs } = await admin
+        .from("email_logs")
+        .select("subscriber_email")
+        .eq("subject", emailSubject);
+      const alreadySentSet = new Set((alreadySentLogs ?? []).map((l) => l.subscriber_email));
 
-    if (filteredSubs.length === 0) {
-      return NextResponse.json(
-        { error: `Bu konu ile tüm abonelere (${skippedCount} kişi) zaten gönderilmiş.` },
-        { status: 400 }
-      );
+      skippedCount = alreadySentSet.size;
+      filteredSubs = subs.filter((s) => !alreadySentSet.has(s.email));
+
+      if (filteredSubs.length === 0) {
+        return NextResponse.json(
+          { error: `Bu konu ile tüm abonelere (${skippedCount} kişi) zaten gönderilmiş.` },
+          { status: 400 }
+        );
+      }
     }
 
     // Filter out subscribers who haven't opened in 60 days
