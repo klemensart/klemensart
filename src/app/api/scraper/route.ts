@@ -1290,6 +1290,92 @@ function inferEventType(title: string, desc: string, url: string): string {
   return "etkinlik"; // bilinmiyor → filtre isRelevant'ta elecek
 }
 
+// ── Scraper 14: Erimtan Arkeoloji ve Sanat Müzesi ──────────────────────────
+// erimtanmuseum.org/tr/takvim — Aylık takvim, temiz <time datetime> etiketleri
+async function scrapeErimtan(): Promise<ScrapedEvent[]> {
+  const events: ScrapedEvent[] = [];
+  const now = new Date();
+
+  // Bu ay + sonraki ay
+  const months = [
+    { month: now.getMonth() + 1, year: now.getFullYear() },
+    { month: now.getMonth() + 2 > 12 ? 1 : now.getMonth() + 2, year: now.getMonth() + 2 > 12 ? now.getFullYear() + 1 : now.getFullYear() },
+  ];
+
+  for (const { month, year } of months) {
+    try {
+      const url = `https://erimtanmuseum.org/tr/takvim?month=${month}&year=${year}`;
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) continue;
+
+      const html = await res.text();
+      const $ = cheerio.load(html);
+
+      $("section.content li").each((_, el) => {
+        const $li = $(el);
+        const $a = $li.find("a").first();
+        const $time = $li.find("time").first();
+
+        // <time datetime="2026-03-10 20:00">
+        const datetime = $time.attr("datetime") ?? "";
+        const eventDate = datetime ? new Date(datetime.replace(" ", "T")).toISOString() : null;
+        if (!eventDate || !isFutureDate(eventDate)) return;
+
+        // h3 = kategori (Müze'de Müzik, Atölye, Konferans vb.), h2 = etkinlik adı
+        const category = $li.find("h3").first().text().trim();
+        const title = $li.find("h2").first().text().trim();
+        if (!title) return;
+
+        // Çocuk atölyelerini atla (5-9 Yaş, 2-4 Yaş vb.)
+        const detail = $li.find("span.h5").text();
+        if (/\b\d+-\d+\s*yaş/i.test(detail) && !detail.toLowerCase().includes("yetişkin")) return;
+
+        const href = $a.attr("href") ?? "";
+        const source_url = href.startsWith("http") ? href : `https://erimtanmuseum.org${href}`;
+
+        // Tür tespiti: kategori + başlık
+        const combined = `${category} ${title}`.toLowerCase();
+        let inferredType = inferEventType(category, title, "");
+        // Erimtan'a özel: müze müzik/caz/konser kategorileri
+        if (inferredType === "etkinlik") {
+          if (combined.includes("konser") || combined.includes("müzik") || combined.includes("caz")) {
+            inferredType = "konser";
+          } else if (combined.includes("konferans")) {
+            inferredType = "panel";
+          } else if (combined.includes("rehber") || combined.includes("tur")) {
+            inferredType = "soylesi";
+          } else if (combined.includes("atölye") || combined.includes("eğitim")) {
+            inferredType = "performans"; // atölye → performans olarak kabul et
+          }
+        }
+
+        if (!isRelevant({ title, description: category, event_type: inferredType })) return;
+
+        events.push({
+          title: `${title}`,
+          description: category ? `${category}` : "",
+          event_type: inferredType,
+          venue: "Erimtan Arkeoloji ve Sanat Müzesi",
+          address: "Gözcü Sokak No:2, Kale, Altındağ, Ankara",
+          event_date: eventDate,
+          end_date: null,
+          source_url,
+          source_name: "Erimtan Müzesi",
+          image_url: null,
+          price_info: null,
+        });
+      });
+    } catch (err) {
+      console.error(`[Erimtan] hatası:`, err);
+    }
+  }
+
+  return events;
+}
+
 // ── Yardımcı: Türkçe tarih parse ─────────────────────────────────────────────
 const TR_MONTHS: Record<string, number> = {
   ocak: 0, şubat: 1, mart: 2, nisan: 3, mayıs: 4, haziran: 5,
@@ -1513,11 +1599,11 @@ export async function GET(req: NextRequest) {
   const results: Record<string, StatEntry> = {
     biletix: mk(), cerModern: mk(), ankaraBB: mk(), cankaya: mk(),
     bilkent: mk(), csoAda: mk(), lavarla: mk(), biletinial: mk(), ankaraMasasi: mk(),
-    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(),
+    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(), erimtan: mk(),
   };
 
   // 2. Her scraper'ı bağımsız çalıştır
-  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere"] as const;
+  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere", "erimtan"] as const;
   const settled = await Promise.allSettled([
     scrapeBiletix(),
     scrapeCerModern(),
@@ -1532,6 +1618,7 @@ export async function GET(req: NextRequest) {
     scrapeMobilet(),
     scrapeUnite(),
     scrapeKultKavaklidere(),
+    scrapeErimtan(),
   ]);
 
   const scraperResults: [StatEntry, ScrapedEvent[]][] = scraperKeys.map((key, i) => {
