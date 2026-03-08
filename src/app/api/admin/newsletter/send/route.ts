@@ -148,7 +148,6 @@ export async function POST(req: NextRequest) {
     let totalSent = 0;
     const batchSize = 100;
     const errors: string[] = [];
-    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
 
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
@@ -157,21 +156,14 @@ export async function POST(req: NextRequest) {
         errors.push(error.message);
       } else {
         totalSent += batch.length;
-        // Resend batch returns array of { id } for each email
         const ids = data?.data ?? [];
-        batch.forEach((email, j) => {
-          logRows.push({
-            resend_email_id: ids[j]?.id || null,
-            subscriber_email: email.to as string,
-            subject: emailSubject,
-          });
-        });
+        const batchLogs = batch.map((email, j) => ({
+          resend_email_id: ids[j]?.id || null,
+          subscriber_email: email.to as string,
+          subject: emailSubject,
+        }));
+        await admin.from("email_logs").insert(batchLogs);
       }
-    }
-
-    // Bulk insert email logs
-    if (logRows.length > 0) {
-      await admin.from("email_logs").insert(logRows);
     }
 
     if (errors.length > 0 && totalSent === 0) {
@@ -254,7 +246,6 @@ export async function POST(req: NextRequest) {
     let totalSent = 0;
     const batchSize = 100;
     const errors: string[] = [];
-    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
 
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
@@ -264,18 +255,13 @@ export async function POST(req: NextRequest) {
       } else {
         totalSent += batch.length;
         const ids = data?.data ?? [];
-        batch.forEach((email, j) => {
-          logRows.push({
-            resend_email_id: ids[j]?.id || null,
-            subscriber_email: email.to as string,
-            subject: emailSubject,
-          });
-        });
+        const batchLogs = batch.map((email, j) => ({
+          resend_email_id: ids[j]?.id || null,
+          subscriber_email: email.to as string,
+          subject: emailSubject,
+        }));
+        await admin.from("email_logs").insert(batchLogs);
       }
-    }
-
-    if (logRows.length > 0) {
-      await admin.from("email_logs").insert(logRows);
     }
 
     if (errors.length > 0 && totalSent === 0) {
@@ -377,7 +363,6 @@ export async function POST(req: NextRequest) {
     let totalSent = 0;
     const batchSize = 100;
     const errors: string[] = [];
-    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
 
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
@@ -387,18 +372,13 @@ export async function POST(req: NextRequest) {
       } else {
         totalSent += batch.length;
         const ids = data?.data ?? [];
-        batch.forEach((email, j) => {
-          logRows.push({
-            resend_email_id: ids[j]?.id || null,
-            subscriber_email: email.to as string,
-            subject: emailSubject,
-          });
-        });
+        const batchLogs = batch.map((email, j) => ({
+          resend_email_id: ids[j]?.id || null,
+          subscriber_email: email.to as string,
+          subject: emailSubject,
+        }));
+        await admin.from("email_logs").insert(batchLogs);
       }
-    }
-
-    if (logRows.length > 0) {
-      await admin.from("email_logs").insert(logRows);
     }
 
     if (errors.length > 0 && totalSent === 0) {
@@ -450,7 +430,6 @@ export async function POST(req: NextRequest) {
     let totalSent = 0;
     const batchSize = 100;
     const errors: string[] = [];
-    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
 
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
@@ -460,18 +439,13 @@ export async function POST(req: NextRequest) {
       } else {
         totalSent += batch.length;
         const ids = data?.data ?? [];
-        batch.forEach((email, j) => {
-          logRows.push({
-            resend_email_id: ids[j]?.id || null,
-            subscriber_email: email.to as string,
-            subject: emailSubject,
-          });
-        });
+        const batchLogs = batch.map((email, j) => ({
+          resend_email_id: ids[j]?.id || null,
+          subscriber_email: email.to as string,
+          subject: emailSubject,
+        }));
+        await admin.from("email_logs").insert(batchLogs);
       }
-    }
-
-    if (logRows.length > 0) {
-      await admin.from("email_logs").insert(logRows);
     }
 
     if (errors.length > 0 && totalSent === 0) {
