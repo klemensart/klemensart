@@ -86,7 +86,21 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   addObject: (obj) => {
     const id = newId();
     const newObj: CanvasObject = { ...obj, id };
-    set((s) => ({ objects: [...s.objects, newObj], selectedId: id }));
+    set((s) => {
+      const objs = [...s.objects];
+      if (obj.type === "image") {
+        // Görselleri metinlerin arkasına ekle (shape'lerden sonra, text'lerden önce)
+        const firstTextIdx = objs.findIndex((o) => o.type === "text");
+        if (firstTextIdx !== -1) {
+          objs.splice(firstTextIdx, 0, newObj);
+        } else {
+          objs.push(newObj);
+        }
+      } else {
+        objs.push(newObj);
+      }
+      return { objects: objs, selectedId: id };
+    });
     get().pushHistory();
   },
 
