@@ -30,17 +30,20 @@
     "csv-parse": "^6.1.0",
     "framer-motion": "^12.34.4",
     "gray-matter": "^4.0.3",
+    "konva": "^10.2.0",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
     "papaparse": "^5.5.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-konva": "^19.2.3",
     "react-leaflet": "^5.0.0",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "resend": "^6.9.3",
     "three": "^0.183.2",
-    "tiptap-markdown": "^0.9.0"
+    "tiptap-markdown": "^0.9.0",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@react-email/preview-server": "^5.2.9",
