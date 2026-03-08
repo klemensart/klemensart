@@ -108,8 +108,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Skip subscribers who already received this exact subject
+    const { data: alreadySentLogs } = await admin
+      .from("email_logs")
+      .select("subscriber_email")
+      .eq("subject", emailSubject);
+    const alreadySentSet = new Set((alreadySentLogs ?? []).map((l) => l.subscriber_email));
+
+    const skippedCount = alreadySentSet.size;
+    let filteredSubs = subs.filter((s) => !alreadySentSet.has(s.email));
+
+    if (filteredSubs.length === 0) {
+      return NextResponse.json(
+        { error: `Bu konu ile tüm abonelere (${skippedCount} kişi) zaten gönderilmiş.` },
+        { status: 400 }
+      );
+    }
+
     // Filter out subscribers who haven't opened in 60 days
-    let filteredSubs = subs;
     if (excludeInactive) {
       const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
       const { data: recentLogs } = await admin
@@ -126,7 +142,7 @@ export async function POST(req: NextRequest) {
         .select("subscriber_email");
       const everReceived = new Set((allLogs ?? []).map((l) => l.subscriber_email));
 
-      filteredSubs = subs.filter((s) =>
+      filteredSubs = filteredSubs.filter((s) =>
         recentOpeners.has(s.email) || !everReceived.has(s.email)
       );
 
@@ -173,8 +189,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const skippedMsg = skippedCount > 0 ? ` (${skippedCount} kişi daha önce almıştı, atlandı)` : "";
     return NextResponse.json({
-      message: `${totalSent} aboneye e-bülten gönderildi.`,
+      message: `${totalSent} aboneye e-bülten gönderildi.${skippedMsg}`,
       sent: totalSent,
       total: subs.length,
     });
