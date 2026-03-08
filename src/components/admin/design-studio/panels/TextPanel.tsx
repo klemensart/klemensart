@@ -2,19 +2,47 @@
 
 import { useDesignStore } from "../hooks/useDesignStore";
 
-const FONT_FAMILIES = [
-  "Plus Jakarta Sans",
-  "Playfair Display",
-  "Georgia",
-  "Arial",
-  "Courier New",
+type FontGroup = {
+  label: string;
+  fonts: string[];
+};
+
+const FONT_GROUPS: FontGroup[] = [
+  {
+    label: "Serif — Editorial",
+    fonts: [
+      "Cormorant Garamond",
+      "EB Garamond",
+      "Playfair Display",
+      "Libre Baskerville",
+      "Lora",
+      "DM Serif Display",
+      "Fraunces",
+    ],
+  },
+  {
+    label: "Sans-Serif — Modern",
+    fonts: [
+      "Plus Jakarta Sans",
+      "Space Grotesk",
+      "Sora",
+    ],
+  },
+  {
+    label: "El Yazısı",
+    fonts: [
+      "Caveat",
+    ],
+  },
 ];
 
+const ALL_FONTS = FONT_GROUPS.flatMap((g) => g.fonts);
+
 const PRESETS = [
-  { label: "Başlık", fontSize: 64, fontFamily: "Playfair Display", fontStyle: "bold" },
-  { label: "Alt Başlık", fontSize: 36, fontFamily: "Plus Jakarta Sans", fontStyle: "bold" },
-  { label: "Gövde", fontSize: 24, fontFamily: "Plus Jakarta Sans", fontStyle: "normal" },
-  { label: "Küçük", fontSize: 16, fontFamily: "Plus Jakarta Sans", fontStyle: "normal" },
+  { label: "Başlık", fontSize: 72, fontFamily: "Cormorant Garamond", fontStyle: "bold" },
+  { label: "Alt Başlık", fontSize: 40, fontFamily: "Space Grotesk", fontStyle: "bold" },
+  { label: "Gövde", fontSize: 26, fontFamily: "EB Garamond", fontStyle: "normal" },
+  { label: "Etiket", fontSize: 18, fontFamily: "Space Grotesk", fontStyle: "bold" },
 ];
 
 export default function TextPanel() {
@@ -43,7 +71,7 @@ export default function TextPanel() {
                   x: 100,
                   y: 100,
                   width: 600,
-                  text: p.label === "Başlık" ? "Başlık metni" : p.label === "Alt Başlık" ? "Alt başlık metni" : "Metin girin",
+                  text: p.label === "Başlık" ? "Başlık metni" : p.label === "Alt Başlık" ? "Alt başlık metni" : p.label === "Etiket" ? "ETİKET" : "Metin girin",
                   fontSize: p.fontSize,
                   fontFamily: p.fontFamily,
                   fontStyle: p.fontStyle,
@@ -58,13 +86,14 @@ export default function TextPanel() {
               <span
                 style={{
                   fontFamily: p.fontFamily,
-                  fontSize: Math.min(p.fontSize / 3, 20),
+                  fontSize: Math.min(p.fontSize / 3, 22),
                   fontWeight: p.fontStyle === "bold" ? 700 : 400,
                 }}
                 className="text-warm-900"
               >
                 {p.label}
               </span>
+              <span className="text-[10px] text-warm-900/30 ml-2">{p.fontFamily}</span>
             </button>
           ))}
         </div>
@@ -77,21 +106,49 @@ export default function TextPanel() {
             Metin Düzenle
           </h3>
 
-          {/* Font family */}
+          {/* Font family — grouped */}
           <div>
             <label className="text-xs text-warm-900/60 mb-1 block">Font</label>
             <select
-              value={selected.fontFamily || "Plus Jakarta Sans"}
+              value={selected.fontFamily || "Cormorant Garamond"}
               onChange={(e) => {
                 updateObject(selected.id, { fontFamily: e.target.value });
                 pushHistory();
               }}
               className="w-full px-3 py-2 border border-warm-100 rounded-lg text-sm bg-white text-warm-900"
+              style={{ fontFamily: selected.fontFamily || "Cormorant Garamond" }}
             >
-              {FONT_FAMILIES.map((f) => (
-                <option key={f} value={f}>{f}</option>
+              {FONT_GROUPS.map((g) => (
+                <optgroup key={g.label} label={g.label}>
+                  {g.fonts.map((f) => (
+                    <option key={f} value={f} style={{ fontFamily: f }}>
+                      {f}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
+
+            {/* Font quick picks */}
+            <div className="flex flex-wrap gap-1 mt-2">
+              {["Cormorant Garamond", "EB Garamond", "Fraunces", "Space Grotesk", "Caveat"].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => {
+                    updateObject(selected.id, { fontFamily: f });
+                    pushHistory();
+                  }}
+                  className={`px-2 py-1 rounded-md text-xs border transition-colors ${
+                    selected.fontFamily === f
+                      ? "bg-coral/10 border-coral/30 text-coral"
+                      : "border-warm-100 text-warm-900/50 hover:border-warm-200"
+                  }`}
+                  style={{ fontFamily: f }}
+                >
+                  {f.split(" ")[0]}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Font size */}
