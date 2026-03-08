@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps, workshopId } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive, template, templateProps, workshopId, segmentId } = await req.json();
 
   // Determine email HTML and subject based on mode
   let emailHtml: string;
@@ -412,6 +412,79 @@ export async function POST(req: NextRequest) {
       message: `${totalSent} kişiye yarım kalan kayıt hatırlatması gönderildi.`,
       sent: totalSent,
       total: abandonedEmails.length,
+    });
+  }
+
+  // ── Segment mode ──
+  if (mode === "segment") {
+    if (!segmentId) {
+      return NextResponse.json(
+        { error: "Hedef kitle seçilmedi." },
+        { status: 400 }
+      );
+    }
+
+    // Dynamically import segment resolver to avoid duplication
+    const segRes = await fetch(
+      new URL(`/api/admin/newsletter/segments?segmentId=${segmentId}`, req.url),
+      { headers: req.headers }
+    );
+    const segData = await segRes.json();
+
+    if (!segRes.ok || !segData.emails || segData.emails.length === 0) {
+      return NextResponse.json(
+        { error: segData.error || "Bu hedef kitlede kimse bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    const segmentEmails: string[] = segData.emails;
+
+    const emails = segmentEmails.map((email: string) => ({
+      from: FROM,
+      to: email,
+      subject: emailSubject,
+      html: emailHtml,
+    }));
+
+    let totalSent = 0;
+    const batchSize = 100;
+    const errors: string[] = [];
+    const logRows: { resend_email_id: string | null; subscriber_email: string; subject: string }[] = [];
+
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      const { data, error } = await resend.batch.send(batch);
+      if (error) {
+        errors.push(error.message);
+      } else {
+        totalSent += batch.length;
+        const ids = data?.data ?? [];
+        batch.forEach((email, j) => {
+          logRows.push({
+            resend_email_id: ids[j]?.id || null,
+            subscriber_email: email.to as string,
+            subject: emailSubject,
+          });
+        });
+      }
+    }
+
+    if (logRows.length > 0) {
+      await admin.from("email_logs").insert(logRows);
+    }
+
+    if (errors.length > 0 && totalSent === 0) {
+      return NextResponse.json(
+        { error: `Gönderim hatası: ${errors[0]}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      message: `${totalSent} kişiye e-posta gönderildi.`,
+      sent: totalSent,
+      total: segmentEmails.length,
     });
   }
 

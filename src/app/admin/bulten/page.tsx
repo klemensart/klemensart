@@ -313,6 +313,12 @@ export default function BultenGonderPage() {
   const [showAbandonedConfirm, setShowAbandonedConfirm] = useState(false);
   const [loadingAbandoned, setLoadingAbandoned] = useState(false);
 
+  // Segment targeting
+  type Segment = { id: string; label: string; description: string; count: number; category: string };
+  const [segments, setSegments] = useState<Segment[]>([]);
+  const [selectedSegmentId, setSelectedSegmentId] = useState("");
+  const [showSegmentConfirm, setShowSegmentConfirm] = useState(false);
+
   // Stats
   type Campaign = { subject: string; sent: number; opened: number; clicked: number; bounced: number; lastSent: string };
   const [stats, setStats] = useState<{
@@ -336,6 +342,14 @@ export default function BultenGonderPage() {
       .then((d) => { if (d.workshops) setWorkshops(d.workshops); })
       .catch(() => {});
   }, []);
+
+  // Fetch audience segments
+  useEffect(() => {
+    fetch("/api/admin/newsletter/segments")
+      .then((r) => r.json())
+      .then((d) => { if (d.segments) setSegments(d.segments); })
+      .catch(() => {});
+  }, [sending]);
 
   // Auto-fill template fields when workshop is selected
   useEffect(() => {
@@ -511,7 +525,7 @@ export default function BultenGonderPage() {
 
   // ── Send newsletter ──
   const sendNewsletter = useCallback(
-    async (mode: "test" | "all" | "workshop" | "abandoned") => {
+    async (mode: "test" | "all" | "workshop" | "abandoned" | "segment") => {
       if (pageMode === "freetext") {
         if (!subject.trim()) {
           setMessage("Konu başlığı gerekli.");
@@ -547,6 +561,7 @@ export default function BultenGonderPage() {
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
                 workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
+                segmentId: mode === "segment" ? selectedSegmentId : undefined,
               }
             : {
                 mode,
@@ -555,6 +570,7 @@ export default function BultenGonderPage() {
                 testEmail: mode === "test" ? testEmail.trim() : undefined,
                 excludeInactive: mode === "all" ? excludeInactive : undefined,
                 workshopId: (mode === "workshop" || mode === "abandoned") ? selectedWorkshopId : undefined,
+                segmentId: mode === "segment" ? selectedSegmentId : undefined,
               };
 
         const res = await fetch("/api/admin/newsletter/send", {
@@ -576,9 +592,10 @@ export default function BultenGonderPage() {
         setShowConfirm(false);
         setShowWorkshopConfirm(false);
         setShowAbandonedConfirm(false);
+        setShowSegmentConfirm(false);
       }
     },
-    [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject, selectedWorkshopId]
+    [pageMode, subject, htmlContent, testEmail, excludeInactive, selectedTemplate, templateProps, templateSubject, selectedWorkshopId, selectedSegmentId]
   );
 
   const handleSendAll = async () => {
@@ -619,6 +636,21 @@ export default function BultenGonderPage() {
       setLoadingParticipants(false);
     }
     setShowWorkshopConfirm(true);
+  };
+
+  const handleSendSegment = () => {
+    if (!selectedSegmentId) {
+      setMessage("Lütfen bir hedef kitle seçin.");
+      return;
+    }
+    // Validate content
+    if (pageMode === "freetext") {
+      if (!subject.trim()) { setMessage("Konu başlığı gerekli."); return; }
+      if (!htmlContent || htmlContent === "<p></p>") { setMessage("İçerik boş olamaz."); return; }
+    } else {
+      if (!selectedTemplate) { setMessage("Lütfen bir şablon seçin."); return; }
+    }
+    setShowSegmentConfirm(true);
   };
 
   const handleSendAbandoned = async () => {
@@ -822,6 +854,46 @@ export default function BultenGonderPage() {
                     {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Segment Targeting */}
+            {segments.length > 0 && (
+              <div className="mt-4 border border-indigo-200 rounded-xl p-4 bg-indigo-50/30">
+                <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Hedef Kitleye Gönder</div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedSegmentId}
+                    onChange={(e) => setSelectedSegmentId(e.target.value)}
+                    className="flex-1 border border-indigo-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-indigo-400 bg-white"
+                  >
+                    <option value="">Hedef kitle seçin...</option>
+                    {(() => {
+                      const categories = [...new Set(segments.map((s) => s.category))];
+                      return categories.map((cat) => (
+                        <optgroup key={cat} label={cat}>
+                          {segments.filter((s) => s.category === cat).map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.label} ({s.count} kişi)
+                            </option>
+                          ))}
+                        </optgroup>
+                      ));
+                    })()}
+                  </select>
+                  <button
+                    onClick={handleSendSegment}
+                    disabled={sending || !selectedSegmentId}
+                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    Hedef Kitleye Gönder
+                  </button>
+                </div>
+                {selectedSegmentId && (
+                  <p className="mt-2 text-xs text-indigo-600">
+                    {segments.find((s) => s.id === selectedSegmentId)?.description}
+                  </p>
+                )}
               </div>
             )}
 
@@ -1119,6 +1191,46 @@ export default function BultenGonderPage() {
                     </div>
                   )}
 
+                  {/* Segment Targeting */}
+                  {segments.length > 0 && (
+                    <div className="mt-4 border border-indigo-200 rounded-xl p-4 bg-indigo-50/30">
+                      <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Hedef Kitleye Gönder</div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <select
+                          value={selectedSegmentId}
+                          onChange={(e) => setSelectedSegmentId(e.target.value)}
+                          className="flex-1 border border-indigo-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-indigo-400 bg-white"
+                        >
+                          <option value="">Hedef kitle seçin...</option>
+                          {(() => {
+                            const categories = [...new Set(segments.map((s) => s.category))];
+                            return categories.map((cat) => (
+                              <optgroup key={cat} label={cat}>
+                                {segments.filter((s) => s.category === cat).map((s) => (
+                                  <option key={s.id} value={s.id}>
+                                    {s.label} ({s.count} kişi)
+                                  </option>
+                                ))}
+                              </optgroup>
+                            ));
+                          })()}
+                        </select>
+                        <button
+                          onClick={handleSendSegment}
+                          disabled={sending || !selectedSegmentId}
+                          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                        >
+                          Hedef Kitleye Gönder
+                        </button>
+                      </div>
+                      {selectedSegmentId && (
+                        <p className="mt-2 text-xs text-indigo-600">
+                          {segments.find((s) => s.id === selectedSegmentId)?.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {message && (
                     <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
                       message.includes("gönderildi")
@@ -1343,6 +1455,59 @@ export default function BultenGonderPage() {
                 onClick={() => sendNewsletter("abandoned")}
                 disabled={sending}
                 className="flex-1 py-3.5 text-sm font-semibold text-amber-600 hover:bg-amber-50 transition-colors disabled:opacity-50"
+              >
+                {sending ? "Gönderiliyor..." : "Evet, Gönder"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Segment Confirmation Modal ── */}
+      {showSegmentConfirm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl overflow-hidden">
+            <div className="px-8 pt-8 pb-0 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-serif font-semibold text-[#2D2926] mb-2">
+                Hedef Kitleye Gönder
+              </h3>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-2">
+                <span className="font-semibold text-[#2D2926]">
+                  {segments.find((s) => s.id === selectedSegmentId)?.label}
+                </span>
+              </p>
+              <p className="text-[#8C857E] text-xs leading-relaxed mb-2">
+                {segments.find((s) => s.id === selectedSegmentId)?.description}
+              </p>
+              <p className="text-[#8C857E] text-sm leading-relaxed mb-6">
+                Bu e-posta{" "}
+                <span className="font-semibold text-[#2D2926]">
+                  {segments.find((s) => s.id === selectedSegmentId)?.count} kişiye
+                </span>{" "}
+                gönderilecektir.
+                <br />
+                Bu işlem geri alınamaz. Onaylıyor musunuz?
+              </p>
+            </div>
+            <div className="flex border-t border-gray-100">
+              <button
+                onClick={() => setShowSegmentConfirm(false)}
+                className="flex-1 py-3.5 text-sm font-medium text-[#8C857E] hover:bg-gray-50 transition-colors border-r border-gray-100"
+              >
+                İptal
+              </button>
+              <button
+                onClick={() => sendNewsletter("segment")}
+                disabled={sending}
+                className="flex-1 py-3.5 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
               >
                 {sending ? "Gönderiliyor..." : "Evet, Gönder"}
               </button>
