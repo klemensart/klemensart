@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
   const slug = (formData.get("slug") as string) || "genel";
+  const bucket = (formData.get("bucket") as string) || "article-images";
 
   if (!file) {
     return NextResponse.json({ error: "Dosya gerekli" }, { status: 400 });
@@ -56,8 +57,11 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
+  const allowedBuckets = new Set(["article-images", "email-assets"]);
+  const targetBucket = allowedBuckets.has(bucket) ? bucket : "article-images";
+
   const { error } = await admin.storage
-    .from("article-images")
+    .from(targetBucket)
     .upload(storagePath, buffer, {
       contentType: file.type,
       upsert: false,
@@ -67,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/article-images/${storagePath}`;
+  const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${targetBucket}/${storagePath}`;
 
   return NextResponse.json({ url: publicUrl, path: storagePath });
 }

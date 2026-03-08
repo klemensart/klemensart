@@ -319,6 +319,45 @@ export default function BultenGonderPage() {
   const [selectedSegmentId, setSelectedSegmentId] = useState("");
   const [showSegmentConfirm, setShowSegmentConfirm] = useState(false);
 
+  // Image upload
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const uploadImage = async (fieldKey: string, file: File) => {
+    setUploadingField(fieldKey);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("bucket", "email-assets");
+      form.append("slug", "newsletter");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      updateProp(fieldKey, data.url);
+    } catch (err) {
+      setMessage(`Yükleme hatası: ${err instanceof Error ? err.message : "Bilinmeyen hata"}`);
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  // Freetext image upload
+  const uploadFreetextImage = async (file: File) => {
+    setUploadingField("freetext");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("bucket", "email-assets");
+      form.append("slug", "newsletter");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      if (editor) editor.chain().focus().setImage({ src: data.url }).run();
+    } catch (err) {
+      setMessage(`Yükleme hatası: ${err instanceof Error ? err.message : "Bilinmeyen hata"}`);
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
   // Stats
   type Campaign = { subject: string; sent: number; opened: number; clicked: number; bounced: number; lastSent: string };
   const [stats, setStats] = useState<{
@@ -688,8 +727,14 @@ export default function BultenGonderPage() {
 
   const addImage = () => {
     if (!editor) return;
-    const url = prompt("Görsel URL'si girin:");
-    if (url) editor.chain().focus().setImage({ src: url.trim() }).run();
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png,image/webp";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) uploadFreetextImage(file);
+    };
+    input.click();
   };
 
   return (
@@ -952,6 +997,7 @@ export default function BultenGonderPage() {
 
                       // Simple fields
                       const sf = field as FieldDef;
+                      const isImageField = sf.key.toLowerCase().includes("imageurl") || sf.key.toLowerCase().includes("image_url");
                       return (
                         <div key={sf.key}>
                           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
@@ -964,6 +1010,63 @@ export default function BultenGonderPage() {
                               rows={3}
                               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] resize-y"
                             />
+                          ) : isImageField ? (
+                            <div>
+                              <div className="flex gap-2">
+                                <input
+                                  type="url"
+                                  value={(templateProps[sf.key] as string) || ""}
+                                  onChange={(e) => updateProp(sf.key, e.target.value)}
+                                  placeholder="https://... veya dosya yükleyin"
+                                  className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60]"
+                                />
+                                <label className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors ${
+                                  uploadingField === sf.key
+                                    ? "bg-gray-100 text-gray-400 cursor-wait"
+                                    : "bg-[#FF6D60] text-white hover:bg-[#e85e52]"
+                                }`}>
+                                  {uploadingField === sf.key ? (
+                                    <span className="animate-spin">&#9696;</span>
+                                  ) : (
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                      <polyline points="17 8 12 3 7 8" />
+                                      <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                  )}
+                                  Yükle
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className="hidden"
+                                    disabled={uploadingField === sf.key}
+                                    onChange={(e) => {
+                                      const f = e.target.files?.[0];
+                                      if (f) uploadImage(sf.key, f);
+                                      e.target.value = "";
+                                    }}
+                                  />
+                                </label>
+                              </div>
+                              {(templateProps[sf.key] as string) && (
+                                <div className="mt-2 relative rounded-lg overflow-hidden border border-gray-100">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={templateProps[sf.key] as string}
+                                    alt="Önizleme"
+                                    className="w-full h-32 object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => updateProp(sf.key, "")}
+                                    className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-black/70"
+                                    title="Görseli kaldır"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <input
                               type={sf.type}
