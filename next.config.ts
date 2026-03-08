@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   compress: true,
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "sgabkrzzzszfqrtgkord.supabase.co",
+      },
+    ],
   },
   experimental: {
     optimizePackageImports: ["framer-motion"],

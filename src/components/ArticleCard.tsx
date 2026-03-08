@@ -14,6 +14,10 @@ const categoryGradient: Record<string, string> = {
 
 const defaultGradient = "from-[#3d1f0a] via-[#6b3a1a] to-[#c47a3a]";
 
+function isExternal(src: string) {
+  return src.startsWith("http://") || src.startsWith("https://");
+}
+
 export default function ArticleCard({ article }: { article: ArticleMeta }) {
   const gradient = categoryGradient[article.category] ?? defaultGradient;
   const hasImage = article.image && article.image.trim() !== "";
@@ -30,6 +34,7 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             loading="lazy"
+            unoptimized={isExternal(article.image!) && !article.image!.includes("sgabkrzzzszfqrtgkord.supabase.co")}
             className="object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />
         ) : (
