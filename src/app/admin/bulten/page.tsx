@@ -320,6 +320,19 @@ export default function BultenGonderPage() {
   const [selectedSegmentId, setSelectedSegmentId] = useState("");
   const [showSegmentConfirm, setShowSegmentConfirm] = useState(false);
 
+  // Campaign history (saved HTML)
+  type SavedCampaign = {
+    id: string;
+    created_at: string;
+    subject: string;
+    template_name: string | null;
+    mode: string;
+    sent_count: number;
+  };
+  const [savedCampaigns, setSavedCampaigns] = useState<SavedCampaign[]>([]);
+  const [previewCampaign, setPreviewCampaign] = useState<{ subject: string; html_content: string } | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+
   // Image upload
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const uploadImage = async (fieldKey: string, file: File) => {
@@ -372,6 +385,10 @@ export default function BultenGonderPage() {
     fetch("/api/admin/newsletter/stats")
       .then((r) => r.json())
       .then((d) => { if (d.campaigns) setStats(d); })
+      .catch(() => {});
+    fetch("/api/admin/newsletter/campaigns")
+      .then((r) => r.json())
+      .then((d) => { if (d.campaigns) setSavedCampaigns(d.campaigns); })
       .catch(() => {});
   }, [sending]);
 
@@ -644,6 +661,46 @@ export default function BultenGonderPage() {
     },
     [pageMode, subject, htmlContent, testEmail, excludeInactive, skipAlreadySent, selectedTemplate, templateProps, templateSubject, selectedWorkshopId, selectedSegmentId]
   );
+
+  const handlePreviewCampaign = async (id: string) => {
+    setLoadingPreview(true);
+    try {
+      const res = await fetch(`/api/admin/newsletter/campaigns?id=${id}`);
+      const data = await res.json();
+      if (res.ok && data.campaign) {
+        setPreviewCampaign(data.campaign);
+      }
+    } catch {
+      setMessage("Önizleme yüklenemedi.");
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
+
+  const handleResendCampaign = async (id: string) => {
+    setLoadingPreview(true);
+    try {
+      const res = await fetch(`/api/admin/newsletter/campaigns?id=${id}`);
+      const data = await res.json();
+      if (res.ok && data.campaign) {
+        // Switch to freetext mode and populate
+        setPageMode("freetext");
+        setSubject(data.campaign.subject);
+        // Set editor content
+        if (editor) {
+          editor.commands.setContent(data.campaign.html_content);
+        }
+        setHtmlContent(data.campaign.html_content);
+        setMessage("Kampanya içeriği editöre yüklendi. Düzenleyip tekrar gönderebilirsiniz.");
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } catch {
+      setMessage("İçerik yüklenemedi.");
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
 
   const handleSendAll = async () => {
     try {
@@ -1332,6 +1389,94 @@ export default function BultenGonderPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── Geçmiş Mailler (Saved Campaigns) ── */}
+      {savedCampaigns.length > 0 && (
+        <div className="mt-10 border-t border-gray-100 pt-8">
+          <h2 className="text-xl font-serif text-[#2D2926] mb-4">Geçmiş Mailler</h2>
+          <p className="text-sm text-[#8C857E] mb-4">
+            Gönderilen maillerin içeriğini görüntüleyin veya tekrar gönderin.
+          </p>
+          <div className="space-y-2">
+            {savedCampaigns.map((c) => {
+              const modeLabels: Record<string, string> = {
+                all: "Tüm Aboneler",
+                workshop: "Atölye",
+                abandoned: "Yarım Kalan",
+                segment: "Hedef Kitle",
+              };
+              return (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-4 border border-gray-100 rounded-xl px-5 py-3 hover:border-gray-200 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-800 truncate">{c.subject}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-[#8C857E]">
+                        {new Date(c.created_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                        {modeLabels[c.mode] || c.mode}
+                      </span>
+                      {c.template_name && c.template_name !== "SerbestMetin" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6D60]/10 text-[#FF6D60]">
+                          {c.template_name}
+                        </span>
+                      )}
+                      <span className="text-xs text-[#8C857E]">{c.sent_count} gönderim</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handlePreviewCampaign(c.id)}
+                      disabled={loadingPreview}
+                      className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    >
+                      Görüntüle
+                    </button>
+                    <button
+                      onClick={() => handleResendCampaign(c.id)}
+                      disabled={loadingPreview}
+                      className="px-3 py-1.5 text-xs font-medium border border-[#FF6D60] rounded-lg text-[#FF6D60] hover:bg-[#FF6D60]/5 transition-colors disabled:opacity-50"
+                    >
+                      Tekrar Gönder
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Campaign Preview Modal ── */}
+      {previewCampaign && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-3xl w-full mx-4 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div>
+                <h3 className="text-sm font-semibold text-[#2D2926]">{previewCampaign.subject}</h3>
+              </div>
+              <button
+                onClick={() => setPreviewCampaign(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors text-lg"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto bg-[#f7f5f2] p-4">
+              <iframe
+                srcDoc={previewCampaign.html_content}
+                title="Kampanya Önizleme"
+                className="w-full border-0 bg-white rounded-lg"
+                style={{ minHeight: 600 }}
+                sandbox="allow-same-origin"
+              />
+            </div>
           </div>
         </div>
       )}

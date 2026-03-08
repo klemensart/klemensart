@@ -194,6 +194,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Save campaign record
+    if (totalSent > 0) {
+      await admin.from("campaigns").insert({
+        subject: emailSubject,
+        html_content: emailHtml,
+        template_name: template && template in templateRegistry ? template : "SerbestMetin",
+        mode: "all",
+        sent_count: totalSent,
+      });
+    }
+
     const skippedMsg = skippedCount > 0 ? ` (${skippedCount} kişi daha önce almıştı, atlandı)` : "";
     return NextResponse.json({
       message: `${totalSent} aboneye e-bülten gönderildi.${skippedMsg}`,
@@ -291,6 +302,17 @@ export async function POST(req: NextRequest) {
         { error: `Gönderim hatası: ${errors[0]}` },
         { status: 500 }
       );
+    }
+
+    // Save campaign record
+    if (totalSent > 0) {
+      await admin.from("campaigns").insert({
+        subject: emailSubject,
+        html_content: emailHtml,
+        template_name: template && template in templateRegistry ? template : "SerbestMetin",
+        mode: "workshop",
+        sent_count: totalSent,
+      });
     }
 
     return NextResponse.json({
@@ -410,6 +432,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Save campaign record
+    if (totalSent > 0) {
+      await admin.from("campaigns").insert({
+        subject: emailSubject,
+        html_content: emailHtml,
+        template_name: template && template in templateRegistry ? template : "SerbestMetin",
+        mode: "abandoned",
+        sent_count: totalSent,
+      });
+    }
+
     return NextResponse.json({
       message: `${totalSent} kişiye yarım kalan kayıt hatırlatması gönderildi.`,
       sent: totalSent,
@@ -475,6 +508,17 @@ export async function POST(req: NextRequest) {
         { error: `Gönderim hatası: ${errors[0]}` },
         { status: 500 }
       );
+    }
+
+    // Save campaign record
+    if (totalSent > 0) {
+      await admin.from("campaigns").insert({
+        subject: emailSubject,
+        html_content: emailHtml,
+        template_name: template && template in templateRegistry ? template : "SerbestMetin",
+        mode: "segment",
+        sent_count: totalSent,
+      });
     }
 
     return NextResponse.json({
