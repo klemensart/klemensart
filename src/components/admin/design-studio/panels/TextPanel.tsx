@@ -256,8 +256,8 @@ export default function TextPanel() {
             </label>
             <input
               type="range"
-              min={0}
-              max={20}
+              min={-20}
+              max={300}
               step={1}
               value={selected.letterSpacing || 0}
               onChange={(e) => updateObject(selected.id, { letterSpacing: Number(e.target.value) })}
