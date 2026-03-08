@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { generateStoryDesignRow } from "@/lib/auto-story";
 
 export async function GET() {
   const userClient = await createServerSupabaseClient();
@@ -60,6 +61,24 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Otomatik Instagram Story tasarımı oluştur
+  try {
+    const storyRow = generateStoryDesignRow(
+      {
+        title: row.title,
+        description: row.description,
+        author: row.author,
+        category: row.category,
+        image: row.image,
+      },
+      user.id
+    );
+    await admin.from("designs").insert(storyRow);
+  } catch {
+    // Story oluşturma başarısız olursa yazı kaydını engelleme
+    console.error("Auto-story generation failed for article:", data.id);
   }
 
   return NextResponse.json({ id: data.id });
