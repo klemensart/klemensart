@@ -72,12 +72,12 @@ export function KlemensLayout({ preview, children }: Props) {
             </Row>
 
             <Text style={footerBrand}>Klemens Art</Text>
-            <Text style={footerAddress}>Ankara, Turkiye</Text>
+            <Text style={footerAddress}>Ankara, Türkiye</Text>
             <Text style={footerLegal}>
-              Bu e-postayi klemensart.com uzerinden abone oldugunuz icin aliyorsunuz.
+              Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
               <br />
               <Link href="https://klemensart.com/abonelik-iptal" style={unsubLink}>
-                Abonelikten cikmak icin tiklayin
+                Abonelikten çıkmak için tıklayın
               </Link>
             </Text>
           </Section>

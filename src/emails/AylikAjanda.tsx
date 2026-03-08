@@ -20,19 +20,19 @@ type Props = {
 
 export default function AylikAjanda({
   monthName = "Mart 2026",
-  editorialIntro = "Bu ay, karanligin ve isigin sanat tarihindeki dansini kesfediyoruz. Barok'tan cagdas sinemaya uzanan bir yolculuk sizi bekliyor — tuvalin ve perdenin arkasinda saklanan insani hikayeleri birlikte okuyacagiz.",
+  editorialIntro = "Bu ay, karanlığın ve ışığın sanat tarihindeki dansını keşfediyoruz. Barok'tan çağdaş sinemaya uzanan bir yolculuk sizi bekliyor — tuvalin ve perdenin arkasında saklanan insani hikayeleri birlikte okuyacağız.",
   events = [
-    { date: "12 Mart, Carsamba", title: "Caravaggio ve Karanligin Estetigi", tag: "Seminer" },
-    { date: "19 Mart, Carsamba", title: "Tarkovsky'nin Zamani: Sinema ve Felsefe", tag: "Film Analizi" },
-    { date: "26 Mart, Carsamba", title: "Jung ve Golge Arketipi", tag: "Psikoloji Atolyesi" },
+    { date: "12 Mart, Çarşamba", title: "Caravaggio ve Karanlığın Estetiği", tag: "Seminer" },
+    { date: "19 Mart, Çarşamba", title: "Tarkovsky'nin Zamanı: Sinema ve Felsefe", tag: "Film Analizi" },
+    { date: "26 Mart, Çarşamba", title: "Jung ve Gölge Arketipi", tag: "Psikoloji Atölyesi" },
   ],
-  editorPickTitle = "Gorme Bicimleri — John Berger",
-  editorPickDescription = "Gorsel kulturun nasil insa edildigini sorgulayan bu kisa ve keskin kitap, sanat tarihine bakisinizi temelden degistirecek. Her Klemens Art katilimcisinin rafinda olmasi gereken bir basyapit.",
+  editorPickTitle = "Görme Biçimleri — John Berger",
+  editorPickDescription = "Görsel kültürün nasıl inşa edildiğini sorgulayan bu kısa ve keskin kitap, sanat tarihine bakışınızı temelden değiştirecek. Her Klemens Art katılımcısının rafında olması gereken bir başyapıt.",
   editorPickImageUrl,
   editorPickUrl = "https://klemensart.com",
 }: Props) {
   return (
-    <KlemensLayout preview={`${monthName} Klemens Art Ajandasi`}>
+    <KlemensLayout preview={`${monthName} Klemens Art Ajandası`}>
       <Section style={content}>
         <Text style={eyebrow}>{monthName} AJANDASI</Text>
         <Text style={h1}>Bu Ay Klemens Art&apos;ta</Text>
@@ -57,13 +57,13 @@ export default function AylikAjanda({
       </Section>
 
       <KlemensButton href="https://klemensart.com/etkinlikler">
-        Tum Etkinlikleri Gorun
+        Tüm Etkinlikleri Görün
       </KlemensButton>
 
       {/* Editor's Pick */}
       <Section style={content}>
         <Hr style={coralDivider} />
-        <Text style={editorLabel}>EDITORUN SECIMI</Text>
+        <Text style={editorLabel}>EDİTÖRÜN SEÇİMİ</Text>
 
         {editorPickImageUrl && (
           <Img

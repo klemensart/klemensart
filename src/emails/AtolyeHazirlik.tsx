@@ -16,37 +16,37 @@ type Props = {
 };
 
 export default function AtolyeHazirlik({
-  workshopTitle = "Modern Sanatin Kirilma Noktalari",
-  instructorName = "Klemens Art Egitmeni",
+  workshopTitle = "Modern Sanatın Kırılma Noktaları",
+  instructorName = "Klemens Art Eğitmeni",
   contactEmail = "info@klemensart.com",
   weeks = [
-    { week: "1. Hafta", title: "Empresyonizmden Soyut'a Gecis", material: "John Berger — Gorme Bicimleri (1-3. bolumler)" },
-    { week: "2. Hafta", title: "Dada, Kaos ve Anlamsizlik", material: "MoMA: Dada belgeseli (YouTube, 45dk)" },
-    { week: "3. Hafta", title: "Soyut Disavurumculuk", material: "Robert Hughes — Yeninin Soku (5. bolum)" },
-    { week: "4. Hafta", title: "Pop Art ve Tuketim Toplumu", material: "Andy Warhol — Felsefesi (secme sayfalar)" },
+    { week: "1. Hafta", title: "Empresyonizmden Soyut'a Geçiş", material: "John Berger — Görme Biçimleri (1-3. bölümler)" },
+    { week: "2. Hafta", title: "Dada, Kaos ve Anlamsızlık", material: "MoMA: Dada belgeseli (YouTube, 45dk)" },
+    { week: "3. Hafta", title: "Soyut Dışavurumculuk", material: "Robert Hughes — Yeninin Şoku (5. bölüm)" },
+    { week: "4. Hafta", title: "Pop Art ve Tüketim Toplumu", material: "Andy Warhol — Felsefesi (seçme sayfalar)" },
   ],
 }: Props) {
   return (
-    <KlemensLayout preview={`${workshopTitle} — Hazirlik Kiti`}>
+    <KlemensLayout preview={`${workshopTitle} — Hazırlık Kiti`}>
       <Section style={content}>
-        <Text style={eyebrow}>ATOLYE HAZIRLIK KITI</Text>
+        <Text style={eyebrow}>ATÖLYE HAZIRLIK KİTİ</Text>
         <Text style={h1}>{workshopTitle}</Text>
 
         <Text style={p}>
-          Hos geldiniz. Bu atolyeden en yuksek verimi almaniz icin
-          asagidaki haftalik programi ve on materyalleri sizin icin
-          hazirladik.
+          Hoş geldiniz. Bu atölyeden en yüksek verimi almanız için
+          aşağıdaki haftalık programı ve ön materyalleri sizin için
+          hazırladık.
         </Text>
 
         <Text style={p}>
-          Her hafta oncesinde ilgili materyali gozden gecirmeniz,
-          tartisman sirasindan cok daha verimli bir deneyim
-          yasamamzi saglayacaktir.
+          Her hafta öncesinde ilgili materyali gözden geçirmeniz,
+          tartışma sırasında çok daha verimli bir deneyim
+          yaşamanızı sağlayacaktır.
         </Text>
 
         <Hr style={thinDivider} />
 
-        <Text style={scheduleTitle}>Haftalik Program</Text>
+        <Text style={scheduleTitle}>Haftalık Program</Text>
 
         {weeks.map((w, i) => (
           <React.Fragment key={i}>
@@ -54,7 +54,7 @@ export default function AtolyeHazirlik({
             <Text style={weekTitle}>{w.title}</Text>
             {w.material && (
               <Text style={weekMaterial}>
-                &#9656;&ensp;On materyal: {w.material}
+                &#9656;&ensp;Ön materyal: {w.material}
               </Text>
             )}
             {i < weeks.length - 1 && <Hr style={lightDivider} />}
@@ -63,11 +63,11 @@ export default function AtolyeHazirlik({
 
         <Hr style={thinDivider} />
 
-        <Text style={contactTitle}>Iletisim</Text>
+        <Text style={contactTitle}>İletişim</Text>
         <Text style={contactText}>
-          Egitmen: {instructorName}
+          Eğitmen: {instructorName}
           <br />
-          Sorulariniz icin: {contactEmail}
+          Sorularınız için: {contactEmail}
         </Text>
       </Section>
     </KlemensLayout>

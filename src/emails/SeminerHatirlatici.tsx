@@ -11,22 +11,22 @@ type Props = {
 };
 
 export default function SeminerHatirlatici({
-  eventTitle = "Caravaggio ve Karanligin Estetiği",
+  eventTitle = "Caravaggio ve Karanlığın Estetiği",
   eventDate = "9 Mart 2026, Pazartesi",
   eventTime = "20:30 (TSI)",
   zoomLink = "https://zoom.us/j/123456789",
   calendarUrl = "https://klemensart.com/takvim",
 }: Props) {
   return (
-    <KlemensLayout preview={`Yarin: ${eventTitle}`}>
+    <KlemensLayout preview={`Yarın: ${eventTitle}`}>
       <Section style={content}>
         <Text style={eyebrow}>HATIRLATMA</Text>
-        <Text style={h1}>Yarin Bulusuyoruz</Text>
+        <Text style={h1}>Yarın Buluşuyoruz</Text>
 
         <Text style={p}>
-          Saatler azaliyor — yarin aksam, birlikte yeni bir dusunce
-          yolculuguna cikiyoruz. Kendinize bir cay demleyin, rahat bir
-          kosede yerinizi alin ve zihninizi acik tutun.
+          Saatler azalıyor — yarın akşam, birlikte yeni bir düşünce
+          yolculuğuna çıkıyoruz. Kendinize bir çay demleyin, rahat bir
+          köşede yerinizi alın ve zihninizi açık tutun.
         </Text>
 
         <Hr style={thinDivider} />
@@ -39,7 +39,7 @@ export default function SeminerHatirlatici({
 
         <Text style={detailLabel}>KATILIM</Text>
         <Text style={detailValue}>
-          Zoom uzerinden canli yayinlanacaktir.
+          Zoom üzerinden canlı yayınlanacaktır.
         </Text>
 
         <Hr style={thinDivider} />
@@ -49,8 +49,8 @@ export default function SeminerHatirlatici({
 
       <Section style={content}>
         <Text style={small}>
-          Zoom baglanti linkiniz etkinlik saatinden 15 dakika once
-          ayri bir e-posta ile iletilecektir.
+          Zoom bağlantı linkiniz etkinlik saatinden 15 dakika önce
+          ayrı bir e-posta ile iletilecektir.
         </Text>
       </Section>
     </KlemensLayout>

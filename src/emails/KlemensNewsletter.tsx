@@ -62,7 +62,7 @@ export default function KlemensNewsletter({
 
           <Section style={footer}>
             <Text style={footerBrand}>Klemens Art</Text>
-            <Text style={footerAddress}>Ankara, Turkiye</Text>
+            <Text style={footerAddress}>Ankara, Türkiye</Text>
 
             <Text style={socialLinks}>
               <Link href="https://instagram.com/klemens.art" style={socialLink}>
@@ -83,10 +83,10 @@ export default function KlemensNewsletter({
             </Text>
 
             <Text style={unsubscribeText}>
-              Bu e-postayı klemensart.com uzerinden abone oldugunuz icin aliyorsunuz.
+              Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
               <br />
               <Link href="https://klemensart.com/abonelik-iptal" style={unsubscribeLink}>
-                Abonelikten cikmak icin tiklayin
+                Abonelikten çıkmak için tıklayın
               </Link>
             </Text>
           </Section>

@@ -9,40 +9,40 @@ type Props = {
 };
 
 export default function EtkinlikTesekkur({
-  eventTitle = "Caravaggio ve Karanligin Estetigi",
+  eventTitle = "Caravaggio ve Karanlığın Estetiği",
   replayUrl = "https://klemensart.com/arsiv",
   bibliography = [
     { title: "Caravaggio: A Life Sacred and Profane", author: "Andrew Graham-Dixon", type: "Kitap" },
     { title: "The Story of Art", author: "E.H. Gombrich", type: "Kitap" },
-    { title: "Caravaggio (2007)", author: "Yon: Angelo Longoni", type: "Film" },
+    { title: "Caravaggio (2007)", author: "Yön: Angelo Longoni", type: "Film" },
   ],
 }: Props) {
   return (
-    <KlemensLayout preview={`${eventTitle} — Kayit ve Bibliyografya`}>
+    <KlemensLayout preview={`${eventTitle} — Kayıt ve Bibliyografya`}>
       <Section style={content}>
-        <Text style={h1}>Tesekkurler</Text>
+        <Text style={h1}>Teşekkürler</Text>
 
         <Text style={p}>
-          Dun aksam birlikte gecirdigimiz zaman icin tesekkur ederiz.
-          &ldquo;{eventTitle}&rdquo; etkinligimiz tamamlandi ve
-          kaydi sizin icin hazirladik.
+          Dün akşam birlikte geçirdiğimiz zaman için teşekkür ederiz.
+          &ldquo;{eventTitle}&rdquo; etkinliğimiz tamamlandı ve
+          kaydı sizin için hazırladık.
         </Text>
 
         <Text style={p}>
-          Etkinlik boyunca paylasilan dusunceler, sorular ve o canli
-          diyaloglar — hepsi arsivimizde yerini aliyor.
+          Etkinlik boyunca paylaşılan düşünceler, sorular ve o canlı
+          diyaloglar — hepsi arşivimizde yerini alıyor.
         </Text>
       </Section>
 
-      <KlemensButton href={replayUrl}>Kaydi Izleyin</KlemensButton>
+      <KlemensButton href={replayUrl}>Kaydı İzleyin</KlemensButton>
 
       {bibliography.length > 0 && (
         <Section style={content}>
           <Hr style={coralDivider} />
 
-          <Text style={bibTitle}>Klemens Art Bibliyografyasi</Text>
+          <Text style={bibTitle}>Klemens Art Bibliyografyası</Text>
           <Text style={bibSubtitle}>
-            Bu etkinlikte gecen ve onerilen kaynaklar:
+            Bu etkinlikte geçen ve önerilen kaynaklar:
           </Text>
 
           {bibliography.map((item, i) => (

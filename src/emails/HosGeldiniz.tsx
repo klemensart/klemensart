@@ -7,41 +7,41 @@ type Props = {
 };
 
 export default function HosGeldiniz({ name }: Props) {
-  const greeting = name ? `${name}, Klemens Art'a Hos Geldiniz` : "Klemens Art'a Hos Geldiniz";
+  const greeting = name ? `${name}, Klemens Art'a Hoş Geldiniz` : "Klemens Art'a Hoş Geldiniz";
 
   return (
-    <KlemensLayout preview="Klemens Art ailesine hosgeldiniz.">
+    <KlemensLayout preview="Klemens Art ailesine hoş geldiniz.">
       <Section style={content}>
         <Text style={h1}>{greeting}</Text>
 
         <Text style={p}>
-          Kulturun ve dusuncenin pesindesiniz — bu bizi cok heyecanlandiriyor.
+          Kültürün ve düşüncenin peşindesiniz — bu bizi çok heyecanlandırıyor.
         </Text>
 
         <Text style={p}>
           Klemens Art, sanat tarihi, sinema, felsefe ve psikoloji gibi alanlarda
-          derinlesmenizi saglayan bir kultur platformu. Burada sizi bekleyen
-          kesfifler:
+          derinleşmenizi sağlayan bir kültür platformu. Burada sizi bekleyen
+          keşifler:
         </Text>
 
         <Text style={listItem}>
-          &#9672;&ensp;Canli Zoom atolyeleri ve seminerler
+          &#9672;&ensp;Canlı Zoom atölyeleri ve seminerler
         </Text>
         <Text style={listItem}>
-          &#9672;&ensp;Kuratoryel icerikler ve tematik okuma listeleri
+          &#9672;&ensp;Küratöryel içerikler ve tematik okuma listeleri
         </Text>
         <Text style={listItem}>
-          &#9672;&ensp;Bagimsiz bir toplulukla fikir alisverisi
+          &#9672;&ensp;Bağımsız bir toplulukla fikir alışverişi
         </Text>
 
         <Text style={p}>
-          Yolculugunuz burada basliyor. Platformu kesfederek
-          size en uygun programi bulun.
+          Yolculuğunuz burada başlıyor. Platformu keşfederek
+          size en uygun programı bulun.
         </Text>
       </Section>
 
       <KlemensButton href="https://klemensart.com">
-        Platformu Kesfedin
+        Platformu Keşfedin
       </KlemensButton>
     </KlemensLayout>
   );
