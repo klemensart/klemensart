@@ -6,7 +6,7 @@ export type Platform = {
 };
 
 export const PLATFORMS: Platform[] = [
-  { id: "instagram-post", label: "Instagram Post", width: 1080, height: 1080 },
+  { id: "instagram-post", label: "Instagram Post (4:3)", width: 1080, height: 1440 },
   { id: "instagram-story", label: "Instagram Story", width: 1080, height: 1920 },
   { id: "x-post", label: "X/Twitter Post", width: 1200, height: 675 },
   { id: "youtube-thumbnail", label: "YouTube Thumbnail", width: 1280, height: 720 },
