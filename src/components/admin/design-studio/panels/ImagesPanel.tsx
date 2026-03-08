@@ -41,29 +41,12 @@ export default function ImagesPanel() {
 
       const { url } = await res.json();
 
-      // Get image dimensions
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await new Promise<void>((resolve) => {
-        img.onload = () => resolve();
-      });
-
-      // Scale down if too large
-      let w = img.width;
-      let h = img.height;
-      const maxDim = 600;
-      if (w > maxDim || h > maxDim) {
-        const ratio = Math.min(maxDim / w, maxDim / h);
-        w = Math.round(w * ratio);
-        h = Math.round(h * ratio);
-      }
-
       addObject({
         type: "image",
-        x: 100,
-        y: 100,
-        width: w,
-        height: h,
+        x: 80,
+        y: 70,
+        width: 920,
+        height: 640,
         src: url,
         opacity: 1,
         rotation: 0,
