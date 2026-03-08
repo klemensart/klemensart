@@ -4,9 +4,10 @@ import { getAllArticlesMetadata } from "@/lib/markdown";
 import IceriklerClient from "@/components/IceriklerClient";
 
 export const metadata: Metadata = {
-  title: "İçerikler — Klemens",
+  title: "İçerikler",
   description:
     "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+  alternates: { canonical: "/icerikler" },
 };
 
 export default async function IceriklerPage() {

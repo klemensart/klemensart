@@ -39,13 +39,37 @@ async function fetchNextSessionDate(workshopId: string): Promise<string | null> 
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const titles: Record<string, string> = {
-    "sanat-tarihinde-duygular": "Sanat Tarihinde Duygular — Klemens Art",
-    "modern-sanat-atolyesi": "Modern Sanatı Okumak — Klemens Art",
-    "ronesans-okuryazarligi": "Rönesans Okur-Yazarlığı — Klemens Art",
-    "kapsamli-sanat-tarihi": "Kapsamlı Sanat Tarihi Atölyesi — Klemens Art",
+  const meta: Record<string, { title: string; description: string }> = {
+    "sanat-tarihinde-duygular": {
+      title: "Sanat Tarihinde Duygular",
+      description: "Korku, haz ve öfkenin sanat tarihindeki izleri — mitolojiden modern tablolara, 3 haftalık canlı Zoom atölyesi.",
+    },
+    "modern-sanat-atolyesi": {
+      title: "Modern Sanatı Okumak",
+      description: "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dilini ve felsefesini öğrenin. Canlı Zoom atölyesi.",
+    },
+    "ronesans-okuryazarligi": {
+      title: "Rönesans Okur-Yazarlığı",
+      description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. Sanatın grameri Rönesans'tır.",
+    },
+    "kapsamli-sanat-tarihi": {
+      title: "Kapsamlı Sanat Tarihi Atölyesi",
+      description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık program.",
+    },
   };
-  return { title: titles[slug] ?? "Atölye — Klemens Art" };
+  const m = meta[slug] ?? { title: "Atölye", description: "" };
+  const cfg = SLUG_TO_ATOLYE[slug];
+
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: `/atolyeler/${slug}` },
+    openGraph: {
+      title: m.title,
+      description: m.description,
+      ...(cfg?.imgCover && { images: [{ url: cfg.imgCover, width: 1200, height: 630 }] }),
+    },
+  };
 }
 
 export default async function AtolyeDetayPage({ params }: Props) {
@@ -58,15 +82,53 @@ export default async function AtolyeDetayPage({ params }: Props) {
     (await fetchNextSessionDate(config.id)) ?? config.targetDate ?? null;
   const status = computeStatus(nextSessionDate);
 
+  const courseTitles: Record<string, string> = {
+    "sanat-tarihinde-duygular": "Sanat Tarihinde Duygular",
+    "modern-sanat-atolyesi": "Modern Sanatı Okumak",
+    "ronesans-okuryazarligi": "Rönesans Okur-Yazarlığı",
+    "kapsamli-sanat-tarihi": "Kapsamlı Sanat Tarihi Atölyesi",
+  };
+
+  const courseDescriptions: Record<string, string> = {
+    "sanat-tarihinde-duygular": "Korku, haz ve öfkenin sanat tarihindeki izleri — 3 haftalık canlı Zoom atölyesi.",
+    "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
+    "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
+    "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze, 10 haftalık kapsamlı sanat tarihi programı.",
+  };
+
+  const courseJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: courseTitles[slug] ?? slug,
+    description: courseDescriptions[slug] ?? "",
+    provider: {
+      "@type": "Organization",
+      name: "Klemens Art",
+      url: "https://klemensart.com",
+    },
+    deliveryMode: "online",
+  };
+
+  let page: React.ReactNode;
   if (slug === "sanat-tarihinde-duygular")
-    return <DuygularPage config={config} status={status} nextSessionDate={nextSessionDate} />;
-  if (slug === "modern-sanat-atolyesi")
-    return <ModernSanatPage config={config} status={status} nextSessionDate={nextSessionDate} />;
-  if (slug === "ronesans-okuryazarligi")
-    return <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} />;
-  if (slug === "kapsamli-sanat-tarihi")
-    return <KapsamliSanatTarihiPage config={config} status={status} />;
-  return <YakindaPage baslik="Bilinmeyen Atölye" />;
+    page = <DuygularPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+  else if (slug === "modern-sanat-atolyesi")
+    page = <ModernSanatPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+  else if (slug === "ronesans-okuryazarligi")
+    page = <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+  else if (slug === "kapsamli-sanat-tarihi")
+    page = <KapsamliSanatTarihiPage config={config} status={status} />;
+  else return <YakindaPage baslik="Bilinmeyen Atölye" />;
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      {page}
+    </>
+  );
 }
 
 /* ─── Ortak bileşenler ──────────────────────────────── */

@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { categories } from "@/lib/icerikler";
+import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 
 const BASE_URL = "https://klemensart.com";
 
@@ -13,8 +15,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/harita`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/hakkimizda`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/club/giris`, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE_URL}/testler/gorsel-algi`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/oyun/sanat-tahmini`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/sergi/yalnizlik`, changeFrequency: "monthly", priority: 0.6 },
   ];
+
+  // Category pages
+  const categoryPages: MetadataRoute.Sitemap = categories.map((c) => ({
+    url: `${BASE_URL}/icerikler/${c.slug}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  // Workshop detail pages
+  const workshopPages: MetadataRoute.Sitemap = Object.keys(SLUG_TO_ATOLYE).map(
+    (slug) => ({
+      url: `${BASE_URL}/atolyeler/${slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })
+  );
 
   // Dynamic article pages from Supabase
   const supabase = createAdminClient();
@@ -31,5 +51,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...articlePages];
+  // Dynamic event detail pages from Supabase
+  const { data: events } = await supabase
+    .from("events")
+    .select("id, event_date")
+    .eq("status", "approved")
+    .order("event_date", { ascending: false });
+
+  const eventPages: MetadataRoute.Sitemap = (events ?? []).map((e) => ({
+    url: `${BASE_URL}/etkinlikler/${e.id}`,
+    lastModified: e.event_date ? new Date(e.event_date) : undefined,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  return [
+    ...staticPages,
+    ...categoryPages,
+    ...workshopPages,
+    ...articlePages,
+    ...eventPages,
+  ];
 }

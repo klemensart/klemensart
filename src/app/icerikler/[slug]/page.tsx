@@ -19,10 +19,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const cat = getCategoryBySlug(slug);
-  if (!cat) return { title: "Bulunamadı — Klemens" };
+  if (!cat) return { title: "Bulunamadı" };
   return {
-    title: `${cat.title} — Klemens`,
+    title: cat.title,
     description: cat.description,
+    alternates: { canonical: `/icerikler/${slug}` },
+    openGraph: {
+      title: cat.title,
+      description: cat.description,
+    },
   };
 }
 

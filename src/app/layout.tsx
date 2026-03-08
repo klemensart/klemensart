@@ -16,9 +16,38 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Klemens — Kültür, Sanat ve Düşünce",
+  metadataBase: new URL("https://klemensart.com"),
+  title: {
+    default: "Klemens — Kültür, Sanat ve Düşünce",
+    template: "%s — Klemens",
+  },
   description:
-    "Sanat tarihi, sinema, psikoloji ve felsefe alanlarında insani ve sıcak bir keşif yolculuğu. Zoom atölyeler, kültür testleri ve tematik içerikler.",
+    "Yeni nesil kültür, sanat ve düşünce ekosistemi. Sanat tarihi atölyeleri, kültür testleri, interaktif harita, dijital sergiler ve derinlemesine içerikler.",
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: "Klemens",
+    images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@KlemensArt",
+  },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Klemens Art",
+  description: "Yeni nesil kültür, sanat ve düşünce ekosistemi.",
+  url: "https://klemensart.com",
+  logo: "https://klemensart.com/logos/logo-wide-dark.PNG",
+  sameAs: [
+    "https://instagram.com/klemens.art",
+    "https://x.com/KlemensArt",
+    "https://www.linkedin.com/company/klemens-art",
+    "https://www.youtube.com/@KlemensArt",
+  ],
 };
 
 export default function RootLayout({
@@ -32,6 +61,10 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-white text-warm-900`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         {children}
       </body>
     </html>
