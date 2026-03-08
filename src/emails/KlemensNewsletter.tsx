@@ -27,10 +27,10 @@ export default function KlemensNewsletter({
   return (
     <Html lang="tr">
       <Head>
-        <Font
-          fontFamily="Georgia"
-          fallbackFontFamily="serif"
-        />
+        <Font fontFamily="Georgia" fallbackFontFamily="serif" />
+        <meta name="color-scheme" content="light only" />
+        <meta name="supported-color-schemes" content="light only" />
+        <style>{darkModeCSS}</style>
       </Head>
       {previewText && <Preview>{previewText}</Preview>}
       <Body style={body}>
@@ -45,7 +45,7 @@ export default function KlemensNewsletter({
             />
           </Section>
 
-          <Hr style={headerLine} />
+          <Hr style={divider} />
 
           {/* Subject */}
           {subject && (
@@ -55,10 +55,15 @@ export default function KlemensNewsletter({
           )}
 
           {/* Dynamic Content */}
-          <div style={contentSection} dangerouslySetInnerHTML={{ __html: htmlContent }} />
+          <Section style={contentSection}>
+            <div
+              className="km-content"
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          </Section>
 
           {/* Footer */}
-          <Hr style={footerLine} />
+          <Hr style={divider} />
 
           <Section style={footer}>
             <Text style={footerBrand}>Klemens Art</Text>
@@ -96,12 +101,35 @@ export default function KlemensNewsletter({
   );
 }
 
+/* ── Dark Mode Override + Image CSS ── */
+const darkModeCSS = `
+  :root { color-scheme: light only; }
+  u + .body { background-color: #f7f5f2 !important; }
+  .km-content img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 16px 0 !important;
+    border-radius: 8px !important;
+  }
+  @media (prefers-color-scheme: dark) {
+    .body { background-color: #f7f5f2 !important; }
+    .km-wrap { background-color: #ffffff !important; }
+    .km-subject { color: #2D2926 !important; }
+    .km-content, .km-content * { color: #3d3833 !important; }
+    .km-content h2, .km-content h3 { color: #2D2926 !important; }
+    .km-content a { color: #FF6D60 !important; }
+    .km-brand { color: #2D2926 !important; }
+    .km-social { color: #FF6D60 !important; }
+  }
+`;
+
 /* ── Styles ── */
 const body: React.CSSProperties = {
   backgroundColor: "#f7f5f2",
   fontFamily: "'Georgia', 'Times New Roman', serif",
   margin: 0,
-  padding: 0,
+  padding: "40px 0",
 };
 
 const container: React.CSSProperties = {
@@ -112,7 +140,7 @@ const container: React.CSSProperties = {
 
 const header: React.CSSProperties = {
   textAlign: "center" as const,
-  padding: "40px 40px 0 40px",
+  padding: "48px 40px 0 40px",
 };
 
 const logoImg: React.CSSProperties = {
@@ -120,10 +148,11 @@ const logoImg: React.CSSProperties = {
   margin: "0 auto",
 };
 
-
-const headerLine: React.CSSProperties = {
+const divider: React.CSSProperties = {
+  border: "none",
   borderTop: "1px solid #e8e4df",
-  margin: "24px 40px",
+  margin: "28px auto",
+  width: "86%",
 };
 
 const subjectSection: React.CSSProperties = {
@@ -146,14 +175,9 @@ const contentSection: React.CSSProperties = {
   color: "#3d3833",
 };
 
-const footerLine: React.CSSProperties = {
-  borderTop: "1px solid #e8e4df",
-  margin: "0 40px",
-};
-
 const footer: React.CSSProperties = {
   textAlign: "center" as const,
-  padding: "24px 40px 32px 40px",
+  padding: "24px 40px 40px 40px",
 };
 
 const footerBrand: React.CSSProperties = {

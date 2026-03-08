@@ -24,6 +24,15 @@ export function KlemensLayout({ preview, children }: Props) {
     <Html lang="tr">
       <Head>
         <meta charSet="utf-8" />
+        <meta name="color-scheme" content="light only" />
+        <meta name="supported-color-schemes" content="light only" />
+        <style>{`
+          :root { color-scheme: light only; }
+          @media (prefers-color-scheme: dark) {
+            .body { background-color: #f5f3f0 !important; }
+            .km-wrap { background-color: #ffffff !important; }
+          }
+        `}</style>
       </Head>
       {preview && <Preview>{preview}</Preview>}
       <Body style={body}>
@@ -131,7 +140,8 @@ const logoImg: React.CSSProperties = {
 const divider: React.CSSProperties = {
   border: "none",
   borderTop: "1px solid #e8e4df",
-  margin: "28px 48px",
+  margin: "28px auto",
+  width: "86%",
 };
 
 const footer: React.CSSProperties = {

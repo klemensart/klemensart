@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TiptapLink from "@tiptap/extension-link";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
+import TiptapImage from "@tiptap/extension-image";
 
 /* ── Template registry (client-side metadata only) ── */
 type FieldDef = {
@@ -436,6 +437,11 @@ export default function BultenGonderPage() {
         openOnClick: false,
         HTMLAttributes: { target: "_blank" },
       }),
+      TiptapImage.configure({
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: { style: "max-width:100%;height:auto;border-radius:8px;margin:12px 0" },
+      }),
       Highlight,
       Placeholder.configure({
         placeholder: "E-bülten içeriğinizi buraya yazın...",
@@ -670,6 +676,12 @@ export default function BultenGonderPage() {
     if (url) editor.chain().focus().setLink({ href: url.trim() }).run();
   };
 
+  const addImage = () => {
+    if (!editor) return;
+    const url = prompt("Görsel URL'si girin:");
+    if (url) editor.chain().focus().setImage({ src: url.trim() }).run();
+  };
+
   return (
     <div className="p-6 sm:p-10 max-w-7xl mx-auto bg-white min-h-screen">
       <style>{EDITOR_CSS}</style>
@@ -774,6 +786,13 @@ export default function BultenGonderPage() {
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                     </svg>
                   </TBtn>
+                  <TBtn title="Görsel Ekle" onClick={addImage}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                  </TBtn>
                 </div>
               )}
               <EditorContent editor={editor} />
@@ -783,14 +802,14 @@ export default function BultenGonderPage() {
           {/* ── Right: Live Preview ── */}
           <div>
             <div className="text-xs text-gray-400 mb-2 font-medium">CANLI ÖNİZLEME</div>
-            <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto">
+            <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto p-6">
               <div style={{ maxWidth: 600, margin: "0 auto", backgroundColor: "#ffffff" }}>
                 {/* Header */}
-                <div style={{ textAlign: "center", padding: "40px 40px 0 40px" }}>
+                <div style={{ textAlign: "center", padding: "48px 40px 0 40px" }}>
                   <div style={{ fontSize: 28, letterSpacing: 6, color: "#2D2926", fontFamily: "Georgia, serif" }}>KLEMENS</div>
                   <div style={{ fontSize: 11, letterSpacing: 3, color: "#8C857E", textTransform: "uppercase", marginTop: 6 }}>art &amp; culture</div>
                 </div>
-                <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "24px 40px" }} />
+                <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "28px auto", width: "86%" }} />
                 {subject && (
                   <div style={{ padding: "0 40px", textAlign: "center", fontFamily: "Georgia, serif" }}>
                     <div style={{ fontSize: 22, fontWeight: 700, color: "#2D2926", lineHeight: "1.4", marginBottom: 24 }}>{subject}</div>
@@ -800,8 +819,8 @@ export default function BultenGonderPage() {
                   style={{ padding: "0 40px 32px 40px", fontSize: 16, lineHeight: "1.7", color: "#3d3833", fontFamily: "Georgia, serif" }}
                   dangerouslySetInnerHTML={{ __html: htmlContent || '<p style="color:#b0a99f">İçerik burada görünecek...</p>' }}
                 />
-                <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "0 40px" }} />
-                <div style={{ textAlign: "center", padding: "24px 40px 32px 40px" }}>
+                <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "28px auto", width: "86%" }} />
+                <div style={{ textAlign: "center", padding: "24px 40px 40px 40px" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: "#2D2926" }}>Klemens Art</div>
                   <div style={{ fontSize: 11, color: "#8C857E", marginTop: 4 }}>Ankara, Türkiye</div>
                   <div style={{ fontSize: 12, marginTop: 16 }}>
