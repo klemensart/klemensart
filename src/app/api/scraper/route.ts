@@ -404,7 +404,7 @@ async function scrapeCankaya(): Promise<ScrapedEvent[]> {
 
         if (icon === "calendar_today") dateStr = value;
         else if (icon === "location_on") venue = value;
-        else if (icon === "stars") priceInfo = value || null;
+        else if (icon === "stars" || icon === "confirmation_number") priceInfo = value || null;
       });
 
       const eventDate = parseTurkishDate(dateStr);
@@ -417,8 +417,15 @@ async function scrapeCankaya(): Promise<ScrapedEvent[]> {
       const source_url = href.startsWith("http") ? href : `https://www.cankaya.bel.tr${href.startsWith("/") ? href : "/" + href}`;
       const imgSrc = $el.find(".event-image img").first().attr("src") ?? null;
 
-      const inferredType = inferEventType(title, "", url);
-      if (!isRelevant({ title, description: "", event_type: inferredType })) return;
+      // Çankaya kültür-sanat sayfası zaten küratörlü — tür tespiti yap ama filtre gevşet
+      let inferredType = inferEventType(title, "", url);
+      // Bilinmeyen türler: mekana göre tahmin et, yoksa "tiyatro" (sayfanın %80+'ı tiyatro)
+      if (inferredType === "etkinlik") {
+        const venueLower = venue.toLowerCase();
+        if (venueLower.includes("salon") || venueLower.includes("sahne")) inferredType = "tiyatro";
+        else if (venueLower.includes("galeri") || venueLower.includes("sergi")) inferredType = "sergi";
+        else inferredType = "tiyatro"; // Çankaya kültür-sanat default
+      }
 
       events.push({
         title,
