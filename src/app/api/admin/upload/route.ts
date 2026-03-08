@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const allowedBuckets = new Set(["article-images", "email-assets"]);
+  const allowedBuckets = new Set(["article-images", "email-assets", "design-assets"]);
   const targetBucket = allowedBuckets.has(bucket) ? bucket : "article-images";
 
   const { error } = await admin.storage

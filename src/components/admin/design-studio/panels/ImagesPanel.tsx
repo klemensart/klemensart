@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useDesignStore } from "../hooks/useDesignStore";
-import { createClient } from "@/lib/supabase";
 
 export default function ImagesPanel() {
   const addObject = useDesignStore((s) => s.addObject);
@@ -18,7 +17,6 @@ export default function ImagesPanel() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       alert("Dosya boyutu 10MB'dan küçük olmalı.");
       return;
@@ -26,21 +24,22 @@ export default function ImagesPanel() {
 
     setUploading(true);
     try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop() || "png";
-      const filename = `design_${Date.now()}.${ext}`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucket", "design-assets");
+      formData.append("slug", "designs");
 
-      const { error } = await supabase.storage
-        .from("design-assets")
-        .upload(filename, file, { cacheControl: "3600", upsert: false });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Upload failed");
+      }
 
-      const { data: urlData } = supabase.storage
-        .from("design-assets")
-        .getPublicUrl(filename);
-
-      const url = urlData.publicUrl;
+      const { url } = await res.json();
 
       // Get image dimensions
       const img = new Image();
@@ -74,7 +73,6 @@ export default function ImagesPanel() {
       alert("Görsel yüklenirken hata oluştu.");
     } finally {
       setUploading(false);
-      // Reset input
       e.target.value = "";
     }
   }
