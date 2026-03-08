@@ -671,13 +671,32 @@ export default function BultenGonderPage() {
   };
 
   return (
-    <div className="p-10 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className="p-6 sm:p-10 max-w-7xl mx-auto bg-white min-h-screen">
       <style>{EDITOR_CSS}</style>
 
+      {/* ── Page Header ── */}
       <h1 className="text-3xl font-serif text-gray-900 mb-1">E-Bülten Gönder</h1>
-      <p className="text-gray-400 text-sm mb-6">
+      <p className="text-gray-400 text-sm mb-8">
         İçerik oluşturun, önizleyin ve abonelerinize gönderin.
       </p>
+
+      {/* ── Stats Overview ── */}
+      {stats && (
+        <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="border border-gray-100 rounded-xl p-4 text-center">
+            <div className="text-2xl font-semibold text-[#2D2926]">{stats.totalActive}</div>
+            <div className="text-xs text-[#8C857E] mt-1">Aktif Abone</div>
+          </div>
+          <div className="border border-gray-100 rounded-xl p-4 text-center">
+            <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
+            <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
+          </div>
+          <div className="border border-gray-100 rounded-xl p-4 text-center">
+            <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
+            <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
+          </div>
+        </div>
+      )}
 
       {/* ── Mode Tabs ── */}
       <div className="flex gap-1 mb-8 bg-gray-100 rounded-xl p-1 w-fit">
@@ -759,142 +778,6 @@ export default function BultenGonderPage() {
               )}
               <EditorContent editor={editor} />
             </div>
-
-            {/* Stats Cards */}
-            {stats && (
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <div className="border border-gray-100 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-semibold text-[#2D2926]">{stats.totalActive}</div>
-                  <div className="text-xs text-[#8C857E] mt-1">Aktif Abone</div>
-                </div>
-                <div className="border border-gray-100 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
-                  <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
-                </div>
-                <div className="border border-gray-100 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
-                  <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
-                </div>
-              </div>
-            )}
-
-            <label className="mt-4 flex items-center gap-2.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={excludeInactive}
-                onChange={(e) => setExcludeInactive(e.target.checked)}
-                className="w-4 h-4 accent-[#FF6D60] rounded"
-              />
-              <span className="text-sm text-gray-600">
-                Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
-                {stats && stats.inactiveLast60Days > 0 && (
-                  <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
-                )}
-              </span>
-            </label>
-
-            {/* Actions */}
-            <div className="mt-4 flex flex-col sm:flex-row gap-3">
-              <div className="flex gap-2 flex-1">
-                <input
-                  type="email"
-                  value={testEmail}
-                  onChange={(e) => setTestEmail(e.target.value)}
-                  placeholder="test@email.com"
-                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60]"
-                />
-                <button
-                  onClick={() => sendNewsletter("test")}
-                  disabled={sending}
-                  className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
-                >
-                  {sending ? "Gönderiyor..." : "Kendime Test Gönder"}
-                </button>
-              </div>
-              <button
-                onClick={handleSendAll}
-                disabled={sending}
-                className="px-6 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50 whitespace-nowrap"
-              >
-                Tüm Abonelere Gönder
-              </button>
-            </div>
-
-            {/* Workshop Targeting */}
-            {workshops.length > 0 && (
-              <div className="mt-4 border border-gray-200 rounded-xl p-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atölye Katılımcılarına Gönder</div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <select
-                    value={selectedWorkshopId}
-                    onChange={(e) => setSelectedWorkshopId(e.target.value)}
-                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
-                  >
-                    <option value="">Atölye seçin...</option>
-                    {workshops.map((w) => (
-                      <option key={w.id} value={w.id}>{w.title}</option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={handleSendWorkshop}
-                    disabled={sending || !selectedWorkshopId || loadingParticipants}
-                    className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Segment Targeting */}
-            {segments.length > 0 && (
-              <div className="mt-4 border border-indigo-200 rounded-xl p-4 bg-indigo-50/30">
-                <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Hedef Kitleye Gönder</div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <select
-                    value={selectedSegmentId}
-                    onChange={(e) => setSelectedSegmentId(e.target.value)}
-                    className="flex-1 border border-indigo-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-indigo-400 bg-white"
-                  >
-                    <option value="">Hedef kitle seçin...</option>
-                    {(() => {
-                      const categories = [...new Set(segments.map((s) => s.category))];
-                      return categories.map((cat) => (
-                        <optgroup key={cat} label={cat}>
-                          {segments.filter((s) => s.category === cat).map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.label} ({s.count} kişi)
-                            </option>
-                          ))}
-                        </optgroup>
-                      ));
-                    })()}
-                  </select>
-                  <button
-                    onClick={handleSendSegment}
-                    disabled={sending || !selectedSegmentId}
-                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
-                  >
-                    Hedef Kitleye Gönder
-                  </button>
-                </div>
-                {selectedSegmentId && (
-                  <p className="mt-2 text-xs text-indigo-600">
-                    {segments.find((s) => s.id === selectedSegmentId)?.description}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {message && (
-              <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
-                message.includes("gönderildi")
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
-              }`}>
-                {message}
-              </div>
-            )}
           </div>
 
           {/* ── Right: Live Preview ── */}
@@ -1064,171 +947,6 @@ export default function BultenGonderPage() {
                       );
                     })}
                   </div>
-
-                  {/* Stats Cards */}
-                  {stats && (
-                    <div className="mt-6 grid grid-cols-3 gap-3">
-                      <div className="border border-gray-100 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-semibold text-[#2D2926]">{stats.totalActive}</div>
-                        <div className="text-xs text-[#8C857E] mt-1">Aktif Abone</div>
-                      </div>
-                      <div className="border border-gray-100 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-semibold text-emerald-600">{stats.openedLast60Days}</div>
-                        <div className="text-xs text-[#8C857E] mt-1">Son 60 Gün Açan</div>
-                      </div>
-                      <div className="border border-gray-100 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-semibold text-amber-500">{stats.inactiveLast60Days}</div>
-                        <div className="text-xs text-[#8C857E] mt-1">60 Gündür Açmayan</div>
-                      </div>
-                    </div>
-                  )}
-
-                  <label className="mt-4 flex items-center gap-2.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={excludeInactive}
-                      onChange={(e) => setExcludeInactive(e.target.checked)}
-                      className="w-4 h-4 accent-[#FF6D60] rounded"
-                    />
-                    <span className="text-sm text-gray-600">
-                      Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
-                      {stats && stats.inactiveLast60Days > 0 && (
-                        <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
-                      )}
-                    </span>
-                  </label>
-
-                  {/* Actions */}
-                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                    <div className="flex gap-2 flex-1">
-                      <input
-                        type="email"
-                        value={testEmail}
-                        onChange={(e) => setTestEmail(e.target.value)}
-                        placeholder="test@email.com"
-                        className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60]"
-                      />
-                      <button
-                        onClick={() => sendNewsletter("test")}
-                        disabled={sending}
-                        className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
-                      >
-                        {sending ? "Gönderiyor..." : "Kendime Test Gönder"}
-                      </button>
-                    </div>
-                    <button
-                      onClick={handleSendAll}
-                      disabled={sending}
-                      className="px-6 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50 whitespace-nowrap"
-                    >
-                      Tüm Abonelere Gönder
-                    </button>
-                  </div>
-
-                  {/* Workshop Targeting */}
-                  {workshops.length > 0 && (
-                    <div className="mt-4 border border-gray-200 rounded-xl p-4">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Atölye Katılımcılarına Gönder</div>
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <select
-                          value={selectedWorkshopId}
-                          onChange={(e) => setSelectedWorkshopId(e.target.value)}
-                          className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
-                        >
-                          <option value="">Atölye seçin...</option>
-                          {workshops.map((w) => (
-                            <option key={w.id} value={w.id}>{w.title}</option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={handleSendWorkshop}
-                          disabled={sending || !selectedWorkshopId || loadingParticipants}
-                          className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Abandoned Checkout — only for YarimKalanKayit template */}
-                  {selectedTemplate?.name === "YarimKalanKayit" && workshops.length > 0 && (
-                    <div className="mt-4 border border-amber-200 rounded-xl p-4 bg-amber-50/50">
-                      <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">Yarım Kalan Kayıtlara Gönder</div>
-                      <p className="text-xs text-amber-600 mb-3">
-                        Ödeme sayfasına girip satın almayı tamamlamayan kullanıcılara hatırlatma gönderir.
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <select
-                          value={selectedWorkshopId}
-                          onChange={(e) => setSelectedWorkshopId(e.target.value)}
-                          className="flex-1 border border-amber-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-amber-400 bg-white"
-                        >
-                          <option value="">Atölye seçin...</option>
-                          {workshops.map((w) => (
-                            <option key={w.id} value={w.id}>{w.title}</option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={handleSendAbandoned}
-                          disabled={sending || !selectedWorkshopId || loadingAbandoned}
-                          className="px-6 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {loadingAbandoned ? "Kontrol ediliyor..." : "Hatırlatma Gönder"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Segment Targeting */}
-                  {segments.length > 0 && (
-                    <div className="mt-4 border border-indigo-200 rounded-xl p-4 bg-indigo-50/30">
-                      <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Hedef Kitleye Gönder</div>
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <select
-                          value={selectedSegmentId}
-                          onChange={(e) => setSelectedSegmentId(e.target.value)}
-                          className="flex-1 border border-indigo-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-indigo-400 bg-white"
-                        >
-                          <option value="">Hedef kitle seçin...</option>
-                          {(() => {
-                            const categories = [...new Set(segments.map((s) => s.category))];
-                            return categories.map((cat) => (
-                              <optgroup key={cat} label={cat}>
-                                {segments.filter((s) => s.category === cat).map((s) => (
-                                  <option key={s.id} value={s.id}>
-                                    {s.label} ({s.count} kişi)
-                                  </option>
-                                ))}
-                              </optgroup>
-                            ));
-                          })()}
-                        </select>
-                        <button
-                          onClick={handleSendSegment}
-                          disabled={sending || !selectedSegmentId}
-                          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
-                        >
-                          Hedef Kitleye Gönder
-                        </button>
-                      </div>
-                      {selectedSegmentId && (
-                        <p className="mt-2 text-xs text-indigo-600">
-                          {segments.find((s) => s.id === selectedSegmentId)?.description}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {message && (
-                    <div className={`mt-4 p-4 rounded-xl text-sm font-medium ${
-                      message.includes("gönderildi")
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
-                    }`}>
-                      {message}
-                    </div>
-                  )}
                 </div>
 
                 {/* ── Right: Template Preview ── */}
@@ -1254,6 +972,170 @@ export default function BultenGonderPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* ══════════════ SEND SECTION ══════════════ */}
+      {(pageMode === "freetext" || selectedTemplate) && (
+        <div className="mt-10 border-t border-gray-100 pt-8">
+          <h2 className="text-lg font-serif text-[#2D2926] mb-6">Gönderim Ayarları</h2>
+
+          <div className="max-w-2xl space-y-4">
+            {/* ── Test Gönderimi ── */}
+            <div className="border border-gray-200 rounded-xl p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Test Gönderimi</div>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="test@email.com"
+                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60]"
+                />
+                <button
+                  onClick={() => sendNewsletter("test")}
+                  disabled={sending}
+                  className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {sending ? "Gönderiyor..." : "Kendime Test Gönder"}
+                </button>
+              </div>
+            </div>
+
+            {/* ── Toplu Gönderim ── */}
+            <div className="border border-gray-200 rounded-xl p-5">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Toplu Gönderim</div>
+
+              <label className="flex items-center gap-2.5 cursor-pointer select-none mb-4">
+                <input
+                  type="checkbox"
+                  checked={excludeInactive}
+                  onChange={(e) => setExcludeInactive(e.target.checked)}
+                  className="w-4 h-4 accent-[#FF6D60] rounded"
+                />
+                <span className="text-sm text-gray-600">
+                  Son 60 günde açmayanlara <span className="font-medium">gönderme</span>
+                  {stats && stats.inactiveLast60Days > 0 && (
+                    <span className="text-xs text-[#8C857E]"> ({stats.inactiveLast60Days} kişi hariç)</span>
+                  )}
+                </span>
+              </label>
+
+              <button
+                onClick={handleSendAll}
+                disabled={sending}
+                className="w-full px-6 py-2.5 bg-[#FF6D60] text-white rounded-xl text-sm font-medium hover:bg-[#e85e52] transition-colors disabled:opacity-50"
+              >
+                Tüm Abonelere Gönder
+              </button>
+            </div>
+
+            {/* ── Atölye Katılımcılarına Gönder ── */}
+            {workshops.length > 0 && (
+              <div className="border border-gray-200 rounded-xl p-5">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Atölye Katılımcılarına Gönder</div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedWorkshopId}
+                    onChange={(e) => setSelectedWorkshopId(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
+                  >
+                    <option value="">Atölye seçin...</option>
+                    {workshops.map((w) => (
+                      <option key={w.id} value={w.id}>{w.title}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSendWorkshop}
+                    disabled={sending || !selectedWorkshopId || loadingParticipants}
+                    className="px-6 py-2.5 bg-[#2D2926] text-white rounded-xl text-sm font-medium hover:bg-[#3d3833] transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {loadingParticipants ? "Kontrol ediliyor..." : "Katılımcılara Gönder"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Yarım Kalan Kayıtlara Gönder (only for YarimKalanKayit template) ── */}
+            {selectedTemplate?.name === "YarimKalanKayit" && workshops.length > 0 && (
+              <div className="border border-amber-200 rounded-xl p-5 bg-amber-50/50">
+                <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">Yarım Kalan Kayıtlara Gönder</div>
+                <p className="text-xs text-amber-600 mb-3">
+                  Ödeme sayfasına girip satın almayı tamamlamayan kullanıcılara hatırlatma gönderir.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedWorkshopId}
+                    onChange={(e) => setSelectedWorkshopId(e.target.value)}
+                    className="flex-1 border border-amber-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-amber-400 bg-white"
+                  >
+                    <option value="">Atölye seçin...</option>
+                    {workshops.map((w) => (
+                      <option key={w.id} value={w.id}>{w.title}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSendAbandoned}
+                    disabled={sending || !selectedWorkshopId || loadingAbandoned}
+                    className="px-6 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {loadingAbandoned ? "Kontrol ediliyor..." : "Hatırlatma Gönder"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Hedef Kitleye Gönder ── */}
+            {segments.length > 0 && (
+              <div className="border border-indigo-200 rounded-xl p-5 bg-indigo-50/30">
+                <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-3">Hedef Kitleye Gönder</div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    value={selectedSegmentId}
+                    onChange={(e) => setSelectedSegmentId(e.target.value)}
+                    className="flex-1 border border-indigo-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-indigo-400 bg-white"
+                  >
+                    <option value="">Hedef kitle seçin...</option>
+                    {(() => {
+                      const categories = [...new Set(segments.map((s) => s.category))];
+                      return categories.map((cat) => (
+                        <optgroup key={cat} label={cat}>
+                          {segments.filter((s) => s.category === cat).map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.label} ({s.count} kişi)
+                            </option>
+                          ))}
+                        </optgroup>
+                      ));
+                    })()}
+                  </select>
+                  <button
+                    onClick={handleSendSegment}
+                    disabled={sending || !selectedSegmentId}
+                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  >
+                    Hedef Kitleye Gönder
+                  </button>
+                </div>
+                {selectedSegmentId && (
+                  <p className="mt-2 text-xs text-indigo-600">
+                    {segments.find((s) => s.id === selectedSegmentId)?.description}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* ── Message ── */}
+            {message && (
+              <div className={`p-4 rounded-xl text-sm font-medium ${
+                message.includes("gönderildi")
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}>
+                {message}
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* ── Campaign History ── */}
