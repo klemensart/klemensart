@@ -41,6 +41,7 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Klemens Art'tan Yeni Duyuru",
     fields: [
       { key: "headline", label: "Başlık", type: "text" },
+      { key: "imageUrl", label: "Görsel URL", type: "url" },
       { key: "body1", label: "Birinci Paragraf", type: "textarea" },
       { key: "body2", label: "İkinci Paragraf", type: "textarea" },
       { key: "buttonText", label: "Buton Metni", type: "text" },
@@ -48,6 +49,7 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     defaults: {
       headline: "Yeni Bir Keşif Sizi Bekliyor",
+      imageUrl: "",
       body1: "Klemens Art olarak bu sezon, kültür ve düşünce dünyasını yeniden şekillendiren bir program hazırladık.",
       body2: "Detayları keşfetmek ve yerinizi ayırtmak için aşağıdaki butona tıklayın.",
       buttonText: "Detayları Keşfedin",
@@ -62,6 +64,7 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Hatırlatma: Yarın Buluşuyoruz",
     fields: [
       { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
+      { key: "imageUrl", label: "Görsel URL", type: "url" },
       { key: "eventDate", label: "Tarih", type: "text" },
       { key: "eventTime", label: "Saat", type: "text" },
       { key: "zoomLink", label: "Zoom Linki", type: "url" },
@@ -69,6 +72,7 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     defaults: {
       eventTitle: "Caravaggio ve Karanlığın Estetiği",
+      imageUrl: "",
       eventDate: "9 Mart 2026, Pazartesi",
       eventTime: "20:30 (TSİ)",
       zoomLink: "https://zoom.us/j/123456789",
@@ -83,6 +87,7 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Teşekkürler — Kayıt ve Bibliyografya",
     fields: [
       { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
+      { key: "imageUrl", label: "Görsel URL", type: "url" },
       { key: "replayUrl", label: "Kayıt URL", type: "url" },
       {
         key: "bibliography",
@@ -97,6 +102,7 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     defaults: {
       eventTitle: "Caravaggio ve Karanlığın Estetiği",
+      imageUrl: "",
       replayUrl: "https://klemensart.com/arsiv",
       bibliography: [
         { title: "Caravaggio: A Life Sacred and Profane", author: "Andrew Graham-Dixon", type: "Kitap" },
@@ -111,6 +117,7 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Atölye Hazırlık Kiti",
     fields: [
       { key: "workshopTitle", label: "Atölye Adı", type: "text" },
+      { key: "imageUrl", label: "Görsel URL", type: "url" },
       { key: "instructorName", label: "Eğitmen Adı", type: "text" },
       { key: "contactEmail", label: "İletişim E-posta", type: "email" },
       {
@@ -126,6 +133,7 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     defaults: {
       workshopTitle: "Modern Sanatın Kırılma Noktaları",
+      imageUrl: "",
       instructorName: "Klemens Art Eğitmeni",
       contactEmail: "info@klemensart.com",
       weeks: [
@@ -177,11 +185,13 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Kaydınızı Tamamlayın",
     fields: [
       { key: "eventTitle", label: "Etkinlik Adı", type: "text" },
+      { key: "imageUrl", label: "Görsel URL", type: "url" },
       { key: "registerUrl", label: "Kayıt URL", type: "url" },
       { key: "contactEmail", label: "İletişim E-posta", type: "email" },
     ],
     defaults: {
       eventTitle: "Modern Sanatın Kırılma Noktaları",
+      imageUrl: "",
       registerUrl: "https://klemensart.com/kayit",
       contactEmail: "info@klemensart.com",
     },

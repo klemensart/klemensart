@@ -1,9 +1,10 @@
-import { Section, Text } from "@react-email/components";
+import { Section, Text, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
 type Props = {
   headline?: string;
+  imageUrl?: string;
   body1?: string;
   body2?: string;
   buttonText?: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function DuyuruBulteni({
   headline = "Yeni Bir Keşif Sizi Bekliyor",
+  imageUrl,
   body1 = "Klemens Art olarak bu sezon, kültür ve düşünce dünyasını yeniden şekillendiren bir program hazırladık. Sanat tarihinden felsefeye, sinemadan psikolojiye uzanan bu yolculukta sizinle birlikte olmak istiyoruz.",
   body2 = "Detayları keşfetmek ve yerinizi ayırtmak için aşağıdaki butona tıklayın.",
   buttonText = "Detayları Keşfedin",
@@ -21,6 +23,7 @@ export default function DuyuruBulteni({
     <KlemensLayout preview={headline}>
       <Section style={content}>
         <Text style={h1}>{headline}</Text>
+        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
         <Text style={p}>{body1}</Text>
         {body2 && <Text style={p}>{body2}</Text>}
       </Section>
@@ -42,6 +45,12 @@ const h1: React.CSSProperties = {
   lineHeight: "1.3",
   margin: "0 0 24px 0",
   textAlign: "center" as const,
+};
+
+const heroImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 0 24px 0",
+  borderRadius: "8px",
 };
 
 const p: React.CSSProperties = {

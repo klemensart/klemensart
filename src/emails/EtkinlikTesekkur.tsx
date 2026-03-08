@@ -1,15 +1,17 @@
-import { Section, Text, Hr } from "@react-email/components";
+import { Section, Text, Hr, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
 type Props = {
   eventTitle?: string;
+  imageUrl?: string;
   replayUrl?: string;
   bibliography?: Array<{ title: string; author?: string; type?: string }>;
 };
 
 export default function EtkinlikTesekkur({
   eventTitle = "Caravaggio ve Karanlığın Estetiği",
+  imageUrl,
   replayUrl = "https://klemensart.com/arsiv",
   bibliography = [
     { title: "Caravaggio: A Life Sacred and Profane", author: "Andrew Graham-Dixon", type: "Kitap" },
@@ -21,6 +23,7 @@ export default function EtkinlikTesekkur({
     <KlemensLayout preview={`${eventTitle} — Kayıt ve Bibliyografya`}>
       <Section style={content}>
         <Text style={h1}>Teşekkürler</Text>
+        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
 
         <Text style={p}>
           Dün akşam birlikte geçirdiğimiz zaman için teşekkür ederiz.
@@ -75,6 +78,12 @@ const h1: React.CSSProperties = {
   lineHeight: "1.3",
   margin: "0 0 24px 0",
   textAlign: "center" as const,
+};
+
+const heroImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 0 24px 0",
+  borderRadius: "8px",
 };
 
 const p: React.CSSProperties = {

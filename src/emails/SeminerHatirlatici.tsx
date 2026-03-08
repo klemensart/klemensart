@@ -1,9 +1,10 @@
-import { Section, Text, Hr } from "@react-email/components";
+import { Section, Text, Hr, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
 type Props = {
   eventTitle?: string;
+  imageUrl?: string;
   eventDate?: string;
   eventTime?: string;
   zoomLink?: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function SeminerHatirlatici({
   eventTitle = "Caravaggio ve Karanlığın Estetiği",
+  imageUrl,
   eventDate = "9 Mart 2026, Pazartesi",
   eventTime = "20:30 (TSI)",
   zoomLink = "https://zoom.us/j/123456789",
@@ -22,6 +24,7 @@ export default function SeminerHatirlatici({
       <Section style={content}>
         <Text style={eyebrow}>HATIRLATMA</Text>
         <Text style={h1}>Yarın Buluşuyoruz</Text>
+        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
 
         <Text style={p}>
           Saatler azalıyor — yarın akşam, birlikte yeni bir düşünce
@@ -77,6 +80,12 @@ const h1: React.CSSProperties = {
   lineHeight: "1.3",
   margin: "0 0 24px 0",
   textAlign: "center" as const,
+};
+
+const heroImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 0 24px 0",
+  borderRadius: "8px",
 };
 
 const p: React.CSSProperties = {

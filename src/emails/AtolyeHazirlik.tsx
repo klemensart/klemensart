@@ -1,4 +1,4 @@
-import { Section, Text, Hr } from "@react-email/components";
+import { Section, Text, Hr, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout } from "./components/KlemensLayout";
 
@@ -10,6 +10,7 @@ type WeekItem = {
 
 type Props = {
   workshopTitle?: string;
+  imageUrl?: string;
   instructorName?: string;
   contactEmail?: string;
   weeks?: WeekItem[];
@@ -17,6 +18,7 @@ type Props = {
 
 export default function AtolyeHazirlik({
   workshopTitle = "Modern Sanatın Kırılma Noktaları",
+  imageUrl,
   instructorName = "Klemens Art Eğitmeni",
   contactEmail = "info@klemensart.com",
   weeks = [
@@ -31,6 +33,7 @@ export default function AtolyeHazirlik({
       <Section style={content}>
         <Text style={eyebrow}>ATÖLYE HAZIRLIK KİTİ</Text>
         <Text style={h1}>{workshopTitle}</Text>
+        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
 
         <Text style={p}>
           Hoş geldiniz. Bu atölyeden en yüksek verimi almanız için
@@ -94,6 +97,12 @@ const h1: React.CSSProperties = {
   lineHeight: "1.35",
   margin: "0 0 24px 0",
   textAlign: "center" as const,
+};
+
+const heroImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 0 24px 0",
+  borderRadius: "8px",
 };
 
 const p: React.CSSProperties = {

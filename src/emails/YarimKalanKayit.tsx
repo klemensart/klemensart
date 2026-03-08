@@ -1,15 +1,17 @@
-import { Section, Text } from "@react-email/components";
+import { Section, Text, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
 type Props = {
   eventTitle?: string;
+  imageUrl?: string;
   registerUrl?: string;
   contactEmail?: string;
 };
 
 export default function YarimKalanKayit({
   eventTitle = "Modern Sanatın Kırılma Noktaları",
+  imageUrl,
   registerUrl = "https://klemensart.com/kayit",
   contactEmail = "info@klemensart.com",
 }: Props) {
@@ -17,6 +19,7 @@ export default function YarimKalanKayit({
     <KlemensLayout preview="Kayıt süreci tamamlanmadı">
       <Section style={content}>
         <Text style={h1}>Kayıt Süreciniz</Text>
+        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
 
         <Text style={p}>
           &ldquo;{eventTitle}&rdquo; için başlattığınız kayıt
@@ -53,6 +56,12 @@ const h1: React.CSSProperties = {
   lineHeight: "1.35",
   margin: "0 0 24px 0",
   textAlign: "center" as const,
+};
+
+const heroImg: React.CSSProperties = {
+  display: "block",
+  margin: "0 0 24px 0",
+  borderRadius: "8px",
 };
 
 const p: React.CSSProperties = {
