@@ -133,69 +133,64 @@ async function scrapeCerModern(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 2: Ankara Büyükşehir Belediyesi ───────────────────────────────────
-// ABB etkinlik sayfası — sunucu taraflı HTML.
+// ABB etkinlik sayfası — a.event-list-item kartları
 async function scrapeAnkaraBB(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
+  const url = "https://www.ankara.bel.tr/etkinlikler";
 
-  const urls = [
-    "https://www.ankara.bel.tr/etkinlikler",
-    "https://www.ankara.bel.tr/haberler?category=etkinlik",
-  ];
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return events;
 
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
-        signal: AbortSignal.timeout(12000),
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    $("a.event-list-item").each((_, el) => {
+      const $a = $(el);
+
+      const title = ($a.attr("title") ?? $a.find(".info strong").first().text()).trim();
+      if (!title) return;
+
+      const href = $a.attr("href") ?? "";
+      const imgSrc = $a.find(".image img").first().attr("src") ?? null;
+      const category = $a.find("span.category").first().text().trim();
+
+      // Tarih: .info içindeki ikinci div > span (takvim ikonlu)
+      const dateStr = $a.find(".info div").eq(1).find("span").first().text().trim();
+      const eventDate = parseTurkishDate(dateStr);
+      if (!eventDate || !isFutureDate(eventDate)) return;
+
+      // Mekan: .info içindeki üçüncü div > span (konum ikonlu)
+      const venue = $a.find(".info div").eq(2).find("span").first().text().trim();
+
+      const source_url = href.startsWith("http")
+        ? href
+        : `https://www.ankara.bel.tr${href.startsWith("/") ? href : "/" + href}`;
+
+      const inferredType = category
+        ? inferEventType(category, title, url)
+        : inferEventType(title, "", url);
+      if (!isRelevant({ title, description: "", event_type: inferredType })) return;
+
+      events.push({
+        title,
+        description: "",
+        event_type: inferredType,
+        venue: venue || "Ankara Büyükşehir",
+        address: "Ankara",
+        event_date: eventDate,
+        end_date: null,
+        source_url,
+        source_name: "Ankara BB",
+        image_url: imgSrc,
+        price_info: "Ücretsiz",
       });
-      if (!res.ok) continue;
-
-      const html = await res.text();
-      const $ = cheerio.load(html);
-
-      // ABB'nin olası kart/liste yapısı
-      $("article, .event-item, .etkinlik, .news-item, .haber-item, li.event").each((_, el) => {
-        const $el = $(el);
-
-        const title = $el.find("h2, h3, h4, .title, .baslik").first().text().trim();
-        if (!title) return;
-
-        const desc   = $el.find("p, .description, .ozet").first().text().trim();
-        const dateRaw = $el.find("time, .date, .tarih, [datetime], span.date").first();
-        const dateStr = dateRaw.attr("datetime") ?? dateRaw.text().trim();
-        const href    = $el.find("a").first().attr("href") ?? "";
-        const imgSrc  = $el.find("img").first().attr("src") ?? null;
-
-        const eventDate = parseTurkishDate(dateStr);
-        if (!eventDate) return;
-
-        // Sadece ileriki tarihli etkinlikler
-        if (new Date(eventDate) < new Date()) return;
-
-        const source_url = href.startsWith("http")
-          ? href
-          : `https://www.ankara.bel.tr${href.startsWith("/") ? href : "/" + href}`;
-
-        const inferredType = inferEventType(title, desc, url);
-        if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
-
-        events.push({
-          title,
-          description: desc.slice(0, 400),
-          event_type: inferredType,
-          venue: "Ankara Büyükşehir",
-          address: "Ankara",
-          event_date: eventDate,
-          end_date: null,
-          source_url,
-          source_name: "Ankara BB",
-          image_url: imgSrc ? (imgSrc.startsWith("http") ? imgSrc : `https://www.ankara.bel.tr${imgSrc}`) : null,
-          price_info: "Ücretsiz",
-        });
-      });
-    } catch (err) {
-      console.error(`[AnkaraBB] ${url} hatası:`, err);
-    }
+    });
+  } catch (err) {
+    console.error(`[AnkaraBB] hatası:`, err);
   }
 
   return events;
@@ -596,7 +591,7 @@ async function scrapeCSOAda(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 7: Lavarla ────────────────────────────────────────────────────────
-// lavarla.com — WordPress/Elementor kültür-sanat blog, etkinlik kategorisi
+// lavarla.com — WordPress/Elementor Loop Grid + Post widget
 async function scrapeLavarla(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://lavarla.com/kategori/pusula/etkinlik/";
@@ -611,6 +606,48 @@ async function scrapeLavarla(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
+    // Yol 1: Elementor Loop Grid — category-etkinlik kartları
+    $("div.e-loop-item").each((_, el) => {
+      const $el = $(el);
+
+      const title = $el.find(".elementor-heading-title").first().text().trim();
+      if (!title) return;
+
+      // Link: data-premium-element-link JSON attribute
+      const linkData = $el.attr("data-premium-element-link");
+      let href = "";
+      if (linkData) {
+        try { href = JSON.parse(linkData).href ?? ""; } catch { /* */ }
+      }
+      if (!href) href = $el.find("a").first().attr("href") ?? "";
+
+      const dateStr = $el.find(".elementor-post-info__item--type-date time").first().text().trim();
+      const imgSrc = $el.find("img").first().attr("src") ?? null;
+
+      const eventDate = parseTurkishDate(dateStr);
+      if (!eventDate || !isFutureDate(eventDate)) return;
+
+      const source_url = href.startsWith("http") ? href : `https://lavarla.com${href}`;
+
+      const inferredType = inferEventType(title, "", url);
+      if (!isRelevant({ title, description: "", event_type: inferredType })) return;
+
+      events.push({
+        title,
+        description: "",
+        event_type: inferredType,
+        venue: "",
+        address: "Ankara",
+        event_date: eventDate,
+        end_date: null,
+        source_url,
+        source_name: "Lavarla",
+        image_url: imgSrc,
+        price_info: null,
+      });
+    });
+
+    // Yol 2: Elementor Post widget (üst grid)
     $("article.elementor-post").each((_, el) => {
       const $el = $(el);
 
@@ -619,15 +656,13 @@ async function scrapeLavarla(): Promise<ScrapedEvent[]> {
       if (!title) return;
 
       const href = $titleLink.attr("href") ?? "";
-      const dateStr = $el.find(".elementor-post-date").first().text().trim();
+      const dateStr = $el.find("span.elementor-post-date").first().text().trim();
       const imgSrc = $el.find(".elementor-post__thumbnail img").first().attr("src") ?? null;
 
       const eventDate = parseTurkishDate(dateStr);
-      if (!eventDate) return;
-      if (new Date(eventDate) < new Date()) return;
+      if (!eventDate || !isFutureDate(eventDate)) return;
 
       const source_url = href.startsWith("http") ? href : `https://lavarla.com${href}`;
-
       const inferredType = inferEventType(title, "", url);
       if (!isRelevant({ title, description: "", event_type: inferredType })) return;
 
@@ -793,7 +828,7 @@ async function scrapeBiletinial(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 9: Ankara Masası ──────────────────────────────────────────────────
-// ankaramasasi.com.tr — Kültür-sanat haberleri, Bootstrap + Swiper yapısı
+// ankaramasasi.com.tr — Bootstrap layout, lazy-loaded images
 async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://www.ankaramasasi.com.tr/haberler/kultur-sanat";
@@ -808,32 +843,32 @@ async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Haber kartları — farklı layout'larda olabilir
     const seen = new Set<string>();
 
-    $("a.desktop-link, a[href*='/haber/']").each((_, el) => {
+    // Ana haber kutusu + liste haberleri
+    $("a.desktop-link").each((_, el) => {
       const $link = $(el);
       const href = $link.attr("href") ?? "";
       if (!href.includes("/haber/")) return;
       if (seen.has(href)) return;
       seen.add(href);
 
-      // Başlık: span.slider-title veya img alt
-      const title = $link.find(".slider-title").first().text().trim()
-        || $link.find("img").first().attr("alt")?.trim() || "";
+      // Başlık: üst blokta h2, listede h2.category-title, veya img alt
+      const $parent = $link.closest(".main-box, .row, .col-md-12, div");
+      const title = $parent.find("h2").first().text().trim()
+        || $link.find("img").attr("alt")?.trim() || "";
       if (!title || title.length < 10) return;
 
-      // Tarih: time, .date, [datetime]
-      const $parent = $link.closest("article, .swiper-slide, .col-md-3, .card, div");
-      const dateStr = $parent.find("time, .date, .tarih, [datetime]").first().text().trim()
-        || $parent.find("time, [datetime]").first().attr("datetime") || "";
+      // Resim: data-src (lazy load) veya src
+      const $img = $parent.find("img").first();
+      const imgSrc = $img.attr("data-src") ?? $img.attr("src") ?? null;
+      // Placeholder'ı atla
+      const image_url = imgSrc && !imgSrc.includes("lazy.webp") ? imgSrc : null;
 
-      const eventDate = parseTurkishDate(dateStr);
-      if (!eventDate) return;
-      if (new Date(eventDate) < new Date()) return;
-
-      const imgSrc = $link.find("img").first().attr("src") ?? null;
       const source_url = href.startsWith("http") ? href : `https://www.ankaramasasi.com.tr${href}`;
+
+      // Ankara Masası haber sitesi — tarih genellikle yok, bugünün tarihini ata
+      const eventDate = new Date().toISOString();
 
       const inferredType = inferEventType(title, "", url);
       if (!isRelevant({ title, description: "", event_type: inferredType })) return;
@@ -848,7 +883,7 @@ async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
         end_date: null,
         source_url,
         source_name: "Ankara Masası",
-        image_url: imgSrc,
+        image_url: image_url,
         price_info: null,
       });
     });
@@ -1266,14 +1301,14 @@ function parseTurkishDate(raw: string): string | null {
   // ISO format — direkt kullan
   if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
     const d = new Date(raw);
-    if (isNaN(d.getTime()) || d.getFullYear() <= 2025) return null;
+    if (isNaN(d.getTime()) || d.getFullYear() < 2024) return null;
     return d.toISOString();
   }
 
   // DD.MM.YYYY veya DD/MM/YYYY
   const dmy = raw.match(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/);
   if (dmy) {
-    if (+dmy[3] <= 2025) return null;
+    if (+dmy[3] < 2024) return null;
     const d = new Date(+dmy[3], +dmy[2] - 1, +dmy[1]);
     if (isNaN(d.getTime())) return null;
     return d.toISOString();
@@ -1289,8 +1324,8 @@ function parseTurkishDate(raw: string): string | null {
     const hasExplicitYear = !!trDate[3];
     let year = hasExplicitYear ? +trDate[3] : now.getFullYear();
 
-    // Explicit year 2025 veya öncesi → kesinlikle atla
-    if (hasExplicitYear && year <= 2025) return null;
+    // Explicit year 2024 öncesi → kesinlikle atla
+    if (hasExplicitYear && year < 2024) return null;
 
     const d = new Date(year, month, day, 20, 0);
     if (isNaN(d.getTime())) return null;
@@ -1351,7 +1386,7 @@ function normalizeTitle(title: string): string {
 function isFutureDate(isoDate: string): boolean {
   const d = new Date(isoDate);
   if (isNaN(d.getTime())) return false;
-  if (d.getFullYear() <= 2025) return false;
+  if (d.getFullYear() < 2025) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return d >= today;
@@ -1514,7 +1549,11 @@ export async function GET(req: NextRequest) {
         event.title = toTitleCaseTR(event.title);
 
         // Geçmiş tarih kontrolü (merkezi filtre — tüm scraperlar için)
-        if (!isFutureDate(event.event_date)) {
+        // Sergiler: end_date varsa ona bak, yoksa event_date
+        const checkDate = event.event_type === "sergi" && event.end_date
+          ? event.end_date
+          : event.event_date;
+        if (!isFutureDate(checkDate)) {
           stat.pastSkipped++;
           continue;
         }
@@ -1646,20 +1685,49 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 4. Geçmiş tarihli etkinlikleri sil (bugünden öncekiler)
+  // 4. Geçmiş tarihli etkinlikleri sil
+  //    - Sergiler: end_date geçmişse sil (end_date yoksa event_date'e bak)
+  //    - Diğerleri: event_date geçmişse sil
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayISO = today.toISOString();
 
-  const { data: pastEvents } = await admin
+  const alreadyDeleted = new Set(toDelete);
+
+  // 4a. Sergi olmayanlar — event_date geçmişse sil
+  const { data: pastNonExhibitions } = await admin
     .from("events")
     .select("id")
     .lt("event_date", todayISO)
-    .not("id", "in", `(${toDelete.join(",")})`); // zaten silinenleri tekrar sayma
+    .neq("event_type", "sergi");
+
+  // 4b. Sergiler — end_date geçmişse sil (end_date null ise event_date'e bak)
+  const { data: allExhibitions } = await admin
+    .from("events")
+    .select("id, event_date, end_date")
+    .eq("event_type", "sergi");
+
+  const pastIds: string[] = [];
+
+  if (pastNonExhibitions) {
+    for (const e of pastNonExhibitions) {
+      if (!alreadyDeleted.has(e.id)) pastIds.push(e.id);
+    }
+  }
+
+  if (allExhibitions) {
+    for (const e of allExhibitions) {
+      if (alreadyDeleted.has(e.id)) continue;
+      // Sergi: end_date varsa ona bak, yoksa event_date'e bak
+      const checkDate = e.end_date || e.event_date;
+      if (checkDate && new Date(checkDate) < today) {
+        pastIds.push(e.id);
+      }
+    }
+  }
 
   let pastRemoved = 0;
-  if (pastEvents && pastEvents.length > 0) {
-    const pastIds = pastEvents.map(e => e.id);
+  if (pastIds.length > 0) {
     for (let i = 0; i < pastIds.length; i += 100) {
       const batch = pastIds.slice(i, i + 100);
       await admin.from("events").delete().in("id", batch);
