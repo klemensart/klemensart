@@ -62,8 +62,8 @@ export default function Navbar() {
             <Image
               src="/logos/logo-wide-dark.PNG"
               alt="Klemens"
-              width={160}
-              height={48}
+              width={120}
+              height={36}
               priority
               onError={() => setLogoError(true)}
             />
