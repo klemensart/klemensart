@@ -6,13 +6,29 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
     (format: "png" | "jpeg" = "png", quality = 1) => {
       const stage = stageRef.current;
       if (!stage) return null;
-      // pixelRatio compensates for display scaling so export is full resolution
-      const currentScale = stage.scaleX() || 1;
+
+      // Geçici olarak scale'i 1'e çek — tam çözünürlükte export için
+      const prevScaleX = stage.scaleX();
+      const prevScaleY = stage.scaleY();
+      const prevWidth = stage.width();
+      const prevHeight = stage.height();
+
+      stage.scaleX(1);
+      stage.scaleY(1);
+      stage.width(prevWidth);
+      stage.height(prevHeight);
+
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
-        pixelRatio: 1 / currentScale,
+        pixelRatio: 1,
       });
+
+      // Scale'i geri al
+      stage.scaleX(prevScaleX);
+      stage.scaleY(prevScaleY);
+      stage.batchDraw();
+
       return uri;
     },
     [stageRef]
@@ -36,15 +52,26 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
     (maxSize = 400) => {
       const stage = stageRef.current;
       if (!stage) return null;
-      const currentScale = stage.scaleX() || 1;
-      const realWidth = stage.width() / currentScale;
-      const realHeight = stage.height() / currentScale;
-      const thumbScale = Math.min(maxSize / realWidth, maxSize / realHeight);
-      return stage.toDataURL({
+
+      const prevScaleX = stage.scaleX();
+      const prevScaleY = stage.scaleY();
+
+      stage.scaleX(1);
+      stage.scaleY(1);
+
+      const thumbScale = Math.min(maxSize / stage.width(), maxSize / stage.height());
+
+      const uri = stage.toDataURL({
         mimeType: "image/jpeg",
         quality: 0.7,
-        pixelRatio: thumbScale / currentScale,
+        pixelRatio: thumbScale,
       });
+
+      stage.scaleX(prevScaleX);
+      stage.scaleY(prevScaleY);
+      stage.batchDraw();
+
+      return uri;
     },
     [stageRef]
   );
