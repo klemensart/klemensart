@@ -292,7 +292,7 @@ html {
 /* Image captions: paragraph right after an image, or text after img in same p */
 .prose-klemens img + p,
 .prose-klemens p:has(> img) {
-  text-align: center;
+  text-align: left;
   font-size: 0.8rem;
   font-style: italic;
   font-weight: 400;
