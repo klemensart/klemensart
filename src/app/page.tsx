@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Hizmetler from "@/components/Hizmetler";
-import DunyamiziBolum from "@/components/DunyamiziBolum";
 import IceriklerSection from "@/components/IceriklerSection";
-import HaritaBanner from "@/components/HaritaBanner";
 import Manifesto from "@/components/Manifesto";
 import Etkinlikler from "@/components/Etkinlikler";
-import Bulten from "@/components/Bulten";
 import Footer from "@/components/Footer";
+
+const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
+const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
+const Bulten = dynamic(() => import("@/components/Bulten"));
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },

@@ -19,9 +19,11 @@ function hexToRgb(hex: string) {
 
 export default function HaritaBanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const rafRef = useRef<number>(0);
   const frameRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
+  const visibleRef = useRef(false);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -106,12 +108,15 @@ export default function HaritaBanner() {
       ctx.fillText(pin.label, px + r + 6, py + labelFs * 0.35);
     }
 
-    rafRef.current = requestAnimationFrame(draw);
+    if (visibleRef.current) {
+      rafRef.current = requestAnimationFrame(draw);
+    }
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const section = sectionRef.current;
+    if (!canvas || !section) return;
 
     const resize = () => {
       const rect = canvas.parentElement!.getBoundingClientRect();
@@ -129,16 +134,29 @@ export default function HaritaBanner() {
 
     resize();
     window.addEventListener("resize", resize);
-    rafRef.current = requestAnimationFrame(draw);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          rafRef.current = requestAnimationFrame(draw);
+        } else {
+          cancelAnimationFrame(rafRef.current);
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(section);
 
     return () => {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(rafRef.current);
+      observer.disconnect();
     };
   }, [draw]);
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#141414" }}>
+    <section ref={sectionRef} className="relative overflow-hidden" style={{ background: "#141414" }}>
       <div className="max-w-6xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
         {/* Text */}
         <div>

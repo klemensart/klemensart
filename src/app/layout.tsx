@@ -7,14 +7,16 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin", "latin-ext"],
   variable: "--font-jakarta",
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin", "latin-ext"],
   variable: "--font-playfair",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
+  style: ["italic"],
+  weight: ["400"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -61,6 +63,7 @@ export default function RootLayout({
     <html lang="tr">
       <head>
         <meta charSet="utf-8" />
+        <link rel="preconnect" href="https://sgabkrzzzszfqrtgkord.supabase.co" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-white text-warm-900`}>
         <script

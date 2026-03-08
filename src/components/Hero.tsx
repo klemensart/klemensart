@@ -1,4 +1,6 @@
-import SynapseNetwork from "@/components/SynapseNetwork";
+import dynamic from "next/dynamic";
+
+const SynapseNetwork = dynamic(() => import("@/components/SynapseNetwork"));
 
 export default function Hero() {
   return (

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -58,11 +59,12 @@ export default function Navbar() {
           {logoError ? (
             <span className="text-xl font-bold tracking-tight text-warm-900">klemens</span>
           ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src="/logos/logo-wide-dark.PNG"
               alt="Klemens"
-              style={{ height: "48px", width: "auto" }}
+              width={160}
+              height={48}
+              priority
               onError={() => setLogoError(true)}
             />
           )}

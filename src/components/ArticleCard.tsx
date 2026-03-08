@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ArticleMeta } from "@/lib/markdown";
 
 // Kategori adına göre placeholder gradient
@@ -23,11 +24,13 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
       {/* ── Görsel alanı ── */}
       <div className="relative h-[200px] overflow-hidden flex-shrink-0">
         {hasImage ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={article.image}
+          <Image
+            src={article.image!}
             alt={article.title}
-            className="w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            className="object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradient}`} />
