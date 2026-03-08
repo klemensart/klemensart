@@ -163,19 +163,19 @@ export const TEMPLATES: Template[] = [
       {
         type: "shape",
         x: 80,
-        y: 60,
+        y: 50,
         width: 920,
-        height: 520,
+        height: 480,
         fill: "#F5F0EB",
         shapeType: "rect",
         opacity: 1,
         rotation: 0,
       },
-      // Kategori etiketi — Montserrat Bold, #ff6c5f, yüksek letter-spacing
+      // Kategori etiketi — Montserrat Bold, #ff6c5f, letter-spacing
       {
         type: "text",
         x: 80,
-        y: 640,
+        y: 590,
         width: 920,
         text: "KÜLTÜR & SANAT",
         fontSize: 43,
@@ -192,7 +192,7 @@ export const TEMPLATES: Template[] = [
       {
         type: "text",
         x: 80,
-        y: 720,
+        y: 660,
         width: 920,
         text: "Romantiklere göre yalnızlık, ayrıcalıklı bir ötekilik, bir doğayla temas etme alanıydı ve pek çok anlamda anlatının başlayabilmesinin ön koşulu olarak görülürdü.",
         fontSize: 34,
@@ -205,11 +205,11 @@ export const TEMPLATES: Template[] = [
         opacity: 1,
         rotation: 0,
       },
-      // Yazar adı — gövde ile aynı font, gövdenin hemen altında
+      // Yazar adı — italic, gövdenin hemen altında
       {
         type: "text",
         x: 80,
-        y: 1060,
+        y: 1000,
         width: 920,
         text: "— Cansu Kul",
         fontSize: 30,
