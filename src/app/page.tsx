@@ -12,6 +12,8 @@ const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
 const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
 const Bulten = dynamic(() => import("@/components/Bulten"));
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {

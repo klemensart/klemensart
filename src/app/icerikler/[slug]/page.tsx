@@ -6,6 +6,8 @@ import { categoryStyles } from "@/lib/category-styles";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import ArticleCard from "@/components/ArticleCard";
 
+export const revalidate = 60;
+
 type Params = { slug: string };
 
 export function generateStaticParams(): Params[] {

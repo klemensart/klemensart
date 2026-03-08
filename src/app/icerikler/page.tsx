@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import IceriklerClient from "@/components/IceriklerClient";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "İçerikler",
   description:
