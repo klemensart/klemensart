@@ -1,19 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useDesignStore } from "../hooks/useDesignStore";
+import { useDesignStore, type CanvasObject } from "../hooks/useDesignStore";
 
-/** Mevcut metinlerin üstüne binmeyecek görsel alanı hesapla */
-function calcImageArea(objects: { type: string; y: number }[]) {
-  const textObjects = objects.filter((o) => o.type === "text");
-  // En üstteki text'in y konumunu bul
-  const firstTextY = textObjects.length > 0
-    ? Math.min(...textObjects.map((o) => o.y))
-    : 800; // text yoksa varsayılan
-  // Görsel: üstte 70px padding, altta 60px boşluk bırak
-  const imgY = 70;
-  const imgHeight = Math.max(200, firstTextY - imgY - 60);
-  return { x: 80, y: imgY, width: 920, height: imgHeight };
+const IMG_X = 80;
+const IMG_Y = 70;
+const IMG_W = 920;
+const IMG_H = 640;
+const GAP = 60; // görsel ile ilk metin arası boşluk
+
+/**
+ * Görsel eklendiğinde tüm text nesnelerini görselin altına kaydırır.
+ * Görselin alt kenarı (IMG_Y + IMG_H) + GAP noktasından başlayarak
+ * mevcut text'ler arasındaki göreli mesafeleri korur.
+ */
+function shiftTextsBelow(objects: CanvasObject[], updateObject: (id: string, attrs: Partial<CanvasObject>) => void) {
+  const textObjs = objects.filter((o) => o.type === "text");
+  if (textObjs.length === 0) return;
+
+  const topTextY = Math.min(...textObjs.map((o) => o.y));
+  const targetY = IMG_Y + IMG_H + GAP;
+  const shift = targetY - topTextY;
+
+  if (shift <= 0) return; // zaten yeterince aşağıda
+
+  for (const t of textObjs) {
+    updateObject(t.id, { y: t.y + shift });
+  }
 }
 
 export default function ImagesPanel() {
@@ -54,10 +67,16 @@ export default function ImagesPanel() {
 
       const { url } = await res.json();
 
-      const area = calcImageArea(objects);
+      // Önce metinleri aşağı kaydır
+      shiftTextsBelow(objects, updateObject);
+
+      // Sonra görseli ekle
       addObject({
         type: "image",
-        ...area,
+        x: IMG_X,
+        y: IMG_Y,
+        width: IMG_W,
+        height: IMG_H,
         src: url,
         opacity: 1,
         rotation: 0,
