@@ -289,8 +289,9 @@ html {
   padding: 0.05em 0.15em;
 }
 
-/* Image captions: paragraph right after an image */
-.prose-klemens img + p {
+/* Image captions: paragraph right after an image, or text after img in same p */
+.prose-klemens img + p,
+.prose-klemens p:has(> img) {
   text-align: center;
   font-size: 0.8rem;
   font-style: italic;
@@ -299,6 +300,9 @@ html {
   color: #a09890;
   margin-top: 0.5rem;
   margin-bottom: 2rem;
+}
+.prose-klemens p:has(> img) strong {
+  font-weight: 400;
 }
 
 /* YouTube embed */
