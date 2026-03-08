@@ -7,6 +7,7 @@ import type { User } from "@supabase/supabase-js";
 
 const navLinks: { label: string; href: string; badge?: string }[] = [
   { label: "Atölyeler",   href: "/atolyeler" },
+  { label: "İçerikler",   href: "/icerikler" },
   { label: "Testler",     href: "/testler" },
   { label: "Etkinlikler", href: "#etkinlikler" },
   { label: "Harita",      href: "/harita",     badge: "Yeni" },
