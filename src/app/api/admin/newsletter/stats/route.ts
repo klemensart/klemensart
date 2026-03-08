@@ -14,11 +14,36 @@ export async function GET() {
 
   const admin = createAdminClient();
 
-  // Get all email logs
-  const { data: logs } = await admin
-    .from("email_logs")
-    .select("subscriber_email, subject, sent_at, opened_at, clicked_at, bounced_at, status")
-    .order("sent_at", { ascending: false });
+  // Get all email logs (paginate to avoid Supabase 1000-row default limit)
+  type LogRow = {
+    subscriber_email: string;
+    subject: string;
+    sent_at: string;
+    opened_at: string | null;
+    clicked_at: string | null;
+    bounced_at: string | null;
+    status: string | null;
+  };
+  const allLogs: LogRow[] = [];
+  const pageSize = 1000;
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data: page } = await admin
+      .from("email_logs")
+      .select("subscriber_email, subject, sent_at, opened_at, clicked_at, bounced_at, status")
+      .order("sent_at", { ascending: false })
+      .range(from, from + pageSize - 1);
+
+    if (page && page.length > 0) {
+      allLogs.push(...page);
+      from += pageSize;
+      hasMore = page.length === pageSize;
+    } else {
+      hasMore = false;
+    }
+  }
 
   // Get active subscribers
   const { data: subs } = await admin
@@ -26,7 +51,6 @@ export async function GET() {
     .select("email")
     .eq("is_active", true);
 
-  const allLogs = logs ?? [];
   const activeEmails = new Set((subs ?? []).map((s) => s.email));
 
   // Per-campaign stats (group by subject)
