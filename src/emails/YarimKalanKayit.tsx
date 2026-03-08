@@ -1,4 +1,4 @@
-import { Section, Text, Img } from "@react-email/components";
+import { Section, Text, Img, Link } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
@@ -19,7 +19,11 @@ export default function YarimKalanKayit({
     <KlemensLayout preview="Kayıt süreci tamamlanmadı">
       <Section style={content}>
         <Text style={h1}>Kayıt Süreciniz</Text>
-        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
+        {imageUrl && (
+          <Link href={registerUrl}>
+            <Img src={imageUrl} alt="" width="100%" style={heroImg} />
+          </Link>
+        )}
 
         <Text style={p}>
           &ldquo;{eventTitle}&rdquo; için başlattığınız kayıt

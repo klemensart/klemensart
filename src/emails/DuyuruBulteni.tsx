@@ -1,4 +1,4 @@
-import { Section, Text, Img } from "@react-email/components";
+import { Section, Text, Img, Link } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
@@ -23,7 +23,11 @@ export default function DuyuruBulteni({
     <KlemensLayout preview={headline}>
       <Section style={content}>
         <Text style={h1}>{headline}</Text>
-        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
+        {imageUrl && (
+          <Link href={buttonUrl}>
+            <Img src={imageUrl} alt="" width="100%" style={heroImg} />
+          </Link>
+        )}
         <Text style={p}>{body1}</Text>
         {body2 && <Text style={p}>{body2}</Text>}
       </Section>

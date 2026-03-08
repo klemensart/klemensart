@@ -1,4 +1,4 @@
-import { Section, Text, Hr, Img } from "@react-email/components";
+import { Section, Text, Hr, Img, Link } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
@@ -24,7 +24,11 @@ export default function SeminerHatirlatici({
       <Section style={content}>
         <Text style={eyebrow}>HATIRLATMA</Text>
         <Text style={h1}>Yarın Buluşuyoruz</Text>
-        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
+        {imageUrl && (
+          <Link href={calendarUrl}>
+            <Img src={imageUrl} alt="" width="100%" style={heroImg} />
+          </Link>
+        )}
 
         <Text style={p}>
           Saatler azalıyor — yarın akşam, birlikte yeni bir düşünce

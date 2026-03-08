@@ -1,4 +1,4 @@
-import { Section, Text, Hr, Img } from "@react-email/components";
+import { Section, Text, Hr, Img, Link } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
@@ -23,7 +23,11 @@ export default function EtkinlikTesekkur({
     <KlemensLayout preview={`${eventTitle} — Kayıt ve Bibliyografya`}>
       <Section style={content}>
         <Text style={h1}>Teşekkürler</Text>
-        {imageUrl && <Img src={imageUrl} alt="" width="100%" style={heroImg} />}
+        {imageUrl && (
+          <Link href={replayUrl}>
+            <Img src={imageUrl} alt="" width="100%" style={heroImg} />
+          </Link>
+        )}
 
         <Text style={p}>
           Dün akşam birlikte geçirdiğimiz zaman için teşekkür ederiz.
