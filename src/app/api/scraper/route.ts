@@ -1296,6 +1296,77 @@ function inferEventType(title: string, desc: string, url: string): string {
   return "etkinlik"; // bilinmiyor → filtre isRelevant'ta elecek
 }
 
+// ── Scraper 15: Ankara Devlet Opera ve Balesi ──────────────────────────────
+// operabale.gov.tr — JSON API, Ankara müdürlüğü (id=1)
+async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
+  const events: ScrapedEvent[] = [];
+  const apiUrl = "https://apimain.operabale.gov.tr/v1/web/temsil/mudurluk/listele/1";
+
+  try {
+    const res = await fetch(apiUrl, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return events;
+
+    const data: Array<{
+      oyunTarihi: string;
+      eserAdi: string;
+      eserKonu: string;
+      sahneAdi: string;
+      seoUrl: string;
+      seoFullUrl: string;
+      afisler: string[];
+    }> = await res.json();
+
+    for (const item of data) {
+      const title = item.eserAdi?.trim();
+      if (!title) continue;
+
+      const eventDate = new Date(item.oyunTarihi).toISOString();
+      if (!isFutureDate(eventDate)) continue;
+
+      // Tür tespiti: başlık + sahne adından
+      const combined = `${title} ${item.sahneAdi ?? ""}`.toLowerCase();
+      let inferredType: string;
+      if (combined.includes("opera") || combined.includes("opera sahnesi")) inferredType = "opera";
+      else if (combined.includes("bale") || combined.includes("ballet")) inferredType = "bale";
+      else if (combined.includes("konser") || combined.includes("müzik") || combined.includes("trio") || combined.includes("duo")) inferredType = "konser";
+      else if (combined.includes("tiyatro") || combined.includes("oyun")) inferredType = "tiyatro";
+      else inferredType = inferEventType(title, item.eserKonu ?? "", "opera bale");
+
+      // Opera/bale scraper'ından gelen her şey kültür-sanata uygun
+      if (!isRelevant({ title, description: item.eserKonu ?? "", event_type: inferredType })) {
+        // Fallback: opera/bale kaynağından gelen bilinmeyen türleri kabul et
+        if (inferredType === "etkinlik") inferredType = "performans";
+        else continue;
+      }
+
+      const source_url = item.seoFullUrl || `https://www.operabale.gov.tr/shows/${item.seoUrl}`;
+      const image_url = item.afisler?.[0] ?? null;
+      const desc = (item.eserKonu ?? "").replace(/\r\n/g, " ").trim().slice(0, 400);
+
+      events.push({
+        title,
+        description: desc,
+        event_type: inferredType,
+        venue: item.sahneAdi || "Ankara DOB",
+        address: "Opera Caddesi, Ulus, Ankara",
+        event_date: eventDate,
+        end_date: null,
+        source_url,
+        source_name: "Ankara DOB",
+        image_url,
+        price_info: null,
+      });
+    }
+  } catch (err) {
+    console.error(`[OperaBale] hatası:`, err);
+  }
+
+  return events;
+}
+
 // ── Scraper 14: Erimtan Arkeoloji ve Sanat Müzesi ──────────────────────────
 // erimtanmuseum.org/tr/takvim — Aylık takvim, temiz <time datetime> etiketleri
 async function scrapeErimtan(): Promise<ScrapedEvent[]> {
@@ -1605,11 +1676,11 @@ export async function GET(req: NextRequest) {
   const results: Record<string, StatEntry> = {
     biletix: mk(), cerModern: mk(), ankaraBB: mk(), cankaya: mk(),
     bilkent: mk(), csoAda: mk(), lavarla: mk(), biletinial: mk(), ankaraMasasi: mk(),
-    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(), erimtan: mk(),
+    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(), erimtan: mk(), operaBale: mk(),
   };
 
   // 2. Her scraper'ı bağımsız çalıştır
-  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere", "erimtan"] as const;
+  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere", "erimtan", "operaBale"] as const;
   const settled = await Promise.allSettled([
     scrapeBiletix(),
     scrapeCerModern(),
@@ -1625,6 +1696,7 @@ export async function GET(req: NextRequest) {
     scrapeUnite(),
     scrapeKultKavaklidere(),
     scrapeErimtan(),
+    scrapeOperaBale(),
   ]);
 
   const scraperResults: [StatEntry, ScrapedEvent[]][] = scraperKeys.map((key, i) => {
