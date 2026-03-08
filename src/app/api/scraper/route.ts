@@ -1054,6 +1054,172 @@ async function scrapeMobilet(): Promise<ScrapedEvent[]> {
   return events;
 }
 
+// ── Scraper 12: Unite Ortak Mekan ────────────────────────────────────────────
+// uniteankara.com — Squarespace calendar page
+async function scrapeUnite(): Promise<ScrapedEvent[]> {
+  const events: ScrapedEvent[] = [];
+  const url = "https://uniteankara.com/calendar";
+
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return events;
+
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    $(".eventlist-event").each((_, el) => {
+      const $el = $(el);
+
+      const title = $el.find(".eventlist-title-link").first().text().trim();
+      if (!title) return;
+
+      // Tarih: ay + gün span'ları
+      const month = $el.find(".eventlist-datetag-startdate--month").first().text().trim();
+      const day = $el.find(".eventlist-datetag-startdate--day").first().text().trim();
+      const dateStr = `${day} ${month}`;
+      const eventDate = parseTurkishDate(dateStr);
+      if (!eventDate || !isFutureDate(eventDate)) return;
+
+      const href = $el.find(".eventlist-title-link").first().attr("href") ?? "";
+      const source_url = href ? `https://uniteankara.com${href}` : url;
+
+      // Resim: thumbnail img
+      const imgSrc = $el.find(".eventlist-column-thumbnail img").first().attr("data-src")
+        ?? $el.find(".eventlist-column-thumbnail img").first().attr("src")
+        ?? null;
+
+      // Açıklama
+      const desc = $el.find(".eventlist-excerpt").first().text().trim();
+
+      const inferredType = inferEventType(title, desc, url);
+      if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
+
+      events.push({
+        title,
+        description: desc.slice(0, 400),
+        event_type: inferredType,
+        venue: "Unite Ortak Mekan",
+        address: "Cinnah 7A, Çankaya, Ankara",
+        event_date: eventDate,
+        end_date: null,
+        source_url,
+        source_name: "Unite Ortak Mekan",
+        image_url: imgSrc,
+        price_info: null,
+      });
+    });
+  } catch (err) {
+    console.error("[Unite] hatası:", err);
+  }
+
+  return events;
+}
+
+// ── Scraper 13: Kült Kavaklıdere ────────────────────────────────────────────
+// kultkavaklidere.org — Ana sayfa carousel + Biletinial venue page fallback
+async function scrapeKultKavaklidere(): Promise<ScrapedEvent[]> {
+  const events: ScrapedEvent[] = [];
+
+  // Yol 1: Biletinial venue page
+  try {
+    const res = await fetch("https://biletinial.com/tr-tr/etkinlikleri/kult-kavaklidere-etkinlikleri", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const $ = cheerio.load(html);
+
+      $("a[href*='/tr-tr/']").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") ?? "";
+        // Sadece etkinlik linkleri (kategori/slug formatı)
+        if (!href.match(/\/tr-tr\/(tiyatro|muzik|sahne-sanatlari|sergi|soylesi|dans|opera|bale|goster|performans|etkinlik)\//)) return;
+
+        const title = ($a.find("img").attr("alt") ?? $a.attr("title") ?? $a.text()).trim();
+        if (!title || title.length < 3) return;
+
+        const imgSrc = $a.find("img").attr("src") ?? null;
+
+        // Biletinial venue etkinlikleri genellikle yakın tarihli — bugünün tarihi ata
+        const eventDate = new Date().toISOString();
+
+        const source_url = href.startsWith("http") ? href : `https://biletinial.com${href}`;
+        const inferredType = inferEventType(title, "", href);
+        if (!isRelevant({ title, description: "", event_type: inferredType })) return;
+
+        events.push({
+          title,
+          description: "",
+          event_type: inferredType,
+          venue: "Kült Kavaklıdere",
+          address: "Tunalı Hilmi Cd. No:105, Çankaya, Ankara",
+          event_date: eventDate,
+          end_date: null,
+          source_url,
+          source_name: "Kült Kavaklıdere",
+          image_url: imgSrc,
+          price_info: null,
+        });
+      });
+    }
+  } catch (err) {
+    console.error("[Kült] Biletinial hatası:", err);
+  }
+
+  // Yol 2: Ana sayfa carousel (etkinlikler sunucu tarafında render edilmişse)
+  try {
+    const res = await fetch("https://www.kultkavaklidere.org/", {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const $ = cheerio.load(html);
+
+      $(".news__item, .news-slider__item").each((_, el) => {
+        const $el = $(el);
+        const title = $el.find("h3, .title, a").first().text().trim();
+        if (!title || title.length < 3) return;
+
+        const href = $el.find("a").first().attr("href") ?? "";
+        const imgSrc = $el.find("img").first().attr("src") ?? null;
+
+        const dateStr = $el.find(".date, time, .event-date").first().text().trim();
+        const eventDate = parseTurkishDate(dateStr) || new Date().toISOString();
+
+        const source_url = href.startsWith("http") ? href : `https://www.kultkavaklidere.org${href}`;
+        const inferredType = inferEventType(title, "", "");
+        if (!isRelevant({ title, description: "", event_type: inferredType })) return;
+
+        events.push({
+          title,
+          description: "",
+          event_type: inferredType,
+          venue: "Kült Kavaklıdere",
+          address: "Tunalı Hilmi Cd. No:105, Çankaya, Ankara",
+          event_date: eventDate,
+          end_date: null,
+          source_url,
+          source_name: "Kült Kavaklıdere",
+          image_url: imgSrc,
+          price_info: null,
+        });
+      });
+    }
+  } catch (err) {
+    console.error("[Kült] Ana sayfa hatası:", err);
+  }
+
+  return events;
+}
+
 // ── Yardımcı: Tür tahmini ─────────────────────────────────────────────────────
 function inferEventType(title: string, desc: string, url: string): string {
   const combined = `${title} ${desc} ${url}`.toLowerCase();
@@ -1305,11 +1471,11 @@ export async function GET(req: NextRequest) {
   const results: Record<string, StatEntry> = {
     biletix: mk(), cerModern: mk(), ankaraBB: mk(), cankaya: mk(),
     bilkent: mk(), csoAda: mk(), lavarla: mk(), biletinial: mk(), ankaraMasasi: mk(),
-    bubilet: mk(), mobilet: mk(),
+    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(),
   };
 
   // 2. Her scraper'ı bağımsız çalıştır
-  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet"] as const;
+  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere"] as const;
   const settled = await Promise.allSettled([
     scrapeBiletix(),
     scrapeCerModern(),
@@ -1322,6 +1488,8 @@ export async function GET(req: NextRequest) {
     scrapeAnkaraMasasi(),
     scrapeBubilet(),
     scrapeMobilet(),
+    scrapeUnite(),
+    scrapeKultKavaklidere(),
   ]);
 
   const scraperResults: [StatEntry, ScrapedEvent[]][] = scraperKeys.map((key, i) => {
