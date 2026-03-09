@@ -44,50 +44,246 @@ const EXHIBITION_MOTTO = {
 void EXHIBITION_MOTTO;
 
 const ARTWORKS: Artwork[] = [
+  // ── Afrodisias (4) ──
   {
     id: 1,
-    title: "Efes'te Yalnızlık",
-    location: "Efes Antik Kenti, İzmir",
-    photographer: "Sergi Sanatçısı",
-    note: "Binlerce yıllık sütunların arasında, kalabalıklar çekildiğinde geriye kalan sessizlik... Efes'in taşlarında yankılanan yalnızlık.",
-    info: "Efes, MÖ 10. yüzyılda kurulan ve antik dünyanın en büyük şehirlerinden biri olan İyon kentidir. Artemis Tapınağı ile dünyanın yedi harikasından birine ev sahipliği yapmıştır.",
-    color: "#8B6914",
-    accent: "#D4A843",
-    image: "/assets/sergi/yalnizlik/eser1.jpg"
+    title: "Afrodisias'ta Sessizlik",
+    location: "Afrodisias, Aydın",
+    photographer: "Theo Atay",
+    note: "UNESCO Dünya Mirası'nın mermer sokakları, binlerce yıllık heykeltraşların ellerinden çıkmış izleri taşıyor. Burada taşlar konuşuyor, insanlar susuyor.",
+    info: "Afrodisias, antik dönemin en ünlü heykeltraşlık okuluna ev sahipliği yapmış bir kenttir. 2017'de UNESCO Dünya Mirası listesine alınmıştır. Stadyumu 30.000 kişi kapasitesiyle antik dünyanın en iyi korunmuş örneklerinden biridir.",
+    color: "#5B3A6B",
+    accent: "#9B6BB0",
+    image: "/sergi/yalnizlik/afrodisias-1.jpg",
   },
   {
     id: 2,
-    title: "Apollon'un Gölgesi",
-    location: "Didim Apollon Tapınağı, Aydın",
-    photographer: "Sergi Sanatçısı",
-    note: "Devasa sütunların gölgesinde küçülmek... Tanrıların evinde insan olmanın o ezici ama huzurlu yalnızlığı.",
-    info: "Apollon Tapınağı, antik çağın en büyük tapınaklarından biridir. 120 adet 20 metre yüksekliğindeki İon sütunuyla inşa edilmiş, kehanet merkezi olarak kullanılmıştır.",
-    color: "#4A6741",
-    accent: "#7BA370",
-    image: "/assets/sergi/yalnizlik/eser2.jpg"
+    title: "Mermer Avlu",
+    location: "Afrodisias, Aydın",
+    photographer: "Theo Atay",
+    note: "Tetrapylon'un dört sütunu arasında rüzgâr bile yavaşlıyor. Aşk tanrıçasının kentinde, yalnızlık bile zarif.",
+    info: "Afrodisias Tetrapylon'u, kentin anıtsal giriş kapısıdır. Dört sütun grubundan oluşan bu yapı, MS 2. yüzyılda inşa edilmiştir ve kabartmalarıyla ünlüdür.",
+    color: "#6B5B3A",
+    accent: "#B09B6B",
+    image: "/sergi/yalnizlik/afrodisias-2.jpg",
   },
   {
     id: 3,
-    title: "Patara'da Akşam",
-    location: "Patara Antik Kenti, Antalya",
-    photographer: "Sergi Sanatçısı",
-    note: "Akdeniz'in son ışıkları antik tiyatronun taşlarına düşerken, zaman durur. Burada yalnızlık bir lüks değil, bir armağan.",
-    info: "Patara, Likya Birliği'nin başkenti ve antik dünyanın önemli liman şehirlerinden biriydi. Noel Baba olarak bilinen Aziz Nikolaos'un doğum yeridir.",
-    color: "#8B4513",
-    accent: "#CD853F",
-    image: "/assets/sergi/yalnizlik/eser3.jpg"
+    title: "Stadyumda Yankı",
+    location: "Afrodisias, Aydın",
+    photographer: "Theo Atay",
+    note: "Otuz bin kişilik stadyumda tek bir ses: rüzgâr. Tribünler bomboş, ama taşlar hâlâ tezahürat bekliyor.",
+    info: "Afrodisias Stadyumu, 262 metre uzunluğu ve 59 metre genişliğiyle Roma döneminin en büyük ve en iyi korunmuş stadyumlarından biridir.",
+    color: "#3A5B6B",
+    accent: "#6B9BB0",
+    image: "/sergi/yalnizlik/afrodisias-3.jpg",
   },
   {
     id: 4,
-    title: "Afrodisias Sessizliği",
-    location: "Afrodisias Antik Kenti, Aydın",
-    photographer: "Sergi Sanatçısı",
-    note: "UNESCO'nun koruması altındaki bu kent, adını aşk tanrıçasından alıyor. Ama burada aşktan çok, taşa işlenmiş bir sessizlik var.",
-    info: "Afrodisias, antik dönemde heykeltraşlık okuluyla ünlüydü. 2017'de UNESCO Dünya Mirası listesine alınmış olup, stadyumu antik dünyanın en iyi korunmuş örneklerinden biridir.",
-    color: "#5B3A6B",
-    accent: "#9B6BB0",
-    image: "/assets/sergi/yalnizlik/eser4.jpg"
-  }
+    title: "Heykeltraşın Mirası",
+    location: "Afrodisias, Aydın",
+    photographer: "Theo Atay",
+    note: "Mermer bloklardan yüzler, bedenler doğmuş bir zamanlar. Şimdi yarım kalmış heykeller, tamamlanmayı bekleyen hikâyeler gibi duruyor.",
+    info: "Afrodisias heykeltraşlık okulu, Roma İmparatorluğu'nun en önemli mermer işleme merkeziydi. Üretilen heykeller Roma'dan İskenderiye'ye kadar geniş bir coğrafyaya ihraç edilirdi.",
+    color: "#6B3A5B",
+    accent: "#B06B9B",
+    image: "/sergi/yalnizlik/afrodisias-4.jpg",
+  },
+  // ── Aizanoi (3) ──
+  {
+    id: 5,
+    title: "Zeus'un Evi",
+    location: "Aizanoi, Kütahya",
+    photographer: "Theo Atay",
+    note: "Anadolu'nun en iyi korunmuş Zeus Tapınağı, iki bin yıldır gökyüzüne bakıyor. Tanrılar gitti, tapınak kaldı.",
+    info: "Aizanoi Zeus Tapınağı, Anadolu'daki en iyi korunmuş Roma tapınağıdır. Benzersiz bir özelliği, alt katında Kybele'ye adanmış bir mağara tapınağı barındırmasıdır.",
+    color: "#8B6914",
+    accent: "#D4A843",
+    image: "/sergi/yalnizlik/aizanoi-1.jpg",
+  },
+  {
+    id: 6,
+    title: "Stadyum ve Tiyatro",
+    location: "Aizanoi, Kütahya",
+    photographer: "Theo Atay",
+    note: "Dünyanın bilinen tek stadyum-tiyatro kompleksi. İki amacı tek yapıda birleştiren mühendislik harikası, şimdi sessizliğe teslim.",
+    info: "Aizanoi, dünyada stadyum ve tiyatronun iç içe geçtiği tek antik kenttir. Bu benzersiz yapı, 2012'de UNESCO Dünya Mirası geçici listesine alınmıştır.",
+    color: "#4A6741",
+    accent: "#7BA370",
+    image: "/sergi/yalnizlik/aizanoi-2.jpg",
+  },
+  {
+    id: 7,
+    title: "Penkalas Kıyısında",
+    location: "Aizanoi, Kütahya",
+    photographer: "Theo Atay",
+    note: "Antik köprünün altından akan Penkalas Çayı, iki bin yıldır aynı şarkıyı söylüyor. Değişen yalnızca dinleyenler.",
+    info: "Aizanoi'nin antik köprüleri, kenti ikiye bölen Penkalas Çayı (günümüzde Kocaçay) üzerinde inşa edilmiştir. Roma döneminin mühendislik başarılarından biridir.",
+    color: "#5B6B3A",
+    accent: "#9BB06B",
+    image: "/sergi/yalnizlik/aizanoi-3.jpg",
+  },
+  // ── Asklepion (1) ──
+  {
+    id: 8,
+    title: "Şifanın Sessizliği",
+    location: "Asklepion, Bergama",
+    photographer: "Theo Atay",
+    note: "Antik dünyanın en ünlü şifa merkezi. Hastalar burada rüyalarıyla iyileşirdi. Şimdi rüya gören yalnızca rüzgâr.",
+    info: "Bergama Asklepion'u, antik çağın en önemli sağlık merkezlerinden biriydi. Hastaların su sesi, müzik ve telkinle tedavi edildiği bu merkez, modern psikoterapinin öncüsü sayılır.",
+    color: "#3A6B5B",
+    accent: "#6BB09B",
+    image: "/sergi/yalnizlik/asklepion-1.jpg",
+  },
+  // ── Assos (1) ──
+  {
+    id: 9,
+    title: "Athena'nın Bakışı",
+    location: "Assos, Çanakkale",
+    photographer: "Theo Atay",
+    note: "Ege'nin üzerinde yükselen Athena Tapınağı'ndan Midilli Adası'na bakış. Aristoteles burada bir okul kurmuştu; şimdi yalnızca martılar ders veriyor.",
+    info: "Assos Athena Tapınağı, Arkaik dönemde inşa edilen tek Dor tapınağıdır. Aristoteles MÖ 347-345 yıllarında burada bir felsefe okulu kurmuştur.",
+    color: "#14698B",
+    accent: "#43A8D4",
+    image: "/sergi/yalnizlik/assos-1.jpg",
+  },
+  // ── Blaundus (1) ──
+  {
+    id: 10,
+    title: "Kanyonun Kıyısında",
+    location: "Blaundus, Uşak",
+    photographer: "Theo Atay",
+    note: "Ulubey Kanyonu'nun kenarında, uçurumla yarışan sütunlar. Dünyanın unuttuğu bir kent, kendini uçurumda hatırlıyor.",
+    info: "Blaundus, Uşak'ın Ulubey ilçesinde, kanyonun kenarında kurulmuş antik bir kenttir. Makedonyalılar tarafından kurulmuş, Roma döneminde önemli bir merkez olmuştur.",
+    color: "#8B4513",
+    accent: "#CD853F",
+    image: "/sergi/yalnizlik/blaundus-1.jpg",
+  },
+  // ── Çatalhöyük (2) ──
+  {
+    id: 11,
+    title: "İlk Ev",
+    location: "Çatalhöyük, Konya",
+    photographer: "Theo Atay",
+    note: "Dünyanın en eski yerleşimlerinden biri. Kapısı olmayan evler, damdan girilen odalar. İnsanlığın ilk 'mahalle'si, dokuz bin yıldır sessiz.",
+    info: "Çatalhöyük, MÖ 7500-5700 yıllarına tarihlenen, dünyanın en eski ve en büyük Neolitik yerleşimlerinden biridir. 2012'de UNESCO Dünya Mirası listesine alınmıştır.",
+    color: "#6B5B4A",
+    accent: "#B09B8A",
+    image: "/sergi/yalnizlik/catalhoyuk-1.jpg",
+  },
+  {
+    id: 12,
+    title: "Neolitik Katmanlar",
+    location: "Çatalhöyük, Konya",
+    photographer: "Theo Atay",
+    note: "Her katman bir nesil, her duvar bir hikâye. Binlerce yıl üst üste yaşamış insanların izleri, toprağın altında saklı.",
+    info: "Çatalhöyük'te 18 yerleşim katmanı tespit edilmiştir. En kalabalık döneminde 8.000'e kadar insanın yaşadığı tahmin edilen kentte, evlerin duvarları boğa başları ve av sahneleriyle süslenmiştir.",
+    color: "#5B4A3A",
+    accent: "#9B8A6B",
+    image: "/sergi/yalnizlik/catalhoyuk-2.jpg",
+  },
+  // ── Kibyra (2) ──
+  {
+    id: 13,
+    title: "Gladyatörün Arenası",
+    location: "Kibyra, Burdur",
+    photographer: "Theo Atay",
+    note: "Gladyatörlerin kanıyla sulanan arena, şimdi kırlangıçlara ev sahipliği yapıyor. Savaş naralarının yerini kuş cıvıltıları aldı.",
+    info: "Kibyra, Burdur'un Gölhisar ilçesinde yer alan antik kenttir. 2015 yılında keşfedilen gladyatör mozaikleriyle dünya gündemine oturmuştur. Medusa kabartmaları ve stadyumuyla dikkat çeker.",
+    color: "#6B3A3A",
+    accent: "#B06B6B",
+    image: "/sergi/yalnizlik/kibyra-1.jpg",
+  },
+  {
+    id: 14,
+    title: "Medusa'nın Gözleri",
+    location: "Kibyra, Burdur",
+    photographer: "Theo Atay",
+    note: "Taşa dönmüş yüzler, zamana meydan okuyor. Medusa'nın bakışı bile buranın yalnızlığını kıramadı.",
+    info: "Kibyra'nın Medusa kabartmaları, Roma döneminin en etkileyici taş işçiliği örnekleri arasındadır. Kent, dört dil konuşulan kozmopolit bir merkez olarak bilinirdi.",
+    color: "#4A3A6B",
+    accent: "#8A6BB0",
+    image: "/sergi/yalnizlik/kibyra-2.jpg",
+  },
+  // ── Laodikeia (4) ──
+  {
+    id: 15,
+    title: "Yedi Kiliseden Biri",
+    location: "Laodikeia, Denizli",
+    photographer: "Theo Atay",
+    note: "Kutsal Kitap'ın yedi kilisesinden biri buradaydı. Binlerce yıl önce inanç dolu cemaatler toplanan bu mekân, şimdi rüzgâra vaaz veriyor.",
+    info: "Laodikeia, Vahiy Kitabı'nda adı geçen yedi kiliseden biridir. Denizli'de yer alan kent, tekstil, tıp ve bankacılıkla zenginleşmiş önemli bir Roma şehriydi.",
+    color: "#3A4A6B",
+    accent: "#6B8AB0",
+    image: "/sergi/yalnizlik/laodikeia-1.jpg",
+  },
+  {
+    id: 16,
+    title: "Antik Cadde",
+    location: "Laodikeia, Denizli",
+    photographer: "Theo Atay",
+    note: "Sütunlu caddenin sonunda ne var? İki bin yıl önce bir pazar, bir hamam, bir yaşam. Şimdi yalnızca ufuk çizgisi.",
+    info: "Laodikeia'nın sütunlu caddesi, kentin ana arteriydi. Her iki yanında dükkanlar ve kamu binaları sıralanan bu cadde, Roma kentsel planlamasının güzel bir örneğidir.",
+    color: "#6B4A3A",
+    accent: "#B08A6B",
+    image: "/sergi/yalnizlik/laodikeia-2.jpg",
+  },
+  {
+    id: 17,
+    title: "Stadyumda Gölgeler",
+    location: "Laodikeia, Denizli",
+    photographer: "Theo Atay",
+    note: "Güneş alçaldıkça stadyumun gölgeleri uzuyor. Seyirciler çoktan gitti, ama gölgeler hâlâ tribünlerde oturuyor.",
+    info: "Laodikeia Stadyumu, 250 metre uzunluğuyla antik dünyanın büyük stadyumlarından biriydi. Atletizm yarışmaları ve gladyatör dövüşlerine ev sahipliği yapardı.",
+    color: "#4A6B3A",
+    accent: "#8AB06B",
+    image: "/sergi/yalnizlik/laodikeia-3.jpg",
+  },
+  {
+    id: 18,
+    title: "Nymphaeum Suları",
+    location: "Laodikeia, Denizli",
+    photographer: "Theo Atay",
+    note: "Çeşmenin suyu çoktan kurudu, ama havuzun mermer kenarları hâlâ pırıl pırıl. Su gitmiş, güzellik kalmış.",
+    info: "Laodikeia'daki anıtsal çeşmeler (nymphaeum), kentin su sisteminin görkemini yansıtır. Kent, antik dönemde özel bir su kanalı sistemiyle Denizli'nin sıcak kaynaklarından beslenirdi.",
+    color: "#3A6B4A",
+    accent: "#6BB08A",
+    image: "/sergi/yalnizlik/laodikeia-4.jpg",
+  },
+  // ── Sagalassos (3) ──
+  {
+    id: 19,
+    title: "Dağın Zirvesinde Roma",
+    location: "Sagalassos, Burdur",
+    photographer: "Theo Atay",
+    note: "1.500 metre yükseklikte, bulutların arasında bir Roma kenti. Burada yalnızlık bir tercih değil, coğrafyanın dayattığı bir kader.",
+    info: "Sagalassos, Burdur'un Ağlasun ilçesinde, Toros Dağları'nın eteklerinde kurulmuş antik bir kenttir. 'Dağların Roma'sı' olarak anılır ve son yıllarda yoğun arkeolojik kazılarla gün yüzüne çıkarılmaktadır.",
+    color: "#3A5B6B",
+    accent: "#6B9BB0",
+    image: "/sergi/yalnizlik/sagalassos-1.jpg",
+  },
+  {
+    id: 20,
+    title: "Antoninler Çeşmesi",
+    location: "Sagalassos, Burdur",
+    photographer: "Theo Atay",
+    note: "İki bin yıl sonra yeniden akan su. Arkeologlar çeşmeyi restore etti ve su, sanki hiç durmamış gibi akmaya başladı.",
+    info: "Antoninler Çeşmesi, MS 2. yüzyılda İmparator Marcus Aurelius döneminde inşa edilmiştir. 2010'da restore edilerek yeniden suyla buluşmuş, antik dünyanın yeniden canlanan simgesi olmuştur.",
+    color: "#5B3A4A",
+    accent: "#9B6B8A",
+    image: "/sergi/yalnizlik/sagalassos-2.jpg",
+  },
+  {
+    id: 21,
+    title: "Bulutların Altında",
+    location: "Sagalassos, Burdur",
+    photographer: "Theo Atay",
+    note: "Sagalassos'un tiyatrosu bulutlara o kadar yakın ki, sahneye çıkan aktörler gökyüzüne dokunabilirmiş gibi. Şimdi seyirci yalnızca bulutlar.",
+    info: "Sagalassos Tiyatrosu, 9.000 kişi kapasitesiyle dağ yamacına oyulmuştur. Tiyatrodan Burdur Gölü'ne uzanan muhteşem manzara, antik dünyada eşsiz bir sahne dekoruydu.",
+    color: "#4A5B3A",
+    accent: "#8A9B6B",
+    image: "/sergi/yalnizlik/sagalassos-3.jpg",
+  },
 ];
 
 export default function YalnizlikSergiPage() {
@@ -102,7 +298,7 @@ export default function YalnizlikSergiPage() {
   const keysRef = useRef<Record<string, boolean>>({});
   const isDraggingRef = useRef(false);
   const lastMouseRef = useRef({ x: 0, y: 0 });
-  const yawRef = useRef(0);
+  const yawRef = useRef(Math.PI / 2);
   const pitchRef = useRef(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const lastStepTimeRef = useRef(0);
@@ -146,9 +342,9 @@ export default function YalnizlikSergiPage() {
     scene.background = new THREE.Color(0xffffff);
     sceneRef.current = scene;
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
-    camera.position.set(0, 1.7, 0);
+    // Camera — start at entrance end (+x), looking inward (-x)
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 200);
+    camera.position.set(32, 1.7, 0);
     cameraRef.current = camera;
 
     // Renderer
@@ -169,6 +365,12 @@ export default function YalnizlikSergiPage() {
     const fill = new THREE.DirectionalLight(0xffffff, 0.5);
     fill.position.set(0, 5, 5);
     scene.add(fill);
+
+    // ── Room dimensions: 70 × 18 corridor ──
+    const ROOM_W = 70;
+    const ROOM_D = 18;
+    const HALF_W = ROOM_W / 2; // 35
+    const HALF_D = ROOM_D / 2; // 9
 
     // Floor — procedural stone texture
     const floorTexCanvas = document.createElement("canvas");
@@ -194,9 +396,9 @@ export default function YalnizlikSergiPage() {
     const floorTex = new THREE.CanvasTexture(floorTexCanvas);
     floorTex.wrapS = THREE.RepeatWrapping;
     floorTex.wrapT = THREE.RepeatWrapping;
-    floorTex.repeat.set(4, 3);
+    floorTex.repeat.set(8, 3);
 
-    const floorGeo = new THREE.PlaneGeometry(24, 18);
+    const floorGeo = new THREE.PlaneGeometry(ROOM_W, ROOM_D);
     const floorMat = new THREE.MeshStandardMaterial({
       map: floorTex,
       roughness: 0.6,
@@ -208,7 +410,7 @@ export default function YalnizlikSergiPage() {
     scene.add(floor);
 
     // Ceiling
-    const ceilGeo = new THREE.PlaneGeometry(24, 18);
+    const ceilGeo = new THREE.PlaneGeometry(ROOM_W, ROOM_D);
     const ceilMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
     const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
     ceiling.rotation.x = Math.PI / 2;
@@ -234,71 +436,86 @@ export default function YalnizlikSergiPage() {
     const wallTex = new THREE.CanvasTexture(wallTexCanvas);
     wallTex.wrapS = THREE.RepeatWrapping;
     wallTex.wrapT = THREE.RepeatWrapping;
-    wallTex.repeat.set(3, 1);
+    wallTex.repeat.set(8, 1);
 
     const wallMat = new THREE.MeshStandardMaterial({
       map: wallTex,
       roughness: 0.95,
     });
 
-    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(24, 5), wallMat);
-    backWall.position.set(0, 2.5, -9);
+    // Back wall (entrance side, z = +HALF_D)
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, 5), wallMat);
+    backWall.position.set(0, 2.5, HALF_D);
+    backWall.rotation.y = Math.PI;
     scene.add(backWall);
 
-    const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(24, 5), wallMat);
-    frontWall.position.set(0, 2.5, 9);
-    frontWall.rotation.y = Math.PI;
+    // Front wall (far end, z = -HALF_D)
+    const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, 5), wallMat);
+    frontWall.position.set(0, 2.5, -HALF_D);
     scene.add(frontWall);
 
-    const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(18, 5), wallMat);
-    leftWall.position.set(-12, 2.5, 0);
+    // Left wall (x = -HALF_W)
+    const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_D, 5), wallMat);
+    leftWall.position.set(-HALF_W, 2.5, 0);
     leftWall.rotation.y = Math.PI / 2;
     scene.add(leftWall);
 
-    const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(18, 5), wallMat);
-    rightWall.position.set(12, 2.5, 0);
+    // Right wall (x = +HALF_W)
+    const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_D, 5), wallMat);
+    rightWall.position.set(HALF_W, 2.5, 0);
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
-    // Create artworks
+    // Create artworks — corridor layout
     const artMeshes: THREE.Mesh[] = [];
     const loader = new THREE.TextureLoader();
     const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
-    // Artwork positions: 2 on back wall, 2 on front wall
-    const artPositions = [
-      { x: -4, z: -8.93, labelZ: -8.94, facing: 0 },        // back wall left
-      { x: 4,  z: -8.93, labelZ: -8.94, facing: 0 },        // back wall right
-      { x: -4, z: 8.93,  labelZ: 8.94,  facing: Math.PI },   // front wall left
-      { x: 4,  z: 8.93,  labelZ: 8.94,  facing: Math.PI },   // front wall right
-    ];
+    // Panoramic frame & canvas sizes
+    const FRAME_W = 5.0;
+    const FRAME_H = 2.0;
+    const CANVAS_W = 4.6;
+    const CANVAS_H = 1.8;
 
     ARTWORKS.forEach((art, i) => {
-      const pos = artPositions[i];
-      const frameGeo = new THREE.BoxGeometry(3.6, 2.6, 0.08);
+      // Front wall (z = -HALF_D): artworks 0-10, Back wall (z = +HALF_D): artworks 11-20
+      // Artworks spread along X axis on the LONG walls
+      let wallX: number, wallZ: number, facing: number;
+      if (i < 11) {
+        // Front wall (z = -9), faces +z (inward)
+        wallX = -30 + i * 6;
+        wallZ = -HALF_D + 0.07;
+        facing = 0; // face +z
+      } else {
+        // Back wall (z = +9), faces -z (inward)
+        wallX = -27 + (i - 11) * 6;
+        wallZ = HALF_D - 0.07;
+        facing = Math.PI; // face -z
+      }
+
+      // Frame
+      const frameGeo = new THREE.BoxGeometry(FRAME_W, FRAME_H, 0.08);
       const frameMat = new THREE.MeshStandardMaterial({
         color: 0x111111,
         metalness: 0.5,
-        roughness: 0.3
+        roughness: 0.3,
       });
       const frame = new THREE.Mesh(frameGeo, frameMat);
       frame.castShadow = true;
-      frame.position.set(pos.x, 1.9, pos.z);
-      frame.rotation.y = pos.facing;
+      frame.position.set(wallX, 1.9, wallZ);
+      frame.rotation.y = facing;
 
-      const canvasGeo = new THREE.PlaneGeometry(3.2, 2.2);
-
-      // Load photo texture
+      // Canvas (photo)
+      const canvasGeo = new THREE.PlaneGeometry(CANVAS_W, CANVAS_H);
       const texture = loader.load(art.image);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = maxAniso;
-      const canvasMat = new THREE.MeshBasicMaterial({
-        map: texture,
-      });
+      const canvasMat = new THREE.MeshBasicMaterial({ map: texture });
       const artCanvas = new THREE.Mesh(canvasGeo, canvasMat);
-      const canvasOffset = pos.facing === 0 ? 0.05 : -0.05;
-      artCanvas.position.set(pos.x, 1.9, pos.z + canvasOffset);
-      artCanvas.rotation.y = pos.facing;
+      // offset canvas slightly in front of frame
+      const canvasOffsetZ = facing === 0 ? 0.05 : -0.05;
+      artCanvas.position.set(wallX, 1.9, wallZ + canvasOffsetZ);
+      artCanvas.rotation.y = facing;
 
       // Label
       const labelCanvas = document.createElement("canvas");
@@ -318,8 +535,9 @@ export default function YalnizlikSergiPage() {
       const labelTex = new THREE.CanvasTexture(labelCanvas);
       const labelMat = new THREE.MeshBasicMaterial({ map: labelTex });
       const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 0.25), labelMat);
-      labelMesh.position.set(pos.x, 0.35, pos.labelZ);
-      labelMesh.rotation.y = pos.facing;
+      const labelOffsetZ = facing === 0 ? 0.06 : -0.06;
+      labelMesh.position.set(wallX, 0.6, wallZ + labelOffsetZ);
+      labelMesh.rotation.y = facing;
 
       scene.add(frame);
       scene.add(artCanvas);
@@ -331,18 +549,20 @@ export default function YalnizlikSergiPage() {
 
     artMeshesRef.current = artMeshes;
 
-    // Bench in center
-    const benchGeo = new THREE.BoxGeometry(3, 0.5, 0.8);
+    // Benches — every 20 units along the corridor (x-axis)
+    const benchGeo = new THREE.BoxGeometry(0.8, 0.5, 3);
     const benchMat = new THREE.MeshStandardMaterial({
       color: 0x333333,
-      metalness: 0.3
+      metalness: 0.3,
     });
-    const bench = new THREE.Mesh(benchGeo, benchMat);
-    bench.position.set(0, 0.25, 0);
-    bench.castShadow = true;
-    scene.add(bench);
+    for (let bx = -20; bx <= 20; bx += 20) {
+      const bench = new THREE.Mesh(benchGeo, benchMat);
+      bench.position.set(bx, 0.25, 0);
+      bench.castShadow = true;
+      scene.add(bench);
+    }
 
-    // Gallery title on left wall
+    // Gallery title panel — entrance short wall (x = +HALF_W), facing -x
     const titleCanvas = document.createElement("canvas");
     titleCanvas.width = 1024;
     titleCanvas.height = 512;
@@ -358,14 +578,21 @@ export default function YalnizlikSergiPage() {
     tctx.fillText("Antik Topraklarda Bir Fotoğraf Sergisi", 512, 280);
     tctx.fillStyle = "#bbbbbb";
     tctx.font = "24px sans-serif";
-    tctx.fillText("klemens \u00d7 sergi sanatçısı", 512, 340);
+    tctx.fillText("klemens \u00d7 Theo Atay", 512, 340);
 
     const titleTex = new THREE.CanvasTexture(titleCanvas);
     const titleMat = new THREE.MeshBasicMaterial({ map: titleTex });
     const titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), titleMat);
-    titleMesh.rotation.y = Math.PI / 2;
-    titleMesh.position.set(-11.95, 2.5, 0);
+    titleMesh.rotation.y = -Math.PI / 2; // face -x (inward)
+    titleMesh.position.set(HALF_W - 0.05, 2.5, 0);
     scene.add(titleMesh);
+
+    // Extra spot lights along corridor (x-axis) for artwork illumination
+    for (let li = -30; li <= 30; li += 15) {
+      const spot = new THREE.PointLight(0xffffff, 0.4, 20);
+      spot.position.set(li, 4.5, 0);
+      scene.add(spot);
+    }
 
     // Animation
     const animate = () => {
@@ -387,8 +614,9 @@ export default function YalnizlikSergiPage() {
       if (keysRef.current["q"]) yawRef.current += 0.025;
       if (keysRef.current["e"]) yawRef.current -= 0.025;
 
-      camera.position.x = Math.max(-11, Math.min(11, camera.position.x));
-      camera.position.z = Math.max(-8, Math.min(8, camera.position.z));
+      // Movement limits — corridor bounds (x = long axis, z = narrow axis)
+      camera.position.x = Math.max(-34, Math.min(34, camera.position.x));
+      camera.position.z = Math.max(-7, Math.min(7, camera.position.z));
       camera.position.y = 1.7;
 
       // Footstep sound
@@ -807,7 +1035,7 @@ export default function YalnizlikSergiPage() {
                   <span style={{ color: "#fff", fontWeight: 600 }}>Mouse sürükle</span> &mdash; Etrafına bak
                 </div>
                 <div style={{ color: "#ccc", fontSize: 13 }}>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>Eserlere tıkla</span> &mdash; Detay gör
+                  <span style={{ color: "#fff", fontWeight: 600 }}>Eserlere yaklaş</span> &mdash; Detay gör
                 </div>
               </div>
             </div>
