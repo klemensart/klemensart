@@ -339,7 +339,7 @@ export default function YalnizlikSergiPage() {
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0x1a1714);
     sceneRef.current = scene;
 
     // Camera — start at entrance end (+x), looking inward (-x)
@@ -358,12 +358,12 @@ export default function YalnizlikSergiPage() {
     mountRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Lighting — bright, even illumination
-    const ambient = new THREE.AmbientLight(0xffffff, 1.8);
+    // Lighting — dim warm ambient for historical atmosphere
+    const ambient = new THREE.AmbientLight(0xfff5e6, 0.35);
     scene.add(ambient);
 
-    const fill = new THREE.DirectionalLight(0xffffff, 0.5);
-    fill.position.set(0, 5, 5);
+    const fill = new THREE.DirectionalLight(0xfff0dd, 0.15);
+    fill.position.set(0, 5, 0);
     scene.add(fill);
 
     // ── Room dimensions: 70 × 18 corridor ──
@@ -372,23 +372,25 @@ export default function YalnizlikSergiPage() {
     const HALF_W = ROOM_W / 2; // 35
     const HALF_D = ROOM_D / 2; // 9
 
-    // Floor — procedural stone texture
+    // Floor — warm polished stone texture
     const floorTexCanvas = document.createElement("canvas");
     floorTexCanvas.width = 512;
     floorTexCanvas.height = 512;
     const fctx = floorTexCanvas.getContext("2d")!;
-    fctx.fillStyle = "#2a2a2a";
+    fctx.fillStyle = "#302a24";
     fctx.fillRect(0, 0, 512, 512);
     const blockSize = 64;
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
-        const variation = Math.floor(Math.random() * 20) - 10;
-        const base = 42 + variation;
-        fctx.fillStyle = `rgb(${base},${base},${base})`;
+        const variation = Math.floor(Math.random() * 15) - 7;
+        const r = 52 + variation;
+        const g = 46 + variation;
+        const b = 40 + variation;
+        fctx.fillStyle = `rgb(${r},${g},${b})`;
         fctx.fillRect(col * blockSize + 2, row * blockSize + 2, blockSize - 4, blockSize - 4);
       }
     }
-    fctx.fillStyle = "#1a1a1a";
+    fctx.fillStyle = "#241e18";
     for (let i = 0; i <= 8; i++) {
       fctx.fillRect(0, i * blockSize - 1, 512, 2);
       fctx.fillRect(i * blockSize - 1, 0, 2, 512);
@@ -401,7 +403,7 @@ export default function YalnizlikSergiPage() {
     const floorGeo = new THREE.PlaneGeometry(ROOM_W, ROOM_D);
     const floorMat = new THREE.MeshStandardMaterial({
       map: floorTex,
-      roughness: 0.6,
+      roughness: 0.25,
       metalness: 0.15,
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -411,25 +413,25 @@ export default function YalnizlikSergiPage() {
 
     // Ceiling
     const ceilGeo = new THREE.PlaneGeometry(ROOM_W, ROOM_D);
-    const ceilMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+    const ceilMat = new THREE.MeshStandardMaterial({ color: 0x1a1714 });
     const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
     ceiling.rotation.x = Math.PI / 2;
     ceiling.position.y = 5;
     scene.add(ceiling);
 
-    // Walls — procedural concrete texture
+    // Walls — warm plaster texture
     const wallTexCanvas = document.createElement("canvas");
     wallTexCanvas.width = 256;
     wallTexCanvas.height = 256;
     const wctx = wallTexCanvas.getContext("2d")!;
-    wctx.fillStyle = "#222222";
+    wctx.fillStyle = "#2a2622";
     wctx.fillRect(0, 0, 256, 256);
     for (let ni = 0; ni < 3000; ni++) {
       const wx = Math.random() * 256;
       const wy = Math.random() * 256;
       const bright = Math.random() > 0.5;
-      wctx.globalAlpha = 0.05 + Math.random() * 0.05;
-      wctx.fillStyle = bright ? "#444444" : "#111111";
+      wctx.globalAlpha = 0.04 + Math.random() * 0.04;
+      wctx.fillStyle = bright ? "#4a4238" : "#1a1612";
       wctx.fillRect(wx, wy, 2 + Math.random() * 3, 2 + Math.random() * 3);
     }
     wctx.globalAlpha = 1;
@@ -493,17 +495,85 @@ export default function YalnizlikSergiPage() {
         facing = Math.PI; // face -z
       }
 
-      // Frame
-      const frameGeo = new THREE.BoxGeometry(FRAME_W, FRAME_H, 0.08);
+      // Frame — dark warm wood, deeper profile
+      const frameGeo = new THREE.BoxGeometry(FRAME_W, FRAME_H, 0.15);
       const frameMat = new THREE.MeshStandardMaterial({
-        color: 0x111111,
-        metalness: 0.5,
-        roughness: 0.3,
+        color: 0x3a2e28,
+        metalness: 0.1,
+        roughness: 0.7,
       });
       const frame = new THREE.Mesh(frameGeo, frameMat);
       frame.castShadow = true;
       frame.position.set(wallX, 1.9, wallZ);
       frame.rotation.y = facing;
+
+      // Passepartout (mat) — textured cream with v-groove & linen grain
+      const matW = CANVAS_W + 0.4;
+      const matH = CANVAS_H + 0.3;
+      const matTexCanvas = document.createElement("canvas");
+      const mtW = 512, mtH = Math.round(512 * (matH / matW));
+      matTexCanvas.width = mtW;
+      matTexCanvas.height = mtH;
+      const mctx = matTexCanvas.getContext("2d")!;
+
+      // Base cream fill
+      mctx.fillStyle = "#f0ebe4";
+      mctx.fillRect(0, 0, mtW, mtH);
+
+      // Subtle linen grain texture
+      for (let gi = 0; gi < 6000; gi++) {
+        const gx = Math.random() * mtW;
+        const gy = Math.random() * mtH;
+        mctx.globalAlpha = 0.03 + Math.random() * 0.03;
+        mctx.fillStyle = Math.random() > 0.5 ? "#ddd8d0" : "#f8f4ef";
+        mctx.fillRect(gx, gy, 1 + Math.random() * 2, 1 + Math.random() * 2);
+      }
+      // Horizontal linen lines
+      mctx.globalAlpha = 0.025;
+      mctx.fillStyle = "#c8c0b5";
+      for (let ly = 0; ly < mtH; ly += 3) {
+        mctx.fillRect(0, ly, mtW, 1);
+      }
+      mctx.globalAlpha = 1;
+
+      // Edge darkening — subtle vignette on the mat itself
+      const edgeGrad = mctx.createRadialGradient(mtW / 2, mtH / 2, Math.min(mtW, mtH) * 0.3, mtW / 2, mtH / 2, Math.max(mtW, mtH) * 0.55);
+      edgeGrad.addColorStop(0, "rgba(0,0,0,0)");
+      edgeGrad.addColorStop(1, "rgba(0,0,0,0.08)");
+      mctx.fillStyle = edgeGrad;
+      mctx.fillRect(0, 0, mtW, mtH);
+
+      // V-groove inner shadow — thin dark line around the photo opening
+      const openL = ((matW - CANVAS_W) / 2 / matW) * mtW;
+      const openR = mtW - openL;
+      const openT = ((matH - CANVAS_H) / 2 / matH) * mtH;
+      const openB = mtH - openT;
+      const grooveW = 2;
+
+      // Outer dark edge of groove
+      mctx.fillStyle = "#8a8078";
+      mctx.fillRect(openL - grooveW, openT - grooveW, openR - openL + grooveW * 2, grooveW); // top
+      mctx.fillRect(openL - grooveW, openB, openR - openL + grooveW * 2, grooveW); // bottom
+      mctx.fillRect(openL - grooveW, openT, grooveW, openB - openT); // left
+      mctx.fillRect(openR, openT, grooveW, openB - openT); // right
+
+      // Inner highlight edge of groove (bevel illusion)
+      mctx.fillStyle = "#faf7f3";
+      mctx.fillRect(openL, openT, openR - openL, 1); // top highlight
+      mctx.fillRect(openL, openT, 1, openB - openT); // left highlight
+
+      const matTex = new THREE.CanvasTexture(matTexCanvas);
+      const matGeo = new THREE.PlaneGeometry(matW, matH);
+      const matMat = new THREE.MeshStandardMaterial({
+        map: matTex,
+        roughness: 0.95,
+        metalness: 0,
+      });
+      const matMesh = new THREE.Mesh(matGeo, matMat);
+      const matOffsetZ = facing === 0 ? 0.079 : -0.079;
+      matMesh.position.set(wallX, 1.9, wallZ + matOffsetZ);
+      matMesh.rotation.y = facing;
+      scene.add(matMesh);
 
       // Canvas (photo)
       const canvasGeo = new THREE.PlaneGeometry(CANVAS_W, CANVAS_H);
@@ -512,10 +582,17 @@ export default function YalnizlikSergiPage() {
       texture.anisotropy = maxAniso;
       const canvasMat = new THREE.MeshBasicMaterial({ map: texture });
       const artCanvas = new THREE.Mesh(canvasGeo, canvasMat);
-      // offset canvas slightly in front of frame
-      const canvasOffsetZ = facing === 0 ? 0.05 : -0.05;
+      const canvasOffsetZ = facing === 0 ? 0.08 : -0.08;
       artCanvas.position.set(wallX, 1.9, wallZ + canvasOffsetZ);
       artCanvas.rotation.y = facing;
+
+      // Per-artwork spot light — warm amber, gentle
+      const spot = new THREE.SpotLight(0xffe4c4, 1.2, 8, Math.PI / 6, 0.7, 1.5);
+      const spotZ = facing === 0 ? wallZ + 3.5 : wallZ - 3.5;
+      spot.position.set(wallX, 4.5, spotZ);
+      spot.target.position.set(wallX, 1.9, wallZ);
+      scene.add(spot);
+      scene.add(spot.target);
 
       // Label
       const labelCanvas = document.createElement("canvas");
@@ -587,11 +664,11 @@ export default function YalnizlikSergiPage() {
     titleMesh.position.set(HALF_W - 0.05, 2.5, 0);
     scene.add(titleMesh);
 
-    // Extra spot lights along corridor (x-axis) for artwork illumination
-    for (let li = -30; li <= 30; li += 15) {
-      const spot = new THREE.PointLight(0xffffff, 0.4, 20);
-      spot.position.set(li, 4.5, 0);
-      scene.add(spot);
+    // Subtle warm corridor fill lights (low intensity, wide spacing)
+    for (let li = -30; li <= 30; li += 20) {
+      const corridorLight = new THREE.PointLight(0xffe8d0, 0.15, 18);
+      corridorLight.position.set(li, 4.5, 0);
+      scene.add(corridorLight);
     }
 
     // Animation
