@@ -112,25 +112,29 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
               <div>
                 <p className={`text-sm font-semibold ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}>
                   {meta.author}
-                  {meta.authorIg && (
-                    <a
-                      href={`https://instagram.com/${meta.authorIg.replace("@", "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`ml-2 text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
-                    >
-                      {meta.authorIg}
-                    </a>
-                  )}
-                  {meta.authorEmail && (
-                    <a
-                      href={`mailto:${meta.authorEmail}`}
-                      className={`ml-2 text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
-                    >
-                      {meta.authorEmail}
-                    </a>
-                  )}
                 </p>
+                {(meta.authorIg || meta.authorEmail) && (
+                  <p className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                    {meta.authorIg && (
+                      <a
+                        href={`https://instagram.com/${meta.authorIg.replace("@", "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
+                      >
+                        {meta.authorIg}
+                      </a>
+                    )}
+                    {meta.authorEmail && (
+                      <a
+                        href={`mailto:${meta.authorEmail}`}
+                        className={`text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
+                      >
+                        {meta.authorEmail}
+                      </a>
+                    )}
+                  </p>
+                )}
                 <p className={`text-xs mt-0.5 ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/40"}`}>
                   {formatDate(meta.date)} · {meta.readTime} okuma
                 </p>
