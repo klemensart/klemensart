@@ -80,12 +80,42 @@ function extractDurakBlocks(mdContent: string): string {
   );
 }
 
+function youtubeIframe(id: string): string {
+  return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+}
+
 function processYouTubeEmbeds(rawHtml: string): string {
-  return rawHtml.replace(/<youtube>([\s\S]*?)<\/youtube>/g, (_, url) => {
+  // 1. <youtube>URL</youtube> custom tag
+  let result = rawHtml.replace(/<youtube>([\s\S]*?)<\/youtube>/g, (_, url) => {
     const id = extractYouTubeId(url.trim());
-    if (!id) return "";
-    return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+    return id ? youtubeIframe(id) : "";
   });
+
+  // 2. Standalone YouTube links: <p><a href="youtube-url">...</a></p>
+  result = result.replace(
+    /<p>\s*<a href="(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s"]*|youtu\.be\/[\w-]+)[^"]*)"[^>]*>[^<]*<\/a>\s*<\/p>/g,
+    (_, url) => {
+      const id = extractYouTubeId(url);
+      return id ? youtubeIframe(id) : `<p><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></p>`;
+    }
+  );
+
+  // 3. Bare YouTube URLs in paragraphs: <p>https://youtube.com/...</p>
+  result = result.replace(
+    /<p>\s*(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s<]*|youtu\.be\/[\w-]+)[^\s<]*)\s*<\/p>/g,
+    (_, url) => {
+      const id = extractYouTubeId(url);
+      return id ? youtubeIframe(id) : `<p>${url}</p>`;
+    }
+  );
+
+  // 4. Remaining YouTube <a> links → open in new tab
+  result = result.replace(
+    /<a href="(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^"]*)"(?![^>]*target=)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer"'
+  );
+
+  return result;
 }
 
 /** Markdown content → processed HTML (tüm özel bloklar dahil) */
