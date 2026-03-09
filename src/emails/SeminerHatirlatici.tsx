@@ -8,7 +8,6 @@ type Props = {
   eventDate?: string;
   eventTime?: string;
   zoomLink?: string;
-  calendarUrl?: string;
 };
 
 export default function SeminerHatirlatici({
@@ -17,7 +16,6 @@ export default function SeminerHatirlatici({
   eventDate = "9 Mart 2026, Pazartesi",
   eventTime = "20:30 (TSI)",
   zoomLink = "https://zoom.us/j/123456789",
-  calendarUrl = "https://klemensart.com/takvim",
 }: Props) {
   return (
     <KlemensLayout preview={`Yarın: ${eventTitle}`}>
@@ -25,7 +23,7 @@ export default function SeminerHatirlatici({
         <Text style={eyebrow}>HATIRLATMA</Text>
         <Text style={h1}>Yarın Buluşuyoruz</Text>
         {imageUrl && (
-          <Link href={calendarUrl}>
+          <Link href={zoomLink}>
             <Img src={imageUrl} alt="" width="100%" style={heroImg} />
           </Link>
         )}
@@ -52,12 +50,12 @@ export default function SeminerHatirlatici({
         <Hr style={thinDivider} />
       </Section>
 
-      <KlemensButton href={calendarUrl}>Takvime Ekle</KlemensButton>
+      <KlemensButton href={zoomLink}>Zoom&apos;a Katıl</KlemensButton>
 
       <Section style={content}>
         <Text style={small}>
-          Zoom bağlantı linkiniz etkinlik saatinden 15 dakika önce
-          ayrı bir e-posta ile iletilecektir.
+          Bağlantı açılmazsa bu linki tarayıcınıza yapıştırın:{" "}
+          <Link href={zoomLink} style={{ color: "#FF6D60" }}>{zoomLink}</Link>
         </Text>
       </Section>
     </KlemensLayout>
