@@ -288,7 +288,7 @@ const ARTWORKS: Artwork[] = [
 
 export default function YalnizlikSergiPage() {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [selectedArt, setSelectedArt] = useState<Artwork | null>(null);
+  const [selectedArtIndex, setSelectedArtIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -310,6 +310,13 @@ export default function YalnizlikSergiPage() {
   const nearestArtIndexRef = useRef<number | null>(null);
   const dragEndTimeRef = useRef(0);
   const [nearestArt, setNearestArt] = useState<Artwork | null>(null);
+  const nearBenchRef = useRef(false);
+  const overlayOpenRef = useRef(false);
+  const [nearBench, setNearBench] = useState(false);
+  const [showSlideshow, setShowSlideshow] = useState(false);
+  const [slideshowIndex, setSlideshowIndex] = useState(0);
+  const touchStartXRef = useRef(0);
+  const selectedArt = selectedArtIndex !== null ? ARTWORKS[selectedArtIndex] : null;
 
   function playFootstep(ctx: AudioContext) {
     const now = ctx.currentTime;
@@ -870,6 +877,17 @@ export default function YalnizlikSergiPage() {
       camera.fov += (targetFov - camera.fov) * 0.05;
       camera.updateProjectionMatrix();
 
+      // Bench proximity detection
+      const benchXPositions = [-15, 0, 15];
+      const camXZ = new THREE.Vector2(camera.position.x, camera.position.z);
+      const isNearBench = benchXPositions.some(bx =>
+        camXZ.distanceTo(new THREE.Vector2(bx, 0)) < 2.5
+      );
+      if (isNearBench !== nearBenchRef.current) {
+        nearBenchRef.current = isNearBench;
+        setNearBench(isNearBench);
+      }
+
       renderer.render(scene, camera);
     };
     animate();
@@ -888,7 +906,7 @@ export default function YalnizlikSergiPage() {
     window.addEventListener("resize", handleResize);
 
     // Keyboard
-    const onKeyDown = (e: KeyboardEvent) => { keysRef.current[e.key.toLowerCase()] = true; };
+    const onKeyDown = (e: KeyboardEvent) => { if (overlayOpenRef.current) return; keysRef.current[e.key.toLowerCase()] = true; };
     const onKeyUp = (e: KeyboardEvent) => { keysRef.current[e.key.toLowerCase()] = false; };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
@@ -997,6 +1015,29 @@ export default function YalnizlikSergiPage() {
       window.removeEventListener("touchstart", initAudio);
     };
   }, []);
+
+  // Sync overlay ref for blocking 3D movement keys
+  useEffect(() => {
+    overlayOpenRef.current = selectedArtIndex !== null || showSlideshow;
+  }, [selectedArtIndex, showSlideshow]);
+
+  // Keyboard navigation for detail & slideshow overlays
+  useEffect(() => {
+    const handleOverlayKey = (e: KeyboardEvent) => {
+      if (selectedArtIndex !== null) {
+        if (e.key === "Escape") { setSelectedArtIndex(null); return; }
+        if (e.key === "ArrowLeft") { setSelectedArtIndex(i => i !== null ? (i - 1 + ARTWORKS.length) % ARTWORKS.length : i); return; }
+        if (e.key === "ArrowRight") { setSelectedArtIndex(i => i !== null ? (i + 1) % ARTWORKS.length : i); return; }
+      }
+      if (showSlideshow) {
+        if (e.key === "Escape") { setShowSlideshow(false); return; }
+        if (e.key === "ArrowLeft") { setSlideshowIndex(i => (i - 1 + ARTWORKS.length) % ARTWORKS.length); return; }
+        if (e.key === "ArrowRight") { setSlideshowIndex(i => (i + 1) % ARTWORKS.length); return; }
+      }
+    };
+    window.addEventListener("keydown", handleOverlayKey);
+    return () => window.removeEventListener("keydown", handleOverlayKey);
+  }, [selectedArtIndex, showSlideshow]);
 
   const toggleAmbient = () => {
     if (!audioCtxRef.current) {
@@ -1235,138 +1276,297 @@ export default function YalnizlikSergiPage() {
         position: "absolute", bottom: 90, left: 0, right: 0,
         display: "flex", flexDirection: "column", alignItems: "center",
         pointerEvents: "none", zIndex: 25,
-        opacity: nearestArt ? 1 : 0,
+        opacity: nearestArt || nearBench ? 1 : 0,
         transition: "opacity 0.4s ease",
       }}>
-        <div style={{
-          color: "#fff", fontSize: 18, fontWeight: 600, letterSpacing: 2,
-          textShadow: "0 2px 8px rgba(0,0,0,0.7)",
-          marginBottom: 12,
-        }}>
-          {nearestArt?.title}
-        </div>
-        <button
-          onClick={() => { if (nearestArt) setSelectedArt(nearestArt); }}
-          style={{
-            pointerEvents: nearestArt ? "auto" : "none",
-            background: "#FF6D60",
-            color: "#fff",
-            border: "none",
-            borderRadius: 24,
-            padding: "10px 28px",
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: 1,
-            cursor: "pointer",
-            boxShadow: "0 4px 16px rgba(255,109,96,0.4)",
-            transition: "transform 0.2s, box-shadow 0.2s",
-          }}
-          onMouseOver={(e) => {
-            (e.target as HTMLElement).style.transform = "scale(1.05)";
-            (e.target as HTMLElement).style.boxShadow = "0 6px 20px rgba(255,109,96,0.5)";
-          }}
-          onMouseOut={(e) => {
-            (e.target as HTMLElement).style.transform = "scale(1)";
-            (e.target as HTMLElement).style.boxShadow = "0 4px 16px rgba(255,109,96,0.4)";
-          }}
-        >
-          Keşfet
-        </button>
+        {nearestArt && (
+          <>
+            <div style={{
+              color: "#fff", fontSize: 18, fontWeight: 600, letterSpacing: 2,
+              textShadow: "0 2px 8px rgba(0,0,0,0.7)",
+              marginBottom: 12,
+            }}>
+              {nearestArt.title}
+            </div>
+            <button
+              onClick={() => { if (nearestArtIndexRef.current !== null) setSelectedArtIndex(nearestArtIndexRef.current); }}
+              style={{
+                pointerEvents: "auto",
+                background: "#FF6D60",
+                color: "#fff",
+                border: "none",
+                borderRadius: 24,
+                padding: "10px 28px",
+                fontSize: 14,
+                fontWeight: 600,
+                letterSpacing: 1,
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(255,109,96,0.4)",
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseOver={(e) => {
+                (e.target as HTMLElement).style.transform = "scale(1.05)";
+                (e.target as HTMLElement).style.boxShadow = "0 6px 20px rgba(255,109,96,0.5)";
+              }}
+              onMouseOut={(e) => {
+                (e.target as HTMLElement).style.transform = "scale(1)";
+                (e.target as HTMLElement).style.boxShadow = "0 4px 16px rgba(255,109,96,0.4)";
+              }}
+            >
+              Keşfet
+            </button>
+          </>
+        )}
+        {nearBench && (
+          <button
+            onClick={() => { setSlideshowIndex(0); setShowSlideshow(true); }}
+            style={{
+              pointerEvents: "auto",
+              marginTop: nearestArt ? 12 : 0,
+              background: "rgba(255,255,255,0.12)",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.25)",
+              borderRadius: 24,
+              padding: "10px 28px",
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: 1,
+              cursor: "pointer",
+              backdropFilter: "blur(8px)",
+              transition: "transform 0.2s, background 0.2s",
+            }}
+            onMouseOver={(e) => {
+              (e.target as HTMLElement).style.transform = "scale(1.05)";
+              (e.target as HTMLElement).style.background = "rgba(255,255,255,0.2)";
+            }}
+            onMouseOut={(e) => {
+              (e.target as HTMLElement).style.transform = "scale(1)";
+              (e.target as HTMLElement).style.background = "rgba(255,255,255,0.12)";
+            }}
+          >
+            Panoramik G&ouml;r&uuml;n&uuml;m
+          </button>
+        )}
       </div>
 
-      {/* Artwork detail panel */}
+      {/* Fullscreen artwork detail viewer */}
       {selectedArt && (
-        <div
-          style={{
-            position: "absolute", inset: 0, background: "rgba(0,0,0,0.85)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 100, backdropFilter: "blur(8px)"
-          }}
-          onClick={() => setSelectedArt(null)}
-        >
+        <div style={{
+          position: "fixed", inset: 0, background: "#000",
+          zIndex: 100, display: "flex", flexDirection: "column",
+        }}>
+          {/* Close button */}
+          <button
+            onClick={() => setSelectedArtIndex(null)}
+            style={{
+              position: "absolute", top: 16, right: 16, zIndex: 110,
+              background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "50%",
+              width: 44, height: 44, color: "#fff", fontSize: 24, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            &times;
+          </button>
+
+          {/* Counter */}
+          <div style={{
+            position: "absolute", top: 24, left: "50%", transform: "translateX(-50%)",
+            zIndex: 110, color: "rgba(255,255,255,0.4)", fontSize: 13, fontWeight: 500,
+          }}>
+            {selectedArtIndex! + 1} / {ARTWORKS.length}
+          </div>
+
+          {/* Photo area */}
           <div
             style={{
-              background: "#1a1a1a",
-              borderRadius: isMobile ? 0 : 16,
-              maxWidth: isMobile ? "100%" : 600,
-              width: isMobile ? "100%" : "90%",
-              height: isMobile ? "100%" : "auto",
-              maxHeight: isMobile ? "100%" : "90vh",
-              overflowY: "auto",
-              border: isMobile ? "none" : "1px solid rgba(255,255,255,0.1)",
+              flex: "0 0 65vh", position: "relative", display: "flex",
+              alignItems: "center", justifyContent: "center", background: "#000",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => { touchStartXRef.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const diff = e.changedTouches[0].clientX - touchStartXRef.current;
+              if (Math.abs(diff) > 50) {
+                setSelectedArtIndex(i => i !== null
+                  ? diff > 0
+                    ? (i - 1 + ARTWORKS.length) % ARTWORKS.length
+                    : (i + 1) % ARTWORKS.length
+                  : i
+                );
+              }
+            }}
           >
-            {/* Artwork preview */}
-            <div style={{ position: "relative" }}>
-              <img
-                src={selectedArt.image}
-                alt={selectedArt.title}
-                style={{ width: "100%", display: "block", borderRadius: "16px 16px 0 0" }}
-              />
-              <div style={{
-                position: "absolute", bottom: 16, left: 16, right: 16
-              }}>
-                <div style={{
-                  background: "rgba(0,0,0,0.6)", borderRadius: 8, padding: "8px 12px",
-                  backdropFilter: "blur(4px)", display: "inline-block"
-                }}>
-                  <span style={{ color: "#FF6D60", fontSize: 11, letterSpacing: 2 }}>
-                    {selectedArt.location}
-                  </span>
-                </div>
-              </div>
-            </div>
+            {/* Prev */}
+            <button
+              onClick={() => setSelectedArtIndex(i => i !== null ? (i - 1 + ARTWORKS.length) % ARTWORKS.length : i)}
+              style={{
+                position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                zIndex: 105, background: "rgba(255,255,255,0.08)", border: "none",
+                borderRadius: "50%", width: 48, height: 48, color: "#fff", fontSize: 28,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.2s",
+              }}
+              onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)"; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"; }}
+            >
+              &#8249;
+            </button>
 
-            {/* Content */}
-            <div style={{ padding: 24 }}>
-              <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: "0 0 4px 0" }}>
+            <img
+              key={selectedArtIndex}
+              src={selectedArt.image}
+              alt={selectedArt.title}
+              style={{ maxWidth: "calc(100% - 120px)", maxHeight: "65vh", objectFit: "contain" }}
+            />
+
+            {/* Next */}
+            <button
+              onClick={() => setSelectedArtIndex(i => i !== null ? (i + 1) % ARTWORKS.length : i)}
+              style={{
+                position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                zIndex: 105, background: "rgba(255,255,255,0.08)", border: "none",
+                borderRadius: "50%", width: 48, height: 48, color: "#fff", fontSize: 28,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.2s",
+              }}
+              onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)"; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"; }}
+            >
+              &#8250;
+            </button>
+          </div>
+
+          {/* Info panel */}
+          <div style={{
+            flex: 1, overflowY: "auto", padding: "20px 24px", background: "#111",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+              <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: 0 }}>
                 {selectedArt.title}
               </h2>
-              <p style={{ color: "#FF6D60", fontSize: 13, margin: "0 0 16px 0" }}>
-                {selectedArt.photographer}
+              <span style={{
+                background: "rgba(255,109,96,0.15)", color: "#FF6D60", fontSize: 12,
+                padding: "4px 12px", borderRadius: 20, whiteSpace: "nowrap", marginLeft: 12,
+                flexShrink: 0,
+              }}>
+                {selectedArt.location}
+              </span>
+            </div>
+
+            <p style={{ color: "#FF6D60", fontSize: 13, margin: "0 0 16px 0" }}>
+              {selectedArt.photographer}
+            </p>
+
+            <div style={{ borderLeft: "2px solid #FF6D60", paddingLeft: 16, marginBottom: 20 }}>
+              <p style={{ color: "#ccc", fontSize: 14, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>
+                &ldquo;{selectedArt.note}&rdquo;
               </p>
+            </div>
 
-              <div style={{
-                borderLeft: "2px solid #FF6D60", paddingLeft: 16, marginBottom: 20
-              }}>
-                <p style={{ color: "#ccc", fontSize: 14, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>
-                  &ldquo;{selectedArt.note}&rdquo;
-                </p>
+            <div style={{ background: "#1a1a1a", borderRadius: 10, padding: 16 }}>
+              <div style={{ color: "#FF6D60", fontSize: 11, letterSpacing: 2, marginBottom: 8, fontWeight: 600 }}>
+                MEKAN HAKKINDA
               </div>
+              <p style={{ color: "#999", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                {selectedArt.info}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-              <div style={{
-                background: "#222", borderRadius: 10, padding: 16
-              }}>
-                <div style={{
-                  color: "#FF6D60", fontSize: 11, letterSpacing: 2, marginBottom: 8, fontWeight: 600
-                }}>
-                  MEKAN HAKKINDA
-                </div>
-                <p style={{ color: "#999", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
-                  {selectedArt.info}
-                </p>
-              </div>
+      {/* Panoramic slideshow overlay */}
+      {showSlideshow && (
+        <div style={{
+          position: "fixed", inset: 0, background: "#000",
+          zIndex: 100, display: "flex", flexDirection: "column",
+        }}>
+          {/* Top bar */}
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "12px 16px", position: "absolute", top: 0, left: 0, right: 0, zIndex: 110,
+          }}>
+            <button
+              onClick={() => setShowSlideshow(false)}
+              style={{
+                background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "50%",
+                width: 44, height: 44, color: "#fff", fontSize: 24, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              &times;
+            </button>
+            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, fontWeight: 500 }}>
+              {slideshowIndex + 1} / {ARTWORKS.length}
+            </span>
+          </div>
 
-              <button
-                onClick={() => setSelectedArt(null)}
-                style={{
-                  marginTop: 20, width: "100%", padding: "12px 0",
-                  background: "transparent", border: "1px solid rgba(255,109,96,0.3)",
-                  borderRadius: 8, color: "#FF6D60", fontSize: 14,
-                  cursor: "pointer", transition: "all 0.2s"
-                }}
-                onMouseOver={(e) => {
-                  (e.target as HTMLElement).style.background = "rgba(255,109,96,0.1)";
-                  (e.target as HTMLElement).style.borderColor = "#FF6D60";
-                }}
-                onMouseOut={(e) => {
-                  (e.target as HTMLElement).style.background = "transparent";
-                  (e.target as HTMLElement).style.borderColor = "rgba(255,109,96,0.3)";
-                }}
-              >
-                Sergiye D&ouml;n
-              </button>
+          {/* Photo area */}
+          <div
+            style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
+              position: "relative", overflow: "hidden",
+            }}
+            onTouchStart={(e) => { touchStartXRef.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const diff = e.changedTouches[0].clientX - touchStartXRef.current;
+              if (Math.abs(diff) > 50) {
+                setSlideshowIndex(i => diff > 0
+                  ? (i - 1 + ARTWORKS.length) % ARTWORKS.length
+                  : (i + 1) % ARTWORKS.length
+                );
+              }
+            }}
+          >
+            {/* Prev */}
+            <button
+              onClick={() => setSlideshowIndex(i => (i - 1 + ARTWORKS.length) % ARTWORKS.length)}
+              style={{
+                position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                zIndex: 105, background: "rgba(255,255,255,0.08)", border: "none",
+                borderRadius: "50%", width: 48, height: 48, color: "#fff", fontSize: 28,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.2s",
+              }}
+              onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)"; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"; }}
+            >
+              &#8249;
+            </button>
+
+            <img
+              key={slideshowIndex}
+              src={ARTWORKS[slideshowIndex].image}
+              alt={ARTWORKS[slideshowIndex].title}
+              style={{ maxWidth: "calc(100% - 120px)", maxHeight: "85vh", objectFit: "contain" }}
+            />
+
+            {/* Next */}
+            <button
+              onClick={() => setSlideshowIndex(i => (i + 1) % ARTWORKS.length)}
+              style={{
+                position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                zIndex: 105, background: "rgba(255,255,255,0.08)", border: "none",
+                borderRadius: "50%", width: 48, height: 48, color: "#fff", fontSize: 28,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.2s",
+              }}
+              onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)"; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)"; }}
+            >
+              &#8250;
+            </button>
+          </div>
+
+          {/* Bottom info strip */}
+          <div style={{
+            padding: "14px 24px", background: "rgba(0,0,0,0.8)",
+            textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.05)",
+          }}>
+            <div style={{ color: "#fff", fontSize: 16, fontWeight: 600, marginBottom: 4 }}>
+              {ARTWORKS[slideshowIndex].title}
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
+              {ARTWORKS[slideshowIndex].location}
             </div>
           </div>
         </div>
