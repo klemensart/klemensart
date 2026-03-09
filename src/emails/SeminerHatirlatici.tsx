@@ -31,9 +31,9 @@ export default function SeminerHatirlatici({
         )}
 
         <Text style={p}>
-          Saatler azalıyor — yarın akşam, birlikte yeni bir düşünce
-          yolculuğuna çıkıyoruz. Kendinize bir çay demleyin, rahat bir
-          köşede yerinizi alın ve zihninizi açık tutun.
+          Yarın akşam, birlikte yeni bir düşünce yolculuğuna çıkıyoruz.
+          Kendinize bir kahve demleyin, konforlu bir köşede yerinizi alın
+          ve merakınızı yanınıza almayı unutmayın.
         </Text>
 
         <Hr style={thinDivider} />
