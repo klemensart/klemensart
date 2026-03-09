@@ -24,7 +24,11 @@ export type ParsedArticle = {
 /* ──────────────── markdown processing helpers ──────────────── */
 
 function extractYouTubeId(url: string): string | null {
-  const m = url.match(/[?&]v=([\w-]+)/) ?? url.match(/youtu\.be\/([\w-]+)/);
+  const m =
+    url.match(/[?&]v=([\w-]+)/) ??
+    url.match(/youtu\.be\/([\w-]+)/) ??
+    url.match(/youtube\.com\/embed\/([\w-]+)/) ??
+    url.match(/youtube\.com\/shorts\/([\w-]+)/);
   return m ? m[1] : null;
 }
 
@@ -84,6 +88,8 @@ function youtubeIframe(id: string): string {
   return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
 }
 
+const YT_URL_RE = /https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s<"]*|youtu\.be\/[\w-]+[^\s<"]*|youtube\.com\/embed\/[\w-]+[^\s<"]*|m\.youtube\.com\/watch\?[^\s<"]*)/g;
+
 function processYouTubeEmbeds(rawHtml: string): string {
   // 1. <youtube>URL</youtube> custom tag
   let result = rawHtml.replace(/<youtube>([\s\S]*?)<\/youtube>/g, (_, url) => {
@@ -91,27 +97,50 @@ function processYouTubeEmbeds(rawHtml: string): string {
     return id ? youtubeIframe(id) : "";
   });
 
-  // 2. Standalone YouTube links: <p><a href="youtube-url">...</a></p>
+  // 2. YouTube <a> links that are alone in a <p> → embed
   result = result.replace(
-    /<p>\s*<a href="(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s"]*|youtu\.be\/[\w-]+)[^"]*)"[^>]*>[^<]*<\/a>\s*<\/p>/g,
-    (_, url) => {
+    /<p>\s*<a [^>]*href="([^"]*)"[^>]*>[^<]*<\/a>\s*<\/p>/g,
+    (match, url) => {
       const id = extractYouTubeId(url);
-      return id ? youtubeIframe(id) : `<p><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></p>`;
+      return id ? youtubeIframe(id) : match;
     }
   );
 
-  // 3. Bare YouTube URLs in paragraphs: <p>https://youtube.com/...</p>
+  // 3. Bare YouTube URLs alone in a <p> → embed
   result = result.replace(
-    /<p>\s*(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s<]*|youtu\.be\/[\w-]+)[^\s<]*)\s*<\/p>/g,
-    (_, url) => {
+    /<p>\s*(https?:\/\/[^\s<]+)\s*<\/p>/g,
+    (match, url) => {
       const id = extractYouTubeId(url);
-      return id ? youtubeIframe(id) : `<p>${url}</p>`;
+      return id ? youtubeIframe(id) : match;
     }
   );
 
-  // 4. Remaining YouTube <a> links → open in new tab
+  // 4. YouTube URL at end of a <p> (after text) → split: keep text, add embed after
   result = result.replace(
-    /<a href="(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^"]*)"(?![^>]*target=)/g,
+    /(<p>[\s\S]*?)\s*(https?:\/\/(?:www\.)?(?:youtube\.com\/watch|youtu\.be\/|m\.youtube\.com\/watch)[^\s<]*)\s*(<\/p>)/g,
+    (match, before, url, after) => {
+      const id = extractYouTubeId(url);
+      if (!id) return match;
+      // Remove trailing <br> or whitespace from the text before
+      const cleanBefore = before.replace(/\s*(<br\s*\/?>)?\s*$/, "");
+      return `${cleanBefore}${after}\n${youtubeIframe(id)}`;
+    }
+  );
+
+  // 5. YouTube <a> links at end of a <p> → split: keep text, embed after
+  result = result.replace(
+    /(<p>[\s\S]*?)\s*<a [^>]*href="([^"]*youtube[^"]*|[^"]*youtu\.be[^"]*)"[^>]*>[^<]*<\/a>\s*(<\/p>)/g,
+    (match, before, url, after) => {
+      const id = extractYouTubeId(url);
+      if (!id) return match;
+      const cleanBefore = before.replace(/\s*(<br\s*\/?>)?\s*$/, "");
+      return `${cleanBefore}${after}\n${youtubeIframe(id)}`;
+    }
+  );
+
+  // 6. Remaining YouTube <a> links → open in new tab
+  result = result.replace(
+    /<a href="(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|m\.youtube\.com)\/[^"]*)"(?![^>]*target=)/g,
     '<a href="$1" target="_blank" rel="noopener noreferrer"'
   );
 
