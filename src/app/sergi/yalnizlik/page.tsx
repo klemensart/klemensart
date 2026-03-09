@@ -879,8 +879,8 @@ export default function YalnizlikSergiPage() {
       if (isDraggingRef.current) {
         const dx = e.clientX - lastMouseRef.current.x;
         const dy = e.clientY - lastMouseRef.current.y;
-        yawRef.current -= dx * 0.003;
-        pitchRef.current -= dy * 0.003;
+        yawRef.current += dx * 0.003;
+        pitchRef.current += dy * 0.003;
         pitchRef.current = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, pitchRef.current));
         lastMouseRef.current = { x: e.clientX, y: e.clientY };
       }
@@ -914,8 +914,8 @@ export default function YalnizlikSergiPage() {
       if (e.touches.length === 1 && isDraggingRef.current) {
         const dx = e.touches[0].clientX - lastMouseRef.current.x;
         const dy = e.touches[0].clientY - lastMouseRef.current.y;
-        yawRef.current -= dx * 0.003;
-        pitchRef.current -= dy * 0.003;
+        yawRef.current += dx * 0.003;
+        pitchRef.current += dy * 0.003;
         pitchRef.current = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, pitchRef.current));
         lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       } else if (e.touches.length === 2 && pinchDistRef.current > 0) {
