@@ -105,7 +105,7 @@ export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
       type: "text",
       x: 80,
       y: 870,
-      width: 920,
+      width: 860,
       text: article.description || article.title,
       fontSize: 34,
       fontFamily: "Montserrat",
