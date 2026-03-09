@@ -340,6 +340,7 @@ export default function YalnizlikSergiPage() {
     // Scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a1714);
+    scene.fog = new THREE.FogExp2(0x1a1714, 0.018);
     sceneRef.current = scene;
 
     // Camera — start at entrance end (+x), looking inward (-x)
@@ -467,6 +468,80 @@ export default function YalnizlikSergiPage() {
     rightWall.position.set(HALF_W, 2.5, 0);
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
+
+    // ── Architectural details (shared geometry, minimal draw calls) ──
+    const darkTrimMat = new THREE.MeshStandardMaterial({ color: 0x1a1612, roughness: 0.8 });
+    const lightTrimMat = new THREE.MeshStandardMaterial({ color: 0x2e2924, roughness: 0.85 });
+    const pilasterMat = new THREE.MeshStandardMaterial({ color: 0x252220, roughness: 0.9 });
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x2a2826, metalness: 0.6, roughness: 0.3 });
+
+    // Baseboard (süpürgelik) — thin dark strip along wall-floor joint
+    const bbGeo = new THREE.BoxGeometry(ROOM_W, 0.15, 0.06);
+    const bbSideGeo = new THREE.BoxGeometry(0.06, 0.15, ROOM_D);
+    // Front & back baseboards
+    const bbFront = new THREE.Mesh(bbGeo, darkTrimMat);
+    bbFront.position.set(0, 0.075, -HALF_D + 0.03);
+    scene.add(bbFront);
+    const bbBack = new THREE.Mesh(bbGeo, darkTrimMat);
+    bbBack.position.set(0, 0.075, HALF_D - 0.03);
+    scene.add(bbBack);
+    // Side baseboards
+    const bbLeft = new THREE.Mesh(bbSideGeo, darkTrimMat);
+    bbLeft.position.set(-HALF_W + 0.03, 0.075, 0);
+    scene.add(bbLeft);
+    const bbRight = new THREE.Mesh(bbSideGeo, darkTrimMat);
+    bbRight.position.set(HALF_W - 0.03, 0.075, 0);
+    scene.add(bbRight);
+
+    // Crown molding (tavan kornişi) — subtle ledge at wall-ceiling joint
+    const crownGeo = new THREE.BoxGeometry(ROOM_W, 0.1, 0.1);
+    const crownSideGeo = new THREE.BoxGeometry(0.1, 0.1, ROOM_D);
+    const crFront = new THREE.Mesh(crownGeo, lightTrimMat);
+    crFront.position.set(0, 4.95, -HALF_D + 0.05);
+    scene.add(crFront);
+    const crBack = new THREE.Mesh(crownGeo, lightTrimMat);
+    crBack.position.set(0, 4.95, HALF_D - 0.05);
+    scene.add(crBack);
+    const crLeft = new THREE.Mesh(crownSideGeo, lightTrimMat);
+    crLeft.position.set(-HALF_W + 0.05, 4.95, 0);
+    scene.add(crLeft);
+    const crRight = new THREE.Mesh(crownSideGeo, lightTrimMat);
+    crRight.position.set(HALF_W - 0.05, 4.95, 0);
+    scene.add(crRight);
+
+    // Ceiling light rail — thin metal track running along corridor center
+    const railGeo = new THREE.BoxGeometry(ROOM_W - 4, 0.04, 0.08);
+    const rail = new THREE.Mesh(railGeo, railMat);
+    rail.position.set(0, 4.96, 0);
+    scene.add(rail);
+    // Rail light housings — small emissive boxes at artwork positions
+    const housingGeo = new THREE.BoxGeometry(0.3, 0.12, 0.12);
+    const housingMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1816,
+      emissive: 0x332a20,
+      emissiveIntensity: 0.3,
+    });
+    ARTWORKS.forEach((_, i) => {
+      const hx = i < 11 ? -30 + i * 6 : -27 + (i - 11) * 6;
+      const housing = new THREE.Mesh(housingGeo, housingMat);
+      housing.position.set(hx, 4.9, 0);
+      scene.add(housing);
+    });
+
+    // Pilasters — shallow wall columns between artwork groups
+    const pilGeo = new THREE.BoxGeometry(0.12, 5, 0.08);
+    // Place on long walls at x positions between each city group
+    const pilXPositions = [-33, -21, -9, 3, 15, 27, 33]; // between city clusters
+    pilXPositions.forEach(px => {
+      // Front wall pilaster
+      const pf = new THREE.Mesh(pilGeo, pilasterMat);
+      pf.position.set(px, 2.5, -HALF_D + 0.04);
+      scene.add(pf);
+      // Back wall pilaster
+      const pb = new THREE.Mesh(pilGeo, pilasterMat);
+      pb.position.set(px, 2.5, HALF_D - 0.04);
+      scene.add(pb);
+    });
 
     // Create artworks — corridor layout
     const artMeshes: THREE.Mesh[] = [];
@@ -613,17 +688,23 @@ export default function YalnizlikSergiPage() {
 
     artMeshesRef.current = artMeshes;
 
-    // Benches — every 20 units along the corridor (x-axis)
-    const benchGeo = new THREE.BoxGeometry(0.8, 0.5, 3);
-    const benchMat = new THREE.MeshStandardMaterial({
-      color: 0x333333,
-      metalness: 0.3,
-    });
-    for (let bx = -20; bx <= 20; bx += 20) {
-      const bench = new THREE.Mesh(benchGeo, benchMat);
-      bench.position.set(bx, 0.25, 0);
-      bench.castShadow = true;
-      scene.add(bench);
+    // Benches — museum-style with legs, every 15 units
+    const seatGeo = new THREE.BoxGeometry(0.6, 0.06, 2.4);
+    const legGeo = new THREE.BoxGeometry(0.06, 0.42, 0.06);
+    const seatMat = new THREE.MeshStandardMaterial({ color: 0x3a302a, roughness: 0.6, metalness: 0.05 });
+    const legMat = new THREE.MeshStandardMaterial({ color: 0x2a2622, roughness: 0.4, metalness: 0.5 });
+    for (let bx = -15; bx <= 15; bx += 15) {
+      // Seat
+      const seat = new THREE.Mesh(seatGeo, seatMat);
+      seat.position.set(bx, 0.45, 0);
+      scene.add(seat);
+      // 4 legs
+      const offsets = [[-0.22, -1.0], [-0.22, 1.0], [0.22, -1.0], [0.22, 1.0]];
+      offsets.forEach(([ox, oz]) => {
+        const leg = new THREE.Mesh(legGeo, legMat);
+        leg.position.set(bx + ox, 0.21, oz);
+        scene.add(leg);
+      });
     }
 
     // Gallery title panel — entrance short wall (x = +HALF_W), facing -x
