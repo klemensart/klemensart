@@ -54,7 +54,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias, antik dönemin en ünlü heykeltraşlık okuluna ev sahipliği yapmış bir kenttir. 2017'de UNESCO Dünya Mirası listesine alınmıştır. Stadyumu 30.000 kişi kapasitesiyle antik dünyanın en iyi korunmuş örneklerinden biridir.",
     color: "#5B3A6B",
     accent: "#9B6BB0",
-    image: "/sergi/yalnizlik/afrodisias-1.webp",
+    image: "/sergi/en-sessiz-zaman/afrodisias-1.webp",
   },
   {
     id: 2,
@@ -65,7 +65,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias Tetrapylon'u, kentin anıtsal giriş kapısıdır. Dört sütun grubundan oluşan bu yapı, MS 2. yüzyılda inşa edilmiştir ve kabartmalarıyla ünlüdür.",
     color: "#6B5B3A",
     accent: "#B09B6B",
-    image: "/sergi/yalnizlik/afrodisias-2.webp",
+    image: "/sergi/en-sessiz-zaman/afrodisias-2.webp",
   },
   {
     id: 3,
@@ -76,7 +76,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias Stadyumu, 262 metre uzunluğu ve 59 metre genişliğiyle Roma döneminin en büyük ve en iyi korunmuş stadyumlarından biridir.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/yalnizlik/afrodisias-3.webp",
+    image: "/sergi/en-sessiz-zaman/afrodisias-3.webp",
   },
   {
     id: 4,
@@ -87,7 +87,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias heykeltraşlık okulu, Roma İmparatorluğu'nun en önemli mermer işleme merkeziydi. Üretilen heykeller Roma'dan İskenderiye'ye kadar geniş bir coğrafyaya ihraç edilirdi.",
     color: "#6B3A5B",
     accent: "#B06B9B",
-    image: "/sergi/yalnizlik/afrodisias-4.webp",
+    image: "/sergi/en-sessiz-zaman/afrodisias-4.webp",
   },
   // ── Aizanoi (3) ──
   {
@@ -99,7 +99,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi Zeus Tapınağı, Anadolu'daki en iyi korunmuş Roma tapınağıdır. Benzersiz bir özelliği, alt katında Kybele'ye adanmış bir mağara tapınağı barındırmasıdır.",
     color: "#8B6914",
     accent: "#D4A843",
-    image: "/sergi/yalnizlik/aizanoi-1.webp",
+    image: "/sergi/en-sessiz-zaman/aizanoi-1.webp",
   },
   {
     id: 6,
@@ -110,7 +110,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi, dünyada stadyum ve tiyatronun iç içe geçtiği tek antik kenttir. Bu benzersiz yapı, 2012'de UNESCO Dünya Mirası geçici listesine alınmıştır.",
     color: "#4A6741",
     accent: "#7BA370",
-    image: "/sergi/yalnizlik/aizanoi-2.webp",
+    image: "/sergi/en-sessiz-zaman/aizanoi-2.webp",
   },
   {
     id: 7,
@@ -121,7 +121,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi'nin antik köprüleri, kenti ikiye bölen Penkalas Çayı (günümüzde Kocaçay) üzerinde inşa edilmiştir. Roma döneminin mühendislik başarılarından biridir.",
     color: "#5B6B3A",
     accent: "#9BB06B",
-    image: "/sergi/yalnizlik/aizanoi-3.webp",
+    image: "/sergi/en-sessiz-zaman/aizanoi-3.webp",
   },
   // ── Asklepion (1) ──
   {
@@ -133,7 +133,7 @@ const ARTWORKS: Artwork[] = [
     info: "Bergama Asklepion'u, antik çağın en önemli sağlık merkezlerinden biriydi. Hastaların su sesi, müzik ve telkinle tedavi edildiği bu merkez, modern psikoterapinin öncüsü sayılır.",
     color: "#3A6B5B",
     accent: "#6BB09B",
-    image: "/sergi/yalnizlik/asklepion-1.webp",
+    image: "/sergi/en-sessiz-zaman/asklepion-1.webp",
   },
   // ── Assos (1) ──
   {
@@ -145,7 +145,7 @@ const ARTWORKS: Artwork[] = [
     info: "Assos Athena Tapınağı, Arkaik dönemde inşa edilen tek Dor tapınağıdır. Aristoteles MÖ 347-345 yıllarında burada bir felsefe okulu kurmuştur.",
     color: "#14698B",
     accent: "#43A8D4",
-    image: "/sergi/yalnizlik/assos-1.webp",
+    image: "/sergi/en-sessiz-zaman/assos-1.webp",
   },
   // ── Blaundus (1) ──
   {
@@ -157,7 +157,7 @@ const ARTWORKS: Artwork[] = [
     info: "Blaundus, Uşak'ın Ulubey ilçesinde, kanyonun kenarında kurulmuş antik bir kenttir. Makedonyalılar tarafından kurulmuş, Roma döneminde önemli bir merkez olmuştur.",
     color: "#8B4513",
     accent: "#CD853F",
-    image: "/sergi/yalnizlik/blaundus-1.webp",
+    image: "/sergi/en-sessiz-zaman/blaundus-1.webp",
   },
   // ── Çatalhöyük (2) ──
   {
@@ -169,7 +169,7 @@ const ARTWORKS: Artwork[] = [
     info: "Çatalhöyük, MÖ 7500-5700 yıllarına tarihlenen, dünyanın en eski ve en büyük Neolitik yerleşimlerinden biridir. 2012'de UNESCO Dünya Mirası listesine alınmıştır.",
     color: "#6B5B4A",
     accent: "#B09B8A",
-    image: "/sergi/yalnizlik/catalhoyuk-1.webp",
+    image: "/sergi/en-sessiz-zaman/catalhoyuk-1.webp",
   },
   {
     id: 12,
@@ -180,7 +180,7 @@ const ARTWORKS: Artwork[] = [
     info: "Çatalhöyük'te 18 yerleşim katmanı tespit edilmiştir. En kalabalık döneminde 8.000'e kadar insanın yaşadığı tahmin edilen kentte, evlerin duvarları boğa başları ve av sahneleriyle süslenmiştir.",
     color: "#5B4A3A",
     accent: "#9B8A6B",
-    image: "/sergi/yalnizlik/catalhoyuk-2.webp",
+    image: "/sergi/en-sessiz-zaman/catalhoyuk-2.webp",
   },
   // ── Kibyra (2) ──
   {
@@ -192,7 +192,7 @@ const ARTWORKS: Artwork[] = [
     info: "Kibyra, Burdur'un Gölhisar ilçesinde yer alan antik kenttir. 2015 yılında keşfedilen gladyatör mozaikleriyle dünya gündemine oturmuştur. Medusa kabartmaları ve stadyumuyla dikkat çeker.",
     color: "#6B3A3A",
     accent: "#B06B6B",
-    image: "/sergi/yalnizlik/kibyra-1.webp",
+    image: "/sergi/en-sessiz-zaman/kibyra-1.webp",
   },
   {
     id: 14,
@@ -203,7 +203,7 @@ const ARTWORKS: Artwork[] = [
     info: "Kibyra'nın Medusa kabartmaları, Roma döneminin en etkileyici taş işçiliği örnekleri arasındadır. Kent, dört dil konuşulan kozmopolit bir merkez olarak bilinirdi.",
     color: "#4A3A6B",
     accent: "#8A6BB0",
-    image: "/sergi/yalnizlik/kibyra-2.webp",
+    image: "/sergi/en-sessiz-zaman/kibyra-2.webp",
   },
   // ── Laodikeia (4) ──
   {
@@ -215,7 +215,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia, Vahiy Kitabı'nda adı geçen yedi kiliseden biridir. Denizli'de yer alan kent, tekstil, tıp ve bankacılıkla zenginleşmiş önemli bir Roma şehriydi.",
     color: "#3A4A6B",
     accent: "#6B8AB0",
-    image: "/sergi/yalnizlik/laodikeia-1.webp",
+    image: "/sergi/en-sessiz-zaman/laodikeia-1.webp",
   },
   {
     id: 16,
@@ -226,7 +226,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia'nın sütunlu caddesi, kentin ana arteriydi. Her iki yanında dükkanlar ve kamu binaları sıralanan bu cadde, Roma kentsel planlamasının güzel bir örneğidir.",
     color: "#6B4A3A",
     accent: "#B08A6B",
-    image: "/sergi/yalnizlik/laodikeia-2.webp",
+    image: "/sergi/en-sessiz-zaman/laodikeia-2.webp",
   },
   {
     id: 17,
@@ -237,7 +237,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia Stadyumu, 250 metre uzunluğuyla antik dünyanın büyük stadyumlarından biriydi. Atletizm yarışmaları ve gladyatör dövüşlerine ev sahipliği yapardı.",
     color: "#4A6B3A",
     accent: "#8AB06B",
-    image: "/sergi/yalnizlik/laodikeia-3.webp",
+    image: "/sergi/en-sessiz-zaman/laodikeia-3.webp",
   },
   {
     id: 18,
@@ -248,7 +248,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia'daki anıtsal çeşmeler (nymphaeum), kentin su sisteminin görkemini yansıtır. Kent, antik dönemde özel bir su kanalı sistemiyle Denizli'nin sıcak kaynaklarından beslenirdi.",
     color: "#3A6B4A",
     accent: "#6BB08A",
-    image: "/sergi/yalnizlik/laodikeia-4.webp",
+    image: "/sergi/en-sessiz-zaman/laodikeia-4.webp",
   },
   // ── Sagalassos (3) ──
   {
@@ -260,7 +260,7 @@ const ARTWORKS: Artwork[] = [
     info: "Sagalassos, Burdur'un Ağlasun ilçesinde, Toros Dağları'nın eteklerinde kurulmuş antik bir kenttir. 'Dağların Roma'sı' olarak anılır ve son yıllarda yoğun arkeolojik kazılarla gün yüzüne çıkarılmaktadır.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/yalnizlik/sagalassos-1.webp",
+    image: "/sergi/en-sessiz-zaman/sagalassos-1.webp",
   },
   {
     id: 20,
@@ -271,7 +271,7 @@ const ARTWORKS: Artwork[] = [
     info: "Antoninler Çeşmesi, MS 2. yüzyılda İmparator Marcus Aurelius döneminde inşa edilmiştir. 2010'da restore edilerek yeniden suyla buluşmuş, antik dünyanın yeniden canlanan simgesi olmuştur.",
     color: "#5B3A4A",
     accent: "#9B6B8A",
-    image: "/sergi/yalnizlik/sagalassos-2.webp",
+    image: "/sergi/en-sessiz-zaman/sagalassos-2.webp",
   },
   {
     id: 21,
@@ -282,11 +282,11 @@ const ARTWORKS: Artwork[] = [
     info: "Sagalassos Tiyatrosu, 9.000 kişi kapasitesiyle dağ yamacına oyulmuştur. Tiyatrodan Burdur Gölü'ne uzanan muhteşem manzara, antik dünyada eşsiz bir sahne dekoruydu.",
     color: "#4A5B3A",
     accent: "#8A9B6B",
-    image: "/sergi/yalnizlik/sagalassos-3.webp",
+    image: "/sergi/en-sessiz-zaman/sagalassos-3.webp",
   },
 ];
 
-export default function YalnizlikSergiPage() {
+export default function EnSessizZamanSergiPage() {
   const mountRef = useRef<HTMLDivElement>(null);
   const [selectedArtIndex, setSelectedArtIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -722,12 +722,12 @@ export default function YalnizlikSergiPage() {
     tctx.fillStyle = "#ffffff";
     tctx.fillRect(0, 0, 1024, 512);
     tctx.fillStyle = "#FF6D60";
-    tctx.font = "bold 64px sans-serif";
+    tctx.font = "italic 56px sans-serif";
     tctx.textAlign = "center";
-    tctx.fillText("Y A L N I Z L I K", 512, 180);
+    tctx.fillText("En Sessiz Zaman", 512, 180);
     tctx.fillStyle = "#999999";
     tctx.font = "28px sans-serif";
-    tctx.fillText("Antik Topraklarda Bir Fotoğraf Sergisi", 512, 280);
+    tctx.fillText("Antik Topraklarda Bir Foto\u011fraf Sergisi", 512, 270);
     tctx.fillStyle = "#bbbbbb";
     tctx.font = "24px sans-serif";
     tctx.fillText("klemens \u00d7 Theo Atay", 512, 340);
@@ -1109,8 +1109,8 @@ export default function YalnizlikSergiPage() {
           background: "#1a1a1a", zIndex: 50
         }}>
           <div style={{ textAlign: "center", color: "#FF6D60" }}>
-            <div style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>YALNIZLIK</div>
-            <div style={{ fontSize: 14, color: "#888" }}>Sergi yükleniyor...</div>
+            <div style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>EN SESSİZ ZAMAN</div>
+            <div style={{ fontSize: 14, color: "#888" }}>Sergi y&uuml;kleniyor...</div>
           </div>
         </div>
       )}
@@ -1149,8 +1149,8 @@ export default function YalnizlikSergiPage() {
         color: "#fff", zIndex: 10
       }}>
         <div style={{ fontSize: 11, letterSpacing: 4, color: "#FF6D60", marginBottom: 4 }}>KLEMENS SANAL SERGİ</div>
-        <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: 6 }}>Y A L N I Z L I K</div>
-        <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>Antik Topraklarda Bir Fotoğraf Sergisi</div>
+        <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: 4, fontStyle: "italic" }}>En Sessiz Zaman</div>
+        <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>Theo Atay</div>
       </div>
 
       {/* On-screen navigation controls */}
@@ -1210,62 +1210,103 @@ export default function YalnizlikSergiPage() {
         </div>
       </div>
 
-      {/* Intro overlay */}
+      {/* Intro overlay — manifesto */}
       {showIntro && !isLoading && (
         <div style={{
-          position: "absolute", inset: 0, background: "rgba(0,0,0,0.85)",
+          position: "absolute", inset: 0, background: "#0a0a0a",
           display: "flex", alignItems: "center", justifyContent: "center",
-          zIndex: 40, backdropFilter: "blur(6px)",
+          zIndex: 40, overflowY: "auto",
         }}>
-          <div style={{ textAlign: "center", maxWidth: 420, padding: 32 }}>
-            <div style={{ fontSize: 11, letterSpacing: 6, color: "#FF6D60", marginBottom: 12 }}>
+          <div style={{ textAlign: "center", maxWidth: 560, padding: "48px 32px" }}>
+            <div style={{ fontSize: 11, letterSpacing: 6, color: "#FF6D60", marginBottom: 24 }}>
               KLEMENS SANAL SERGİ
             </div>
-            <div style={{ fontSize: 32, fontWeight: 300, letterSpacing: 8, color: "#fff", marginBottom: 8 }}>
-              Y A L N I Z L I K
-            </div>
-            <div style={{ fontSize: 14, color: "#888", marginBottom: 32 }}>
-              Antik Topraklarda Bir Fotoğraf Sergisi
-            </div>
+
+            {/* TR manifesto */}
             <div style={{
-              background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: "20px 24px",
-              marginBottom: 32, textAlign: "left",
-              border: "1px solid rgba(255,255,255,0.08)",
+              fontSize: 28, fontWeight: 300, fontStyle: "italic", color: "#fff",
+              marginBottom: 20, letterSpacing: 2, lineHeight: 1.3,
             }}>
-              <div style={{ fontSize: 11, color: "#FF6D60", letterSpacing: 2, marginBottom: 12, fontWeight: 600 }}>
-                KONTROLLER
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ color: "#ccc", fontSize: 13 }}>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>WASD</span> veya <span style={{ color: "#fff", fontWeight: 600 }}>ok tuşları</span> &mdash; Hareket
+              &ldquo;En Sessiz Zaman&rdquo;
+            </div>
+            <p style={{
+              color: "rgba(255,255,255,0.65)", fontSize: 15, lineHeight: 1.9,
+              margin: "0 0 32px 0", fontStyle: "italic",
+            }}>
+              Binlerce y&#305;l &ouml;ncesinin sesleri aniden kayboluyor, ku&#351;lar&#305;n, a&#287;a&ccedil;lar&#305;n,
+              do&#287;an&#305;n ve benim sesimle kar&#305;&#351;&#305;yor. Ve bu sessizlik anlar&#305;nda, aram&#305;zda
+              hi&ccedil;bir fark olmad&#305;&#287;&#305;n&#305;, bir ve ayn&#305; oldu&#287;umuzu hissediyorum. Ayn&#305; do&#287;an&#305;n
+              imgeleri olarak var olmaya ve yok olmaya devam ediyoruz.
+            </p>
+
+            {/* Divider */}
+            <div style={{
+              width: 40, height: 1, background: "rgba(255,255,255,0.15)",
+              margin: "0 auto 32px",
+            }} />
+
+            {/* EN manifesto */}
+            <div style={{
+              fontSize: 22, fontWeight: 300, fontStyle: "italic", color: "rgba(255,255,255,0.5)",
+              marginBottom: 16, letterSpacing: 1, lineHeight: 1.3,
+            }}>
+              &ldquo;The Quietest Time&rdquo;
+            </div>
+            <p style={{
+              color: "rgba(255,255,255,0.35)", fontSize: 14, lineHeight: 1.9,
+              margin: "0 0 32px 0", fontStyle: "italic",
+            }}>
+              The sounds of thousands of years ago suddenly disappear, mingling with the
+              sounds of birds, trees, nature and me. And in such moments of silence, I
+              feel that there is no difference between us, that we are one and the same.
+              We continue to exist and disappear as images of the same nature.
+            </p>
+
+            {/* Artist */}
+            <div style={{
+              color: "rgba(255,255,255,0.4)", fontSize: 14, letterSpacing: 3,
+              marginBottom: 48, fontWeight: 500,
+            }}>
+              &mdash; Theo Atay
+            </div>
+
+            {/* Controls */}
+            <div style={{
+              background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "16px 20px",
+              marginBottom: 32, textAlign: "left",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>WASD</span> / <span style={{ color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>ok tu&#351;lar&#305;</span> &mdash; Hareket
                 </div>
-                <div style={{ color: "#ccc", fontSize: 13 }}>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>Q / E</span> &mdash; Sola / sağa bak
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>Q / E</span> &mdash; Sola / sa&#287;a bak
                 </div>
-                <div style={{ color: "#ccc", fontSize: 13 }}>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>Mouse sürükle</span> &mdash; Etrafına bak
-                </div>
-                <div style={{ color: "#ccc", fontSize: 13 }}>
-                  <span style={{ color: "#fff", fontWeight: 600 }}>Eserlere yaklaş</span> &mdash; Detay gör
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>Mouse s&uuml;r&uuml;kle</span> &mdash; Etraf&#305;na bak
                 </div>
               </div>
             </div>
+
             <button
               onClick={() => setShowIntro(false)}
               style={{
                 padding: "14px 48px", background: "transparent",
-                border: "1px solid #FF6D60", borderRadius: 10,
+                border: "1px solid rgba(255,109,96,0.5)", borderRadius: 10,
                 color: "#FF6D60", fontSize: 15, fontWeight: 600,
                 cursor: "pointer", transition: "all 0.2s", letterSpacing: 2,
               }}
               onMouseOver={(e) => {
-                (e.target as HTMLElement).style.background = "rgba(255,109,96,0.15)";
+                (e.target as HTMLElement).style.background = "rgba(255,109,96,0.12)";
+                (e.target as HTMLElement).style.borderColor = "#FF6D60";
               }}
               onMouseOut={(e) => {
                 (e.target as HTMLElement).style.background = "transparent";
+                (e.target as HTMLElement).style.borderColor = "rgba(255,109,96,0.5)";
               }}
             >
-              Sergiyi Keşfet
+              Sergiyi Ke&#351;fet
             </button>
           </div>
         </div>

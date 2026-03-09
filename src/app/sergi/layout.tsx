@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Yalnızlık Sergisi",
+  title: "En Sessiz Zaman — Dijital Sergi",
   description:
-    "İnteraktif dijital sergi: Yalnızlığın sanat tarihindeki yansımaları. 3D galeri deneyimi.",
-  alternates: { canonical: "/sergi/yalnizlik" },
+    "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
+  alternates: { canonical: "/sergi/en-sessiz-zaman" },
   openGraph: {
-    title: "Yalnızlık — Dijital Sergi",
-    description: "Yalnızlığın sanat tarihindeki yansımaları. İnteraktif 3D galeri deneyimi.",
+    title: "En Sessiz Zaman — Dijital Sergi",
+    description: "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
   },
 };
 

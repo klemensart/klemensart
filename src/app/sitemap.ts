@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/hakkimizda`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/testler/gorsel-algi`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/oyun/sanat-tahmini`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/sergi/yalnizlik`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/sergi/en-sessiz-zaman`, changeFrequency: "monthly", priority: 0.6 },
   ];
 
   // Category pages
