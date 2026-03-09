@@ -681,7 +681,8 @@ export default function YalnizlikSergiPage() {
       scene.add(artLight);
       scene.add(labelMesh);
 
-      artCanvas.userData = { artworkId: art.id, index: i };
+      artCanvas.userData.artworkId = art.id;
+      artCanvas.userData.index = i;
       artMeshes.push(artCanvas);
     });
 
