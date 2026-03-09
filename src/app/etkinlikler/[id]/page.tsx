@@ -108,36 +108,40 @@ export default async function EtkinlikDetayPage({ params }: Props) {
   const badge = TYPE_COLORS[type] ?? "bg-warm-100 text-warm-900/50";
   const label = TYPE_LABELS[type] ?? type;
 
+  const description = event.description || event.ai_comment || event.title;
+
   const eventJsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Event",
     name: event.title,
-    ...(event.description && { description: event.description }),
-    ...(event.event_date && { startDate: event.event_date }),
-    ...(event.end_date && { endDate: event.end_date }),
+    description,
+    eventStatus: "https://schema.org/EventScheduled",
+    startDate: event.event_date ?? undefined,
+    endDate: event.end_date ?? event.event_date ?? undefined,
     ...(event.image_url && { image: event.image_url }),
-    ...(event.venue && {
-      location: {
-        "@type": "Place",
-        name: event.venue,
-        ...(event.address && {
-          address: { "@type": "PostalAddress", streetAddress: event.address },
-        }),
-      },
-    }),
+    location: {
+      "@type": "Place",
+      name: event.venue ?? "Ankara",
+      ...(event.address && {
+        address: { "@type": "PostalAddress", streetAddress: event.address },
+      }),
+    },
     organizer: {
       "@type": "Organization",
       name: event.source_name ?? "Klemens Art",
       url: event.source_url ?? "https://klemensart.com",
     },
-    ...(event.price_info && {
-      offers: {
-        "@type": "Offer",
-        price: event.price_info,
-        priceCurrency: "TRY",
-        availability: "https://schema.org/InStock",
-      },
-    }),
+    performer: {
+      "@type": "Organization",
+      name: event.source_name ?? "Klemens Art",
+    },
+    offers: {
+      "@type": "Offer",
+      price: event.price_info ?? "0",
+      priceCurrency: "TRY",
+      availability: "https://schema.org/InStock",
+      url: event.source_url ?? `https://klemensart.com/etkinlikler/${event.id}`,
+    },
   };
 
   return (
