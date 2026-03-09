@@ -54,7 +54,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias, antik dönemin en ünlü heykeltraşlık okuluna ev sahipliği yapmış bir kenttir. 2017'de UNESCO Dünya Mirası listesine alınmıştır. Stadyumu 30.000 kişi kapasitesiyle antik dünyanın en iyi korunmuş örneklerinden biridir.",
     color: "#5B3A6B",
     accent: "#9B6BB0",
-    image: "/sergi/yalnizlik/afrodisias-1.jpg",
+    image: "/sergi/yalnizlik/afrodisias-1.webp",
   },
   {
     id: 2,
@@ -65,7 +65,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias Tetrapylon'u, kentin anıtsal giriş kapısıdır. Dört sütun grubundan oluşan bu yapı, MS 2. yüzyılda inşa edilmiştir ve kabartmalarıyla ünlüdür.",
     color: "#6B5B3A",
     accent: "#B09B6B",
-    image: "/sergi/yalnizlik/afrodisias-2.jpg",
+    image: "/sergi/yalnizlik/afrodisias-2.webp",
   },
   {
     id: 3,
@@ -76,7 +76,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias Stadyumu, 262 metre uzunluğu ve 59 metre genişliğiyle Roma döneminin en büyük ve en iyi korunmuş stadyumlarından biridir.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/yalnizlik/afrodisias-3.jpg",
+    image: "/sergi/yalnizlik/afrodisias-3.webp",
   },
   {
     id: 4,
@@ -87,7 +87,7 @@ const ARTWORKS: Artwork[] = [
     info: "Afrodisias heykeltraşlık okulu, Roma İmparatorluğu'nun en önemli mermer işleme merkeziydi. Üretilen heykeller Roma'dan İskenderiye'ye kadar geniş bir coğrafyaya ihraç edilirdi.",
     color: "#6B3A5B",
     accent: "#B06B9B",
-    image: "/sergi/yalnizlik/afrodisias-4.jpg",
+    image: "/sergi/yalnizlik/afrodisias-4.webp",
   },
   // ── Aizanoi (3) ──
   {
@@ -99,7 +99,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi Zeus Tapınağı, Anadolu'daki en iyi korunmuş Roma tapınağıdır. Benzersiz bir özelliği, alt katında Kybele'ye adanmış bir mağara tapınağı barındırmasıdır.",
     color: "#8B6914",
     accent: "#D4A843",
-    image: "/sergi/yalnizlik/aizanoi-1.jpg",
+    image: "/sergi/yalnizlik/aizanoi-1.webp",
   },
   {
     id: 6,
@@ -110,7 +110,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi, dünyada stadyum ve tiyatronun iç içe geçtiği tek antik kenttir. Bu benzersiz yapı, 2012'de UNESCO Dünya Mirası geçici listesine alınmıştır.",
     color: "#4A6741",
     accent: "#7BA370",
-    image: "/sergi/yalnizlik/aizanoi-2.jpg",
+    image: "/sergi/yalnizlik/aizanoi-2.webp",
   },
   {
     id: 7,
@@ -121,7 +121,7 @@ const ARTWORKS: Artwork[] = [
     info: "Aizanoi'nin antik köprüleri, kenti ikiye bölen Penkalas Çayı (günümüzde Kocaçay) üzerinde inşa edilmiştir. Roma döneminin mühendislik başarılarından biridir.",
     color: "#5B6B3A",
     accent: "#9BB06B",
-    image: "/sergi/yalnizlik/aizanoi-3.jpg",
+    image: "/sergi/yalnizlik/aizanoi-3.webp",
   },
   // ── Asklepion (1) ──
   {
@@ -133,7 +133,7 @@ const ARTWORKS: Artwork[] = [
     info: "Bergama Asklepion'u, antik çağın en önemli sağlık merkezlerinden biriydi. Hastaların su sesi, müzik ve telkinle tedavi edildiği bu merkez, modern psikoterapinin öncüsü sayılır.",
     color: "#3A6B5B",
     accent: "#6BB09B",
-    image: "/sergi/yalnizlik/asklepion-1.jpg",
+    image: "/sergi/yalnizlik/asklepion-1.webp",
   },
   // ── Assos (1) ──
   {
@@ -145,7 +145,7 @@ const ARTWORKS: Artwork[] = [
     info: "Assos Athena Tapınağı, Arkaik dönemde inşa edilen tek Dor tapınağıdır. Aristoteles MÖ 347-345 yıllarında burada bir felsefe okulu kurmuştur.",
     color: "#14698B",
     accent: "#43A8D4",
-    image: "/sergi/yalnizlik/assos-1.jpg",
+    image: "/sergi/yalnizlik/assos-1.webp",
   },
   // ── Blaundus (1) ──
   {
@@ -157,7 +157,7 @@ const ARTWORKS: Artwork[] = [
     info: "Blaundus, Uşak'ın Ulubey ilçesinde, kanyonun kenarında kurulmuş antik bir kenttir. Makedonyalılar tarafından kurulmuş, Roma döneminde önemli bir merkez olmuştur.",
     color: "#8B4513",
     accent: "#CD853F",
-    image: "/sergi/yalnizlik/blaundus-1.jpg",
+    image: "/sergi/yalnizlik/blaundus-1.webp",
   },
   // ── Çatalhöyük (2) ──
   {
@@ -169,7 +169,7 @@ const ARTWORKS: Artwork[] = [
     info: "Çatalhöyük, MÖ 7500-5700 yıllarına tarihlenen, dünyanın en eski ve en büyük Neolitik yerleşimlerinden biridir. 2012'de UNESCO Dünya Mirası listesine alınmıştır.",
     color: "#6B5B4A",
     accent: "#B09B8A",
-    image: "/sergi/yalnizlik/catalhoyuk-1.jpg",
+    image: "/sergi/yalnizlik/catalhoyuk-1.webp",
   },
   {
     id: 12,
@@ -180,7 +180,7 @@ const ARTWORKS: Artwork[] = [
     info: "Çatalhöyük'te 18 yerleşim katmanı tespit edilmiştir. En kalabalık döneminde 8.000'e kadar insanın yaşadığı tahmin edilen kentte, evlerin duvarları boğa başları ve av sahneleriyle süslenmiştir.",
     color: "#5B4A3A",
     accent: "#9B8A6B",
-    image: "/sergi/yalnizlik/catalhoyuk-2.jpg",
+    image: "/sergi/yalnizlik/catalhoyuk-2.webp",
   },
   // ── Kibyra (2) ──
   {
@@ -192,7 +192,7 @@ const ARTWORKS: Artwork[] = [
     info: "Kibyra, Burdur'un Gölhisar ilçesinde yer alan antik kenttir. 2015 yılında keşfedilen gladyatör mozaikleriyle dünya gündemine oturmuştur. Medusa kabartmaları ve stadyumuyla dikkat çeker.",
     color: "#6B3A3A",
     accent: "#B06B6B",
-    image: "/sergi/yalnizlik/kibyra-1.jpg",
+    image: "/sergi/yalnizlik/kibyra-1.webp",
   },
   {
     id: 14,
@@ -203,7 +203,7 @@ const ARTWORKS: Artwork[] = [
     info: "Kibyra'nın Medusa kabartmaları, Roma döneminin en etkileyici taş işçiliği örnekleri arasındadır. Kent, dört dil konuşulan kozmopolit bir merkez olarak bilinirdi.",
     color: "#4A3A6B",
     accent: "#8A6BB0",
-    image: "/sergi/yalnizlik/kibyra-2.jpg",
+    image: "/sergi/yalnizlik/kibyra-2.webp",
   },
   // ── Laodikeia (4) ──
   {
@@ -215,7 +215,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia, Vahiy Kitabı'nda adı geçen yedi kiliseden biridir. Denizli'de yer alan kent, tekstil, tıp ve bankacılıkla zenginleşmiş önemli bir Roma şehriydi.",
     color: "#3A4A6B",
     accent: "#6B8AB0",
-    image: "/sergi/yalnizlik/laodikeia-1.jpg",
+    image: "/sergi/yalnizlik/laodikeia-1.webp",
   },
   {
     id: 16,
@@ -226,7 +226,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia'nın sütunlu caddesi, kentin ana arteriydi. Her iki yanında dükkanlar ve kamu binaları sıralanan bu cadde, Roma kentsel planlamasının güzel bir örneğidir.",
     color: "#6B4A3A",
     accent: "#B08A6B",
-    image: "/sergi/yalnizlik/laodikeia-2.jpg",
+    image: "/sergi/yalnizlik/laodikeia-2.webp",
   },
   {
     id: 17,
@@ -237,7 +237,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia Stadyumu, 250 metre uzunluğuyla antik dünyanın büyük stadyumlarından biriydi. Atletizm yarışmaları ve gladyatör dövüşlerine ev sahipliği yapardı.",
     color: "#4A6B3A",
     accent: "#8AB06B",
-    image: "/sergi/yalnizlik/laodikeia-3.jpg",
+    image: "/sergi/yalnizlik/laodikeia-3.webp",
   },
   {
     id: 18,
@@ -248,7 +248,7 @@ const ARTWORKS: Artwork[] = [
     info: "Laodikeia'daki anıtsal çeşmeler (nymphaeum), kentin su sisteminin görkemini yansıtır. Kent, antik dönemde özel bir su kanalı sistemiyle Denizli'nin sıcak kaynaklarından beslenirdi.",
     color: "#3A6B4A",
     accent: "#6BB08A",
-    image: "/sergi/yalnizlik/laodikeia-4.jpg",
+    image: "/sergi/yalnizlik/laodikeia-4.webp",
   },
   // ── Sagalassos (3) ──
   {
@@ -260,7 +260,7 @@ const ARTWORKS: Artwork[] = [
     info: "Sagalassos, Burdur'un Ağlasun ilçesinde, Toros Dağları'nın eteklerinde kurulmuş antik bir kenttir. 'Dağların Roma'sı' olarak anılır ve son yıllarda yoğun arkeolojik kazılarla gün yüzüne çıkarılmaktadır.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/yalnizlik/sagalassos-1.jpg",
+    image: "/sergi/yalnizlik/sagalassos-1.webp",
   },
   {
     id: 20,
@@ -271,7 +271,7 @@ const ARTWORKS: Artwork[] = [
     info: "Antoninler Çeşmesi, MS 2. yüzyılda İmparator Marcus Aurelius döneminde inşa edilmiştir. 2010'da restore edilerek yeniden suyla buluşmuş, antik dünyanın yeniden canlanan simgesi olmuştur.",
     color: "#5B3A4A",
     accent: "#9B6B8A",
-    image: "/sergi/yalnizlik/sagalassos-2.jpg",
+    image: "/sergi/yalnizlik/sagalassos-2.webp",
   },
   {
     id: 21,
@@ -282,7 +282,7 @@ const ARTWORKS: Artwork[] = [
     info: "Sagalassos Tiyatrosu, 9.000 kişi kapasitesiyle dağ yamacına oyulmuştur. Tiyatrodan Burdur Gölü'ne uzanan muhteşem manzara, antik dünyada eşsiz bir sahne dekoruydu.",
     color: "#4A5B3A",
     accent: "#8A9B6B",
-    image: "/sergi/yalnizlik/sagalassos-3.jpg",
+    image: "/sergi/yalnizlik/sagalassos-3.webp",
   },
 ];
 
@@ -639,15 +639,14 @@ export default function YalnizlikSergiPage() {
       matMesh.position.set(wallX, 1.9, wallZ + matOffsetZ);
       matMesh.rotation.y = facing;
 
-      // Canvas (photo) — unique texture per artwork
-      const texture = loader.load(art.image);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = maxAniso;
-      const canvasMat = new THREE.MeshBasicMaterial({ map: texture });
+      // Canvas (photo) — lazy loaded when camera is near
+      const canvasMat = new THREE.MeshBasicMaterial({ color: 0x2a2622 });
       const artCanvas = new THREE.Mesh(sharedCanvasGeo, canvasMat);
       const canvasOffsetZ = facing === 0 ? 0.08 : -0.08;
       artCanvas.position.set(wallX, 1.9, wallZ + canvasOffsetZ);
       artCanvas.rotation.y = facing;
+      artCanvas.userData.loaded = false;
+      artCanvas.userData.imageSrc = art.image;
 
       // Per-artwork warm PointLight (much cheaper than SpotLight)
       const artLight = new THREE.PointLight(0xffe4c4, 0.6, 6, 2);
@@ -740,8 +739,33 @@ export default function YalnizlikSergiPage() {
     }
 
     // Animation
+    // Lazy texture loading — load when camera is within 25 units
+    const LOAD_DIST = 25;
+    let lazyFrame = 0;
+    const checkLazyLoad = () => {
+      // Check 3 artworks per frame to spread load
+      for (let c = 0; c < 3; c++) {
+        const idx = (lazyFrame * 3 + c) % artMeshes.length;
+        const mesh = artMeshes[idx];
+        if (mesh.userData.loaded) continue;
+        const dist = camera.position.distanceTo(mesh.position);
+        if (dist < LOAD_DIST) {
+          mesh.userData.loaded = true;
+          const tex = loader.load(mesh.userData.imageSrc);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = maxAniso;
+          (mesh.material as THREE.MeshBasicMaterial).map = tex;
+          (mesh.material as THREE.MeshBasicMaterial).color.set(0xffffff);
+          (mesh.material as THREE.MeshBasicMaterial).needsUpdate = true;
+        }
+      }
+      lazyFrame++;
+    };
+
     const animate = () => {
       frameIdRef.current = requestAnimationFrame(animate);
+
+      checkLazyLoad();
 
       const speed = 0.08;
       const dir = new THREE.Vector3();
