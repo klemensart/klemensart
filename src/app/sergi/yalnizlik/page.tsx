@@ -479,122 +479,107 @@ export default function YalnizlikSergiPage() {
     const CANVAS_W = 4.6;
     const CANVAS_H = 1.8;
 
+    // ── Shared geometry & materials (created once, reused 21×) ──
+    const sharedFrameGeo = new THREE.BoxGeometry(FRAME_W, FRAME_H, 0.15);
+    const sharedFrameMat = new THREE.MeshStandardMaterial({
+      color: 0x3a2e28,
+      metalness: 0.1,
+      roughness: 0.7,
+    });
+    const sharedCanvasGeo = new THREE.PlaneGeometry(CANVAS_W, CANVAS_H);
+    const sharedLabelGeo = new THREE.PlaneGeometry(2, 0.25);
+
+    // ── Shared passepartout texture (created once) ──
+    const PP_W = CANVAS_W + 0.4;
+    const PP_H = CANVAS_H + 0.3;
+    const ppTexCanvas = document.createElement("canvas");
+    const ppPxW = 512, ppPxH = Math.round(512 * (PP_H / PP_W));
+    ppTexCanvas.width = ppPxW;
+    ppTexCanvas.height = ppPxH;
+    const pctx = ppTexCanvas.getContext("2d")!;
+    pctx.fillStyle = "#f0ebe4";
+    pctx.fillRect(0, 0, ppPxW, ppPxH);
+    for (let gi = 0; gi < 6000; gi++) {
+      const gx = Math.random() * ppPxW;
+      const gy = Math.random() * ppPxH;
+      pctx.globalAlpha = 0.03 + Math.random() * 0.03;
+      pctx.fillStyle = Math.random() > 0.5 ? "#ddd8d0" : "#f8f4ef";
+      pctx.fillRect(gx, gy, 1 + Math.random() * 2, 1 + Math.random() * 2);
+    }
+    pctx.globalAlpha = 0.025;
+    pctx.fillStyle = "#c8c0b5";
+    for (let ly = 0; ly < ppPxH; ly += 3) {
+      pctx.fillRect(0, ly, ppPxW, 1);
+    }
+    pctx.globalAlpha = 1;
+    const edgeGrad = pctx.createRadialGradient(ppPxW / 2, ppPxH / 2, Math.min(ppPxW, ppPxH) * 0.3, ppPxW / 2, ppPxH / 2, Math.max(ppPxW, ppPxH) * 0.55);
+    edgeGrad.addColorStop(0, "rgba(0,0,0,0)");
+    edgeGrad.addColorStop(1, "rgba(0,0,0,0.08)");
+    pctx.fillStyle = edgeGrad;
+    pctx.fillRect(0, 0, ppPxW, ppPxH);
+    const openL = ((PP_W - CANVAS_W) / 2 / PP_W) * ppPxW;
+    const openR = ppPxW - openL;
+    const openT = ((PP_H - CANVAS_H) / 2 / PP_H) * ppPxH;
+    const openB = ppPxH - openT;
+    const grooveW = 2;
+    pctx.fillStyle = "#8a8078";
+    pctx.fillRect(openL - grooveW, openT - grooveW, openR - openL + grooveW * 2, grooveW);
+    pctx.fillRect(openL - grooveW, openB, openR - openL + grooveW * 2, grooveW);
+    pctx.fillRect(openL - grooveW, openT, grooveW, openB - openT);
+    pctx.fillRect(openR, openT, grooveW, openB - openT);
+    pctx.fillStyle = "#faf7f3";
+    pctx.fillRect(openL, openT, openR - openL, 1);
+    pctx.fillRect(openL, openT, 1, openB - openT);
+
+    const sharedPPTex = new THREE.CanvasTexture(ppTexCanvas);
+    const sharedPPGeo = new THREE.PlaneGeometry(PP_W, PP_H);
+    const sharedPPMat = new THREE.MeshStandardMaterial({
+      map: sharedPPTex,
+      roughness: 0.95,
+      metalness: 0,
+    });
+
     ARTWORKS.forEach((art, i) => {
       // Front wall (z = -HALF_D): artworks 0-10, Back wall (z = +HALF_D): artworks 11-20
-      // Artworks spread along X axis on the LONG walls
       let wallX: number, wallZ: number, facing: number;
       if (i < 11) {
-        // Front wall (z = -9), faces +z (inward)
         wallX = -30 + i * 6;
         wallZ = -HALF_D + 0.07;
-        facing = 0; // face +z
+        facing = 0;
       } else {
-        // Back wall (z = +9), faces -z (inward)
         wallX = -27 + (i - 11) * 6;
         wallZ = HALF_D - 0.07;
-        facing = Math.PI; // face -z
+        facing = Math.PI;
       }
 
-      // Frame — dark warm wood, deeper profile
-      const frameGeo = new THREE.BoxGeometry(FRAME_W, FRAME_H, 0.15);
-      const frameMat = new THREE.MeshStandardMaterial({
-        color: 0x3a2e28,
-        metalness: 0.1,
-        roughness: 0.7,
-      });
-      const frame = new THREE.Mesh(frameGeo, frameMat);
+      // Frame (shared geo & mat)
+      const frame = new THREE.Mesh(sharedFrameGeo, sharedFrameMat);
       frame.castShadow = true;
       frame.position.set(wallX, 1.9, wallZ);
       frame.rotation.y = facing;
 
-      // Passepartout (mat) — textured cream with v-groove & linen grain
-      const matW = CANVAS_W + 0.4;
-      const matH = CANVAS_H + 0.3;
-      const matTexCanvas = document.createElement("canvas");
-      const mtW = 512, mtH = Math.round(512 * (matH / matW));
-      matTexCanvas.width = mtW;
-      matTexCanvas.height = mtH;
-      const mctx = matTexCanvas.getContext("2d")!;
-
-      // Base cream fill
-      mctx.fillStyle = "#f0ebe4";
-      mctx.fillRect(0, 0, mtW, mtH);
-
-      // Subtle linen grain texture
-      for (let gi = 0; gi < 6000; gi++) {
-        const gx = Math.random() * mtW;
-        const gy = Math.random() * mtH;
-        mctx.globalAlpha = 0.03 + Math.random() * 0.03;
-        mctx.fillStyle = Math.random() > 0.5 ? "#ddd8d0" : "#f8f4ef";
-        mctx.fillRect(gx, gy, 1 + Math.random() * 2, 1 + Math.random() * 2);
-      }
-      // Horizontal linen lines
-      mctx.globalAlpha = 0.025;
-      mctx.fillStyle = "#c8c0b5";
-      for (let ly = 0; ly < mtH; ly += 3) {
-        mctx.fillRect(0, ly, mtW, 1);
-      }
-      mctx.globalAlpha = 1;
-
-      // Edge darkening — subtle vignette on the mat itself
-      const edgeGrad = mctx.createRadialGradient(mtW / 2, mtH / 2, Math.min(mtW, mtH) * 0.3, mtW / 2, mtH / 2, Math.max(mtW, mtH) * 0.55);
-      edgeGrad.addColorStop(0, "rgba(0,0,0,0)");
-      edgeGrad.addColorStop(1, "rgba(0,0,0,0.08)");
-      mctx.fillStyle = edgeGrad;
-      mctx.fillRect(0, 0, mtW, mtH);
-
-      // V-groove inner shadow — thin dark line around the photo opening
-      const openL = ((matW - CANVAS_W) / 2 / matW) * mtW;
-      const openR = mtW - openL;
-      const openT = ((matH - CANVAS_H) / 2 / matH) * mtH;
-      const openB = mtH - openT;
-      const grooveW = 2;
-
-      // Outer dark edge of groove
-      mctx.fillStyle = "#8a8078";
-      mctx.fillRect(openL - grooveW, openT - grooveW, openR - openL + grooveW * 2, grooveW); // top
-      mctx.fillRect(openL - grooveW, openB, openR - openL + grooveW * 2, grooveW); // bottom
-      mctx.fillRect(openL - grooveW, openT, grooveW, openB - openT); // left
-      mctx.fillRect(openR, openT, grooveW, openB - openT); // right
-
-      // Inner highlight edge of groove (bevel illusion)
-      mctx.fillStyle = "#faf7f3";
-      mctx.fillRect(openL, openT, openR - openL, 1); // top highlight
-      mctx.fillRect(openL, openT, 1, openB - openT); // left highlight
-
-      const matTex = new THREE.CanvasTexture(matTexCanvas);
-      const matGeo = new THREE.PlaneGeometry(matW, matH);
-      const matMat = new THREE.MeshStandardMaterial({
-        map: matTex,
-        roughness: 0.95,
-        metalness: 0,
-      });
-      const matMesh = new THREE.Mesh(matGeo, matMat);
+      // Passepartout (shared geo, mat & texture)
+      const matMesh = new THREE.Mesh(sharedPPGeo, sharedPPMat);
       const matOffsetZ = facing === 0 ? 0.079 : -0.079;
       matMesh.position.set(wallX, 1.9, wallZ + matOffsetZ);
       matMesh.rotation.y = facing;
-      scene.add(matMesh);
 
-      // Canvas (photo)
-      const canvasGeo = new THREE.PlaneGeometry(CANVAS_W, CANVAS_H);
+      // Canvas (photo) — unique texture per artwork
       const texture = loader.load(art.image);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = maxAniso;
       const canvasMat = new THREE.MeshBasicMaterial({ map: texture });
-      const artCanvas = new THREE.Mesh(canvasGeo, canvasMat);
+      const artCanvas = new THREE.Mesh(sharedCanvasGeo, canvasMat);
       const canvasOffsetZ = facing === 0 ? 0.08 : -0.08;
       artCanvas.position.set(wallX, 1.9, wallZ + canvasOffsetZ);
       artCanvas.rotation.y = facing;
 
-      // Per-artwork spot light — warm amber, gentle
-      const spot = new THREE.SpotLight(0xffe4c4, 1.2, 8, Math.PI / 6, 0.7, 1.5);
-      const spotZ = facing === 0 ? wallZ + 3.5 : wallZ - 3.5;
-      spot.position.set(wallX, 4.5, spotZ);
-      spot.target.position.set(wallX, 1.9, wallZ);
-      scene.add(spot);
-      scene.add(spot.target);
+      // Per-artwork warm PointLight (much cheaper than SpotLight)
+      const artLight = new THREE.PointLight(0xffe4c4, 0.6, 6, 2);
+      const lightZ = facing === 0 ? wallZ + 2 : wallZ - 2;
+      artLight.position.set(wallX, 3.8, lightZ);
 
-      // Label
+      // Label (unique text per artwork)
       const labelCanvas = document.createElement("canvas");
       labelCanvas.width = 512;
       labelCanvas.height = 64;
@@ -611,13 +596,15 @@ export default function YalnizlikSergiPage() {
 
       const labelTex = new THREE.CanvasTexture(labelCanvas);
       const labelMat = new THREE.MeshBasicMaterial({ map: labelTex });
-      const labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 0.25), labelMat);
+      const labelMesh = new THREE.Mesh(sharedLabelGeo, labelMat);
       const labelOffsetZ = facing === 0 ? 0.06 : -0.06;
       labelMesh.position.set(wallX, 0.6, wallZ + labelOffsetZ);
       labelMesh.rotation.y = facing;
 
       scene.add(frame);
+      scene.add(matMesh);
       scene.add(artCanvas);
+      scene.add(artLight);
       scene.add(labelMesh);
 
       artCanvas.userData = { artworkId: art.id, index: i };
