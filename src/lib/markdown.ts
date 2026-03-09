@@ -99,7 +99,7 @@ function processYouTubeEmbeds(rawHtml: string): string {
 
   // 2. YouTube <a> links that are alone in a <p> → embed
   result = result.replace(
-    /<p>\s*<a [^>]*href="([^"]*)"[^>]*>[^<]*<\/a>\s*<\/p>/g,
+    /<p>\s*<a [^>]*href="([^"]*)"[^>]*>[\s\S]*?<\/a>\s*<\/p>/g,
     (match, url) => {
       const id = extractYouTubeId(url);
       return id ? youtubeIframe(id) : match;
@@ -129,7 +129,7 @@ function processYouTubeEmbeds(rawHtml: string): string {
 
   // 5. YouTube <a> links at end of a <p> → split: keep text, embed after
   result = result.replace(
-    /(<p>[\s\S]*?)\s*<a [^>]*href="([^"]*youtube[^"]*|[^"]*youtu\.be[^"]*)"[^>]*>[^<]*<\/a>\s*(<\/p>)/g,
+    /(<p>[\s\S]*?)\s*<a [^>]*href="([^"]*youtube[^"]*|[^"]*youtu\.be[^"]*)"[^>]*>[\s\S]*?<\/a>\s*(<\/p>)/g,
     (match, before, url, after) => {
       const id = extractYouTubeId(url);
       if (!id) return match;
