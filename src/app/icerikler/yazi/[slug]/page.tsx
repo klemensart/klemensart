@@ -17,18 +17,27 @@ export async function generateMetadata({
   const article = await getArticleBySlug(slug);
   if (!article) return { title: "Bulunamadı" };
 
-  const ogImage = article.meta.image
-    ? { url: article.meta.image, width: 1200, height: 630, alt: article.meta.title }
+  const BASE = "https://klemensart.com";
+  const articleUrl = `${BASE}/icerikler/yazi/${slug}`;
+  const absImage = article.meta.image
+    ? article.meta.image.startsWith("http") ? article.meta.image : `${BASE}${article.meta.image}`
+    : undefined;
+
+  const ogImage = absImage
+    ? { url: absImage, width: 1200, height: 630, alt: article.meta.title }
     : undefined;
 
   return {
     title: article.meta.title,
     description: article.meta.description,
-    alternates: { canonical: `/icerikler/yazi/${slug}` },
+    alternates: { canonical: articleUrl },
     openGraph: {
       type: "article",
+      url: articleUrl,
       title: article.meta.title,
       description: article.meta.description,
+      siteName: "Klemens",
+      locale: "tr_TR",
       ...(ogImage && { images: [ogImage] }),
       publishedTime: article.meta.date || undefined,
       authors: article.meta.author ? [article.meta.author] : undefined,
@@ -38,7 +47,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: article.meta.title,
       description: article.meta.description,
-      ...(article.meta.image && { images: [article.meta.image] }),
+      ...(absImage && { images: [absImage] }),
     },
   };
 }
@@ -52,12 +61,18 @@ export default async function ArticlePage({
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
+  const absImg = article.meta.image
+    ? article.meta.image.startsWith("http") ? article.meta.image : `https://klemensart.com${article.meta.image}`
+    : undefined;
+  const artUrl = `https://klemensart.com/icerikler/yazi/${slug}`;
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.meta.title,
     description: article.meta.description,
-    ...(article.meta.image && { image: article.meta.image }),
+    url: artUrl,
+    ...(absImg && { image: absImg }),
     ...(article.meta.date && { datePublished: article.meta.date }),
     ...(article.meta.author && {
       author: { "@type": "Person", name: article.meta.author },

@@ -44,7 +44,9 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
   const [readingMode, setReadingMode] = useState(false);
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const encodedUrl = encodeURIComponent(shareUrl);
   const shareText = encodeURIComponent(meta.title);
+  const [copied, setCopied] = useState(false);
 
   return (
     <div
@@ -250,20 +252,9 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
             Paylaş
           </p>
           <div className="flex items-center gap-3">
-            {/* Instagram */}
-            <a
-              href={`https://www.instagram.com/`}
-              target="_blank" rel="noopener noreferrer"
-              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
-              aria-label="Instagram'da paylaş"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-              </svg>
-            </a>
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/?text=${shareText}`}
+              href={`https://wa.me/?text=${shareText}%20${encodedUrl}`}
               target="_blank" rel="noopener noreferrer"
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
               aria-label="WhatsApp'ta paylaş"
@@ -272,20 +263,9 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
                 <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
               </svg>
             </a>
-            {/* LinkedIn */}
-            <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
-              target="_blank" rel="noopener noreferrer"
-              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
-              aria-label="LinkedIn'de paylaş"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
-              </svg>
-            </a>
             {/* X / Twitter */}
             <a
-              href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
+              href={`https://x.com/intent/tweet?text=${shareText}&url=${encodedUrl}`}
               target="_blank" rel="noopener noreferrer"
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
               aria-label="X'te paylaş"
@@ -294,9 +274,20 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </a>
+            {/* LinkedIn */}
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+              target="_blank" rel="noopener noreferrer"
+              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
+              aria-label="LinkedIn'de paylaş"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
             {/* Mail */}
             <a
-              href={`mailto:?subject=${shareText}&body=${shareUrl}`}
+              href={`mailto:?subject=${shareText}&body=${shareText}%0A%0A${encodedUrl}`}
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"}`}
               aria-label="E-posta ile paylaş"
             >
@@ -304,6 +295,30 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
               </svg>
             </a>
+            {/* Linki Kopyala */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(shareUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 hover:border-coral hover:text-coral ${
+                copied
+                  ? "border-coral text-coral"
+                  : darkMode ? "border-[#f5f0eb]/15 text-[#f5f0eb]/40" : "border-warm-200 text-warm-900/35"
+              }`}
+              aria-label="Linki kopyala"
+            >
+              {copied ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
