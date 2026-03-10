@@ -895,8 +895,7 @@ export default function EnSessizZamanSergiPage() {
         }
       }
 
-      const swayZ = velMag > 0.001 ? Math.sin(bobPhaseRef.current * 0.5) * 0.004 : 0;
-      const euler = new THREE.Euler(pitchRef.current, yawRef.current, swayZ, "YXZ");
+      const euler = new THREE.Euler(pitchRef.current, yawRef.current, 0, "YXZ");
       camera.quaternion.setFromEuler(euler);
 
       // FOV zoom when close to artwork + proximity detection
