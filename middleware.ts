@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { waitForDebugger } from "node:inspector";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
