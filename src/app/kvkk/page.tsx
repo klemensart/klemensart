@@ -5,6 +5,12 @@ export const metadata: Metadata = {
   description:
     "Klemens Art kişisel verilerin korunması ve işlenmesine ilişkin aydınlatma metni.",
   alternates: { canonical: "/kvkk" },
+  openGraph: {
+    title: "KVKK Aydınlatma Metni — Klemens",
+    description:
+      "Klemens Art kişisel verilerin korunması ve işlenmesine ilişkin aydınlatma metni.",
+    url: "https://klemensart.com/kvkk",
+  },
 };
 
 const B = {

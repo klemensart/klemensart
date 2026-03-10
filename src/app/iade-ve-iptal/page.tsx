@@ -5,6 +5,12 @@ export const metadata: Metadata = {
   description:
     "Klemens Art online atölye ve dijital içerik satın alımlarına ilişkin iade, iptal ve cayma hakkı koşulları.",
   alternates: { canonical: "/iade-ve-iptal" },
+  openGraph: {
+    title: "İade ve İptal Politikası — Klemens",
+    description:
+      "Klemens Art online atölye ve dijital içerik satın alımlarına ilişkin iade, iptal ve cayma hakkı koşulları.",
+    url: "https://klemensart.com/iade-ve-iptal",
+  },
 };
 
 const B = {

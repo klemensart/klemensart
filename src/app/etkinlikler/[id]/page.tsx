@@ -137,9 +137,10 @@ export default async function EtkinlikDetayPage({ params }: Props) {
     },
     offers: {
       "@type": "Offer",
-      price: event.price_info ?? "0",
+      price: parseFloat((event.price_info ?? "").replace(/[^0-9.,]/g, "").replace(",", ".")) || 0,
       priceCurrency: "TRY",
       availability: "https://schema.org/InStock",
+      validFrom: event.event_date ?? new Date().toISOString().slice(0, 10),
       url: event.source_url ?? `https://klemensart.com/etkinlikler/${event.id}`,
     },
   };

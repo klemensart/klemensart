@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   description:
     "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
   alternates: { canonical: "/icerikler" },
+  openGraph: {
+    title: "İçerikler — Klemens",
+    description:
+      "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+    url: "https://klemensart.com/icerikler",
+  },
 };
 
 export default async function IceriklerPage() {

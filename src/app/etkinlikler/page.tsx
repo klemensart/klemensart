@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   description:
     "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
   alternates: { canonical: "/etkinlikler" },
+  openGraph: {
+    title: "Kültür & Sanat Takvimi — Klemens",
+    description:
+      "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+    url: "https://klemensart.com/etkinlikler",
+  },
 };
 
 export default function EtkinliklerPage() {
