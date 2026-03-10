@@ -59,7 +59,7 @@ const SERILER: SeriesWorkshop[] = [
     description: "Korku, haz ve öfkenin sanat tarihindeki izleri — mitolojiden modern tablolara, 3 haftalık canlı keşif.",
     duration: "3 Hafta",
     price: "1.500 TL",
-    imgSquare: "/images/workshops/sanat-tarihinde-duygular-square.png",
+    imgSquare: "/images/workshops/sanat-tarihinde-duygular-square.webp",
     imgPosition: "center 30%",
   },
   {
@@ -69,7 +69,7 @@ const SERILER: SeriesWorkshop[] = [
     description: "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dilini ve felsefesini öğrenin.",
     duration: "10 Hafta",
     price: "6.000 TL",
-    imgSquare: "/images/workshops/modern-sanat-atolyesi-square.png",
+    imgSquare: "/images/workshops/modern-sanat-atolyesi-square.webp",
     imgPosition: "center center",
   },
   {
@@ -79,7 +79,7 @@ const SERILER: SeriesWorkshop[] = [
     description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğren. Sanatın grameri Rönesans'tır.",
     duration: "8 Hafta",
     price: "—",
-    imgSquare: "/images/workshops/ronesans-atolyesi-square.png",
+    imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
     imgPosition: "center 20%",
   },
   {
@@ -89,7 +89,7 @@ const SERILER: SeriesWorkshop[] = [
     description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık kapsamlı program.",
     duration: "10 Hafta",
     price: "6.000 TL",
-    imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.png",
+    imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
     imgPosition: "center center",
   },
 ];

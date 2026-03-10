@@ -311,6 +311,8 @@ export default function EnSessizZamanSergiPage() {
   const dragEndTimeRef = useRef(0);
   const [nearestArt, setNearestArt] = useState<Artwork | null>(null);
   const nearBenchRef = useRef(false);
+  const velocityRef = useRef(new THREE.Vector3());
+  const bobPhaseRef = useRef(0);
   const overlayOpenRef = useRef(false);
   const [nearBench, setNearBench] = useState(false);
   const [showSlideshow, setShowSlideshow] = useState(false);
@@ -775,40 +777,75 @@ export default function EnSessizZamanSergiPage() {
 
       checkLazyLoad();
 
-      const speed = 0.08;
+      const maxSpeed = 0.08;
       const dir = new THREE.Vector3();
       camera.getWorldDirection(dir);
       dir.y = 0;
       dir.normalize();
       const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0));
 
-      if (keysRef.current["w"] || keysRef.current["arrowup"]) camera.position.addScaledVector(dir, speed);
-      if (keysRef.current["s"] || keysRef.current["arrowdown"]) camera.position.addScaledVector(dir, -speed);
-      if (keysRef.current["a"] || keysRef.current["arrowleft"]) camera.position.addScaledVector(right, -speed);
-      if (keysRef.current["d"] || keysRef.current["arrowright"]) camera.position.addScaledVector(right, speed);
+      // Velocity-based movement with acceleration/deceleration
+      const targetVel = new THREE.Vector3();
+      if (keysRef.current["w"] || keysRef.current["arrowup"]) targetVel.addScaledVector(dir, maxSpeed);
+      if (keysRef.current["s"] || keysRef.current["arrowdown"]) targetVel.addScaledVector(dir, -maxSpeed);
+      if (keysRef.current["a"] || keysRef.current["arrowleft"]) targetVel.addScaledVector(right, -maxSpeed);
+      if (keysRef.current["d"] || keysRef.current["arrowright"]) targetVel.addScaledVector(right, maxSpeed);
+
+      if (targetVel.lengthSq() > 0) {
+        velocityRef.current.lerp(targetVel, 0.08);
+      } else {
+        velocityRef.current.multiplyScalar(0.92);
+      }
 
       // Q/E rotation
       if (keysRef.current["q"]) yawRef.current += 0.025;
       if (keysRef.current["e"]) yawRef.current -= 0.025;
 
-      // Movement limits — corridor bounds (x = long axis, z = narrow axis)
-      camera.position.x = Math.max(-34, Math.min(34, camera.position.x));
-      camera.position.z = Math.max(-7, Math.min(7, camera.position.z));
-      camera.position.y = 1.7;
+      // Soft boundary — reduce velocity near walls
+      const xMin = -34, xMax = 34, zMin = -7, zMax = 7;
+      const softRange = 2;
+      if (velocityRef.current.x < 0) {
+        const f = Math.min(1, Math.max(0, (camera.position.x - xMin - 0.3) / softRange));
+        velocityRef.current.x *= f;
+      } else if (velocityRef.current.x > 0) {
+        const f = Math.min(1, Math.max(0, (xMax - camera.position.x - 0.3) / softRange));
+        velocityRef.current.x *= f;
+      }
+      if (velocityRef.current.z < 0) {
+        const f = Math.min(1, Math.max(0, (camera.position.z - zMin - 0.3) / softRange));
+        velocityRef.current.z *= f;
+      } else if (velocityRef.current.z > 0) {
+        const f = Math.min(1, Math.max(0, (zMax - camera.position.z - 0.3) / softRange));
+        velocityRef.current.z *= f;
+      }
 
-      // Footstep sound
-      const moving = keysRef.current["w"] || keysRef.current["s"] || keysRef.current["a"] || keysRef.current["d"]
-        || keysRef.current["arrowup"] || keysRef.current["arrowdown"] || keysRef.current["arrowleft"] || keysRef.current["arrowright"];
-      if (moving && audioCtxRef.current) {
+      camera.position.add(velocityRef.current);
+
+      // Hard clamp as safety net
+      camera.position.x = Math.max(xMin, Math.min(xMax, camera.position.x));
+      camera.position.z = Math.max(zMin, Math.min(zMax, camera.position.z));
+
+      // Head bob — sinusoidal vertical sway while moving
+      const velMag = velocityRef.current.length();
+      if (velMag > 0.001) {
+        bobPhaseRef.current += velMag * 8;
+      } else {
+        bobPhaseRef.current *= 0.9;
+      }
+      camera.position.y = 1.7 + Math.sin(bobPhaseRef.current) * 0.018;
+
+      // Footstep sound — interval proportional to velocity
+      if (velMag > 0.005 && audioCtxRef.current) {
         const now = performance.now();
-        if (now - lastStepTimeRef.current > 350) {
+        const stepInterval = 500 - (velMag / maxSpeed) * 220;
+        if (now - lastStepTimeRef.current > stepInterval) {
           lastStepTimeRef.current = now;
           playFootstep(audioCtxRef.current);
         }
       }
 
       // Snap assist — soft yaw towards nearest artwork in view
-      if (!isDraggingRef.current && performance.now() - dragEndTimeRef.current > 500) {
+      if (!isDraggingRef.current && performance.now() - dragEndTimeRef.current > 500 && velMag < 0.04) {
         const lookDir = new THREE.Vector3();
         camera.getWorldDirection(lookDir);
         lookDir.y = 0;
@@ -831,7 +868,7 @@ export default function EnSessizZamanSergiPage() {
           const toArt = new THREE.Vector3().subVectors(artMeshes[si].position, camera.position);
           toArt.y = 0;
           const sd = toArt.length();
-          if (sd >= 5) continue;
+          if (sd >= 4) continue;
           toArt.normalize();
 
           // Must be within ±60° of look direction
@@ -854,11 +891,12 @@ export default function EnSessizZamanSergiPage() {
           let diff = targetYaw - yawRef.current;
           while (diff > Math.PI) diff -= 2 * Math.PI;
           while (diff < -Math.PI) diff += 2 * Math.PI;
-          yawRef.current += diff * 0.02;
+          yawRef.current += diff * 0.012;
         }
       }
 
-      const euler = new THREE.Euler(pitchRef.current, yawRef.current, 0, "YXZ");
+      const swayZ = velMag > 0.001 ? Math.sin(bobPhaseRef.current * 0.5) * 0.004 : 0;
+      const euler = new THREE.Euler(pitchRef.current, yawRef.current, swayZ, "YXZ");
       camera.quaternion.setFromEuler(euler);
 
       // FOV zoom when close to artwork + proximity detection
@@ -874,7 +912,7 @@ export default function EnSessizZamanSergiPage() {
         setNearestArt(newNearest !== null ? ARTWORKS[newNearest] : null);
       }
       const targetFov = minDist < 2 ? 50 : minDist < 4 ? 50 + (minDist - 2) * 5 : 60;
-      camera.fov += (targetFov - camera.fov) * 0.05;
+      camera.fov += (targetFov - camera.fov) * 0.03;
       camera.updateProjectionMatrix();
 
       // Bench proximity detection

@@ -4,13 +4,14 @@ import { useState } from "react";
 
 export default function Bulten() {
   const [email, setEmail] = useState("");
+  const [kvkkChecked, setKvkkChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !kvkkChecked) return;
 
     setLoading(true);
     setStatus("idle");
@@ -82,11 +83,34 @@ export default function Bulten() {
             />
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !kvkkChecked}
               className="px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all whitespace-nowrap disabled:opacity-50"
             >
               {loading ? "Gönderiliyor..." : "Abone Ol"}
             </button>
+
+            {/* KVKK onay kutusu */}
+            <label className="flex items-start gap-3 text-left mt-3 cursor-pointer sm:col-span-2">
+              <input
+                type="checkbox"
+                checked={kvkkChecked}
+                onChange={(e) => setKvkkChecked(e.target.checked)}
+                className="mt-1 w-4 h-4 flex-shrink-0 accent-coral rounded"
+              />
+              <span className="text-white/40 text-xs leading-relaxed">
+                Kişisel verilerimin işlenmesine ilişkin{" "}
+                <a
+                  href="/kvkk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-coral/70 underline underline-offset-2 hover:text-coral"
+                >
+                  KVKK Aydınlatma Metni
+                </a>
+                &apos;ni okudum ve e-posta adresimin bülten gönderimi amacıyla
+                işlenmesini kabul ediyorum.
+              </span>
+            </label>
           </form>
         )}
 
