@@ -832,17 +832,10 @@ export default function EnSessizZamanSergiPage() {
       } else {
         bobPhaseRef.current *= 0.9;
       }
-      camera.position.y = 1.7 + Math.sin(bobPhaseRef.current) * 0.018;
+      camera.position.y = 1.7 + Math.sin(bobPhaseRef.current) * 0.005;
 
-      // Footstep sound — interval proportional to velocity
-      if (velMag > 0.005 && audioCtxRef.current) {
-        const now = performance.now();
-        const stepInterval = 500 - (velMag / maxSpeed) * 220;
-        if (now - lastStepTimeRef.current > stepInterval) {
-          lastStepTimeRef.current = now;
-          playFootstep(audioCtxRef.current);
-        }
-      }
+
+
 
       // Snap assist — soft yaw towards nearest artwork in view
       if (!isDraggingRef.current && performance.now() - dragEndTimeRef.current > 500 && velMag < 0.04) {
