@@ -186,10 +186,9 @@ const nextConfig: NextConfig = {
       // ═══════════════════════════════════════════════════════
       // 7. YASAL SAYFALAR
       // ═══════════════════════════════════════════════════════
-      { source: "/kvkk", destination: "/", permanent: true },
       { source: "/gizlilik-ve-guvenlik", destination: "/", permanent: true },
       { source: "/satis-sozlesmesi", destination: "/", permanent: true },
-      { source: "/iptal-ve-iade-kosullari", destination: "/", permanent: true },
+      { source: "/iptal-ve-iade-kosullari", destination: "/iade-ve-iptal", permanent: true },
 
       // ═══════════════════════════════════════════════════════
       // 8. ESKİ / GEREKSİZ
