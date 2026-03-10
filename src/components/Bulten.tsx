@@ -68,34 +68,33 @@ export default function Bulten() {
             {message}
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e-posta adresiniz"
-              required
-              disabled={loading}
-              className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:border-coral focus:bg-white/15 transition-all disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={loading || !kvkkChecked}
-              className="px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all whitespace-nowrap disabled:opacity-50"
-            >
-              {loading ? "Gönderiliyor..." : "Abone Ol"}
-            </button>
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e-posta adresiniz"
+                required
+                disabled={loading}
+                className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:border-coral focus:bg-white/15 transition-all disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={loading || !kvkkChecked}
+                className="px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all whitespace-nowrap disabled:opacity-50"
+              >
+                {loading ? "Gönderiliyor..." : "Abone Ol"}
+              </button>
+            </div>
 
             {/* KVKK onay kutusu */}
-            <label className="flex items-start gap-3 text-left mt-3 cursor-pointer sm:col-span-2">
+            <label className="flex items-start gap-3 text-left mt-4 cursor-pointer max-w-sm mx-auto">
               <input
                 type="checkbox"
                 checked={kvkkChecked}
                 onChange={(e) => setKvkkChecked(e.target.checked)}
-                className="mt-1 w-4 h-4 flex-shrink-0 accent-coral rounded"
+                className="mt-0.5 w-4 h-4 flex-shrink-0 accent-coral rounded"
               />
               <span className="text-white/40 text-xs leading-relaxed">
                 Kişisel verilerimin işlenmesine ilişkin{" "}
