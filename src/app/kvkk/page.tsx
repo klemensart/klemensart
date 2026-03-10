@@ -61,7 +61,7 @@ export default function KvkkPage() {
           <Section title="1. Veri Sorumlusu">
             <p>
               6698 sayılı Kişisel Verilerin Korunması Kanunu (&quot;KVKK&quot;)
-              kapsamında veri sorumlusu <strong>Klemens Art</strong>&apos;tır.
+              kapsamında veri sorumlusu <strong>Klemens Art Prodüksiyon Limited Şirketi</strong>&apos;dir.
             </p>
           </Section>
 
