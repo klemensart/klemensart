@@ -126,8 +126,8 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
         <h1>Ankara Kültür ve Sanat Haritası</h1>
         <h2>Ankara Kültür ve Sanat Mekânları</h2>
         <ul>
-          {PLACES.map((p) => (
-            <li key={p.name}>
+          {PLACES.map((p, i) => (
+            <li key={`${p.name}-${i}`}>
               <strong>{p.name}</strong> ({TYPE_LABELS[p.type]}) — {p.desc}
             </li>
           ))}

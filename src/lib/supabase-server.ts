@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
 
 /**
- * Server-side Supabase client.
+ * Server-side Supabase client (cookie-based — web).
  * Kullan: Server Components ve Route Handlers'da.
  * Client bileşenlerinde KULLANMA — "next/headers" sadece sunucuda çalışır.
  */
@@ -26,4 +28,27 @@ export async function createServerSupabaseClient() {
       },
     }
   );
+}
+
+/**
+ * Mobil client için Bearer token destekli Supabase client.
+ * API route'larında: Authorization header varsa token client, yoksa cookie client kullan.
+ */
+export function createRequestSupabaseClient(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const client = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      }
+    );
+    return client;
+  }
+  // Fallback: cookie-based client (web)
+  return null;
 }

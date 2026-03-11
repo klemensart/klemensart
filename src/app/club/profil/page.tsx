@@ -9,7 +9,9 @@ import {
   PlayIcon, LockIcon, ClockIcon, CalendarIcon, ChevronDownIcon,
   FilmIcon, BookIcon, ChartIcon, HeartIcon, SettingsIcon,
   VideoIcon, ArrowRightIcon, LogoutIcon, CloseIcon, DownloadIcon,
+  MapPinIcon,
 } from "@/lib/icons";
+import { getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
 
 const BUNNY_LIB = "596471";
 
@@ -333,12 +335,13 @@ function LocaSkeleton() {
 }
 
 /* ─── Tabs ─── */
-type TabId = "loca" | "tests" | "favorites" | "settings";
+type TabId = "loca" | "tests" | "favorites" | "discoveries" | "settings";
 const TABS: { id: TabId; label: string; icon: (active: boolean) => React.ReactElement }[] = [
-  { id: "loca",      label: "Loca",           icon: (a) => <FilmIcon     size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
-  { id: "tests",     label: "Test Geçmişi",   icon: (a) => <ChartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
-  { id: "favorites", label: "Favori Yazılar", icon: (a) => <HeartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
-  { id: "settings",  label: "Hesap",          icon: (a) => <SettingsIcon size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "loca",        label: "Loca",           icon: (a) => <FilmIcon     size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "tests",       label: "Test Geçmişi",   icon: (a) => <ChartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "favorites",   label: "Favori Yazılar", icon: (a) => <HeartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "discoveries", label: "Keşiflerim",     icon: (a) => <MapPinIcon   size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "settings",    label: "Hesap",          icon: (a) => <SettingsIcon size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
 ];
 
 /* ═══════════════════════════════════
@@ -361,6 +364,17 @@ export default function ProfilPage() {
 
   // Video player
   const [playingVideo, setPlayingVideo] = useState<{ bunnyId: string; title: string } | null>(null);
+
+  // Keşiflerim data
+  type GamStats = { total_visits: number; total_stars: number; total_badges: number; total_routes_completed: number; rank_name: string };
+  type GamBadge = { badge_type: string; badge_key: string; badge_name: string; stars_earned: number; earned_at: string };
+  type GamVisit = { place_slug: string; place_name: string; place_type: string; visited_at: string };
+  type GamReview = { place_slug: string; place_name: string; rating: number; review_text: string | null; created_at: string };
+  const [gamStats, setGamStats] = useState<GamStats | null>(null);
+  const [gamBadges, setGamBadges] = useState<GamBadge[]>([]);
+  const [gamVisits, setGamVisits] = useState<GamVisit[]>([]);
+  const [gamReviews, setGamReviews] = useState<GamReview[]>([]);
+  const [gamLoading, setGamLoading] = useState(false);
 
   /* ─── Auth ─── */
   useEffect(() => {
@@ -448,9 +462,28 @@ export default function ProfilPage() {
     setLocaLoading(false);
   }, []);
 
+  const fetchGam = useCallback(async () => {
+    setGamLoading(true);
+    try {
+      const res = await fetch("/api/harita/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setGamStats(data.stats);
+        setGamBadges(data.badges || []);
+        setGamVisits(data.visits || []);
+        setGamReviews(data.reviews || []);
+      }
+    } catch { /* ignore */ }
+    setGamLoading(false);
+  }, []);
+
   useEffect(() => {
     if (user) fetchLoca(user.id);
   }, [user, fetchLoca]);
+
+  useEffect(() => {
+    if (user && activeTab === "discoveries") fetchGam();
+  }, [user, activeTab, fetchGam]);
 
   /* ─── Sign out ─── */
   const handleSignOut = async () => {
@@ -677,6 +710,165 @@ export default function ProfilPage() {
               <p className="text-[15px] font-semibold text-brand-dark mt-4">Favori Yazılar</p>
               <p className="text-[13px]">Beğendiğin ve kaydettiğin içerikler burada listelenecek.</p>
               <p className="text-xs italic mt-2">Yakında</p>
+            </div>
+          )}
+
+          {/* ══ KEŞİFLERİM ══ */}
+          {activeTab === "discoveries" && (
+            <div>
+              {gamLoading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto" />
+                </div>
+              ) : !gamStats || gamStats.total_visits === 0 ? (
+                <div className="text-center py-[60px] text-brand-warm">
+                  <MapPinIcon size={48} className="text-brand-light mx-auto" />
+                  <p className="text-[15px] font-semibold text-brand-dark mt-4">Henüz keşif yok</p>
+                  <p className="text-[13px]">Haritadaki mekanlara check-in yaparak rozet kazanabilirsin!</p>
+                  <Link
+                    href="/harita"
+                    className="inline-flex items-center gap-1.5 mt-5 px-[22px] py-[11px] bg-coral text-white rounded-[10px] text-[13px] font-semibold no-underline"
+                  >
+                    Haritaya Git <ArrowRightIcon size={13} className="text-white" />
+                  </Link>
+                </div>
+              ) : (() => {
+                const rank = getRank(gamStats.total_stars);
+                const nextRank = getNextRank(gamStats.total_stars);
+                const progressPct = nextRank
+                  ? ((gamStats.total_stars - rank.minStars) / (nextRank.minStars - rank.minStars)) * 100
+                  : 100;
+                return (
+                  <>
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                      {[
+                        { label: "Ziyaret", value: gamStats.total_visits, icon: "📍" },
+                        { label: "Yıldız", value: gamStats.total_stars, icon: "⭐" },
+                        { label: "Rozet", value: gamStats.total_badges, icon: "🏅" },
+                        { label: "Rota", value: gamStats.total_routes_completed, icon: "🗺️" },
+                      ].map((s, i) => (
+                        <div key={i} className="bg-white rounded-[14px] px-4 py-5 text-center shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+                          <div className="text-2xl mb-1">{s.icon}</div>
+                          <div className="text-[28px] font-bold text-brand-dark tabular-nums">{s.value}</div>
+                          <div className="text-xs text-brand-warm mt-0.5">{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Rank */}
+                    <div className="bg-white rounded-[14px] p-5 shadow-[0_1px_4px_rgba(0,0,0,0.03)] mb-6">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-3xl">{rank.icon}</span>
+                        <div>
+                          <div className="text-[17px] font-bold text-brand-dark">{rank.name}</div>
+                          <div className="text-xs text-brand-warm">
+                            {nextRank
+                              ? `Sonraki: ${nextRank.icon} ${nextRank.name} (${nextRank.minStars - gamStats.total_stars} ⭐ kaldı)`
+                              : "En yüksek ünvan!"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-2 bg-brand-light rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-coral transition-[width] duration-500"
+                          style={{ width: `${Math.min(progressPct, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1.5 text-[10px] text-brand-warm">
+                        <span>{rank.icon} {rank.minStars}</span>
+                        {nextRank && <span>{nextRank.icon} {nextRank.minStars}</span>}
+                      </div>
+                    </div>
+
+                    {/* Badges */}
+                    {gamBadges.length > 0 && (
+                      <>
+                        <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mb-3">
+                          ROZETLERİM
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
+                          {gamBadges.map((b) => {
+                            const typeIcons: Record<string, string> = {
+                              visit: "📍", route_complete: "🗺️", category: "🎯", milestone: "🏆",
+                            };
+                            return (
+                              <div key={b.badge_key} className="bg-white rounded-xl px-3.5 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-lg">{typeIcons[b.badge_type] || "🏅"}</span>
+                                  <span className="text-xs font-semibold text-brand-dark truncate">{b.badge_name}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[10px] text-brand-warm">
+                                    +{b.stars_earned} ⭐
+                                  </span>
+                                  <span className="text-[10px] text-brand-warm">
+                                    {new Date(b.earned_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Recent visits */}
+                    {gamVisits.length > 0 && (
+                      <>
+                        <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mb-3">
+                          SON ZİYARETLER
+                        </h3>
+                        <div className="bg-white rounded-[14px] shadow-[0_1px_4px_rgba(0,0,0,0.03)] mb-6 overflow-hidden">
+                          {gamVisits.slice(0, 10).map((v, i) => (
+                            <div key={`${v.place_slug}-${i}`} className={`flex items-center gap-3 px-4 py-3 ${i < gamVisits.length - 1 && i < 9 ? "border-b border-brand-light" : ""}`}>
+                              <div className="w-8 h-8 rounded-lg bg-brand-light flex items-center justify-center shrink-0">
+                                <MapPinIcon size={14} className="text-coral" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-brand-dark truncate">{v.place_name}</div>
+                                <div className="text-[11px] text-brand-warm">{v.place_type}</div>
+                              </div>
+                              <span className="text-[11px] text-brand-warm shrink-0">
+                                {new Date(v.visited_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Reviews */}
+                    {gamReviews.length > 0 && (
+                      <>
+                        <h3 className="text-[11px] font-semibold text-brand-warm tracking-widest mb-3">
+                          YORUMLARIM
+                        </h3>
+                        <div className="flex flex-col gap-2.5 mb-6">
+                          {gamReviews.map((r) => (
+                            <div key={r.place_slug} className="bg-white rounded-xl px-4 py-3.5 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-semibold text-brand-dark">{r.place_name}</span>
+                                <div className="flex gap-0.5">
+                                  {[1, 2, 3, 4, 5].map((s) => (
+                                    <span key={s} style={{ color: s <= r.rating ? "#FFB300" : "#ddd", fontSize: 12 }}>★</span>
+                                  ))}
+                                </div>
+                              </div>
+                              {r.review_text && (
+                                <p className="text-xs text-brand-warm leading-relaxed m-0">{r.review_text}</p>
+                              )}
+                              <div className="text-[10px] text-brand-warm mt-1">
+                                {new Date(r.created_at).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
 

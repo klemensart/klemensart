@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { PLACES, ROUTES, TYPE_LABELS, type PlaceType, type CulturePlace, type Route } from "@/lib/harita-data";
+import { placeSlug, haversineDistance, getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
 
 /* ───────── Types ───────── */
 
@@ -17,6 +18,22 @@ type SupabaseEvent = {
 };
 
 type MapMode = "explore" | "routes";
+
+type PlaceReview = {
+  id: string;
+  rating: number;
+  review_text: string | null;
+  user_display_name: string | null;
+  created_at: string;
+};
+
+type CheckInResult = {
+  stars_earned: number;
+  new_badges: { type: string; name: string; stars: number }[];
+  total_stars: number;
+  rank: string;
+  rank_icon: string;
+};
 
 /* ───────── Constants ───────── */
 
@@ -140,6 +157,24 @@ export default function HaritaPage() {
   const dragStartYRef = useRef(0);
   const dragStartPctRef = useRef(40);
 
+  // Gamification state
+  const [gamUser, setGamUser] = useState<{ id: string } | null>(null);
+  const [visitedSlugs, setVisitedSlugs] = useState<Set<string>>(new Set());
+  const [todaySlugs, setTodaySlugs] = useState<Set<string>>(new Set());
+  const [totalStars, setTotalStars] = useState(0);
+  const [rankName, setRankName] = useState("Meraklı");
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [checkInResult, setCheckInResult] = useState<CheckInResult | null>(null);
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Reviews state
+  const [placeReviews, setPlaceReviews] = useState<{ avg: number; count: number; items: PlaceReview[] }>({ avg: 0, count: 0, items: [] });
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   // Fetch events for selected place
   const fetchEvents = useCallback(async (place: CulturePlace) => {
     setEventsLoading(true);
@@ -164,10 +199,59 @@ export default function HaritaPage() {
     setEventsLoading(false);
   }, []);
 
+  // Fetch gamification stats on mount
+  const fetchGamStats = useCallback(async () => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session?.user) return;
+      setGamUser({ id: data.session.user.id });
+
+      const res = await fetch("/api/harita/stats");
+      if (!res.ok) return;
+      const json = await res.json();
+      setVisitedSlugs(new Set(json.visitedSlugs || []));
+      setTodaySlugs(new Set(json.todaySlugs || []));
+      setTotalStars(json.stats?.total_stars ?? 0);
+      setRankName(json.stats?.rank_name ?? "Meraklı");
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchGamStats(); }, [fetchGamStats]);
+
+  // Track user position continuously for check-in distance
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    const wid = navigator.geolocation.watchPosition(
+      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 10000 },
+    );
+    return () => navigator.geolocation.clearWatch(wid);
+  }, []);
+
+  // Fetch reviews for a place
+  const fetchReviews = useCallback(async (slug: string) => {
+    setReviewsLoading(true);
+    try {
+      const res = await fetch(`/api/harita/reviews?place_slug=${slug}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPlaceReviews(data);
+      }
+    } catch { /* ignore */ }
+    setReviewsLoading(false);
+  }, []);
+
   const selectPlace = useCallback((place: CulturePlace) => {
     setSelectedPlace(place);
     fetchEvents(place);
-  }, [fetchEvents]);
+    fetchReviews(placeSlug(place.name));
+    setCheckInResult(null);
+    setShowReviewForm(false);
+    setReviewRating(0);
+    setReviewText("");
+  }, [fetchEvents, fetchReviews]);
 
   // Locate user on map
   const locateUser = useCallback(() => {
@@ -534,6 +618,12 @@ export default function HaritaPage() {
       const labelColor = isDark ? "#fff" : "#1a1a2e";
       const labelShadow = isDark ? "0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6)" : "0 1px 3px rgba(255,255,255,0.8),0 0 6px rgba(255,255,255,0.4)";
       const markerBorder = isDark ? "none" : "2px solid #fff";
+      const isVis = visitedSlugs.has(placeSlug(place.name));
+      const visitCheckHtml = isVis
+        ? `<div style="position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#4CAF50;display:flex;align-items:center;justify-content:center;border:2px solid ${isDark ? '#1a1a1a' : '#fff'};z-index:2;">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>`
+        : "";
       const labelHtml = showLabel
         ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:${labelColor};text-shadow:${labelShadow};pointer-events:none;">${place.name}</div>`
         : "";
@@ -550,7 +640,7 @@ export default function HaritaPage() {
             cursor:pointer;transition:transform 0.2s;
             animation:marker-glow 3s infinite;
             --glow-color:${color};
-          ">${svg}</div>${labelHtml}
+          ">${svg}</div>${visitCheckHtml}${labelHtml}
         </div>`,
       });
 
@@ -562,7 +652,7 @@ export default function HaritaPage() {
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [activeFilter, currentZoom, mapReady, selectPlace, mode, isDark]);
+  }, [activeFilter, currentZoom, mapReady, selectPlace, mode, isDark, visitedSlugs]);
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
@@ -583,6 +673,383 @@ export default function HaritaPage() {
   };
 
   const activeStop = activeRoute?.stops[activeStopIndex] ?? null;
+
+  /* ───────── Check-in handler ───────── */
+  const handleCheckIn = async (place: CulturePlace) => {
+    if (!gamUser || !userPos || checkingIn) return;
+    setCheckingIn(true);
+    setCheckInResult(null);
+    try {
+      const res = await fetch("/api/harita/check-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          place_slug: placeSlug(place.name),
+          user_lat: userPos.lat,
+          user_lng: userPos.lng,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCheckInResult(data);
+        setVisitedSlugs((prev) => new Set([...prev, placeSlug(place.name)]));
+        setTodaySlugs((prev) => new Set([...prev, placeSlug(place.name)]));
+        setTotalStars(data.total_stars);
+        setRankName(data.rank);
+      } else if (data.already) {
+        setTodaySlugs((prev) => new Set([...prev, placeSlug(place.name)]));
+      }
+    } catch { /* ignore */ }
+    setCheckingIn(false);
+  };
+
+  /* ───────── Route stop check-in handler ───────── */
+  const [routeCheckInResult, setRouteCheckInResult] = useState<CheckInResult & { route_completed?: boolean } | null>(null);
+  const [routeCompleted, setRouteCompleted] = useState(false);
+
+  const handleRouteStopCheckIn = async (stop: { name: string; lat: number; lng: number }, routeId: number) => {
+    if (!gamUser || !userPos || checkingIn) return;
+    setCheckingIn(true);
+    setRouteCheckInResult(null);
+    try {
+      const res = await fetch("/api/harita/check-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          place_slug: placeSlug(stop.name),
+          user_lat: userPos.lat,
+          user_lng: userPos.lng,
+          place_name: stop.name,
+          place_lat: stop.lat,
+          place_lng: stop.lng,
+          place_type: "rota",
+          route_id: routeId,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRouteCheckInResult(data);
+        setVisitedSlugs((prev) => new Set([...prev, placeSlug(stop.name)]));
+        setTodaySlugs((prev) => new Set([...prev, placeSlug(stop.name)]));
+        setTotalStars(data.total_stars);
+        setRankName(data.rank);
+        if (data.route_completed) setRouteCompleted(true);
+      } else if (data.already) {
+        setTodaySlugs((prev) => new Set([...prev, placeSlug(stop.name)]));
+      }
+    } catch { /* ignore */ }
+    setCheckingIn(false);
+  };
+
+  /* ───────── Review submit handler ───────── */
+  const handleSubmitReview = async (place: CulturePlace) => {
+    if (!gamUser || submittingReview || reviewRating === 0) return;
+    setSubmittingReview(true);
+    try {
+      const res = await fetch("/api/harita/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          place_slug: placeSlug(place.name),
+          place_name: place.name,
+          rating: reviewRating,
+          review_text: reviewText || undefined,
+        }),
+      });
+      if (res.ok) {
+        setShowReviewForm(false);
+        setReviewRating(0);
+        setReviewText("");
+        fetchReviews(placeSlug(place.name));
+      }
+    } catch { /* ignore */ }
+    setSubmittingReview(false);
+  };
+
+  /* ───────── Check-in button renderer ───────── */
+  const renderCheckInButton = (place: CulturePlace, compact?: boolean) => {
+    const slug = placeSlug(place.name);
+    const visitedToday = todaySlugs.has(slug);
+    const isVisited = visitedSlugs.has(slug);
+
+    // Not logged in
+    if (!gamUser) {
+      return (
+        <Link
+          href="/club/giris"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            padding: compact ? "10px 14px" : "12px 16px",
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: compact ? 8 : 10, color: "#999",
+            fontSize: compact ? 12 : 13, fontWeight: 500,
+            textDecoration: "none",
+            marginBottom: compact ? 10 : 14,
+          }}
+        >
+          Giriş yaparak check-in yapın
+        </Link>
+      );
+    }
+
+    // Already visited today
+    if (visitedToday) {
+      return (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: compact ? "10px 14px" : "12px 16px",
+          background: "rgba(76,175,80,0.12)", border: "1px solid rgba(76,175,80,0.3)",
+          borderRadius: compact ? 8 : 10, color: "#4CAF50",
+          fontSize: compact ? 12 : 13, fontWeight: 600,
+          marginBottom: compact ? 10 : 14,
+        }}>
+          <svg width={compact ? 14 : 16} height={compact ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="#4CAF50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          Ziyaret edildi
+          {isVisited && <span style={{ fontSize: 10, opacity: 0.7 }}>+1 ⭐</span>}
+        </div>
+      );
+    }
+
+    // Check-in result animation
+    if (checkInResult) {
+      return (
+        <div style={{
+          padding: compact ? "12px" : "16px",
+          background: "rgba(76,175,80,0.1)", border: "1px solid rgba(76,175,80,0.25)",
+          borderRadius: compact ? 8 : 10,
+          marginBottom: compact ? 10 : 14,
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: compact ? 22 : 28, marginBottom: 6 }}>⭐</div>
+          <div style={{ color: "#4CAF50", fontSize: compact ? 14 : 16, fontWeight: 700, marginBottom: 4 }}>
+            +{checkInResult.stars_earned} Yıldız!
+          </div>
+          <div style={{ color: "#999", fontSize: compact ? 11 : 12 }}>
+            {checkInResult.rank_icon} {checkInResult.rank} — Toplam {checkInResult.total_stars} ⭐
+          </div>
+          {checkInResult.new_badges.filter(b => b.type !== "visit").map((b, i) => (
+            <div key={i} style={{
+              marginTop: 6, padding: "4px 10px",
+              background: "rgba(255,215,0,0.1)", borderRadius: 6,
+              color: "#FFB300", fontSize: 11, fontWeight: 600, display: "inline-block",
+            }}>
+              🏅 {b.name} (+{b.stars} ⭐)
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Distance check
+    const dist = userPos ? haversineDistance(userPos.lat, userPos.lng, place.lat, place.lng) : null;
+    const inRange = dist !== null && dist <= 200;
+
+    return (
+      <button
+        onClick={() => inRange && handleCheckIn(place)}
+        disabled={!inRange || checkingIn}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: compact ? "10px 14px" : "12px 16px",
+          width: "100%",
+          background: inRange ? "rgba(66,133,244,0.12)" : "rgba(255,255,255,0.05)",
+          border: `1px solid ${inRange ? "rgba(66,133,244,0.3)" : "rgba(255,255,255,0.1)"}`,
+          borderRadius: compact ? 8 : 10,
+          color: inRange ? "#4285F4" : "#666",
+          fontSize: compact ? 12 : 13, fontWeight: 600,
+          cursor: inRange && !checkingIn ? "pointer" : "not-allowed",
+          transition: "all 0.2s",
+          marginBottom: compact ? 10 : 14,
+          opacity: checkingIn ? 0.6 : 1,
+        }}
+      >
+        {checkingIn ? (
+          "Check-in yapılıyor..."
+        ) : inRange ? (
+          <>
+            <svg width={compact ? 14 : 16} height={compact ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="#4285F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Buradayım ✓
+          </>
+        ) : dist !== null ? (
+          `Mekana yaklaşın (${Math.round(dist)}m)`
+        ) : (
+          "Konum bekleniyor..."
+        )}
+      </button>
+    );
+  };
+
+  /* ───────── Reviews section renderer ───────── */
+  const renderReviewsSection = (place: CulturePlace, compact?: boolean) => {
+    const slug = placeSlug(place.name);
+    const canReview = gamUser && totalStars >= 5 && visitedSlugs.has(slug);
+
+    return (
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: compact ? 14 : 20, marginTop: compact ? 10 : 16 }}>
+        <div style={{ color: "#FF6D60", fontSize: compact ? 10 : 11, letterSpacing: 2, marginBottom: compact ? 10 : 14, fontWeight: 600 }}>
+          YORUMLAR
+        </div>
+
+        {/* Average rating */}
+        {!reviewsLoading && placeReviews.count > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: compact ? 10 : 14 }}>
+            <div style={{ display: "flex", gap: 2 }}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <span key={s} style={{ color: s <= Math.round(placeReviews.avg) ? "#FFB300" : "#444", fontSize: compact ? 14 : 16 }}>★</span>
+              ))}
+            </div>
+            <span style={{ color: "#fff", fontSize: compact ? 13 : 14, fontWeight: 600 }}>{placeReviews.avg}</span>
+            <span style={{ color: "#666", fontSize: compact ? 11 : 12 }}>({placeReviews.count} yorum)</span>
+          </div>
+        )}
+
+        {reviewsLoading ? (
+          <div style={{ color: "#666", fontSize: compact ? 12 : 13 }}>Yükleniyor...</div>
+        ) : placeReviews.count === 0 ? (
+          <div style={{ color: "#555", fontSize: compact ? 12 : 13, marginBottom: compact ? 10 : 14 }}>
+            Henüz yorum yok
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: compact ? 8 : 10, marginBottom: compact ? 12 : 16 }}>
+            {placeReviews.items.slice(0, 3).map((r) => (
+              <div key={r.id} style={{
+                background: "rgba(255,255,255,0.03)", borderRadius: compact ? 8 : 10,
+                padding: compact ? "10px 12px" : "12px 14px",
+                border: "1px solid rgba(255,255,255,0.06)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <div style={{
+                    width: compact ? 24 : 28, height: compact ? 24 : 28, borderRadius: "50%",
+                    background: "rgba(255,109,96,0.15)", color: "#FF6D60",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: compact ? 10 : 11, fontWeight: 700,
+                  }}>
+                    {(r.user_display_name || "A").charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ color: "#ccc", fontSize: compact ? 12 : 13, fontWeight: 500 }}>
+                      {r.user_display_name || "Anonim"}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: 1 }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <span key={s} style={{ color: s <= r.rating ? "#FFB300" : "#444", fontSize: compact ? 10 : 11 }}>★</span>
+                    ))}
+                  </div>
+                </div>
+                {r.review_text && (
+                  <div style={{ color: "#aaa", fontSize: compact ? 12 : 13, lineHeight: 1.5 }}>
+                    {r.review_text}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Write review button / form */}
+        {canReview && !showReviewForm && (
+          <button
+            onClick={() => setShowReviewForm(true)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              width: "100%", padding: compact ? "10px" : "12px",
+              background: "rgba(255,109,96,0.1)", border: "1px solid rgba(255,109,96,0.25)",
+              borderRadius: compact ? 8 : 10, color: "#FF6D60",
+              fontSize: compact ? 12 : 13, fontWeight: 600, cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            <svg width={compact ? 14 : 16} height={compact ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            Yorum Yaz
+          </button>
+        )}
+
+        {showReviewForm && (
+          <div style={{
+            background: "rgba(255,255,255,0.03)", borderRadius: compact ? 8 : 10,
+            padding: compact ? "12px" : "16px",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            {/* Star rating */}
+            <div style={{ display: "flex", gap: 4, marginBottom: 10, justifyContent: "center" }}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setReviewRating(s)}
+                  style={{
+                    background: "none", border: "none", cursor: "pointer",
+                    fontSize: compact ? 24 : 28, padding: 2,
+                    color: s <= reviewRating ? "#FFB300" : "#444",
+                    transition: "color 0.15s",
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            {/* Text */}
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value.slice(0, 280))}
+              placeholder="Düşüncelerinizi paylaşın..."
+              style={{
+                width: "100%", minHeight: compact ? 60 : 80, padding: compact ? "8px 10px" : "10px 12px",
+                background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: 8, color: "#ddd", fontSize: compact ? 12 : 13,
+                resize: "vertical", outline: "none", boxSizing: "border-box",
+              }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+              <span style={{ color: "#555", fontSize: 11 }}>{reviewText.length}/280</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  onClick={() => { setShowReviewForm(false); setReviewRating(0); setReviewText(""); }}
+                  style={{
+                    padding: "6px 14px", background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6,
+                    color: "#888", fontSize: 12, cursor: "pointer",
+                  }}
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={() => handleSubmitReview(place)}
+                  disabled={reviewRating === 0 || submittingReview}
+                  style={{
+                    padding: "6px 14px",
+                    background: reviewRating > 0 ? "rgba(255,109,96,0.2)" : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${reviewRating > 0 ? "rgba(255,109,96,0.4)" : "rgba(255,255,255,0.1)"}`,
+                    borderRadius: 6,
+                    color: reviewRating > 0 ? "#FF6D60" : "#555",
+                    fontSize: 12, fontWeight: 600,
+                    cursor: reviewRating > 0 && !submittingReview ? "pointer" : "not-allowed",
+                    opacity: submittingReview ? 0.6 : 1,
+                  }}
+                >
+                  {submittingReview ? "Gönderiliyor..." : "Gönder"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!canReview && gamUser && totalStars < 5 && (
+          <div style={{ color: "#555", fontSize: compact ? 10 : 11, marginTop: 6 }}>
+            Yorum yazmak için en az 5 ⭐ gerekli (Şu an: {totalStars})
+          </div>
+        )}
+      </div>
+    );
+  };
 
   /* ───────── Shared panel content renderer for events ───────── */
   const renderDirectionsButton = (place: CulturePlace, compact?: boolean) => {
@@ -688,41 +1155,159 @@ export default function HaritaPage() {
   /* ───────── Story panel content (shared between desktop & mobile) ───────── */
   const renderStoryContent = (compact?: boolean) => {
     if (!activeRoute || !activeStop) return null;
+
+    const stopSlug = placeSlug(activeStop.name);
+    const stopVisited = visitedSlugs.has(stopSlug);
+    const stopVisitedToday = todaySlugs.has(stopSlug);
+    const visitedCount = activeRoute.stops.filter((s) => visitedSlugs.has(placeSlug(s.name))).length;
+    const allStopsVisited = visitedCount === activeRoute.stops.length;
+    const stopDist = userPos ? haversineDistance(userPos.lat, userPos.lng, activeStop.lat, activeStop.lng) : null;
+    const stopInRange = stopDist !== null && stopDist <= 200;
+
     return (
       <>
-        {/* Route title */}
+        {/* Route title + progress */}
         <div style={{
           display: "flex", alignItems: "center", gap: 8, marginBottom: compact ? 12 : 16,
           paddingBottom: compact ? 10 : 12, borderBottom: `1px solid ${activeRoute.color}30`,
         }}>
           {renderRouteIcon(activeRoute.id, activeRoute.color, compact ? 16 : 20)}
-          <span style={{ color: activeRoute.color, fontSize: compact ? 12 : 13, fontWeight: 600, letterSpacing: 1 }}>
-            {activeRoute.title}
-          </span>
+          <div style={{ flex: 1 }}>
+            <span style={{ color: activeRoute.color, fontSize: compact ? 12 : 13, fontWeight: 600, letterSpacing: 1 }}>
+              {activeRoute.title}
+            </span>
+            {gamUser && (
+              <div style={{ color: "#666", fontSize: 10, marginTop: 2 }}>
+                {visitedCount}/{activeRoute.stops.length} durak ziyaret edildi
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Route completion celebration */}
+        {routeCompleted && allStopsVisited && (
+          <div style={{
+            padding: compact ? "14px" : "18px", marginBottom: compact ? 12 : 16,
+            background: `${activeRoute.color}15`, border: `1px solid ${activeRoute.color}40`,
+            borderRadius: 12, textAlign: "center",
+          }}>
+            <div style={{ fontSize: compact ? 32 : 40, marginBottom: 8 }}>🏆</div>
+            <div style={{ color: activeRoute.color, fontSize: compact ? 16 : 18, fontWeight: 700, marginBottom: 4 }}>
+              Rota Tamamlandı!
+            </div>
+            <div style={{ color: "#ccc", fontSize: compact ? 12 : 13 }}>
+              &quot;{activeRoute.title}&quot; rotasını tamamladınız — +3 bonus ⭐
+            </div>
+          </div>
+        )}
+
         {/* Stop number */}
-        <div style={{
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          width: compact ? 28 : 32, height: compact ? 28 : 32, borderRadius: "50%",
-          background: activeRoute.color, color: "#fff",
-          fontSize: compact ? 14 : 16, fontWeight: 700, marginBottom: compact ? 8 : 12,
-        }}>
-          {activeStopIndex + 1}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: compact ? 8 : 12 }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            width: compact ? 28 : 32, height: compact ? 28 : 32, borderRadius: "50%",
+            background: stopVisited ? "#4CAF50" : activeRoute.color, color: "#fff",
+            fontSize: compact ? 14 : 16, fontWeight: 700,
+          }}>
+            {stopVisited ? "✓" : activeStopIndex + 1}
+          </div>
+          {stopVisited && (
+            <span style={{ color: "#4CAF50", fontSize: compact ? 11 : 12, fontWeight: 600 }}>Ziyaret edildi</span>
+          )}
         </div>
 
         <h2 style={{ color: "#fff", fontSize: compact ? 18 : 22, fontWeight: 600, margin: "0 0 12px 0", lineHeight: 1.3 }}>
           {activeStop.name}
         </h2>
 
-        <p style={{ color: "#bbb", fontSize: compact ? 13 : 14, lineHeight: 1.8, margin: "0 0 20px 0" }}>
+        <p style={{ color: "#bbb", fontSize: compact ? 13 : 14, lineHeight: 1.8, margin: "0 0 16px 0" }}>
           {activeStop.story}
         </p>
+
+        {/* Route stop check-in */}
+        {gamUser && !stopVisitedToday && !routeCheckInResult && (
+          <button
+            onClick={() => stopInRange && handleRouteStopCheckIn(activeStop, activeRoute.id)}
+            disabled={!stopInRange || checkingIn}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              padding: compact ? "10px 14px" : "12px 16px",
+              width: "100%", marginBottom: compact ? 12 : 16,
+              background: stopInRange ? `${activeRoute.color}18` : "rgba(255,255,255,0.05)",
+              border: `1px solid ${stopInRange ? activeRoute.color + "40" : "rgba(255,255,255,0.1)"}`,
+              borderRadius: compact ? 8 : 10,
+              color: stopInRange ? activeRoute.color : "#666",
+              fontSize: compact ? 12 : 13, fontWeight: 600,
+              cursor: stopInRange && !checkingIn ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+              opacity: checkingIn ? 0.6 : 1,
+            }}
+          >
+            {checkingIn ? (
+              "Check-in yapılıyor..."
+            ) : stopInRange ? (
+              <>
+                <svg width={compact ? 14 : 16} height={compact ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke={activeRoute.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                Buradayım ✓
+              </>
+            ) : stopDist !== null ? (
+              `Durağa yaklaşın (${Math.round(stopDist)}m)`
+            ) : (
+              "Konum bekleniyor..."
+            )}
+          </button>
+        )}
+
+        {!gamUser && (
+          <Link
+            href="/club/giris"
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              padding: compact ? "10px 14px" : "12px 16px",
+              marginBottom: compact ? 12 : 16,
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: compact ? 8 : 10, color: "#999",
+              fontSize: compact ? 12 : 13, fontWeight: 500,
+              textDecoration: "none",
+            }}
+          >
+            Giriş yaparak check-in yapın
+          </Link>
+        )}
+
+        {/* Route check-in result */}
+        {routeCheckInResult && (
+          <div style={{
+            padding: compact ? "12px" : "16px", marginBottom: compact ? 12 : 16,
+            background: "rgba(76,175,80,0.1)", border: "1px solid rgba(76,175,80,0.25)",
+            borderRadius: compact ? 8 : 10, textAlign: "center",
+          }}>
+            <div style={{ fontSize: compact ? 22 : 28, marginBottom: 6 }}>⭐</div>
+            <div style={{ color: "#4CAF50", fontSize: compact ? 14 : 16, fontWeight: 700, marginBottom: 4 }}>
+              +{routeCheckInResult.stars_earned} Yıldız!
+            </div>
+            <div style={{ color: "#999", fontSize: compact ? 11 : 12 }}>
+              {routeCheckInResult.rank_icon} {routeCheckInResult.rank} — Toplam {routeCheckInResult.total_stars} ⭐
+            </div>
+            {routeCheckInResult.new_badges.filter(b => b.type !== "visit").map((b, i) => (
+              <div key={i} style={{
+                marginTop: 6, padding: "4px 10px",
+                background: "rgba(255,215,0,0.1)", borderRadius: 6,
+                color: "#FFB300", fontSize: 11, fontWeight: 600, display: "inline-block",
+              }}>
+                🏅 {b.name} (+{b.stars} ⭐)
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Nav buttons */}
         <div style={{ display: "flex", gap: 10 }}>
           <button
-            onClick={() => setActiveStopIndex(Math.max(0, activeStopIndex - 1))}
+            onClick={() => { setActiveStopIndex(Math.max(0, activeStopIndex - 1)); setRouteCheckInResult(null); }}
             disabled={activeStopIndex === 0}
             style={{
               flex: 1, padding: compact ? "10px 0" : "12px 0",
@@ -736,7 +1321,7 @@ export default function HaritaPage() {
             &larr; &Ouml;nceki
           </button>
           <button
-            onClick={() => setActiveStopIndex(Math.min(activeRoute.stops.length - 1, activeStopIndex + 1))}
+            onClick={() => { setActiveStopIndex(Math.min(activeRoute.stops.length - 1, activeStopIndex + 1)); setRouteCheckInResult(null); }}
             disabled={activeStopIndex === activeRoute.stops.length - 1}
             style={{
               flex: 1, padding: compact ? "10px 0" : "12px 0",
@@ -753,24 +1338,28 @@ export default function HaritaPage() {
           </button>
         </div>
 
-        {/* Progress */}
+        {/* Progress dots — green for visited */}
         <div style={{ marginTop: 14, display: "flex", gap: 4, justifyContent: "center" }}>
-          {activeRoute.stops.map((_, i) => (
-            <div
-              key={i}
-              onClick={() => setActiveStopIndex(i)}
-              style={{
-                width: i === activeStopIndex ? 20 : 8, height: 8, borderRadius: 4,
-                background: i === activeStopIndex ? activeRoute.color : "rgba(255,255,255,0.1)",
-                cursor: "pointer", transition: "all 0.3s",
-              }}
-            />
-          ))}
+          {activeRoute.stops.map((s, i) => {
+            const sVisited = visitedSlugs.has(placeSlug(s.name));
+            const isActive = i === activeStopIndex;
+            return (
+              <div
+                key={i}
+                onClick={() => { setActiveStopIndex(i); setRouteCheckInResult(null); }}
+                style={{
+                  width: isActive ? 20 : 8, height: 8, borderRadius: 4,
+                  background: isActive ? activeRoute.color : sVisited ? "#4CAF50" : "rgba(255,255,255,0.1)",
+                  cursor: "pointer", transition: "all 0.3s",
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Back to routes */}
         <button
-          onClick={deselectRoute}
+          onClick={() => { deselectRoute(); setRouteCheckInResult(null); setRouteCompleted(false); }}
           style={{
             marginTop: 20, width: "100%", padding: compact ? "8px 0" : "10px 0",
             background: "transparent",
@@ -1029,8 +1618,10 @@ export default function HaritaPage() {
                 <p style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px 0" }}>
                   {selectedPlace.desc}
                 </p>
+                {renderCheckInButton(selectedPlace)}
                 {renderDirectionsButton(selectedPlace)}
                 {renderEventsSection()}
+                {renderReviewsSection(selectedPlace)}
               </div>
             </div>
           )}
@@ -1079,8 +1670,10 @@ export default function HaritaPage() {
           <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: "0 0 14px 0" }}>
             {selectedPlace.desc}
           </p>
+          {renderCheckInButton(selectedPlace, true)}
           {renderDirectionsButton(selectedPlace, true)}
           {renderEventsSection(true)}
+          {renderReviewsSection(selectedPlace, true)}
         </div>
       )}
 
