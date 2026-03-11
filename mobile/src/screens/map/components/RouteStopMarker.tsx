@@ -21,7 +21,7 @@ function RouteStopMarkerInner({ stop, index, color, isActive, onPress }: Props) 
     <Marker
       coordinate={{ latitude: stop.lat, longitude: stop.lng }}
       onPress={() => onPress(index)}
-      tracksViewChanges={false}
+      tracksViewChanges={true}
     >
       <View
         style={[

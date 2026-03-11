@@ -13,11 +13,15 @@ import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
 import { apiFetch } from "../../services/api";
 
 interface Workshop {
-  id: number;
+  id: string;
   title: string;
-  description: string;
+  description: string | null;
   total_sessions: number;
   is_live: boolean;
+  slug: string | null;
+  price: string | null;
+  for_sale: boolean;
+  image: string | null;
 }
 
 export default function WorkshopsListScreen({ navigation }: any) {
@@ -25,8 +29,8 @@ export default function WorkshopsListScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Workshop[]>("/api/workshops")
-      .then(setWorkshops)
+    apiFetch<{ workshops: Workshop[] }>("/api/public/workshops")
+      .then((res) => setWorkshops(res.workshops))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -62,10 +66,10 @@ export default function WorkshopsListScreen({ navigation }: any) {
               )}
             </View>
             <Text style={styles.cardDesc} numberOfLines={2}>
-              {item.description}
+              {item.description ?? ""}
             </Text>
             <Text style={styles.cardMeta}>
-              {item.total_sessions} ders
+              {item.total_sessions} ders{item.price ? ` · ${item.price}` : ""}
             </Text>
           </TouchableOpacity>
         )}

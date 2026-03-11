@@ -13,11 +13,17 @@ import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
 import { apiFetch } from "../../services/api";
 
 interface Event {
-  id: number;
+  id: string;
   title: string;
-  venue: string;
-  date: string;
-  category: string;
+  description: string | null;
+  event_type: string;
+  venue: string | null;
+  event_date: string | null;
+  end_date: string | null;
+  price_info: string | null;
+  image_url: string | null;
+  source_url: string | null;
+  ai_comment: string | null;
 }
 
 export default function EventsListScreen({ navigation }: any) {
@@ -25,8 +31,8 @@ export default function EventsListScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Event[]>("/api/events")
-      .then(setEvents)
+    apiFetch<{ events: Event[] }>("/api/public/events")
+      .then((res) => setEvents(res.events))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -57,10 +63,10 @@ export default function EventsListScreen({ navigation }: any) {
             onPress={() => navigation.navigate("EventDetail", { event: item })}
             activeOpacity={0.7}
           >
-            <Text style={styles.cardCategory}>{item.category}</Text>
+            <Text style={styles.cardCategory}>{item.event_type}</Text>
             <Text style={styles.cardTitle}>{item.title}</Text>
             <Text style={styles.cardMeta}>
-              {item.venue} · {new Date(item.date).toLocaleDateString("tr-TR")}
+              {item.venue ?? ""}{item.event_date ? ` · ${new Date(item.event_date).toLocaleDateString("tr-TR")}` : ""}
             </Text>
           </TouchableOpacity>
         )}

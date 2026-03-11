@@ -1,6 +1,6 @@
 /* ─── Harita Ekranı (Hero) ─── */
 
-import React, { useRef, useCallback, useMemo } from "react";
+import React, { useRef, useCallback, useMemo, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region, MapStyleElement, LatLng } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -51,13 +51,20 @@ export default function MapScreen() {
     return PLACES.filter((p) => p.type === activeFilter);
   }, [activeFilter]);
 
+  // Sınır içinde clamp — sınırdaki mekanlarda harita takılmasın
+  const clampLat = (lat: number) =>
+    Math.min(Math.max(lat, ANKARA_BOUNDS.southWest.latitude + 0.005), ANKARA_BOUNDS.northEast.latitude - 0.005);
+  const clampLng = (lng: number) =>
+    Math.min(Math.max(lng, ANKARA_BOUNDS.southWest.longitude + 0.005), ANKARA_BOUNDS.northEast.longitude - 0.005);
+
   const handleMarkerPress = useCallback(
     (place: CulturePlace) => {
       selectPlace(place);
+      // Marker'ı bottom sheet'in üstünde tutmak için latitude'ü biraz aşağı kaydır
       mapRef.current?.animateToRegion(
         {
-          latitude: place.lat,
-          longitude: place.lng,
+          latitude: clampLat(place.lat - 0.003),
+          longitude: clampLng(place.lng),
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         },
@@ -75,24 +82,29 @@ export default function MapScreen() {
     return isDark ? MAP_STYLE_DARK : MAP_STYLE_LIGHT;
   }, [isDark, selectedRoute]);
 
-  // Rota seçildiğinde haritayı fit et
-  const handleStopPress = useCallback(
-    (index: number) => {
-      setActiveStop(index);
-      if (selectedRoute) {
-        const stop = selectedRoute.stops[index];
+  // Rota durak değiştiğinde (marker tıklama, Sonraki/Önceki butonları) haritayı animate et
+  useEffect(() => {
+    if (selectedRoute && activeStopIndex >= 0) {
+      const stop = selectedRoute.stops[activeStopIndex];
+      if (stop) {
         mapRef.current?.animateToRegion(
           {
-            latitude: stop.lat,
-            longitude: stop.lng,
+            latitude: clampLat(stop.lat - 0.002),
+            longitude: clampLng(stop.lng),
             latitudeDelta: 0.008,
             longitudeDelta: 0.008,
           },
           400
         );
       }
+    }
+  }, [selectedRoute, activeStopIndex]);
+
+  const handleStopPress = useCallback(
+    (index: number) => {
+      setActiveStop(index);
     },
-    [selectedRoute, setActiveStop]
+    [setActiveStop]
   );
 
   return (

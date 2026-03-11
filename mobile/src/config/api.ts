@@ -1,12 +1,13 @@
 /* ─── API Konfigürasyonu ─── */
 
-import { Platform } from "react-native";
+import Constants from "expo-constants";
 
-// Geliştirme: Android emülatör → 10.0.2.2, iOS simülatör → localhost
-const DEV_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost";
+// Expo Go fiziksel cihazda: Metro dev server'ın IP'sini otomatik al
+// Emülatörde veya bulunamazsa fallback: prod URL
+const devHost = Constants.expoConfig?.hostUri?.split(":")[0];
 
-export const API_BASE_URL = __DEV__
-  ? `http://${DEV_HOST}:3000`
+export const API_BASE_URL = __DEV__ && devHost
+  ? `http://${devHost}:3000`
   : "https://klemensart.com";
 
 export const SUPABASE_URL = "https://sgabkrzzzszfqrtgkord.supabase.co";

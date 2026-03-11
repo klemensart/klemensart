@@ -15,8 +15,8 @@ export default function ArticleReaderScreen({ route }: any) {
   const { earnXp } = useXp();
 
   useEffect(() => {
-    apiFetch<{ html: string }>(`/api/articles/${article.slug}`)
-      .then((data) => setHtml(data.html))
+    apiFetch<{ contentHtml: string }>(`/api/public/articles/${article.slug}`)
+      .then((data) => setHtml(data.contentHtml))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [article.slug]);

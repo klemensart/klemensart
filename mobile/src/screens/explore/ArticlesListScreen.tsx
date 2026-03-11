@@ -15,9 +15,12 @@ import { apiFetch } from "../../services/api";
 interface Article {
   slug: string;
   title: string;
-  excerpt: string;
+  description: string;
+  author: string;
   category: string;
   date: string;
+  image: string;
+  tags: string[];
 }
 
 export default function ArticlesListScreen({ navigation }: any) {
@@ -25,8 +28,8 @@ export default function ArticlesListScreen({ navigation }: any) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<Article[]>("/api/articles")
-      .then(setArticles)
+    apiFetch<{ articles: Article[] }>("/api/public/articles")
+      .then((res) => setArticles(res.articles))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -56,7 +59,10 @@ export default function ArticlesListScreen({ navigation }: any) {
             <Text style={styles.cardCategory}>{item.category}</Text>
             <Text style={styles.cardTitle}>{item.title}</Text>
             <Text style={styles.cardExcerpt} numberOfLines={2}>
-              {item.excerpt}
+              {item.description}
+            </Text>
+            <Text style={styles.cardMeta}>
+              {item.author}{item.date ? ` · ${new Date(item.date).toLocaleDateString("tr-TR")}` : ""}
             </Text>
           </TouchableOpacity>
         )}
@@ -101,5 +107,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.sm,
     color: COLORS.warm,
     lineHeight: 18,
+    marginBottom: 4,
   },
+  cardMeta: { fontSize: FONTS.sizes.xs, color: COLORS.warm },
 });
