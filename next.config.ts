@@ -193,6 +193,11 @@ const nextConfig: NextConfig = {
       // ═══════════════════════════════════════════════════════
       // 8. ESKİ / GEREKSİZ
       // ═══════════════════════════════════════════════════════
+      { source: "/saskin-oyunbazin-okuma-macerasi", destination: "/icerikler", permanent: true },
+      { source: "/sanatin-tekel-yonetimi-2", destination: "/icerikler/yazi/sanatin-tekel-yonetimi", permanent: true },
+      { source: "/dijital-nostalji-tehlikesi-yapay-zeka-tarihi-fotograflarin-yerini-alabilir-mi-3", destination: "/icerikler/yazi/dijital-nostalji-tehlikesi-yapay-zeka-tarihi-fotograflarin-yerini-alabilir-mi", permanent: true },
+      { source: "/klemens-club", destination: "/club/giris", permanent: true },
+      { source: "/wp-content/:path*", destination: "/", permanent: true },
       { source: "/download", destination: "/", permanent: true },
       { source: "/etn_category/:path*", destination: "/etkinlikler", permanent: true },
       { source: "/etn-tags/:path*", destination: "/etkinlikler", permanent: true },

@@ -2,6 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Eski WordPress ?post_type=post&p=XXX query'lerini yakala
+  const postType = request.nextUrl.searchParams.get("post_type");
+  if (postType === "post" && request.nextUrl.searchParams.has("p")) {
+    return NextResponse.redirect(new URL("/icerikler", request.url), 301);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -40,5 +46,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/club/:path*"],
+  matcher: ["/club/:path*", "/"],
 };
