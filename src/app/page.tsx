@@ -21,6 +21,12 @@ export const metadata: Metadata = {
     description:
       "Yeni nesil kültür, sanat ve düşünce ekosistemi. Sanat tarihi atölyeleri, kültür testleri, interaktif harita, dijital sergiler ve derinlemesine içerikler.",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Klemens — Yeni Nesil Kültür, Sanat ve Düşünce Ekosistemi",
+    description:
+      "Sanat tarihi atölyeleri, kültür testleri, interaktif harita, dijital sergiler ve derinlemesine içerikler.",
+  },
 };
 
 export default function Home() {

@@ -6,25 +6,28 @@ import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 const BASE_URL = "https://klemensart.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: BASE_URL, changeFrequency: "weekly", priority: 1 },
-    { url: `${BASE_URL}/icerikler`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${BASE_URL}/atolyeler`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${BASE_URL}/etkinlikler`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${BASE_URL}/harita`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/testler`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE_URL}/hakkimizda`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE_URL}/iade-ve-iptal`, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/kvkk`, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE_URL}/testler/gorsel-algi`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/oyun/sanat-tahmini`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/sergi/en-sessiz-zaman`, changeFrequency: "monthly", priority: 0.6 },
+    { url: BASE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE_URL}/icerikler`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE_URL}/atolyeler`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${BASE_URL}/etkinlikler`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${BASE_URL}/harita`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/testler`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE_URL}/hakkimizda`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/iade-ve-iptal`, lastModified: new Date("2026-03-10"), changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE_URL}/kvkk`, lastModified: new Date("2026-03-01"), changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE_URL}/testler/gorsel-algi`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/oyun/sanat-tahmini`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
   ];
 
   // Category pages
   const categoryPages: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${BASE_URL}/icerikler/${c.slug}`,
+    lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
@@ -33,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const workshopPages: MetadataRoute.Sitemap = Object.keys(SLUG_TO_ATOLYE).map(
     (slug) => ({
       url: `${BASE_URL}/atolyeler/${slug}`,
+      lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })

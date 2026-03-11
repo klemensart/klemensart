@@ -27,8 +27,36 @@ export const metadata: Metadata = {
 export default async function IceriklerPage() {
   const articles = await getAllArticlesMetadata();
 
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Klemens Art İçerikler",
+    description:
+      "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+    url: "https://klemensart.com/icerikler",
+    publisher: {
+      "@type": "Organization",
+      name: "Klemens Art",
+      url: "https://klemensart.com",
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: articles.length,
+      itemListElement: articles.slice(0, 20).map((a, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `https://klemensart.com/icerikler/yazi/${a.slug}`,
+        name: a.title,
+      })),
+    },
+  };
+
   return (
     <main className="min-h-screen bg-warm-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
 
       {/* Statik başlık */}
       <section className="pt-32 pb-0 px-6 bg-white">
