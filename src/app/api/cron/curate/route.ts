@@ -26,6 +26,7 @@ type FeedItem = {
   title: string;
   link: string;
   summary: string;
+  fullText: string;
   image: string | null;
   pubDate: string | null;
 };
@@ -36,6 +37,38 @@ type ScoredItem = FeedItem & {
   suggestedCategory: string;
   suggestedTags: string[];
 };
+
+// ── Kaynak Makale Çekici ─────────────────────────────────────────────────────
+async function fetchArticleText(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "KlemensArt/1.0 (+https://klemensart.com)" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    // HTML'den metin çıkar: tag'leri kaldır, fazla boşlukları temizle
+    const text = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, " ")
+      .trim();
+    // İlk 3000 karakter yeterli (token limiti)
+    return text.slice(0, 3000);
+  } catch {
+    return "";
+  }
+}
 
 // ── RSS Toplama ─────────────────────────────────────────────────────────────
 async function fetchAllFeeds(): Promise<FeedItem[]> {
@@ -66,11 +99,20 @@ async function fetchAllFeeds(): Promise<FeedItem[]> {
             if (match) image = match[1];
           }
 
+          // content:encoded genelde tam makale metnini içerir
+          const encoded = item["content:encoded"] ?? "";
+          const snippet = item.contentSnippet ?? item.content ?? "";
+          const rawText = encoded
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
           items.push({
             source: src.name,
             title: item.title ?? "",
             link: item.link ?? "",
-            summary: (item.contentSnippet ?? item.content ?? "").slice(0, 500),
+            summary: snippet.slice(0, 500),
+            fullText: rawText.slice(0, 2000),
             image,
             pubDate: item.pubDate ?? item.isoDate ?? null,
           });
@@ -188,10 +230,18 @@ ${listing}`,
 }
 
 // ── İçerik Üretimi (Sonnet — kaliteli yazım) ───────────────────────────────
-const SYSTEM_PROMPT = `Sen Klemens Art'ın editoryal yapay zeka yazarısın.
+const SYSTEM_PROMPT = `Sen Klemens Art'ın editoryal yazarısın.
 
 KİMLİĞİN:
 Klemens Art, Türkiye merkezli multidisipliner bir kültür, sanat ve düşünce platformudur. Sanat tarihi, felsefe, mimarlık, sinema, edebiyat, müzik ve arkeoloji alanlarında derinlemesine içerikler üretir. Okuyucusu: kültüre meraklı, entelektüel ama elitist olmayan, 25-45 yaş arası kentli birey.
+
+DOĞRULUK KURALLARI (EN ÖNEMLİ):
+- SADECE kaynak metinde verilen bilgileri kullan. Tarih, sayı, isim, yer gibi olgusal bilgileri ASLA uydurma.
+- Kaynakta olmayan istatistik, tarih, rakam veya detay EKLEME. Bilmiyorsan yazma.
+- Bir olayın tarihinden emin değilsen tarih verme, "yakın dönemde" gibi genel ifadeler kullan.
+- Mimari detaylar (sütun sayısı, yapım yılı vb.) gibi spesifik bilgileri SADECE kaynakta varsa yaz.
+- Türkiye'den referans verirken de olgusal doğruluğa dikkat et — uydurma benzetme yapma.
+- Şüphe duyduğun her bilgiyi atla. Yanlış bilgi vermektense eksik bırakmak tercih edilir.
 
 DİL VE TON:
 - Zarif, dingin, otoriter ama samimi ve davetkâr.
@@ -200,6 +250,7 @@ DİL VE TON:
 - Paragraflar kısa (2-4 cümle). Metin nefes alacak. Dergi kalitesi.
 - Birinci çoğul veya edilgen çatı kullan: "incelediğimizde", "dikkat çekiyor", "gösteriyor".
 - Asla "bu yazıda ele alacağız" gibi klişe girişler yapma. Doğrudan konuya dal.
+- ASLA emoji kullanma. Ne başlıkta, ne spot cümlesinde, ne içerikte. Hiçbir yerde emoji olmamalı.
 
 BİÇİM KURALLARI:
 - Format: Markdown.
@@ -208,12 +259,11 @@ BİÇİM KURALLARI:
 - Kaynak haberdeki bilgiyi Türk okuyucuya bağla: yerel referanslar, karşılaştırmalar ekle.
 - Özgün yorum ve analiz kat; salt tercüme yapma.
 - Son paragraf düşündürücü bir kapanış olsun — açık uçlu bir soru veya ufuk açıcı bir gözlem.
-- Emojileri yalnızca başlık ve spot cümlesinde kullan (en fazla 1-2 adet): 🎨 🏛️ 🎬 📚 🎭 🎵
 
 ÇIKTI FORMATI (JSON):
 {
-  "title": "Makale başlığı",
-  "description": "1-2 cümlelik spot/özet (SEO description, max 160 karakter)",
+  "title": "Makale başlığı (emoji yok)",
+  "description": "1-2 cümlelik spot/özet (SEO description, max 160 karakter, emoji yok)",
   "category": "Kültür & Sanat",
   "tags": ["etiket1", "etiket2"],
   "content": "## Tam markdown içerik..."
@@ -231,6 +281,16 @@ async function generateArticle(
   tags: string[];
   content: string;
 } | null> {
+  // RSS'teki metin yetersizse kaynak sayfadan tam metni çek
+  let sourceText = item.fullText || item.summary;
+  if (sourceText.length < 500 && item.link) {
+    console.log(`[curate] Kaynak makale çekiliyor: ${item.link}`);
+    const fetched = await fetchArticleText(item.link);
+    if (fetched.length > sourceText.length) {
+      sourceText = fetched;
+    }
+  }
+
   const resp = await anthropic.messages.create({
     model: SONNET,
     max_tokens: 4000,
@@ -243,13 +303,15 @@ async function generateArticle(
 KAYNAK: ${item.source}
 BAŞLIK: ${item.title}
 LİNK: ${item.link}
-ÖZET: ${item.summary}
+
+TAM METİN (kaynak makaleden — SADECE bu metindeki bilgileri kullan, olgusal bilgi ekleme/uydurma):
+${sourceText}
 
 ÖNERİLEN KATEGORİ: ${item.suggestedCategory}
 ÖNERİLEN ETİKETLER: ${item.suggestedTags.join(", ")}
 SEO NOTU: ${item.reason}
 
-Haberi birebir çevirme. Klemens Art okuyucusu için yeniden yaz: bağlam ekle, Türkiye'den referanslar ver, özgün yorum kat.`,
+ÖNEMLİ: Haberi birebir çevirme ama SADECE kaynak metindeki bilgilere dayan. Tarih, sayı, isim gibi olgusal bilgileri uydurma. Kaynakta olmayan detay ekleme. Klemens Art okuyucusu için yeniden yaz: özgün yorum ve analiz kat ama olgusal bilgileri değiştirme.`,
       },
     ],
   });
@@ -358,7 +420,7 @@ export async function GET(req: NextRequest) {
           slug,
           title: article.title,
           description: article.description,
-          author: "Klemens Editör",
+          author: "KLEMENS",
           author_email: "info@klemensart.com",
           date: today,
           category: article.category,
