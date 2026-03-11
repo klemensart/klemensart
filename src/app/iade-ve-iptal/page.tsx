@@ -11,6 +11,12 @@ export const metadata: Metadata = {
       "Klemens Art online atölye ve dijital içerik satın alımlarına ilişkin iade, iptal ve cayma hakkı koşulları.",
     url: "https://klemensart.com/iade-ve-iptal",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "İade ve İptal Politikası — Klemens",
+    description:
+      "Klemens Art online atölye ve dijital içerik satın alımlarına ilişkin iade, iptal ve cayma hakkı koşulları.",
+  },
 };
 
 const B = {

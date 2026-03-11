@@ -12,6 +12,12 @@ export const metadata: Metadata = {
       "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
     url: "https://klemensart.com/etkinlikler",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kültür & Sanat Takvimi — Klemens",
+    description:
+      "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+  },
 };
 
 export default function EtkinliklerPage() {

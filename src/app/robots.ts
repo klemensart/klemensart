@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/club/profil", "/admin/", "/auth/"],
+        disallow: ["/admin/", "/auth/", "/club/", "/api/", "/abonelik-iptal"],
       },
     ],
     sitemap: "https://klemensart.com/sitemap.xml",

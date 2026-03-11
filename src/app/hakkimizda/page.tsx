@@ -13,6 +13,12 @@ export const metadata: Metadata = {
       "Sanat, kültür ve düşünce dünyasına birbirine bağlı zihinlerle yaklaşan bir kolektif.",
     url: "https://klemensart.com/hakkimizda",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hakkımızda — Klemens",
+    description:
+      "Sanat, kültür ve düşünce dünyasına birbirine bağlı zihinlerle yaklaşan bir kolektif.",
+  },
 };
 
 export default async function HakkimizdaPage() {

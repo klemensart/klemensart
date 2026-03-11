@@ -11,6 +11,12 @@ export const metadata: Metadata = {
       "Klemens Art kişisel verilerin korunması ve işlenmesine ilişkin aydınlatma metni.",
     url: "https://klemensart.com/kvkk",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "KVKK Aydınlatma Metni — Klemens",
+    description:
+      "Klemens Art kişisel verilerin korunması ve işlenmesine ilişkin aydınlatma metni.",
+  },
 };
 
 const B = {

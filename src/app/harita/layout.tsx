@@ -7,6 +7,13 @@ export const metadata: Metadata = {
     "Ankara'nın müze, galeri, tiyatro, konser salonu ve tarihi mekânlarını keşfedin. 90+ kültür noktası ve 13 tematik rota içeren interaktif kültür haritası.",
   alternates: { canonical: "/harita" },
   openGraph: {
+    title: "Ankara Kültür & Sanat Haritası — Klemens",
+    description:
+      "90+ müze, galeri, tiyatro, konser salonu ve tarihi mekân. 13 tematik yürüyüş rotası.",
+    url: "https://klemensart.com/harita",
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "Ankara Kültür & Sanat Haritası",
     description:
       "90+ müze, galeri, tiyatro, konser salonu ve tarihi mekân. 13 tematik yürüyüş rotası.",

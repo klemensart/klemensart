@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description:
     "Sanat, sinema ve kültür bilginizi eğlenceli testlerle ölçün. Görsel algı testi ve daha fazlası.",
   alternates: { canonical: "/testler" },
+  openGraph: {
+    title: "Kültür Testleri — Klemens",
+    description:
+      "Sanat, sinema ve kültür bilginizi eğlenceli testlerle ölçün.",
+  },
 };
 
 export default function TestlerLayout({ children }: { children: React.ReactNode }) {

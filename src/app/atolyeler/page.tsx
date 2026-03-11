@@ -12,6 +12,12 @@ export const metadata: Metadata = {
       "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
     url: "https://klemensart.com/atolyeler",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sanat Tarihi Atölyeleri — Klemens",
+    description:
+      "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
+  },
 };
 
 export default function AtolyelerPage() {

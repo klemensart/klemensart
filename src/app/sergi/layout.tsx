@@ -6,8 +6,16 @@ export const metadata: Metadata = {
     "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
   alternates: { canonical: "/sergi/en-sessiz-zaman" },
   openGraph: {
+    title: "En Sessiz Zaman — Dijital Sergi — Klemens",
+    description:
+      "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
+    url: "https://klemensart.com/sergi/en-sessiz-zaman",
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "En Sessiz Zaman — Dijital Sergi",
-    description: "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
+    description:
+      "Antik topraklarda bir fotoğraf sergisi. Theo Atay'ın objektifinden 3D galeri deneyimi.",
   },
 };
 

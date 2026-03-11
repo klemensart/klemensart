@@ -16,6 +16,12 @@ export const metadata: Metadata = {
       "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
     url: "https://klemensart.com/icerikler",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "İçerikler — Klemens",
+    description:
+      "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+  },
 };
 
 export default async function IceriklerPage() {
