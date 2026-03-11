@@ -525,13 +525,14 @@ export default function HaritaPage() {
   const activeStop = activeRoute?.stops[activeStopIndex] ?? null;
 
   /* ───────── Shared panel content renderer for events ───────── */
+  // Panel arka planı her zaman koyu — etkinlik renkleri panelle uyumlu olmalı
   const renderEventsSection = (compact?: boolean) => {
-    const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
-    const cardBorder = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)";
-    const cardHoverBg = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
-    const titleColor = isDark ? "#fff" : "#1a1a2e";
-    const mutedColor = isDark ? "#888" : "#666";
-    const dimColor = isDark ? "#666" : "#999";
+    const cardBg = "rgba(255,255,255,0.03)";
+    const cardBorder = "rgba(255,255,255,0.06)";
+    const cardHoverBg = "rgba(255,255,255,0.07)";
+    const titleColor = "#fff";
+    const mutedColor = "#888";
+    const dimColor = "#666";
 
     return (
       <div style={{ borderTop: `1px solid ${cardBorder}`, paddingTop: compact ? 14 : 20 }}>
