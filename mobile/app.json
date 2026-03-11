@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Klemens Art",
+    "slug": "klemensart",
+    "scheme": "klemensart",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFBF7"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.klemensart.app",
+      "config": {
+        "googleMapsApiKey": "AIzaSyByMgtIdbjB0UnhFbmJxJ78rw14LU1ZCqE"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Yakındaki kültür mekanlarını keşfetmek ve check-in yapmak için konumunuza ihtiyacımız var.",
+        "NSLocationAlwaysUsageDescription": "Yakınındaki kültür mekanları hakkında bildirim alabilmek için konumunuza ihtiyacımız var.",
+        "NSMicrophoneUsageDescription": "Sesli yorum bırakmak için mikrofon erişimi gerekli."
+      }
+    },
+    "android": {
+      "package": "com.klemensart.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFBF7",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyByMgtIdbjB0UnhFbmJxJ78rw14LU1ZCqE"
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-asset",
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser"
+    ]
+  }
+}
