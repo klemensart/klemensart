@@ -70,7 +70,7 @@ export default function LoginScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.skipBtn}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.reset({ index: 0, routes: [{ name: "Main" }] })}
         >
           <Text style={styles.skipText}>Misafir olarak devam et</Text>
         </TouchableOpacity>
