@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 type Stats = {
   users: number;
@@ -55,14 +55,37 @@ const CARDS = [
   },
 ];
 
+type ActionState = "idle" | "loading" | "success" | "error";
+type ActionResult = { state: ActionState; message: string };
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [scraper, setScraper] = useState<ActionResult>({ state: "idle", message: "" });
+  const [curate, setCurate] = useState<ActionResult>({ state: "idle", message: "" });
 
   useEffect(() => {
     fetch("/api/admin/stats")
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
+  }, []);
+
+  const runAction = useCallback(async (
+    endpoint: string,
+    setter: (v: ActionResult) => void,
+  ) => {
+    setter({ state: "loading", message: "" });
+    try {
+      const res = await fetch(endpoint, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setter({ state: "error", message: data.error ?? "Hata oluştu" });
+      } else {
+        setter({ state: "success", message: data.message ?? JSON.stringify(data) });
+      }
+    } catch (e) {
+      setter({ state: "error", message: (e as Error).message });
+    }
   }, []);
 
   return (
@@ -74,7 +97,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {CARDS.map((card) => (
           <div
             key={card.key}
@@ -95,6 +118,50 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-4">
+        <h2 className="text-lg font-bold text-warm-900 mb-4">Hızlı İşlemler</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+          {/* Scraper */}
+          <div className="bg-white rounded-2xl border border-warm-100 p-5">
+            <p className="text-sm font-semibold text-warm-900 mb-1">Etkinlik Scraper</p>
+            <p className="text-xs text-warm-900/45 mb-4">Ankara etkinliklerini tara ve güncelle</p>
+            <button
+              onClick={() => runAction("/api/admin/scraper", setScraper)}
+              disabled={scraper.state === "loading"}
+              className="px-4 py-2 bg-warm-900 text-white text-sm font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {scraper.state === "loading" ? "Çalışıyor..." : "Başlat"}
+            </button>
+            {scraper.state === "success" && (
+              <p className="text-xs text-emerald-600 mt-3">{scraper.message}</p>
+            )}
+            {scraper.state === "error" && (
+              <p className="text-xs text-red-500 mt-3">{scraper.message}</p>
+            )}
+          </div>
+
+          {/* Curate */}
+          <div className="bg-white rounded-2xl border border-warm-100 p-5">
+            <p className="text-sm font-semibold text-warm-900 mb-1">Haber Kürasyon</p>
+            <p className="text-xs text-warm-900/45 mb-4">RSS kaynaklarından AI ile içerik üret</p>
+            <button
+              onClick={() => runAction("/api/admin/curate", setCurate)}
+              disabled={curate.state === "loading"}
+              className="px-4 py-2 bg-coral text-white text-sm font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {curate.state === "loading" ? "Çalışıyor..." : "Kürasyon Başlat"}
+            </button>
+            {curate.state === "success" && (
+              <p className="text-xs text-emerald-600 mt-3">{curate.message}</p>
+            )}
+            {curate.state === "error" && (
+              <p className="text-xs text-red-500 mt-3">{curate.message}</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
