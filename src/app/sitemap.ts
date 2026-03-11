@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/iade-ve-iptal`, lastModified: new Date("2026-03-10"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE_URL}/kvkk`, lastModified: new Date("2026-03-01"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE_URL}/testler/gorsel-algi`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/oyun/sanat-tahmini`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
+    // oyun/sanat-tahmini henüz yayında değil — sitemap'ten çıkarıldı
     { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: new Date("2026-03-01"), changeFrequency: "monthly", priority: 0.6 },
   ];
 
