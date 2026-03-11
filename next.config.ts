@@ -203,6 +203,24 @@ const nextConfig: NextConfig = {
       { source: "/etn-tags/:path*", destination: "/etkinlikler", permanent: true },
       { source: "/etn-speaker-category/:path*", destination: "/etkinlikler", permanent: true },
 
+      // WordPress yazar sayfaları
+      { source: "/author/:path*", destination: "/hakkimizda", permanent: true },
+
+      // WordPress checkout / step
+      { source: "/step/:path*", destination: "/atolyeler", permanent: true },
+
+      // WordPress video sayfaları
+      { source: "/video-tag", destination: "/", permanent: true },
+      { source: "/video-tag/:path*", destination: "/", permanent: true },
+      { source: "/video-category", destination: "/", permanent: true },
+      { source: "/video-category/:path*", destination: "/", permanent: true },
+      { source: "/search-videos", destination: "/", permanent: true },
+
+      // WordPress eski home / ajanda
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/ajanda", destination: "/etkinlikler", permanent: true },
+      { source: "/ajanda/:path*", destination: "/etkinlikler", permanent: true },
+
       // ═══════════════════════════════════════════════════════
       // 9. TARİH ARŞİVLERİ
       // ═══════════════════════════════════════════════════════
