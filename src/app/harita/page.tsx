@@ -138,18 +138,20 @@ export default function HaritaPage() {
   const dragStartPctRef = useRef(40);
 
   // Fetch events for selected place
-  const fetchEvents = useCallback(async (placeName: string) => {
+  const fetchEvents = useCallback(async (place: CulturePlace) => {
     setEventsLoading(true);
     setPanelEvents([]);
     try {
       const supabase = createClient();
       const now = new Date().toISOString();
+      const names = [place.name, ...(place.venueAliases || [])];
+      const orFilter = names.map((n) => `venue.ilike.%${n}%`).join(",");
       const { data } = await supabase
         .from("events")
         .select("id, title, event_date, end_date, event_type, venue, price_info")
         .eq("status", "approved")
         .gte("event_date", now)
-        .ilike("venue", `%${placeName}%`)
+        .or(orFilter)
         .order("event_date", { ascending: true })
         .limit(5);
       setPanelEvents(data || []);
@@ -161,7 +163,7 @@ export default function HaritaPage() {
 
   const selectPlace = useCallback((place: CulturePlace) => {
     setSelectedPlace(place);
-    fetchEvents(place.name);
+    fetchEvents(place);
   }, [fetchEvents]);
 
   // Clear route layers from map
@@ -511,56 +513,101 @@ export default function HaritaPage() {
     return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
   };
 
+  const getRelativeLabel = (d: string | null): { text: string; color: string } | null => {
+    if (!d) return null;
+    const now = new Date();
+    const date = new Date(d);
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.round((dateStart.getTime() - todayStart.getTime()) / 86400000);
+    if (diffDays === 0) return { text: "Bugün", color: "#22c55e" };
+    if (diffDays === 1) return { text: "Yarın", color: "#f59e0b" };
+    if (diffDays > 1 && diffDays <= 6) return { text: date.toLocaleDateString("tr-TR", { weekday: "long" }), color: "#6366f1" };
+    return null;
+  };
+
   const activeStop = activeRoute?.stops[activeStopIndex] ?? null;
 
   /* ───────── Shared panel content renderer for events ───────── */
-  const renderEventsSection = (compact?: boolean) => (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: compact ? 14 : 20 }}>
-      <div style={{ color: "#FF6D60", fontSize: compact ? 10 : 11, letterSpacing: 2, marginBottom: compact ? 10 : 14, fontWeight: 600 }}>
-        YAKLAŞAN ETKİNLİKLER
-      </div>
-      {eventsLoading ? (
-        <div style={{ color: "#666", fontSize: compact ? 12 : 13 }}>Yükleniyor...</div>
-      ) : panelEvents.length === 0 ? (
-        <div style={{
-          background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: compact ? "12px" : "16px",
-          border: "1px solid rgba(255,255,255,0.05)",
-        }}>
-          <div style={{ color: "#555", fontSize: compact ? 12 : 13, textAlign: "center" }}>
-            Şu an planlanmış etkinlik yok
-          </div>
+  const renderEventsSection = (compact?: boolean) => {
+    const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)";
+    const cardBorder = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)";
+    const cardHoverBg = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
+    const titleColor = isDark ? "#fff" : "#1a1a2e";
+    const mutedColor = isDark ? "#888" : "#666";
+    const dimColor = isDark ? "#666" : "#999";
+    const priceBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+
+    return (
+      <div style={{ borderTop: `1px solid ${cardBorder}`, paddingTop: compact ? 14 : 20 }}>
+        <div style={{ color: "#FF6D60", fontSize: compact ? 10 : 11, letterSpacing: 2, marginBottom: compact ? 10 : 14, fontWeight: 600 }}>
+          YAKLAŞAN ETKİNLİKLER
         </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: compact ? 8 : 10 }}>
-          {panelEvents.map((ev) => (
-            <div key={ev.id} style={{
-              background: "rgba(255,255,255,0.03)", borderRadius: compact ? 8 : 10, padding: compact ? "10px 12px" : "14px",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}>
-              <div style={{ color: "#fff", fontSize: compact ? 13 : 14, fontWeight: 500, marginBottom: compact ? 4 : 6 }}>
-                {ev.title}
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                {ev.event_date && (
-                  <span style={{ color: "#888", fontSize: compact ? 11 : 12 }}>
-                    {formatDate(ev.event_date)}
-                  </span>
-                )}
-                {!compact && ev.price_info && (
-                  <span style={{
-                    color: "#666", fontSize: 11,
-                    background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "2px 8px",
-                  }}>
-                    {ev.price_info}
-                  </span>
-                )}
-              </div>
+        {eventsLoading ? (
+          <div style={{ color: dimColor, fontSize: compact ? 12 : 13 }}>Yükleniyor...</div>
+        ) : panelEvents.length === 0 ? (
+          <div style={{
+            background: cardBg, borderRadius: 10, padding: compact ? "12px" : "16px",
+            border: `1px solid ${cardBorder}`,
+          }}>
+            <div style={{ color: dimColor, fontSize: compact ? 12 : 13, textAlign: "center" }}>
+              Şu an planlanmış etkinlik yok
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: compact ? 8 : 10 }}>
+            {panelEvents.map((ev) => {
+              const rel = getRelativeLabel(ev.event_date);
+              return (
+                <Link key={ev.id} href={`/etkinlikler/${ev.id}`} style={{ textDecoration: "none" }}>
+                  <div
+                    style={{
+                      background: cardBg, borderRadius: compact ? 8 : 10, padding: compact ? "10px 12px" : "14px",
+                      border: `1px solid ${cardBorder}`, transition: "background 0.2s",
+                      display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = cardHoverBg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = cardBg; }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ color: titleColor, fontSize: compact ? 13 : 14, fontWeight: 500, marginBottom: compact ? 4 : 6 }}>
+                        {ev.title}
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                        {rel && (
+                          <span style={{
+                            color: "#fff", fontSize: 10, fontWeight: 600,
+                            background: rel.color, borderRadius: 4, padding: "1px 6px",
+                          }}>
+                            {rel.text}
+                          </span>
+                        )}
+                        {ev.event_date && (
+                          <span style={{ color: mutedColor, fontSize: compact ? 11 : 12 }}>
+                            {formatDate(ev.event_date)}
+                            {ev.end_date && ` → ${formatDate(ev.end_date)}`}
+                          </span>
+                        )}
+                        {!compact && ev.price_info && (
+                          <span style={{
+                            color: dimColor, fontSize: 11,
+                            background: priceBg, borderRadius: 6, padding: "2px 8px",
+                          }}>
+                            {ev.price_info}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <span style={{ color: mutedColor, fontSize: 16, flexShrink: 0 }}>&rarr;</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   /* ───────── Story panel content (shared between desktop & mobile) ───────── */
   const renderStoryContent = (compact?: boolean) => {
