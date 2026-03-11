@@ -15,12 +15,14 @@ export const metadata: Metadata = {
     description:
       "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
     url: "https://klemensart.com/icerikler",
+    images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "İçerikler — Klemens",
     description:
       "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+    images: ["/logos/logo-wide-dark.PNG"],
   },
 };
 
@@ -51,11 +53,24 @@ export default async function IceriklerPage() {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: "https://klemensart.com" },
+      { "@type": "ListItem", position: 2, name: "İçerikler", item: "https://klemensart.com/icerikler" },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-warm-50">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       {/* Statik başlık */}

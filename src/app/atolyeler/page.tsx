@@ -12,12 +12,14 @@ export const metadata: Metadata = {
     description:
       "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
     url: "https://klemensart.com/atolyeler",
+    images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Sanat Tarihi Atölyeleri — Klemens",
     description:
       "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
+    images: ["/logos/logo-wide-dark.PNG"],
   },
 };
 
@@ -62,11 +64,24 @@ export default function AtolyelerPage() {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: "https://klemensart.com" },
+      { "@type": "ListItem", position: 2, name: "Atölyeler", item: "https://klemensart.com/atolyeler" },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <AtolyelerClient />
     </>

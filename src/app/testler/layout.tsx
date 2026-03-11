@@ -15,8 +15,21 @@ export const metadata: Metadata = {
 };
 
 export default function TestlerLayout({ children }: { children: React.ReactNode }) {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: "https://klemensart.com" },
+      { "@type": "ListItem", position: 2, name: "Testler", item: "https://klemensart.com/testler" },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Navbar />
       {children}
       <Footer />

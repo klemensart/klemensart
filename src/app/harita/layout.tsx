@@ -11,12 +11,14 @@ export const metadata: Metadata = {
     description:
       "90+ müze, galeri, tiyatro, konser salonu ve tarihi mekân. 13 tematik yürüyüş rotası.",
     url: "https://klemensart.com/harita",
+    images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Ankara Kültür & Sanat Haritası",
     description:
       "90+ müze, galeri, tiyatro, konser salonu ve tarihi mekân. 13 tematik yürüyüş rotası.",
+    images: ["/logos/logo-wide-dark.PNG"],
   },
 };
 
@@ -82,6 +84,15 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
     })),
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: "https://klemensart.com" },
+      { "@type": "ListItem", position: 2, name: "Kültür Haritası", item: "https://klemensart.com/harita" },
+    ],
+  };
+
   return (
     <>
       <script
@@ -91,6 +102,10 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(routesJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
       {/* Crawler-erişilebilir mekân ve rota listesi (görsel olarak gizli) */}
@@ -108,6 +123,7 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
           border: 0,
         }}
       >
+        <h1>Ankara Kültür ve Sanat Haritası</h1>
         <h2>Ankara Kültür ve Sanat Mekânları</h2>
         <ul>
           {PLACES.map((p) => (
