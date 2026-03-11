@@ -2,7 +2,7 @@
    PLACES ve ROUTES hem client (harita) hem server (SEO/JSON-LD) tarafından kullanılır.
 */
 
-export type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi" | "edebiyat" | "gastronomi";
+export type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi" | "edebiyat" | "gastronomi" | "miras";
 
 export type CulturePlace = {
   lat: number;
@@ -40,6 +40,7 @@ export const TYPE_LABELS: Record<PlaceType, string> = {
   tarihi: "Tarihi",
   edebiyat: "Edebiyat",
   gastronomi: "Gastronomi",
+  miras: "Kültürel Miras",
 };
 
 export const PLACES: CulturePlace[] = [
@@ -201,6 +202,129 @@ export const PLACES: CulturePlace[] = [
   { lat: 39.9420, lng: 32.8530, type: "gastronomi", name: "Tarihi Uludağ Kebapçısı", desc: "1950'ler, klasik esnaf lokantası." },
   { lat: 40.0900, lng: 32.6850, type: "gastronomi", name: "Kazan Kavurması Lokantaları", desc: "Coğrafi işaretli Kazan Kavurması." },
   { lat: 39.9150, lng: 32.8600, type: "gastronomi", name: "Aspava Gastronomi Kültürü", desc: "1970'ler, Ankara'ya özgü yeme-içme ritüeli." },
+
+  /* ── KÜLTÜREL MİRAS (Resmi Envanter) ── */
+
+  /* Beypazarı */
+  { lat: 40.1698, lng: 31.9192, type: "miras", name: "Beypazarı Bedesteni", desc: "Osmanlı dönemi kapalı çarşısı, altı kubbeli taş yapı. Tescilli kültür varlığı." },
+  { lat: 40.1688, lng: 31.9185, type: "miras", name: "Paşa Hamamı (Beypazarı)", desc: "Osmanlı klasik hamam mimarisi. Sıcaklık, soğukluk ve halvet bölümleriyle korunmuş." },
+  { lat: 40.1695, lng: 31.9190, type: "miras", name: "Akşemsettin Camii", desc: "Fatih'in hocası Akşemsettin adına. Beypazarı'nın manevi merkezi." },
+  { lat: 40.1720, lng: 31.9175, type: "miras", name: "Kaygusuz Abdal Türbesi", desc: "14. yy sufi ozanı. Bektaşi geleneğinin öncülerinden, hicivli nefesleriyle ünlü." },
+  { lat: 40.1660, lng: 31.9100, type: "miras", name: "Hacılar Köprüsü", desc: "Osmanlı dönemi taş köprü, kervan yolu üzerinde." },
+  { lat: 40.1550, lng: 31.9400, type: "miras", name: "İnözü Vadisi Kaya Kiliseleri ve Mezarları", desc: "Vadiye oyulmuş Bizans dönemi kaya kiliseleri ve kaya mezarları. Kapadokya benzeri peribacaları." },
+  { lat: 40.1710, lng: 31.9210, type: "miras", name: "Yediler Türbesi", desc: "Yedi evliyanın yattığına inanılan ortak türbe. Halk inancı ve ziyaret geleneği." },
+
+  /* Nallıhan */
+  { lat: 40.1850, lng: 31.3480, type: "miras", name: "Tabduk Emre Türbesi", desc: "Yunus Emre'nin hocası, 13. yy mutasavvıfı. Emrem Sultan (Baba Sultan) köyünde." },
+  { lat: 40.1845, lng: 31.3490, type: "miras", name: "Bacım Sultan Türbesi", desc: "Tabduk Emre'nin eşi. Anadolu kadın erenleri geleneğinin sembol ismi." },
+  { lat: 40.1860, lng: 31.3500, type: "miras", name: "Nasuhpaşa Camii (Nallıhan)", desc: "16. yy, Nasuh Paşa Hanı'nın yanında inşa edilmiş külliye parçası." },
+
+  /* Polatlı */
+  { lat: 39.6400, lng: 31.9600, type: "miras", name: "Girmeç Kalesi", desc: "Frigya-Roma-Bizans katmanlı yüksek tepe kalesi. Gordion'a hakim stratejik konum." },
+  { lat: 39.6550, lng: 31.9920, type: "miras", name: "Kral Yolu Kalıntıları", desc: "MO 5. yy Pers imparatorluk yolu. Sardis'ten Susa'ya uzanan antik ticaret hattının Gordion kesiti." },
+
+  /* Kızılcahamam */
+  { lat: 40.4710, lng: 32.6510, type: "miras", name: "Sey Hamamı (Kızılcahamam)", desc: "Tarihi kaplıca yapısı. Roma'dan Osmanlı'ya termal su geleneğinin kesintisiz tanığı." },
+
+  /* Sincan */
+  { lat: 40.0200, lng: 32.5500, type: "miras", name: "Zincirlikaya Mağaraları ve Kilise Kalıntısı", desc: "Kaya oyma Bizans dönemi kilise ve yaşam alanları. Ankara'nın bilinen en iyi korunmuş kaya manastır kompleksi." },
+  { lat: 39.9800, lng: 32.5800, type: "miras", name: "Yedi Odalar Kaya Yerleşmesi", desc: "Roma/Bizans dönemi, kayaya oyulmuş yedi odalı yerleşim. Manastır veya inziva yeri." },
+  { lat: 39.9700, lng: 32.5600, type: "miras", name: "Hisar Kale (Sincan)", desc: "Ankara Çayı vadisine hakim stratejik tepe kalesi. Bizans-Selçuklu dönemi." },
+
+  /* Mamak */
+  { lat: 39.9450, lng: 32.9250, type: "miras", name: "Hüseyin Gazi Türbesi", desc: "8. yy Emevi-Abbasi savaşlarında şehit düşen komutanın türbesi. Yoğun ziyaret yeri." },
+
+  /* Keçiören */
+  { lat: 39.9600, lng: 32.8600, type: "miras", name: "Etlik Köprüsü", desc: "Osmanlı dönemi taş köprü. Keçiören'in en eski sivil yapılarından." },
+
+  /* Çankaya */
+  { lat: 39.9200, lng: 32.8600, type: "miras", name: "Saraçoğlu Mahallesi", desc: "1944-46, Paul Bonatz tasarımı. Cumhuriyet'in ilk planlı konut yerleşkesi, kentsel sit alanı." },
+
+  /* Kazan */
+  { lat: 40.2300, lng: 32.6800, type: "miras", name: "Dur Hasan Şah Türbesi", desc: "Kazan'daki tescilli Osmanlı türbesi. Bölgenin manevi hafızası." },
+
+  /* Çamlıdere */
+  { lat: 40.4920, lng: 32.4680, type: "miras", name: "Peçenek Bucağı Camii", desc: "Çamlıdere'de tescilli tarihi ahşap cami. Kırsal Anadolu cami mimarisinin sade örneği." },
+
+  /* Gölbaşı — AST 2023, Doç. Dr. Derya Yılmaz, AGHA Projesi */
+  { lat: 39.7800, lng: 32.8000, type: "miras", name: "Tulumtaş Manastır Mağaraları", desc: "Gölbaşı'nda kayaya oyulmuş Bizans manastır kompleksi. Şarap üretim tekneleri kalıntıları." },
+  { lat: 39.7540, lng: 32.8200, type: "miras", name: "Hacılar Höyüğü (Gölbaşı)", desc: "165x200 m, 22 m yüksekliğinde anıtsal höyük. 1940-41'de R.O. Arık tarafından Türk Tarih Kurumu adına kazılmış; Frig dönemi yapıları ortaya çıkarılmış. 7 km doğusundaki Karaoğlan kazısıyla bağlantılı. MÖ III. bin'den MÖ I. bin'e kesintisiz yerleşim. Hitit yol ağının Gölbaşı güzergahında stratejik konum. (AST 2023)" },
+  { lat: 39.7650, lng: 32.7900, type: "miras", name: "Devedaşı Höyüğü", desc: "306x256 m boyutunda, Gölbaşı'nın en büyük höyüklerinden. Kalkolitik Çağ'dan Demir Çağı sonuna kadar yerleşim katmanları. 1. derece arkeolojik sit alanı. Yüzeyinde seramikten yapılmış ikincil kullanım disk ağırşak bulunmuş. (AST 2023, AGHA Projesi)" },
+  { lat: 39.7630, lng: 32.8300, type: "miras", name: "Tulumtaş Höyüğü", desc: "2007-2008'de Anadolu Medeniyetleri Müzesi kurtarma kazısı. En az 4 tabaka: Orta Tunç Çağı, Roma, Helenistik ve Erken Doğu Roma. İncek yolu höyüğü ikiye bölmüş. Kesikköprü Barajı su projesi sırasında keşfedilmiş. (AST 2023)" },
+  { lat: 39.7600, lng: 32.8250, type: "miras", name: "Kapaklı Höyüğü ve Antik Şarap Teknesi", desc: "Höyüğün hemen yanında, ana kayaya oyulmuş taş şarap sıkma teknesi — tel çitle koruma altında. Bizans dönemi bağcılık ve şarap üretiminin fiziksel kanıtı. Höyükte MÖ III. bin'den Bizans'a seramik. (AST 2023)" },
+  { lat: 39.7700, lng: 32.8100, type: "miras", name: "Taştepe (Taşdeve Mağarası)", desc: "Mogan Gölü'nü besleyen Çölova Deresi kıyısında, 1118 m rakımlı doğal kayalık üzerinde Geç Roma/Bizans karakol yerleşimi. Tepe merkezinde eski bir mağara girişi ('Taşdeve Mağarası') bulunuyordu; tahribatla kapanmış. Vadiye hakim stratejik gözetleme noktası. (AST 2023)" },
+  { lat: 39.7750, lng: 32.7950, type: "miras", name: "Karaağızlı Höyüğü", desc: "Geç Kalkolitik'ten Bizans'a 5000 yıllık yerleşim. 13.80 m boyunca izlenebilen sur duvarı kalıntısı ve tepede Klasik Çağ'a ait devasa taş yapı temeli. Haymana yoluna hakim konumda. İlk kez 1994'te S. Omura tarafından tespit edilmiş. (AST 2023)" },
+
+  /* Gölbaşı — AST 2023, Prof. Dr. Gizem & Metin Kartal, Paleolitik Araştırma */
+  { lat: 39.7680, lng: 32.8460, type: "miras", name: "Bezirhane-Kazmalı Paleolitik Alanı", desc: "2022'de keşfedilen, Ankara için ilk üçgen formlu iki yüzeyli alet (biface). Yoğun çört yumruları ve Orta Paleolitik levallois çekirdekler. Gölbaşı'nın en zengin Paleolitik buluntu noktalarından. Hammadde kaynağı ve açık hava atölyesi niteliğinde. (AST 2023, Kartal & Kartal)" },
+  { lat: 39.7720, lng: 32.8350, type: "miras", name: "Dikilitaş Levallois Açık Hava Atölyesi", desc: "Taş ocağı çevresinde 10'dan fazla buluntu noktasında yoğun Orta Paleolitik levallois çekirdek, yonga ve düzeltili parça koleksiyonu. Ankara'nın bilinen en kapsamlı Paleolitik açık hava atölye alanı. Tipik levallois çekirdekler Anadolu Medeniyetleri Müzesi'ne teslim edilmiş. (AST 2023)" },
+  { lat: 39.7580, lng: 32.8150, type: "miras", name: "Boyalık Paleolitik Çört Yatağı", desc: "Alt ve Orta Paleolitik buluntuların yoğun olduğu doğal çört hammadde kaynağı. Kıyıcılar, levallois çekirdekler ve yüzlerce yontma taş alet parçası. Ankara'nın en eski insan izlerinin (Alt Paleolitik, ~500.000+ yıl) bulunduğu alanlardan. (AST 2023)" },
+
+  /* Güdül — AST 2023, Prof. Dr. Mehmet Sağır, Paleontolojik Araştırma */
+  { lat: 40.2100, lng: 32.2900, type: "miras", name: "Kaşharman Fosil Lokalitesi (Güdül)", desc: "Miyosen Dönem (5-20 milyon yıl) memeli fosil yatağı. At familyası (Equidae) ve sığırgiller (Bovidae) fosil kalıntıları yamaç kenarında yoğun dağılım halinde. Kirmil Çayı kenarında keşfedilmiş. Ankara'nın paleontolojik zenginliğinin en yeni kanıtı. (AST 2023, Sağır)" },
+
+  /* Yenimahalle */
+  { lat: 39.9550, lng: 32.8200, type: "miras", name: "Akköprü (1222)", desc: "Sultan I. Alâeddin Keykubad tarafından 619/1222'de yaptırılan 7 kemerli Selçuklu köprüsü. 79.74 m uzunluk, 4.77 m genişlik. Ankara Çayı üzerinde 800 yıldır ayakta. Ayakların üçgen mahmuzlu kesme taş kaplaması özgün. İstanbul Yolu'nun en eski geçiş noktası. (AST 2023, Bozkurt)" },
+
+  /* Şereflikoçhisar */
+  { lat: 38.9400, lng: 33.5400, type: "miras", name: "Alaeddin (Kurşunlu) Camii (Şereflikoçhisar)", desc: "Selçuklu dönemi kurşun kaplı kubbeli cami. Tuz Gölü havzasının en eski ibadet yapısı." },
+
+  /* ── AST 2023 CİLT 3 ── */
+
+  /* Polatlı — AST 2023, Doç. Dr. Müge Durusu-Tanrıöver, PYAP Projesi */
+  { lat: 39.6200, lng: 32.1450, type: "miras", name: "Sarıoba Höyük", desc: "Kalkolitik'ten Roma'ya kesintisiz 5 dönem yerleşim. Polatlı kuzeyinde Ankara Çayı'na 300 m mesafede. 2022'de %100 kapsama yüzey taraması yapıldı. Küçük Kalkolitik yerleşim, Tunç Çağları boyunca genişlemiş, seyrek Demir Çağı ve ardından Helenistik-Roma yeniden iskanı. Bölgenin MÖ 2. binyılını anlamak için en kritik iki höyükten biri. (AST 2023, PYAP)" },
+  { lat: 39.5450, lng: 32.0500, type: "miras", name: "Karayavşan Höyük", desc: "Kalkolitik, İlk Tunç ve Orta Tunç Çağı höyüğü. 1960'larda Raci Temizer tarafından Anadolu Medeniyetleri Müzesi adına kazıldı. İlk Tunç Çağı figürinleri bulunmuş. 2022'de yüzeyde İlk Tunç Çağı'na ait metal eritme potası keşfedilip müzeye teslim edildi — bölgede erken metalürjinin kanıtı. Kaçak kazı ve toprak alımıyla ciddi tahribata uğramış. (AST 2023, PYAP)" },
+  { lat: 39.5600, lng: 32.1700, type: "miras", name: "Kargalı Kalesi", desc: "Demir Çağı, Roma ve Bizans dönemlerine tarihlenen tepedeki kale. Ulaşılması güç, hakim konumda stratejik bir yapı. Yüzey buluntuları olası Galat kökenine işaret ediyor. Polatlı'nın en gizemli savunma yapısı. (AST 2023, PYAP)" },
+  { lat: 39.6350, lng: 32.1200, type: "miras", name: "Hacıtuğrul Baba Türbesi ve Yerleşimi", desc: "Selçuklu dönemi türbe, doğu ve güneydoğusunda geniş bir yerleşim alanıyla çevrili. Yeşil, sarı, kahverengi sırlı ve mavi-beyaz bezemeli seramikler Selçuklu-Türk dönemine tarihlenirken, buluntular arasında Frig gri malları da tespit edilmiş — bölgenin Demir Çağı'na uzanan derinliğinin kanıtı. (AST 2023, PYAP)" },
+  { lat: 39.6050, lng: 32.1750, type: "miras", name: "Enik Tepe", desc: "Polatlı merkezin 3 km kuzeydoğusunda doğal bir tepe üzerinde Bizans dönemi yamaç yerleşimi. Pembe hamurlu boyasız çanak çömlek ve mavi cam bilezik parçaları (Bizans mezarlıklarının tipik buluntusu) keşfedilmiş. (AST 2023, PYAP)" },
+
+  /* Elmadağ — AST 2023, Görür, Çetin vd. Yüzey Araştırması */
+  { lat: 39.8800, lng: 33.0500, type: "miras", name: "Tekke Yazılıkaya Kaya Resimleri", desc: "Tarih öncesi kaya sanatı! Tekke köyü kuzeydoğusunda iki ayrı noktada: Kaya Pınar mevkiinde düzleştirilmiş kaya yüzeyine kolları kalkık insan figürleri oyulmuş. İkinci nokta (Akçaali-Tekke arası) kazıma tekniğiyle dikdörtgen ve yarım daire şekiller — muhtemelen kubbeli yapı tasvirleri. Ankara'nın bilinen en eski sanat eserleri arasında. (AST 2023, Elmadağ)" },
+  { lat: 39.8700, lng: 33.0900, type: "miras", name: "Kuşcuali Kaya Şapeli", desc: "Bizans dönemi kaya oyma şapel. Dikdörtgen planlı naos (5.45 × 2.31 m), yarım daire apsisi (1.58 × 1.22 m) ve beşik tonoz örtüsü. Define avcıları tarafından ağır tahribata uğramış, bezeme izleri yok olmuş. Ankara'nın az bilinen Bizans kaya mimarisi örneklerinden. (AST 2023, Elmadağ)" },
+  { lat: 39.9300, lng: 32.8800, type: "miras", name: "Hasanoğlan Köy Enstitüsü Yerleşkesi", desc: "1940'larda kurulan efsanevi köy enstitüsü kampüsü. Tescilli yapılar: ana bina, açık hava amfi tiyatrosu, müzik okulu ve konser salonu, atölye binaları. Cumhuriyet eğitim idealinin somut mirası. Ayrıca yakınında tarih öncesi Hasanoğlan Figürini'nin bulunduğu alan, Roma dönemi mil taşları ve kabartmalar da mevcut. (AST 2023, Elmadağ)" },
+  { lat: 39.8900, lng: 33.0400, type: "miras", name: "Tekke Dibektaşı Kutsal Alanı", desc: "Tekke köyü kuzeyinde antik kayalık alanda oyulmuş çukurlar ve kanallar — adak/sunu ritüellerine işaret eden kutsal alan. 10 m batıda tahrip edilmiş pithos gömüsü ve pişmiş toprak parçaları tespit edilmiş. Antik dönemde (muhtemelen Roma öncesi) dinsel/ritüel işlev gören nadir bir açık hava tapınım alanı. (AST 2023, Elmadağ)" },
+
+  /* Ayaş — AST 2023, Doç. Dr. Tolga Bozkurt, Ortaçağ Ankara Kuzeybatı */
+  { lat: 40.0150, lng: 32.3400, type: "miras", name: "Ayaş Kilik Camii (1560-61)", desc: "968/1560-61 tarihli kitabesiyle Ayaş'ın en anıtsal camisi. 9.88 × 16.98 m geniş dikdörtgen plan, 4 sıra ahşap sütunla 5 sahına bölünmüş. Özgün alçı kalıplı mihrap, boyalı bezemeli minber. Kuzeydoğu köşesinde ahşap minare. Hacıveli Mahallesi'nde. (AST 2023, Bozkurt)" },
+  { lat: 40.0100, lng: 32.3380, type: "miras", name: "Bünyamin Ayaşî Camii ve Türbesi", desc: "16. yüzyıl Bayramî-Melamî şeyhi Bünyamin Ayaşî'ye atfedilen üç sahınlı cami. Özgün ahşap minber. Kuzeydoğu köşesinde kare gövdeli, kubbeli türbe — şeyhin kabri burada. Dervişimam Mahallesi'nde. Ankara'nın tasavvuf geleneğinin Ayaş'taki somut izi. (AST 2023, Bozkurt)" },
+
+  /* Beypazarı — AST 2023, Bozkurt */
+  { lat: 40.0700, lng: 32.2200, type: "miras", name: "Adaören Kalesi", desc: "Beypazarı'nın 30 km doğusunda, Kirmir Çayı vadisinde yarımada şeklindeki yükselti üzerinde ortaçağ kalesi. Dik kayalıklar ve çay doğal hendek görevi görüyor. Güneydoğudan giriş, iki altıgen burçlu doğu kapısı (biri kısmen ayakta). Roma tonozlu oda, Bizans devşirme malzeme, Türk-İslam kültürel varlığına işaret eden ovo tipi dikili taşlar. Üç dönemin izini taşıyan stratejik savunma yapısı. (AST 2023, Bozkurt)" },
+
+  /* Sincan — AST 2023, Bozkurt */
+  { lat: 39.9900, lng: 32.6100, type: "miras", name: "Zir Köprüsü", desc: "Yenikent'te Zir (İstanoz) Vadisi girişinde, dere üzerinde 4 kemerli taş köprü. 4.40 m genişlik, 40 m uzunluk. Memba tarafı ayaklarında mahmuzlar. İlk yapım ortaçağa tarihleniyor olabilir. Yakınında Osmanlı dönemi gayrimüslim mezarlığı — Ermeni kitabeli ve haç monogramlı mezar taşlarıyla birlikte. (AST 2023, Bozkurt)" },
+  { lat: 39.9700, lng: 32.5500, type: "miras", name: "Fatma Bacı Türbesi (1310)", desc: "Sincan Bacı Mahallesi'nde kare gövdeli, piramidal çatılı türbe. 25 Haziran 1310'da vefat eden Fatma Bacı'ya ait — Sincan çevresinin en eski tarihli tescilli yapısı. Yanında mihrap duvarına dik üç sahınlı cami. Ahi geleneğinin kadın kolunun (Bacıyan-ı Rum) nadir fiziksel kanıtlarından. (AST 2023, Bozkurt)" },
+
+  /* Çubuk — AST 2023, Albayrak vd. 1402 Ankara Meydan Savaşı Araştırması */
+  { lat: 40.1700, lng: 32.9500, type: "miras", name: "Gayri Tepesi (1402 Savaş Alanı)", desc: "1402 Ankara Meydan Savaşı'nın en çarpıcı bulgusu. Çubuk'un 10 km güneybatısında, Kutuören yakınında yoğun insan kemik kalıntıları yüzeyde tespit edilmiş. Tarla sürme ve yol yapımıyla en az 30 birey: 4 kadın, 15 erkek, 6-10 yaş çocuklar. Tibia kondilinde kesik izleri, kaburga parçalarında 500-600°C yanık. Yıldırım Bayezid'in kaçış rotası üzerinde. Jeoradar ve kazı planlanıyor. (AST 2023, Albayrak)" },
+  { lat: 40.2200, lng: 33.0200, type: "miras", name: "Melikşah Tepesi", desc: "Çubuk'ta Yıldırım Bayezid'in 1402 Ankara Meydan Savaşı'nda komuta ettiği tepe olarak önerilen alan. Doğu yamacında Osmanlı dönemi sırlı seramikler ve bir at nalı parçası bulunmuş (nal Anadolu Medeniyetleri Müzesi'ne teslim edildi). Güneyde Bizans ve Osmanlı seramikleri. Yakınında tescilli Melikşah Hamamı. (AST 2023, Albayrak)" },
+
+  /* ── AST 2019-2020 ── */
+
+  /* Evren — AST 2019-2020, Prof. Dr. Mehmet Sağır, Ankara İli Yüzey Araştırması */
+  { lat: 39.2100, lng: 33.2500, type: "miras", name: "Cebirli Fosil Lokalitesi (Evren)", desc: "Hirfanlı Barajı kıyısında keşfedilen Üst Miyosen Dönem (5-11 milyon yıl) zengin fosil yatağı. Bovidae (sığırgiller), zürafa, gergedan ve hortumlulara (fil benzeri) ait fosiller baraj su seviyesinin hemen üzerindeki çökellerde yoğun biçimde dağılmış. 2020'de Anadolu Medeniyetleri Müzesi ile kurtarma kazısı yapıldı. Baraj suları alanı giderek tahrip ediyor. (AST 2019-2020, Sağır)" },
+  { lat: 40.0800, lng: 32.6200, type: "miras", name: "Kocatepe Mağarası (Kazan)", desc: "Kahraman Kazan ilçesi Kınık Mahallesi kuzeyinde arkeolojik mağara. İçerisinde kültürel dolgu, seramik parçaları ve insan kemikleri tespit edilmiş. Kemikler Anadolu Medeniyetleri Müzesi'ne teslim edildi. Kaçak kazı çukurlarıyla tahribata uğramış. Çevresindeki Karataş ve Değirmen Çeşme lokalitelerinde Orta Paleolitik el baltaları, çekirdekler ve kazıyıcılar bulunmuş. (AST 2019-2020, Sağır)" },
+  { lat: 39.7350, lng: 32.7600, type: "miras", name: "Çakmaklıbel Paleolitik Alanı (Gölbaşı)", desc: "Gölbaşı ilçesi Selametli Mahallesi'nde Çakmaklı Tepe yamaçlarında Orta Paleolitik açık hava alanı. Çok sayıda çakmaktaşı çekirdek, yonga ve kenar kazıyıcı tespit edilmiş. Yakın çevrede insan eli ile oyulmuş arkeolojik mağaralar da keşfedildi. Ankara'nın güney ilçelerindeki Paleolitik insan izlerinin yeni kanıtı. (AST 2019-2020, Sağır)" },
+
+  /* Kazan — AST 2019, Prof. Dr. Mehmet Sağır, 2018 Yılı Ankara İli Araştırması */
+  { lat: 40.1000, lng: 32.6500, type: "miras", name: "Sinaptepe Paleolitik Alanı (Kazan)", desc: "Kahraman Kazan ilçesi Yassıören Mahallesi kuzeyinde Sinaptepe'nin batı yamaçlarında yoğun Pleistosen Dönem taş alet yatağı. Çekirdek, vurgaç, ön kazıyıcı, kenar kazıyıcı, yonga, dilgi ve çentikli aletler. Aynı alanda Miyosen çökelleri içinde omurgalı fosilleri de gözlemlendi. Ankara'nın kuzey batısında Paleolitik insan varlığının önemli kanıtı. (AST 2019, Sağır)" },
+  { lat: 40.0700, lng: 32.5800, type: "miras", name: "Karataş Paleolitik Lokalitesi (Kazan)", desc: "Kahraman Kazan Sarılar Mahallesi'nde keşfedilen çok zengin açık hava Paleolitik alanı. Alt Paleolitik ve Orta Paleolitik başlangıcına ait el baltaları (iki yüzeyli), çekirdekler, vurgaçlar, kazıyıcılar. Buluntuların yoğunluğu araştırmacıları 'kazı gerektirecek nitelikte' değerlendirmesine götürdü. Ankara Paleolitiği için kritik bir keşif. (AST 2019, Sağır)" },
+
+  /* Ayaş — AST 2019, Sağır, 2018 Ankara İli Araştırması */
+  { lat: 40.0600, lng: 32.3800, type: "miras", name: "Asarıntepe Fosil Lokalitesi (Ayaş)", desc: "Ayaş ilçesi Pınaryaka Köyü'nün 3 km kuzeydoğusunda Miyosen Dönem omurgalı fosil yatağı. At familyasına ait kemik kalıntıları ve küçük baş hayvanlara ait fosiller yamaçlara yayılmış halde. Tarım faaliyetleriyle giderek tahrip oluyor. (AST 2019, Sağır)" },
+
+  /* ── AST 2011 ── */
+
+  /* Çankaya/Gölbaşı — AST 2011, Doç. Dr. İlgezdi Bertram & Bertram, ODTÜ İTÇ Araştırması */
+  { lat: 39.8900, lng: 32.7800, type: "miras", name: "Koçumbeli İlk Tunç Çağı Yerleşimi", desc: "ODTÜ kampüsü yakınında İlk Tunç Çağı II'ye (MÖ ~2700-2400) tarihlenen müstahkem yerleşim. 45 × 40 m boyutlarında, üç yandan çevre duvarıyla çevrili. 1960'larda B. Tezcan tarafından kazılmış. 650 m güneybatısında benzer planlı Ahlatlıbel yerleşimi yer alıyor. Ankara'nın merkezinde İlk Tunç Çağı yaşamının nadir kanıtı. (AST 2011, İlgezdi Bertram)" },
+  { lat: 39.7400, lng: 32.7900, type: "miras", name: "Karaoğlan Höyük (Gölbaşı)", desc: "1937-1942 yıllarında R.O. Arık başkanlığında kazılan önemli İlk Tunç Çağı höyüğü. Siyah açkılı, yiv bezemeli ve kırmızı açkılı seramikleriyle tanınır. 2010'da ODTÜ ekibi çevresinde 8 İlk Tunç Çağı yerleşimi daha tespit etti. Koçumbeli ve Ahlatlıbel ile birlikte 'Ankara Grubu' olarak anılan İTÇ kültür çevresinin merkezi. (AST 2011, İlgezdi Bertram)" },
+
+  /* ── AST 2018 (2017 Sezonu) ── */
+
+  /* Kalecik — AST 2018, Prof. Dr. Mehmet Sağır, 2017 Ankara İli Araştırması */
+  { lat: 40.2949, lng: 33.4870, type: "miras", name: "Çandır Fosil Lokalitesi (Kalecik)", desc: "Ankara'nın Kalecik ilçesi Çandır Köyü'nde Orta Miyosen Dönem (yaklaşık 12-14 milyon yıl) büyük memeli fosil yatağı. Hortumlu hayvanlar (Proboscidea), çift tırnaklılar (Artiodactyla) ve tek tırnaklılar (Perissodactyla) fosilleri. Daha önceki kazılarda hominoid (insansı primat) kalıntıları da bulunmuş — Anadolu'nun en önemli Miyosen primat lokalitelerinden. GPS: 40°17'41\"K, 33°29'13\"D. (AST 2018, Sağır)" },
+  { lat: 39.7368, lng: 33.0720, type: "miras", name: "Yaylaköy Miyosen Fosil Yatağı (Çankaya)", desc: "Çankaya ilçesi Yaylaköy-Evcilerağılları Mevkii'nde in-situ (yerinde) Miyosen Dönem fosil yatağı. Tek tırnaklılar (at familyası), çift tırnaklılar ve hortumlu hayvan fosilleri doğal konumlarında keşfedildi. Tarla açma faaliyetleriyle tehdit altında. MTA tarafından da önceden tespit edilmişti. GPS: 39°44'12\"K, 33°04'19\"D. (AST 2018, Sağır)" },
+  { lat: 39.7200, lng: 32.8200, type: "miras", name: "Yaylabağ Alt Paleolitik Alanı (Gölbaşı)", desc: "Gölbaşı ilçesi Yaylabağ Köyü doğusunda hem Alt Paleolitik hem Orta Paleolitik döneme ait taş aletlerin bulunduğu geniş alan. Andezitten büyük yonga parçaları (Alt Paleolitik) ve çok sayıda düzeltili yonga (Orta Paleolitik). Ankara'nın güney bölgesinde en az ~500.000 yıllık insan varlığının kanıtı. (AST 2018, Sağır)" },
 ];
 
 export const ROUTES: Route[] = [

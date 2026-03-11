@@ -29,6 +29,7 @@ const TYPE_COLORS: Record<PlaceType, string> = {
   tarihi: "#FFB300",
   edebiyat: "#8B5CF6",
   gastronomi: "#E91E63",
+  miras: "#795548",
 };
 
 const TYPE_SVGS: Record<PlaceType, string> = {
@@ -39,6 +40,7 @@ const TYPE_SVGS: Record<PlaceType, string> = {
   tarihi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 21V11l4-4 4 4 4-4 4 4v10"/><path d="M9 21v-4h6v4"/><path d="M3 11h18"/></svg>`,
   edebiyat: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>`,
   gastronomi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`,
+  miras: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
 };
 
 const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
@@ -50,6 +52,7 @@ const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
   { key: "tarihi", label: "Tarihi" },
   { key: "edebiyat", label: "Edebiyat" },
   { key: "gastronomi", label: "Gastronomi" },
+  { key: "miras", label: "Kültürel Miras" },
 ];
 
 
