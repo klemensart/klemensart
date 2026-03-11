@@ -107,7 +107,7 @@ export const PLACES: CulturePlace[] = [
   { lat: 40.1675, lng: 31.9211, type: "tarihi", name: "Beypazarı Tarihi Konakları", desc: "Osmanlı-Türk sivil mimarisinin en iyi korunmuş dokusu." },
   { lat: 40.3575, lng: 32.5475, type: "tarihi", name: "Mahkeme Ağacın Kaya Yerleşimleri", desc: "Roma dönemi yeraltı kiliseleri." },
   { lat: 40.0972, lng: 33.4083, type: "tarihi", name: "Kalecik Kalesi", desc: "Galat ve Roma izleri, Kızılırmak vadisine hakim." },
-  { lat: 39.9523, lng: 32.8261, type: "tarihi", name: "Akköprü", desc: "1222, Selçuklu dönemi, 7 kemerli taş köprü." },
+  { lat: 39.9523, lng: 32.8261, type: "tarihi", name: "Akköprü", desc: "1222, I. Alaeddin Keykubad, 7 kemer gözlü anıtsal Selçuklu köprüsü. Üçgen mahmuzlar ve Arapça kitabe." },
   { lat: 40.1849, lng: 31.3501, type: "tarihi", name: "Nasuh Paşa Hanı", desc: "1599, 43 odalı Osmanlı ticaret hanı." },
   { lat: 40.2197, lng: 32.2448, type: "tarihi", name: "İnönü Mağaraları", desc: "Hitit'ten Bizans'a çok katlı kaya yerleşimleri." },
 
@@ -172,6 +172,22 @@ export const PLACES: CulturePlace[] = [
   { lat: 40.4930, lng: 32.4700, type: "tarihi", name: "Şeyh Ali Semerkandi Türbesi", desc: "15. yy İslam alimi, manevi turizm." },
   { lat: 39.9400, lng: 32.8550, type: "tarihi", name: "Zincirli Camii", desc: "17. yy, kırmızı tuğla ve ahşap tavan." },
   { lat: 39.9895, lng: 33.1738, type: "tarihi", name: "Hasanoğlan Köy Enstitüsü", desc: "1941, aydınlanma projesi mirası." },
+
+  /* ── KALE VE SAVUNMA YAPILARI ── */
+  { lat: 39.9415, lng: 32.8658, type: "tarihi", name: "Akkale (İç Kale)", desc: "Selçuklu dönemi, çokgen planlı, sivri kemerli kapılar ve poternler. Kayıp St. Clemens Kilisesi ahşapları burada korunuyor." },
+  { lat: 39.9395, lng: 32.8660, type: "tarihi", name: "Şarkkale ve Zindan Kapı", desc: "İç kalenin güneydoğu burcu. Roma mimari parçaları Türk döneminde devşirilmiş. Tarihi seyirdim yolu." },
+  { lat: 39.9390, lng: 32.8625, type: "tarihi", name: "Kale Kapısı ve İlhanlı Kitabesi", desc: "Dış surların anıtsal girişi. 1330 tarihli Farsça İlhanlı vergi kitabesi. Yanındaki burç geç Osmanlı saat kulesine dönüştürülmüş." },
+  { lat: 39.9435, lng: 32.8580, type: "tarihi", name: "Roma Dönemi Sur Kalıntıları", desc: "Çankırı Caddesi, 1999-2006 kazılarında bulunan MS 2-3. yy bosajlı taş örgülü anıtsal Roma surları." },
+  { lat: 39.9405, lng: 32.8660, type: "tarihi", name: "İç Kale Sarnıcı", desc: "Doğu surlarında, yıkık evin altından çıkan beşik tonozlu tuğla sarnıç. Kuşatma dönemi hayatta kalma stratejisi." },
+
+  /* ── İNANÇ VE BELLEK MEKANLARI ── */
+  { lat: 39.9400, lng: 32.8640, type: "tarihi", name: "Sultan Alaeddin Camii", desc: "1197-98, İç Kale'de surlara yaslanmış. Ahşap tavan ve alçı mihrap ile Selçuklu estetiğinin Ankara'daki en eski temsilcisi." },
+  { lat: 39.9375, lng: 32.8665, type: "tarihi", name: "Zöhre Hatun (Felekeddin) Türbesi", desc: "14-15. yy, gizemli baldaken (açık) türbe. Dört sütun, tuğla kemerler ve kirpi saçaklar." },
+  { lat: 39.9365, lng: 32.8655, type: "tarihi", name: "Ahi Şerafeddin Türbesi", desc: "1330, Ahilik teşkilatının izi. Firuze ve mavi-beyaz sırlı çini sandukalar. Orijinal ahşap sanduka Etnografya Müzesi'nde." },
+  { lat: 40.0170, lng: 32.3380, type: "tarihi", name: "Ayaş Ulu Camii", desc: "15. yy, mukarnas başlıklı ahşap direkler, kaba yonu taş işçiliği, taklit kündekari minber. Anadolu ahşap mimarisinin sessiz devi." },
+
+  /* ── KÖPRÜLER VE SU YAPILARI ── */
+  { lat: 39.9850, lng: 32.5600, type: "tarihi", name: "Zir Köprüsü", desc: "İstanoz Vadisi girişinde Ortaçağ taş köprüsü. 4 kemer gözü. Yakınında Ermenice yazıtlı mezar taşları." },
 
   /* ── EK EDEBİYAT ── */
   { lat: 39.9210, lng: 32.8560, type: "edebiyat", name: "Adnan Ötüken İl Halk Kütüphanesi", desc: "1922, Paul Bonatz binası." },
