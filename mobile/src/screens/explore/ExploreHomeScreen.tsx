@@ -7,7 +7,7 @@ import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
 
 const SECTIONS = [
   { icon: "🎭", title: "Etkinlikler", desc: "Ankara'daki kültür-sanat etkinlikleri", screen: "EventsList" },
-  { icon: "📰", title: "Makaleler", desc: "Derinlemesine kültür yazıları", screen: "ArticlesList" },
+  { icon: "📰", title: "İçerikler", desc: "Derinlemesine kültür yazıları", screen: "ArticlesList" },
   { icon: "🎨", title: "Atölyeler", desc: "Sanat atölyeleri ve kurslar", screen: "WorkshopsList" },
   { icon: "🖼️", title: "Sergiler", desc: "3D sanal sergi deneyimi", screen: "Exhibition" },
   { icon: "📝", title: "Testler", desc: "Kültür-sanat bilgi testleri", screen: "Test" },

@@ -8,9 +8,11 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
 import { apiFetch } from "../../services/api";
+import { API_BASE_URL } from "../../config/api";
 
 interface Workshop {
   id: string;
@@ -22,6 +24,7 @@ interface Workshop {
   price: string | null;
   for_sale: boolean;
   image: string | null;
+  next_session_date: string | null;
 }
 
 export default function WorkshopsListScreen({ navigation }: any) {
@@ -34,6 +37,12 @@ export default function WorkshopsListScreen({ navigation }: any) {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const resolveImage = (img: string | null) => {
+    if (!img) return null;
+    if (img.startsWith("http")) return img;
+    return `${API_BASE_URL}${img}`;
+  };
 
   if (loading) {
     return (
@@ -49,30 +58,52 @@ export default function WorkshopsListScreen({ navigation }: any) {
         data={workshops}
         keyExtractor={(w) => String(w.id)}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<Text style={styles.header}>Atölyeler</Text>}
         ListEmptyComponent={<Text style={styles.empty}>Henüz atölye yok.</Text>}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate("WorkshopDetail", { workshop: item })}
-            activeOpacity={0.7}
-          >
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              {item.is_live && (
-                <View style={styles.liveBadge}>
-                  <Text style={styles.liveText}>CANLI</Text>
-                </View>
+        renderItem={({ item }) => {
+          const imageUri = resolveImage(item.image);
+          return (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("WorkshopDetail", { workshop: item })
+              }
+              activeOpacity={0.7}
+            >
+              {imageUri && (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                />
               )}
-            </View>
-            <Text style={styles.cardDesc} numberOfLines={2}>
-              {item.description ?? ""}
-            </Text>
-            <Text style={styles.cardMeta}>
-              {item.total_sessions} ders{item.price ? ` · ${item.price}` : ""}
-            </Text>
-          </TouchableOpacity>
-        )}
+              <View style={styles.cardBody}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  {item.is_live && (
+                    <View style={styles.liveBadge}>
+                      <Text style={styles.liveText}>CANLI</Text>
+                    </View>
+                  )}
+                </View>
+                {item.description ? (
+                  <Text style={styles.cardDesc} numberOfLines={2}>
+                    {item.description}
+                  </Text>
+                ) : null}
+                <View style={styles.cardFooter}>
+                  <Text style={styles.cardMeta}>
+                    {item.total_sessions} ders
+                  </Text>
+                  {item.price && (
+                    <Text style={styles.cardPrice}>{item.price}</Text>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
@@ -81,26 +112,33 @@ export default function WorkshopsListScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.cream },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  list: { padding: SPACING.xl, paddingTop: 60 },
-  header: {
-    fontSize: FONTS.sizes.xxl,
-    fontWeight: "700",
-    color: COLORS.dark,
-    marginBottom: SPACING.xl,
+  list: { padding: SPACING.lg, paddingTop: SPACING.sm },
+  empty: {
+    fontSize: FONTS.sizes.md,
+    color: COLORS.warm,
+    textAlign: "center",
+    marginTop: SPACING.xxl,
   },
-  empty: { fontSize: FONTS.sizes.md, color: COLORS.warm, textAlign: "center" },
+
   card: {
     backgroundColor: COLORS.white,
     borderRadius: RADIUS.lg,
-    padding: SPACING.xl,
     marginBottom: SPACING.md,
+    overflow: "hidden",
     ...SHADOWS.sm,
+  },
+  cardImage: {
+    width: "100%",
+    height: 150,
+  },
+  cardBody: {
+    padding: SPACING.lg,
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   cardTitle: {
     fontSize: FONTS.sizes.lg,
@@ -124,7 +162,20 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.sm,
     color: COLORS.warm,
     lineHeight: 18,
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  cardMeta: { fontSize: FONTS.sizes.xs, color: COLORS.warm },
+  cardFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cardMeta: {
+    fontSize: FONTS.sizes.xs,
+    color: COLORS.warm,
+  },
+  cardPrice: {
+    fontSize: FONTS.sizes.md,
+    fontWeight: "700",
+    color: COLORS.coral,
+  },
 });

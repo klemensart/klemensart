@@ -1,7 +1,7 @@
 /* ─── Harita Ekranı (Hero) ─── */
 
 import React, { useRef, useCallback, useMemo, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region, MapStyleElement, LatLng } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -42,7 +42,7 @@ export default function MapScreen() {
 
   const {
     mode, activeFilter, isDark, selectPlace, setMode, toggleTheme,
-    selectedRoute, activeStopIndex, setActiveStop,
+    selectedRoute, activeStopIndex, setActiveStop, selectedPlace,
   } = useMapStore();
   const { visitedSlugs } = useGamificationStore();
 
@@ -57,18 +57,23 @@ export default function MapScreen() {
   const clampLng = (lng: number) =>
     Math.min(Math.max(lng, ANKARA_BOUNDS.southWest.longitude + 0.005), ANKARA_BOUNDS.northEast.longitude - 0.005);
 
+  // Bottom sheet açıkken mapPadding.bottom artır — marker her zaman sheet üstünde kalır
+  const SHEET_HEIGHT = Math.round(Dimensions.get("window").height * 0.55);
+
   const handleMarkerPress = useCallback(
     (place: CulturePlace) => {
       selectPlace(place);
-      // Marker'ı bottom sheet'in üstünde tutmak için latitude'ü biraz aşağı kaydır
-      mapRef.current?.animateToRegion(
+      // animateCamera ile marker'ı tam koordinata ortala
+      // mapPadding.bottom sheet yüksekliğini hesaba katarak marker'ı yukarıda tutar
+      mapRef.current?.animateCamera(
         {
-          latitude: clampLat(place.lat - 0.003),
-          longitude: clampLng(place.lng),
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          center: {
+            latitude: clampLat(place.lat),
+            longitude: clampLng(place.lng),
+          },
+          zoom: 15,
         },
-        400
+        { duration: 400 }
       );
     },
     [selectPlace]
@@ -87,14 +92,15 @@ export default function MapScreen() {
     if (selectedRoute && activeStopIndex >= 0) {
       const stop = selectedRoute.stops[activeStopIndex];
       if (stop) {
-        mapRef.current?.animateToRegion(
+        mapRef.current?.animateCamera(
           {
-            latitude: clampLat(stop.lat - 0.002),
-            longitude: clampLng(stop.lng),
-            latitudeDelta: 0.008,
-            longitudeDelta: 0.008,
+            center: {
+              latitude: clampLat(stop.lat),
+              longitude: clampLng(stop.lng),
+            },
+            zoom: 15.5,
           },
-          400
+          { duration: 400 }
         );
       }
     }
@@ -121,7 +127,7 @@ export default function MapScreen() {
         rotateEnabled={false}
         pitchEnabled={false}
         toolbarEnabled={false}
-        mapPadding={{ top: 0, right: 0, bottom: 100, left: 0 }}
+        mapPadding={{ top: 0, right: 0, bottom: selectedPlace ? SHEET_HEIGHT : 100, left: 0 }}
         minZoomLevel={9}
         maxZoomLevel={18}
         onMapReady={() => {

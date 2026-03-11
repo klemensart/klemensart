@@ -58,12 +58,12 @@ export default function ExploreStack() {
       <Stack.Screen
         name="ArticlesList"
         component={ArticlesListScreen}
-        options={{ title: "Makaleler" }}
+        options={{ title: "İçerikler" }}
       />
       <Stack.Screen
         name="ArticleReader"
         component={ArticleReaderScreen}
-        options={{ title: "Makale" }}
+        options={{ title: "" }}
       />
       <Stack.Screen
         name="WorkshopsList"

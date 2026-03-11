@@ -1,89 +1,198 @@
 /* ─── Atölye Detay ─── */
 
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
+import { API_BASE_URL } from "../../config/api";
 
 export default function WorkshopDetailScreen({ route, navigation }: any) {
   const { workshop } = route.params;
 
+  const resolveImage = (img: string | null) => {
+    if (!img) return null;
+    if (img.startsWith("http")) return img;
+    return `${API_BASE_URL}${img}`;
+  };
+
+  const imageUri = resolveImage(workshop.image);
+
+  const handleBuy = () => {
+    if (!workshop.for_sale) {
+      Alert.alert("Bilgi", "Bu atölye şu anda satışta değil.");
+      return;
+    }
+    navigation.navigate("PaymentWebView", { workshopId: workshop.id });
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{workshop.title}</Text>
-      {workshop.is_live && (
-        <View style={styles.liveBadge}>
-          <Text style={styles.liveText}>CANLI ATÖLYE</Text>
-        </View>
+      {/* Kapak görseli */}
+      {imageUri && (
+        <Image source={{ uri: imageUri }} style={styles.cover} resizeMode="cover" />
       )}
-      <Text style={styles.desc}>{workshop.description}</Text>
 
-      <View style={styles.statsRow}>
-        <View style={styles.stat}>
-          <Text style={styles.statNum}>{workshop.total_sessions}</Text>
-          <Text style={styles.statLabel}>Ders</Text>
-        </View>
+      {/* Başlık + badge */}
+      <View style={styles.header}>
+        <Text style={styles.title}>{workshop.title}</Text>
+        {workshop.is_live && (
+          <View style={styles.liveBadge}>
+            <Text style={styles.liveText}>CANLI</Text>
+          </View>
+        )}
       </View>
 
+      {/* Açıklama */}
+      {workshop.description ? (
+        <Text style={styles.desc}>{workshop.description}</Text>
+      ) : null}
+
+      {/* Bilgi kartları */}
+      <View style={styles.infoRow}>
+        <View style={styles.infoCard}>
+          <Text style={styles.infoNum}>{workshop.total_sessions}</Text>
+          <Text style={styles.infoLabel}>Ders</Text>
+        </View>
+        {workshop.price && (
+          <View style={styles.infoCard}>
+            <Text style={styles.infoNum}>{workshop.price}</Text>
+            <Text style={styles.infoLabel}>Fiyat</Text>
+          </View>
+        )}
+        {workshop.next_session_date && (
+          <View style={styles.infoCard}>
+            <Text style={styles.infoNum}>
+              {new Date(workshop.next_session_date).toLocaleDateString("tr-TR", {
+                day: "numeric",
+                month: "short",
+              })}
+            </Text>
+            <Text style={styles.infoLabel}>Sonraki Ders</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Satın al / Kayıt ol butonu */}
       <TouchableOpacity
-        style={styles.buyBtn}
-        onPress={() => navigation.navigate("PaymentWebView", { workshopId: workshop.id })}
+        style={[styles.buyBtn, !workshop.for_sale && styles.buyBtnDisabled]}
+        onPress={handleBuy}
         activeOpacity={0.7}
       >
-        <Text style={styles.buyText}>Satın Al</Text>
+        <Text style={styles.buyText}>
+          {workshop.for_sale
+            ? workshop.price
+              ? `${workshop.price} — Satın Al`
+              : "Kayıt Ol"
+            : "Yakında"}
+        </Text>
       </TouchableOpacity>
+
+      {/* Alt bilgi */}
+      <Text style={styles.note}>
+        Ödeme sonrası atölye erişiminiz otomatik açılır.
+      </Text>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.cream },
-  content: { padding: SPACING.xl, paddingTop: 60 },
+  content: { paddingBottom: 40 },
+
+  cover: {
+    width: "100%",
+    height: 220,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: SPACING.xl,
+    paddingBottom: 0,
+    gap: 10,
+  },
   title: {
     fontSize: FONTS.sizes.xxl,
     fontWeight: "700",
     color: COLORS.dark,
-    marginBottom: SPACING.sm,
+    flex: 1,
   },
   liveBadge: {
     backgroundColor: "#E53935",
     borderRadius: RADIUS.sm,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    alignSelf: "flex-start",
-    marginBottom: SPACING.md,
   },
   liveText: {
     fontSize: FONTS.sizes.xs,
     fontWeight: "700",
     color: "#fff",
   },
+
   desc: {
     fontSize: FONTS.sizes.md,
     color: COLORS.dark,
     lineHeight: 24,
-    marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.md,
   },
-  statsRow: {
+
+  infoRow: {
     flexDirection: "row",
-    marginBottom: SPACING.xxl,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.xl,
+    gap: SPACING.md,
   },
-  stat: { alignItems: "center", marginRight: SPACING.xxl },
-  statNum: {
-    fontSize: FONTS.sizes.xxl,
+  infoCard: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    alignItems: "center",
+    ...SHADOWS.sm,
+  },
+  infoNum: {
+    fontSize: FONTS.sizes.lg,
     fontWeight: "700",
     color: COLORS.dark,
+    marginBottom: 2,
   },
-  statLabel: { fontSize: FONTS.sizes.xs, color: COLORS.warm },
+  infoLabel: {
+    fontSize: FONTS.sizes.xs,
+    color: COLORS.warm,
+  },
+
   buyBtn: {
     backgroundColor: COLORS.coral,
     borderRadius: RADIUS.lg,
     paddingVertical: 16,
     alignItems: "center",
+    marginHorizontal: SPACING.xl,
+    marginTop: SPACING.xxl,
     ...SHADOWS.md,
+  },
+  buyBtnDisabled: {
+    backgroundColor: COLORS.warm,
+    opacity: 0.5,
   },
   buyText: {
     fontSize: FONTS.sizes.lg,
     fontWeight: "700",
     color: "#fff",
+  },
+
+  note: {
+    fontSize: FONTS.sizes.xs,
+    color: COLORS.warm,
+    textAlign: "center",
+    marginTop: SPACING.md,
+    paddingHorizontal: SPACING.xl,
   },
 });
