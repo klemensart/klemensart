@@ -23,10 +23,12 @@ export const metadata: Metadata = {
 
 export default async function EtkinliklerPage() {
   const supabase = createAdminClient();
+  const now = new Date().toISOString();
   const { data: events } = await supabase
     .from("events")
     .select("id, title, event_date, venue")
     .eq("status", "approved")
+    .gte("event_date", now)
     .order("event_date", { ascending: true })
     .limit(20);
 

@@ -67,10 +67,12 @@ export default function EtkinliklerClient() {
       setLoading(true);
       const supabase = createClient();
 
+      const now = new Date().toISOString();
       let q = supabase
         .from("events")
         .select("id,title,description,ai_comment,event_type,venue,address,event_date,source_url,source_name,price_info,is_klemens_event")
         .eq("status", "approved")
+        .gte("event_date", now)
         .order("event_date", { ascending: true });
 
       if (filter === "Atölyeler") {

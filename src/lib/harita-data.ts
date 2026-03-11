@@ -2,7 +2,7 @@
    PLACES ve ROUTES hem client (harita) hem server (SEO/JSON-LD) tarafından kullanılır.
 */
 
-export type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi" | "edebiyat" | "gastronomi" | "miras";
+export type PlaceType = "müze" | "galeri" | "konser" | "tiyatro" | "tarihi" | "edebiyat" | "miras";
 
 export type CulturePlace = {
   lat: number;
@@ -40,7 +40,6 @@ export const TYPE_LABELS: Record<PlaceType, string> = {
   tiyatro: "Tiyatro",
   tarihi: "Tarihi",
   edebiyat: "Edebiyat",
-  gastronomi: "Gastronomi",
   miras: "Kültürel Miras",
 };
 
@@ -114,13 +113,6 @@ export const PLACES: CulturePlace[] = [
   { lat: 40.2197, lng: 32.2448, type: "tarihi", name: "İnönü Mağaraları", desc: "Hitit'ten Bizans'a çok katlı kaya yerleşimleri." },
 
   /* ── GASTRONOMİ ── */
-  { lat: 39.9380, lng: 32.8630, type: "gastronomi", name: "Tarihi Boğaziçi Lokantası", desc: "1956, meşhur Ankara Tavası, bakır tencerelerde." },
-  { lat: 39.9420, lng: 32.8540, type: "gastronomi", name: "Tarihi Ulus Hali", desc: "1937, Robert Oerley tasarımı, geleneksel hal kültürü." },
-  { lat: 39.9360, lng: 32.8030, type: "gastronomi", name: "AOÇ Merkez Lokantası", desc: "1925 kurulan çiftlikte tarihi gastronomi kampüsü." },
-  { lat: 39.9380, lng: 32.8640, type: "gastronomi", name: "Zenger Paşa Konağı", desc: "18. yy konak, müze-restoran, yöresel mutfak." },
-  { lat: 40.1680, lng: 31.9210, type: "gastronomi", name: "Beypazarı Taş Fırınları ve Alaaddin Sokak", desc: "Coğrafi işaretli Beypazarı Kurusu." },
-  { lat: 40.1070, lng: 33.4180, type: "gastronomi", name: "Kalecik Karası Üzüm Bağları", desc: "MÖ 2000'den beri bağcılık, şarap rotası." },
-  { lat: 40.2620, lng: 33.0160, type: "gastronomi", name: "Çubuk Turşu Köyü", desc: "15. yy'dan beri coğrafi işaretli Çubuk Turşusu üretimi." },
 
   /* ── EK MÜZELER ── */
   { lat: 39.9350, lng: 32.8500, type: "müze", name: "Ankara Palas Müzesi", desc: "1928 yapımı Cumhuriyet konukevi, Şubat 2024'te müzeye dönüştürüldü." },
@@ -198,11 +190,6 @@ export const PLACES: CulturePlace[] = [
   { lat: 39.9390, lng: 32.8670, type: "edebiyat", name: "Şairler ve Yazarlar Evi", desc: "Hamamönü'nde şiir dinletileri." },
 
   /* ── EK GASTRONOMİ ── */
-  { lat: 39.9410, lng: 32.8555, type: "gastronomi", name: "Tarihi Merkez Efendi Fırını", desc: "Coğrafi işaretli Ankara Simidi." },
-  { lat: 39.9410, lng: 32.8560, type: "gastronomi", name: "Ali Uzun Şekercisi", desc: "1930'lar, akide şekeri ve lokum." },
-  { lat: 39.9420, lng: 32.8530, type: "gastronomi", name: "Tarihi Uludağ Kebapçısı", desc: "1950'ler, klasik esnaf lokantası." },
-  { lat: 40.0900, lng: 32.6850, type: "gastronomi", name: "Kazan Kavurması Lokantaları", desc: "Coğrafi işaretli Kazan Kavurması." },
-  { lat: 39.9150, lng: 32.8600, type: "gastronomi", name: "Aspava Gastronomi Kültürü", desc: "1970'ler, Ankara'ya özgü yeme-içme ritüeli." },
 
   /* ── KÜLTÜREL MİRAS (Resmi Envanter) ── */
 
