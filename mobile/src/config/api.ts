@@ -2,10 +2,8 @@
 
 import Constants from "expo-constants";
 
-// Expo Go fiziksel cihazda: Metro dev server'ın IP'sini otomatik al
-// Emülatörde veya bulunamazsa fallback: prod URL
+// Dev: local Next.js server, Prod: klemensart.com
 const devHost = Constants.expoConfig?.hostUri?.split(":")[0];
-
 export const API_BASE_URL = __DEV__ && devHost
   ? `http://${devHost}:3000`
   : "https://klemensart.com";
