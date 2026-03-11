@@ -128,6 +128,13 @@ export default function HaritaPage() {
   const [activeStopIndex, setActiveStopIndex] = useState(0);
   const [showRouteList, setShowRouteList] = useState(true);
 
+  // User location state
+  const [locating, setLocating] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userMarkerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userCircleRef = useRef<any>(null);
+
   // Mobile panel drag state
   const [panelPct, setPanelPct] = useState(40); // percent of viewport
   const dragStartYRef = useRef(0);
@@ -161,6 +168,54 @@ export default function HaritaPage() {
     setSelectedPlace(place);
     fetchEvents(place);
   }, [fetchEvents]);
+
+  // Locate user on map
+  const locateUser = useCallback(() => {
+    const map = mapRef.current;
+    const Leaf = leafletRef.current;
+    if (!map || !Leaf) return;
+
+    setLocating(true);
+    map.locate({ setView: true, maxZoom: 15 });
+
+    map.once("locationfound", (e: { latlng: { lat: number; lng: number }; accuracy: number }) => {
+      setLocating(false);
+
+      // Remove previous markers
+      if (userMarkerRef.current) { map.removeLayer(userMarkerRef.current); }
+      if (userCircleRef.current) { map.removeLayer(userCircleRef.current); }
+
+      // Pulsating blue dot
+      const pulseIcon = Leaf.divIcon({
+        className: "",
+        html: `<div style="
+          width: 16px; height: 16px; border-radius: 50%;
+          background: #4285F4; border: 3px solid #fff;
+          box-shadow: 0 0 0 0 rgba(66,133,244,0.4);
+          animation: pulse-loc 2s infinite;
+        "></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+
+      userMarkerRef.current = Leaf.marker(e.latlng, { icon: pulseIcon, zIndexOffset: 1000 })
+        .addTo(map)
+        .bindPopup("Buradasınız");
+
+      // Accuracy circle
+      userCircleRef.current = Leaf.circle(e.latlng, {
+        radius: Math.min(e.accuracy, 500),
+        color: "#4285F4",
+        fillColor: "#4285F4",
+        fillOpacity: 0.08,
+        weight: 1,
+      }).addTo(map);
+    });
+
+    map.once("locationerror", () => {
+      setLocating(false);
+    });
+  }, []);
 
   // Clear route layers from map
   const clearRouteLayers = useCallback(() => {
@@ -382,6 +437,11 @@ export default function HaritaPage() {
     link.rel = "stylesheet";
     link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
     document.head.appendChild(link);
+
+    // Pulse animation for user location dot
+    const style = document.createElement("style");
+    style.textContent = `@keyframes pulse-loc { 0% { box-shadow: 0 0 0 0 rgba(66,133,244,0.4); } 70% { box-shadow: 0 0 0 12px rgba(66,133,244,0); } 100% { box-shadow: 0 0 0 0 rgba(66,133,244,0); } }`;
+    document.head.appendChild(style);
 
     import("leaflet").then((L) => {
       leafletRef.current = L.default || L;
@@ -839,6 +899,31 @@ export default function HaritaPage() {
           )}
         </div>
       </div>
+
+      {/* Locate me button — above zoom controls */}
+      <button
+        onClick={locateUser}
+        disabled={locating}
+        title="Konumumu göster"
+        style={{
+          position: "absolute", bottom: 100, left: 14, zIndex: 15,
+          width: 36, height: 36, borderRadius: 8,
+          background: isDark ? "rgba(0,0,0,0.7)" : "#fff",
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "#d1d5db"}`,
+          boxShadow: isDark ? "none" : "0 2px 6px rgba(0,0,0,0.1)",
+          cursor: locating ? "wait" : "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "all 0.2s",
+          opacity: locating ? 0.6 : 1,
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={locating ? "#4285F4" : (isDark ? "#ccc" : "#374151")} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v4" /><path d="M12 18v4" />
+          <path d="M2 12h4" /><path d="M18 12h4" />
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+      </button>
 
       {/* Legend — bottom right (explore only) */}
       {mode === "explore" && (
