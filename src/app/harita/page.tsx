@@ -585,6 +585,34 @@ export default function HaritaPage() {
   const activeStop = activeRoute?.stops[activeStopIndex] ?? null;
 
   /* ───────── Shared panel content renderer for events ───────── */
+  const renderDirectionsButton = (place: CulturePlace, compact?: boolean) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&destination_place_id=&travelmode=walking`;
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: compact ? "10px 14px" : "12px 16px",
+          background: "rgba(66,133,244,0.12)", border: "1px solid rgba(66,133,244,0.25)",
+          borderRadius: compact ? 8 : 10, color: "#4285F4",
+          fontSize: compact ? 13 : 14, fontWeight: 600,
+          textDecoration: "none", cursor: "pointer",
+          transition: "all 0.2s",
+          marginBottom: compact ? 14 : 20,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(66,133,244,0.2)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(66,133,244,0.12)"; }}
+      >
+        <svg width={compact ? 16 : 18} height={compact ? 16 : 18} viewBox="0 0 24 24" fill="none" stroke="#4285F4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 11l19-9-9 19-2-8-8-2z" />
+        </svg>
+        Yol Tarifi Al
+      </a>
+    );
+  };
+
   // Panel arka planı her zaman koyu — etkinlik renkleri panelle uyumlu olmalı
   const renderEventsSection = (compact?: boolean) => {
     const cardBg = "rgba(255,255,255,0.03)";
@@ -998,9 +1026,10 @@ export default function HaritaPage() {
                 <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: "0 0 12px 0", lineHeight: 1.3 }}>
                   {selectedPlace.name}
                 </h2>
-                <p style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: "0 0 24px 0" }}>
+                <p style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px 0" }}>
                   {selectedPlace.desc}
                 </p>
+                {renderDirectionsButton(selectedPlace)}
                 {renderEventsSection()}
               </div>
             </div>
@@ -1047,9 +1076,10 @@ export default function HaritaPage() {
           <h3 style={{ color: "#fff", fontSize: 18, fontWeight: 600, margin: "0 0 8px 0", lineHeight: 1.3 }}>
             {selectedPlace.name}
           </h3>
-          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: "0 0 16px 0" }}>
+          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: "0 0 14px 0" }}>
             {selectedPlace.desc}
           </p>
+          {renderDirectionsButton(selectedPlace, true)}
           {renderEventsSection(true)}
         </div>
       )}
