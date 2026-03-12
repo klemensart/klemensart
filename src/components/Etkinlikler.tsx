@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 type EventRow = {
   id: string;
@@ -38,7 +38,7 @@ export default async function Etkinlikler() {
   let events: EventRow[] = [];
 
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("events")
       .select("id,title,description,event_type,venue,event_date,is_klemens_event")
