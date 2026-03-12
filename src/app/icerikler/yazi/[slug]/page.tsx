@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { getArticleBySlug } from "@/lib/markdown";
 import ArticleReader from "@/components/ArticleReader";
 
-// Dynamic rendering — yazılar artık Supabase'den geliyor
-export const dynamic = "force-dynamic";
+// ISR: 60 saniyede bir yeniden oluştur — SEO dostu cache header'ları sağlar
+export const revalidate = 60;
 
 type Params = { slug: string };
 

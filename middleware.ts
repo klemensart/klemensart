@@ -2,6 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   // Eski WordPress query parametrelerini yakala
   const postType = request.nextUrl.searchParams.get("post_type");
   if (postType === "post" && request.nextUrl.searchParams.has("p")) {
@@ -9,6 +11,12 @@ export async function middleware(request: NextRequest) {
   }
   if (request.nextUrl.searchParams.has("page_id")) {
     return NextResponse.redirect(new URL("/", request.url), 301);
+  }
+
+  // Auth kontrolü yalnızca /club/* rotalarında çalışsın
+  // Diğer sayfalarda Supabase auth çağrısı yapma — cache header'ını bozar
+  if (!pathname.startsWith("/club")) {
+    return NextResponse.next();
   }
 
   let response = NextResponse.next({ request });
@@ -36,12 +44,12 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // /club/profil → giriş yapmamışsa yönlendir
-  if (request.nextUrl.pathname.startsWith("/club/profil") && !user) {
+  if (pathname.startsWith("/club/profil") && !user) {
     return NextResponse.redirect(new URL("/club/giris", request.url));
   }
 
   // Zaten giriş yapmışsa /club/giris'e girmesin
-  if (request.nextUrl.pathname.startsWith("/club/giris") && user) {
+  if (pathname.startsWith("/club/giris") && user) {
     return NextResponse.redirect(new URL("/club/profil", request.url));
   }
 
@@ -49,5 +57,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/club/:path*", "/"],
+  matcher: ["/club/:path*"],
 };
