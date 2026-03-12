@@ -5,6 +5,7 @@ import ArticleReader from "@/components/ArticleReader";
 
 // ISR: 60 saniyede bir yeniden oluştur — SEO dostu cache header'ları sağlar
 export const revalidate = 60;
+export const fetchCache = "default-cache";
 
 type Params = { slug: string };
 
