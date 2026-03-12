@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
-import { getArticleBySlug } from "@/lib/markdown";
+import { getArticleBySlug, getAllArticleSlugs } from "@/lib/markdown";
 import ArticleReader from "@/components/ArticleReader";
 
 export const revalidate = 60;
 
-// Supabase fetch'lerini Next.js cache katmanına sar
-const getCachedArticle = unstable_cache(
-  async (slug: string) => getArticleBySlug(slug),
-  ["article-by-slug"],
-  { revalidate: 60 }
-);
+// Build-time'da bilinen slug'ları üret, yeni yazılar on-demand ISR ile oluşturulur
+export async function generateStaticParams() {
+  const slugs = await getAllArticleSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 type Params = { slug: string };
 
@@ -21,7 +19,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getCachedArticle(slug);
+  const article = await getArticleBySlug(slug);
   if (!article) return { title: "Bulunamadı" };
 
   const BASE = "https://klemensart.com";
@@ -65,7 +63,7 @@ export default async function ArticlePage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const article = await getCachedArticle(slug);
+  const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
   const absImg = article.meta.image
