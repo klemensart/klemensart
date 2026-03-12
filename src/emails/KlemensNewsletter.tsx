@@ -116,6 +116,7 @@ const darkModeCSS = `
     .km-content, .km-content * { color: #3d3833 !important; }
     .km-content h2, .km-content h3 { color: #2D2926 !important; }
     .km-content a { color: #FF6D60 !important; }
+    .km-content .km-bonbon { color: #ffffff !important; }
     .km-brand { color: #2D2926 !important; }
     .km-social { color: #FF6D60 !important; }
   }
