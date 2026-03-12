@@ -1,4 +1,4 @@
-/* ─── Ana Tab Navigasyonu (3 tab) ─── */
+/* ─── Ana Tab Navigasyonu (4 tab) ─── */
 
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -7,11 +7,13 @@ import { COLORS, FONTS } from "../config/theme";
 
 import MapScreen from "../screens/map/MapScreen";
 import ExploreStack from "./ExploreStack";
+import LocaScreen from "../screens/loca/LocaScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 
 export type MainTabParamList = {
   Harita: undefined;
   Kesfet: undefined;
+  Loca: undefined;
   Profil: undefined;
 };
 
@@ -50,6 +52,13 @@ export default function MainTabs() {
         options={{
           tabBarLabel: "Keşfet",
           tabBarIcon: ({ focused }) => <TabIcon icon="🔍" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Loca"
+        component={LocaScreen}
+        options={{
+          tabBarIcon: ({ focused }) => <TabIcon icon="🏛️" focused={focused} />,
         }}
       />
       <Tab.Screen

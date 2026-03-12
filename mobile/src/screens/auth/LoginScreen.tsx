@@ -1,4 +1,4 @@
-/* ─── Giriş Ekranı (E-posta + Google OAuth) ─── */
+/* ─── Giriş Ekranı (Native E-posta/Şifre) ─── */
 
 import React, { useState } from "react";
 import {
@@ -13,14 +13,8 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import * as WebBrowser from "expo-web-browser";
-import { makeRedirectUri } from "expo-auth-session";
 import { supabase } from "../../config/supabase";
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../config/theme";
-
-WebBrowser.maybeCompleteAuthSession();
-
-const redirectUri = makeRedirectUri({ scheme: "klemensart" });
 
 type Mode = "login" | "register";
 
@@ -30,10 +24,36 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      Alert.alert("Uyarı", "Lütfen önce e-posta adresinizi girin.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail);
+      if (error) throw error;
+      Alert.alert(
+        "Bağlantı Gönderildi",
+        "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.",
+        [{ text: "Tamam" }]
+      );
+    } catch (err: any) {
+      Alert.alert("Hata", err?.message ?? "Bir hata oluştu.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailAuth = async () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !password) {
       Alert.alert("Uyarı", "E-posta ve şifre gerekli.");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("Uyarı", "Şifre en az 6 karakter olmalı.");
       return;
     }
 
@@ -56,49 +76,16 @@ export default function LoginScreen({ navigation }: any) {
           password,
         });
         if (error) throw error;
-        // Auth state listener in App.tsx will handle navigation
+        // Auth state listener in App.tsx handles navigation
       }
     } catch (err: any) {
       const msg =
         err?.message === "Invalid login credentials"
           ? "E-posta veya şifre hatalı."
+          : err?.message?.includes("already registered")
+          ? "Bu e-posta zaten kayıtlı. Giriş yapmayı deneyin."
           : err?.message ?? "Bir hata oluştu.";
       Alert.alert("Hata", msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: redirectUri,
-          skipBrowserRedirect: true,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri);
-        if (result.type === "success" && result.url) {
-          const url = new URL(result.url);
-          const params = new URLSearchParams(url.hash.slice(1) || url.search.slice(1));
-          const accessToken = params.get("access_token");
-          const refreshToken = params.get("refresh_token");
-
-          if (accessToken && refreshToken) {
-            await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Google login error:", err);
     } finally {
       setLoading(false);
     }
@@ -113,7 +100,7 @@ export default function LoginScreen({ navigation }: any) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Logo & Tagline */}
+        {/* Logo */}
         <View style={styles.top}>
           <Text style={styles.logo}>Klemens</Text>
           <Text style={styles.tagline}>Kültür, sanat ve düşünce</Text>
@@ -166,22 +153,14 @@ export default function LoginScreen({ navigation }: any) {
             </Text>
           </TouchableOpacity>
 
-          {/* Ayırıcı */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>veya</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Google */}
-          <TouchableOpacity
-            style={styles.googleBtn}
-            activeOpacity={0.8}
-            onPress={handleGoogleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.googleText}>Google ile devam et</Text>
-          </TouchableOpacity>
+          {mode === "login" && (
+            <TouchableOpacity
+              style={styles.forgotBtn}
+              onPress={handleForgotPassword}
+            >
+              <Text style={styles.forgotText}>Şifremi Unuttum</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Misafir + Şartlar */}
@@ -215,7 +194,7 @@ const styles = StyleSheet.create({
 
   top: {
     alignItems: "center",
-    paddingTop: 60,
+    paddingTop: 80,
     marginBottom: SPACING.xxl,
   },
   logo: {
@@ -255,42 +234,17 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 
-  switchBtn: { alignItems: "center", paddingVertical: 4 },
+  switchBtn: { alignItems: "center", paddingVertical: 8 },
   switchText: {
     fontSize: FONTS.sizes.sm,
     color: COLORS.coral,
     fontWeight: "600",
   },
-
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: SPACING.sm,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.light ?? "#eee",
-  },
-  dividerText: {
-    marginHorizontal: SPACING.md,
+  forgotBtn: { alignItems: "center", paddingVertical: 6 },
+  forgotText: {
     fontSize: FONTS.sizes.sm,
     color: COLORS.warm,
-  },
-
-  googleBtn: {
-    backgroundColor: COLORS.white,
-    borderRadius: RADIUS.lg,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: COLORS.light ?? "#eee",
-    ...SHADOWS.sm,
-  },
-  googleText: {
-    fontSize: FONTS.sizes.md,
-    fontWeight: "600",
-    color: COLORS.dark,
+    fontWeight: "500",
   },
 
   bottom: { paddingTop: SPACING.xl, paddingBottom: 20 },

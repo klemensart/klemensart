@@ -1,7 +1,7 @@
 /* ─── Harita Ekranı (Hero) ─── */
 
 import React, { useRef, useCallback, useMemo, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region, MapStyleElement, LatLng } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -30,10 +30,10 @@ const ANKARA: Region = {
   longitudeDelta: 0.04,
 };
 
-// Ankara + çevre ilçeler sınırı (Polatlı, Beypazarı, Çubuk, Haymana vs.)
+// Tüm mekanları kapsayan sınırlar (Polatlı, Beypazarı, Kızılcahamam, Haymana vb.)
 const ANKARA_BOUNDS = {
-  northEast: { latitude: 40.15, longitude: 33.25 } as LatLng,
-  southWest: { latitude: 39.60, longitude: 32.30 } as LatLng,
+  northEast: { latitude: 40.52, longitude: 33.56 } as LatLng,
+  southWest: { latitude: 38.92, longitude: 31.33 } as LatLng,
 };
 
 export default function MapScreen() {
@@ -53,27 +53,29 @@ export default function MapScreen() {
 
   // Sınır içinde clamp — sınırdaki mekanlarda harita takılmasın
   const clampLat = (lat: number) =>
-    Math.min(Math.max(lat, ANKARA_BOUNDS.southWest.latitude + 0.005), ANKARA_BOUNDS.northEast.latitude - 0.005);
+    Math.min(Math.max(lat, ANKARA_BOUNDS.southWest.latitude + 0.001), ANKARA_BOUNDS.northEast.latitude - 0.001);
   const clampLng = (lng: number) =>
-    Math.min(Math.max(lng, ANKARA_BOUNDS.southWest.longitude + 0.005), ANKARA_BOUNDS.northEast.longitude - 0.005);
+    Math.min(Math.max(lng, ANKARA_BOUNDS.southWest.longitude + 0.001), ANKARA_BOUNDS.northEast.longitude - 0.001);
 
-  // Bottom sheet açıkken mapPadding.bottom artır — marker her zaman sheet üstünde kalır
-  const SHEET_HEIGHT = Math.round(Dimensions.get("window").height * 0.55);
+  // Bottom sheet ekranın ~60%'ını kaplıyor.
+  // Marker'ı sheet'in hemen üstünde göstermek için:
+  // latitudeDelta=0.008 ile harita ~0.008° yüksekliğinde görünür alan açar.
+  // Marker'ı ekranın üst %30'una koymak için center'ı aşağı kaydırıyoruz:
+  // offset = latitudeDelta * 0.30 ≈ 0.0024
+  const TARGET_LAT_DELTA = 0.008;
+  const MARKER_OFFSET = TARGET_LAT_DELTA * 0.30;
 
   const handleMarkerPress = useCallback(
     (place: CulturePlace) => {
       selectPlace(place);
-      // animateCamera ile marker'ı tam koordinata ortala
-      // mapPadding.bottom sheet yüksekliğini hesaba katarak marker'ı yukarıda tutar
-      mapRef.current?.animateCamera(
+      mapRef.current?.animateToRegion(
         {
-          center: {
-            latitude: clampLat(place.lat),
-            longitude: clampLng(place.lng),
-          },
-          zoom: 15,
+          latitude: clampLat(place.lat - MARKER_OFFSET),
+          longitude: clampLng(place.lng),
+          latitudeDelta: TARGET_LAT_DELTA,
+          longitudeDelta: TARGET_LAT_DELTA,
         },
-        { duration: 400 }
+        350
       );
     },
     [selectPlace]
@@ -92,15 +94,14 @@ export default function MapScreen() {
     if (selectedRoute && activeStopIndex >= 0) {
       const stop = selectedRoute.stops[activeStopIndex];
       if (stop) {
-        mapRef.current?.animateCamera(
+        mapRef.current?.animateToRegion(
           {
-            center: {
-              latitude: clampLat(stop.lat),
-              longitude: clampLng(stop.lng),
-            },
-            zoom: 15.5,
+            latitude: clampLat(stop.lat - MARKER_OFFSET),
+            longitude: clampLng(stop.lng),
+            latitudeDelta: TARGET_LAT_DELTA,
+            longitudeDelta: TARGET_LAT_DELTA,
           },
-          { duration: 400 }
+          350
         );
       }
     }
@@ -127,7 +128,7 @@ export default function MapScreen() {
         rotateEnabled={false}
         pitchEnabled={false}
         toolbarEnabled={false}
-        mapPadding={{ top: 0, right: 0, bottom: selectedPlace ? SHEET_HEIGHT : 100, left: 0 }}
+        mapPadding={{ top: 0, right: 0, bottom: 0, left: 0 }}
         minZoomLevel={9}
         maxZoomLevel={18}
         onMapReady={() => {

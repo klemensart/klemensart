@@ -6,6 +6,7 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from "../../../config/theme";
 import { TYPE_LABELS } from "../../../shared/harita-data";
 import { useMapStore } from "../../../stores/map-store";
+import { useLocaStore } from "../../../stores/loca-store";
 import DirectionsButton from "./DirectionsButton";
 import CheckInButton from "./CheckInButton";
 import CheckInResult from "./CheckInResult";
@@ -16,6 +17,7 @@ const SNAP_POINTS = ["25%", "60%", "90%"];
 
 export default function PlaceBottomSheet() {
   const { selectedPlace, selectPlace } = useMapStore();
+  const { togglePlace, isPlaceSaved } = useLocaStore();
   const sheetRef = useRef<BottomSheet>(null);
   const { status: checkInStatus, earnedStars, checkIn, reset: resetCheckIn } = useCheckIn();
 
@@ -35,6 +37,7 @@ export default function PlaceBottomSheet() {
 
   const typeColor = COLORS.type[selectedPlace.type] ?? COLORS.warm;
   const typeLabel = TYPE_LABELS[selectedPlace.type] ?? selectedPlace.type;
+  const placeSaved = isPlaceSaved(selectedPlace.name);
 
   return (
     <BottomSheet
@@ -48,9 +51,28 @@ export default function PlaceBottomSheet() {
     >
       <BottomSheetView style={styles.content}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Tip badge */}
-          <View style={[styles.typeBadge, { backgroundColor: typeColor }]}>
-            <Text style={styles.typeText}>{typeLabel}</Text>
+          {/* Tip badge + Kaydet */}
+          <View style={styles.topRow}>
+            <View style={[styles.typeBadge, { backgroundColor: typeColor }]}>
+              <Text style={styles.typeText}>{typeLabel}</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.saveBtn, placeSaved && styles.saveBtnActive]}
+              onPress={() =>
+                togglePlace({
+                  name: selectedPlace.name,
+                  type: selectedPlace.type,
+                  lat: selectedPlace.lat,
+                  lng: selectedPlace.lng,
+                })
+              }
+              activeOpacity={0.7}
+            >
+              <Text style={styles.saveIcon}>{placeSaved ? "❤️" : "🤍"}</Text>
+              <Text style={[styles.saveText, placeSaved && styles.saveTextActive]}>
+                {placeSaved ? "Kaydedildi" : "Kaydet"}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* İsim */}
@@ -104,13 +126,39 @@ const styles = StyleSheet.create({
   },
   handle: { backgroundColor: COLORS.light, width: 40 },
   content: { flex: 1, paddingHorizontal: SPACING.xl },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.sm,
+  },
   typeBadge: {
     alignSelf: "flex-start",
     borderRadius: RADIUS.full,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    marginBottom: SPACING.sm,
-    marginTop: SPACING.sm,
+  },
+  saveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.light ?? "#f0ebe5",
+    borderRadius: RADIUS.full,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 4,
+  },
+  saveBtnActive: {
+    backgroundColor: "#FFF3E0",
+  },
+  saveIcon: { fontSize: 14 },
+  saveText: {
+    fontSize: FONTS.sizes.xs,
+    fontWeight: "600",
+    color: COLORS.warm,
+  },
+  saveTextActive: {
+    color: COLORS.coral,
   },
   typeText: {
     fontSize: FONTS.sizes.xs,

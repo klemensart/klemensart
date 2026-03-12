@@ -9,9 +9,15 @@ import { StyleSheet } from "react-native";
 import RootNavigator from "./src/navigation/RootNavigator";
 import { supabase } from "./src/config/supabase";
 import { useAuthStore } from "./src/stores/auth-store";
+import { useLocaStore } from "./src/stores/loca-store";
 
 export default function App() {
   const setSession = useAuthStore((s) => s.setSession);
+  const hydrateLocaStore = useLocaStore((s) => s.hydrate);
+
+  useEffect(() => {
+    hydrateLocaStore();
+  }, []);
 
   useEffect(() => {
     // İlk session kontrolü

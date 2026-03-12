@@ -27,10 +27,10 @@ interface Article {
 
 const CATEGORIES = [
   { key: null, label: "Tümü" },
-  { key: "odak", label: "Odak" },
-  { key: "kultur-sanat", label: "Kültür Sanat" },
-  { key: "ilham-verenler", label: "İlham Verenler" },
-  { key: "kent-yasam", label: "Kent & Yaşam" },
+  { key: "Odak", label: "Odak" },
+  { key: "Kültür & Sanat", label: "Kültür & Sanat" },
+  { key: "İlham Verenler", label: "İlham Verenler" },
+  { key: "Kent & Yaşam", label: "Kent & Yaşam" },
 ];
 
 export default function ArticlesListScreen({ navigation }: any) {
@@ -40,7 +40,7 @@ export default function ArticlesListScreen({ navigation }: any) {
 
   const fetchArticles = useCallback((category: string | null) => {
     setLoading(true);
-    const params = category ? `?category=${category}&limit=100` : "?limit=100";
+    const params = category ? `?category=${encodeURIComponent(category)}&limit=100` : "?limit=100";
     apiFetch<{ articles: Article[] }>(`/api/public/articles${params}`)
       .then((res) => setArticles(res.articles))
       .catch(() => {})
