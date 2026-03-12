@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import RSSParser from "rss-parser";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { Resend } from "resend";
+import { render } from "@react-email/render";
+import StoryBildirimi from "@/emails/StoryBildirimi";
 
 // ── Modeller ────────────────────────────────────────────────────────────────
 const HAIKU = "claude-haiku-4-5-20251001"; // filtreleme — ucuz, hızlı
@@ -434,6 +437,13 @@ export async function GET(req: NextRequest) {
 
     // 4. İçerik üret ve kaydet
     const created: string[] = [];
+    const createdArticles: {
+      title: string;
+      description: string;
+      category: string;
+      image: string;
+      designId: string | null;
+    }[] = [];
 
     for (const item of top2) {
       const article = await generateArticle(item, anthropic);
@@ -482,6 +492,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Auto-story tasarımı oluştur
+      let designId: string | null = null;
       try {
         const { generateStoryDesignRow } = await import("@/lib/auto-story");
         const designRow = generateStoryDesignRow(
@@ -494,12 +505,15 @@ export async function GET(req: NextRequest) {
           },
           "system" // cron job — kullanıcı yok
         );
-        const { error: designErr } = await admin
+        const { data: designData, error: designErr } = await admin
           .from("designs")
-          .insert(designRow);
+          .insert(designRow)
+          .select("id")
+          .single();
         if (designErr) {
           console.warn(`[curate] Story tasarımı hatası (${slug}):`, designErr.message);
         } else {
+          designId = designData.id;
           console.log(`[curate] Story tasarımı oluşturuldu: ${article.title}`);
         }
       } catch (e) {
@@ -507,7 +521,56 @@ export async function GET(req: NextRequest) {
       }
 
       created.push(`${data.id} — ${article.title}`);
+      createdArticles.push({
+        title: article.title,
+        description: article.description,
+        category: article.category,
+        image,
+        designId,
+      });
       console.log(`[curate] Taslak kaydedildi: ${article.title}`);
+    }
+
+    // 5. Admin'e story bildirim e-postası gönder
+    if (createdArticles.length > 0) {
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "info@klemensart.com";
+
+        const articleCards = createdArticles
+          .filter((a) => a.designId)
+          .map((a) => ({
+            title: a.title,
+            description: a.description,
+            category: a.category,
+            image: a.image,
+            designId: a.designId!,
+          }));
+
+        if (articleCards.length > 0) {
+          const emailHtml = await render(
+            StoryBildirimi({ articles: articleCards })
+          );
+
+          const titles = articleCards.map((a) => a.title);
+          const subject =
+            titles.length === 1
+              ? `Yeni Story Hazır — ${titles[0]}`
+              : `Yeni Story'ler Hazır — ${titles[0]} & ${titles[1]}`;
+
+          await resend.emails.send({
+            from: "Klemens Art <info@klemensart.com>",
+            to: ADMIN_EMAIL,
+            subject,
+            html: emailHtml,
+          });
+
+          console.log(`[curate] Story bildirimi gönderildi: ${ADMIN_EMAIL}`);
+        }
+      } catch (e) {
+        // Bildirim hatası cron'un geri kalanını etkilememeli
+        console.error("[curate] Bildirim e-postası gönderilemedi:", (e as Error).message);
+      }
     }
 
     return NextResponse.json({
