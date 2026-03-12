@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: "Kültür & Sanat Takvimi",
   description:
     "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+  keywords: [
+    "Ankara etkinlikler",
+    "Ankara sergileri",
+    "Ankara konser",
+    "Ankara tiyatro",
+    "kültür sanat takvimi",
+    "Ankara festival",
+    "sanat etkinlikleri",
+    "söyleşi etkinlik",
+  ],
   alternates: { canonical: "/etkinlikler" },
   openGraph: {
     title: "Kültür & Sanat Takvimi — Klemens",

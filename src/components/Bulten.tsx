@@ -75,6 +75,7 @@ export default function Bulten() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="e-posta adresiniz"
+                aria-label="E-posta adresiniz"
                 required
                 disabled={loading}
                 className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/15 text-white placeholder-white/35 focus:outline-none focus:border-coral focus:bg-white/15 transition-all disabled:opacity-50"

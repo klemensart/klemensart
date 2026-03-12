@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
@@ -16,6 +17,16 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
+  keywords: [
+    "kültür sanat platformu",
+    "sanat tarihi atölyeleri",
+    "Ankara kültür etkinlikleri",
+    "sanat testleri",
+    "interaktif kültür haritası",
+    "dijital sergi",
+    "sanat yazıları",
+    "klemens art",
+  ],
   openGraph: {
     title: "Klemens — Yeni Nesil Kültür, Sanat ve Düşünce Ekosistemi",
     description:
@@ -34,13 +45,19 @@ export default function Home() {
     <main>
       <Navbar />
       <Hero />
-      <HaritaBanner />
+      <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
+        <HaritaBanner />
+      </Suspense>
       <Hizmetler />
-      <DunyamiziBolum />
+      <Suspense fallback={<div className="h-96 bg-warm-50 animate-pulse" />}>
+        <DunyamiziBolum />
+      </Suspense>
       <IceriklerSection />
       <Manifesto />
       <Etkinlikler />
-      <Bulten />
+      <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
+        <Bulten />
+      </Suspense>
       <Footer />
     </main>
   );

@@ -414,6 +414,10 @@ export async function GET(req: NextRequest) {
         image = await findCoverImage(searchQuery);
       }
 
+      // Kaynak bağlantısını içeriğin sonuna ekle
+      const sourceAttribution = `\n\n---\n\n**Kaynak:** [${item.source}](${item.link})`;
+      const contentWithSource = article.content + sourceAttribution;
+
       const { data, error } = await admin
         .from("articles")
         .insert({
@@ -426,7 +430,7 @@ export async function GET(req: NextRequest) {
           category: article.category,
           tags: article.tags,
           image,
-          content: article.content,
+          content: contentWithSource,
           status: "draft",
         })
         .select("id")
@@ -435,6 +439,31 @@ export async function GET(req: NextRequest) {
       if (error) {
         console.error(`[curate] Insert hatası (${slug}):`, error.message);
         continue;
+      }
+
+      // Auto-story tasarımı oluştur
+      try {
+        const { generateStoryDesignRow } = await import("@/lib/auto-story");
+        const designRow = generateStoryDesignRow(
+          {
+            title: article.title,
+            description: article.description,
+            author: "KLEMENS",
+            category: article.category,
+            image,
+          },
+          "system" // cron job — kullanıcı yok
+        );
+        const { error: designErr } = await admin
+          .from("designs")
+          .insert(designRow);
+        if (designErr) {
+          console.warn(`[curate] Story tasarımı hatası (${slug}):`, designErr.message);
+        } else {
+          console.log(`[curate] Story tasarımı oluşturuldu: ${article.title}`);
+        }
+      } catch (e) {
+        console.warn(`[curate] Story oluşturulamadı:`, (e as Error).message);
       }
 
       created.push(`${data.id} — ${article.title}`);

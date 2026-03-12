@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   title: "Kültür Testleri",
   description:
     "Sanat, sinema ve kültür bilginizi eğlenceli testlerle ölçün. Görsel algı testi ve daha fazlası.",
+  keywords: [
+    "sanat testi",
+    "kültür testi",
+    "görsel algı testi",
+    "sanat bilgi yarışması",
+    "kültür quizi",
+    "sinema testi",
+  ],
   alternates: { canonical: "/testler" },
   openGraph: {
     title: "Kültür Testleri — Klemens",

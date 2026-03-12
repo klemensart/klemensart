@@ -33,7 +33,7 @@ export default function IceriklerClient({ articles }: { articles: ArticleMeta[] 
       {/* Filter pills — white hero bölümünün devamı */}
       <div className="bg-white px-6 pb-12">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap gap-3 pt-8">
+          <div className="flex flex-wrap gap-3 pt-8" role="group" aria-label="Kategori filtreleri">
             <button
               onClick={() => setKategori("")}
               className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-150 ${
@@ -74,8 +74,8 @@ export default function IceriklerClient({ articles }: { articles: ArticleMeta[] 
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredArticles.map((article) => (
-                <ArticleCard key={article.slug} article={article} />
+              {filteredArticles.map((article, i) => (
+                <ArticleCard key={article.slug} article={article} priority={i < 3} />
               ))}
             </div>
           )}

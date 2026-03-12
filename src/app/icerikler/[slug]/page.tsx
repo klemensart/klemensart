@@ -25,9 +25,17 @@ export async function generateMetadata({
   return {
     title: cat.title,
     description: cat.description,
+    keywords: [cat.title, "sanat yazıları", "kültür makaleleri", "klemens art"],
     alternates: { canonical: `/icerikler/${slug}` },
     openGraph: {
-      title: cat.title,
+      title: `${cat.title} — Klemens`,
+      description: cat.description,
+      url: `https://klemensart.com/icerikler/${slug}`,
+      images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${cat.title} — Klemens`,
       description: cat.description,
     },
   };
@@ -108,8 +116,8 @@ export default async function CategoryPage({
         <div className="max-w-6xl mx-auto">
           {filtered.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((article) => (
-                <ArticleCard key={article.slug} article={article} />
+              {filtered.map((article, i) => (
+                <ArticleCard key={article.slug} article={article} priority={i < 3} />
               ))}
             </div>
           ) : (

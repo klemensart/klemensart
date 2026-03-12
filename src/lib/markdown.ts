@@ -226,6 +226,57 @@ export async function getAllArticleSlugs(): Promise<string[]> {
   return data.map((row) => row.slug);
 }
 
+export async function getRelatedArticles(
+  currentSlug: string,
+  category: string,
+  limit = 3
+): Promise<ArticleMeta[]> {
+  const supabase = createAdminClient();
+
+  // Önce aynı kategoriden makaleleri dene
+  const { data: sameCat } = await supabase
+    .from("articles")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+    .eq("status", "published")
+    .eq("category", category)
+    .neq("slug", currentSlug)
+    .order("date", { ascending: false })
+    .limit(limit);
+
+  let rows = sameCat ?? [];
+
+  // Yetersizse diğer kategorilerden tamamla
+  if (rows.length < limit) {
+    const existingSlugs = [currentSlug, ...rows.map((r) => r.slug)];
+    const { data: others } = await supabase
+      .from("articles")
+      .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+      .eq("status", "published")
+      .not("slug", "in", `(${existingSlugs.join(",")})`)
+      .order("date", { ascending: false })
+      .limit(limit - rows.length);
+    if (others) rows = [...rows, ...others];
+  }
+
+  return rows.map((row) => {
+    const wordCount = (row.content ?? "").trim().split(/\s+/).length;
+    const minutes = Math.max(1, Math.round(wordCount / 200));
+    return {
+      title: row.title ?? "",
+      description: row.description ?? "",
+      author: row.author ?? "",
+      authorIg: row.author_ig ?? undefined,
+      authorEmail: row.author_email ?? undefined,
+      date: row.date ?? "",
+      category: row.category ?? "",
+      tags: row.tags ?? [],
+      image: row.image ?? "",
+      readTime: `${minutes} dk`,
+      slug: row.slug,
+    };
+  });
+}
+
 export async function getAllArticlesMetadata(): Promise<ArticleMeta[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getArticleBySlug, getAllArticleSlugs } from "@/lib/markdown";
+import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles } from "@/lib/markdown";
 import ArticleReader from "@/components/ArticleReader";
 
 export const revalidate = 60;
@@ -32,9 +32,17 @@ export async function generateMetadata({
     ? { url: absImage, width: 1200, height: 630, alt: article.meta.title }
     : undefined;
 
+  const keywords = [
+    article.meta.category,
+    ...article.meta.tags.slice(0, 5),
+    "klemens art",
+    "sanat yazısı",
+  ];
+
   return {
     title: article.meta.title,
     description: article.meta.description,
+    keywords,
     alternates: { canonical: articleUrl },
     openGraph: {
       type: "article",
@@ -65,6 +73,8 @@ export default async function ArticlePage({
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
+
+  const relatedArticles = await getRelatedArticles(slug, article.meta.category);
 
   const absImg = article.meta.image
     ? article.meta.image.startsWith("http") ? article.meta.image : `https://klemensart.com${article.meta.image}`
@@ -109,7 +119,7 @@ export default async function ArticlePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <ArticleReader article={article} />
+      <ArticleReader article={article} relatedArticles={relatedArticles} />
     </>
   );
 }

@@ -46,6 +46,7 @@ export default function Navbar() {
 
   return (
     <nav
+      aria-label="Ana navigasyon"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-white/95 backdrop-blur-md shadow-sm shadow-warm-900/5"
@@ -55,7 +56,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
-        <a href="/" className="flex items-center opacity-90 hover:opacity-100 transition-opacity">
+        <a href="/" aria-label="Klemens Ana Sayfa" className="flex items-center opacity-90 hover:opacity-100 transition-opacity">
           {logoError ? (
             <span className="text-xl font-bold tracking-tight text-warm-900">klemens</span>
           ) : (
@@ -95,6 +96,7 @@ export default function Navbar() {
             <Link
               href="/club/profil"
               title={user.email}
+              aria-label={`Profil — ${user.email}`}
               className="w-9 h-9 rounded-full bg-coral flex items-center justify-center text-white text-xs font-bold hover:opacity-85 active:scale-95 transition-all duration-150"
             >
               {getInitials(user.email ?? "KL")}
@@ -121,7 +123,8 @@ export default function Navbar() {
         <button
           className="md:hidden p-2 -mr-2 text-warm-900"
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Menüyü aç"
+          aria-label={menuOpen ? "Menüyü kapat" : "Menüyü aç"}
+          aria-expanded={menuOpen}
         >
           {menuOpen ? (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -159,6 +162,7 @@ export default function Navbar() {
             <Link
               href="/club/profil"
               onClick={() => setMenuOpen(false)}
+              aria-label={`Profil — ${user.email}`}
               className="flex items-center gap-3 py-1"
             >
               <div className="w-8 h-8 rounded-full bg-coral flex items-center justify-center text-white text-xs font-bold">

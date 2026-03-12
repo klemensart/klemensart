@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: "Atölyeler",
   description:
     "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış. Sanat Tarihinde Duygular, Modern Sanat, Rönesans ve daha fazlası.",
+  keywords: [
+    "sanat tarihi atölyesi",
+    "online sanat eğitimi",
+    "Zoom atölye",
+    "rönesans atölyesi",
+    "modern sanat eğitimi",
+    "sanat tarihi kursu",
+    "sanat semineri",
+    "Caravaggio",
+  ],
   alternates: { canonical: "/atolyeler" },
   openGraph: {
     title: "Sanat Tarihi Atölyeleri — Klemens",

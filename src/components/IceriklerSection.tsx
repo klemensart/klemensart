@@ -104,8 +104,8 @@ export default async function IceriklerSection() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {featured.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
+            {featured.map((article, i) => (
+              <ArticleCard key={article.slug} article={article} priority={i < 3} />
             ))}
           </div>
         </div>

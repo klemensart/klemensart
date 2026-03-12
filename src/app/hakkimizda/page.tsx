@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: "Hakkımızda",
   description:
     "Klemens ekibini tanıyın. Sanat, kültür ve düşünce dünyasına birbirine bağlı zihinlerle yaklaşan bir kolektif.",
+  keywords: [
+    "Klemens ekibi",
+    "kültür sanat kolektifi",
+    "sanat platformu hakkında",
+    "klemens art",
+  ],
   alternates: { canonical: "/hakkimizda" },
   openGraph: {
     title: "Hakkımızda — Klemens",

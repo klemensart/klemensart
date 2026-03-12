@@ -9,6 +9,16 @@ export const metadata: Metadata = {
   title: "İçerikler",
   description:
     "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+  keywords: [
+    "sanat yazıları",
+    "kültür sanat makaleleri",
+    "sanat tarihi",
+    "kültür analizi",
+    "sanat eleştirisi",
+    "düşünce yazıları",
+    "sanat haberleri",
+    "sergi incelemeleri",
+  ],
   alternates: { canonical: "/icerikler" },
   openGraph: {
     title: "İçerikler — Klemens",

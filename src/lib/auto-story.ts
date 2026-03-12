@@ -147,7 +147,7 @@ export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
 
 export function generateStoryDesignRow(
   article: ArticleData & { id?: string },
-  userId: string
+  userId?: string | null
 ) {
   const canvasData = generateStoryCanvasData(article);
 
@@ -159,6 +159,6 @@ export function generateStoryDesignRow(
     canvas_data: canvasData,
     thumbnail_url: null,
     is_template: false,
-    created_by: userId,
+    ...(userId && userId !== "system" ? { created_by: userId } : {}),
   };
 }

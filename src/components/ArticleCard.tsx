@@ -14,11 +14,18 @@ const categoryGradient: Record<string, string> = {
 
 const defaultGradient = "from-[#3d1f0a] via-[#6b3a1a] to-[#c47a3a]";
 
+// 10x6 warm-toned SVG blur placeholder (base64)
+const BLUR_DATA_URL =
+  "data:image/svg+xml;base64," +
+  btoa(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="24"><rect width="40" height="24" fill="#d4c5b0"/><rect width="40" height="12" fill="#c9b89a"/></svg>'
+  );
+
 function isExternal(src: string) {
   return src.startsWith("http://") || src.startsWith("https://");
 }
 
-export default function ArticleCard({ article }: { article: ArticleMeta }) {
+export default function ArticleCard({ article, priority = false }: { article: ArticleMeta; priority?: boolean }) {
   const gradient = categoryGradient[article.category] ?? defaultGradient;
   const hasImage = article.image && article.image.trim() !== "";
 
@@ -33,7 +40,9 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
             alt={article.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="lazy"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            {...(priority ? { priority: true } : { loading: "lazy" as const })}
             unoptimized={isExternal(article.image!) && !article.image!.includes("sgabkrzzzszfqrtgkord.supabase.co")}
             className="object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />

@@ -27,6 +27,18 @@ export const metadata: Metadata = {
   },
   description:
     "Yeni nesil kültür, sanat ve düşünce ekosistemi. Sanat tarihi atölyeleri, kültür testleri, interaktif harita, dijital sergiler ve derinlemesine içerikler.",
+  keywords: [
+    "kültür sanat",
+    "sanat tarihi",
+    "kültür platformu",
+    "sanat atölyesi",
+    "kültür etkinlikleri",
+    "dijital sergi",
+    "Ankara kültür",
+    "sanat eğitimi",
+    "klemens",
+    "klemens art",
+  ],
   openGraph: {
     type: "website",
     locale: "tr_TR",
@@ -54,6 +66,55 @@ const orgJsonLd = {
   ],
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Klemens",
+  alternateName: "Klemens Art",
+  url: "https://klemensart.com",
+  inLanguage: "tr",
+  publisher: { "@type": "Organization", name: "Klemens Art" },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://klemensart.com/icerikler?kategori={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": "https://klemensart.com/#localbusiness",
+  name: "Klemens Art",
+  description: "Ankara merkezli kültür, sanat ve düşünce platformu. Sanat tarihi atölyeleri, kültür etkinlikleri ve dijital sergiler.",
+  url: "https://klemensart.com",
+  logo: "https://klemensart.com/logos/logo-wide-dark.PNG",
+  image: "https://klemensart.com/logos/logo-wide-dark.PNG",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Ankara",
+    addressCountry: "TR",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 39.9334,
+    longitude: 32.8597,
+  },
+  sameAs: [
+    "https://instagram.com/klemens.art",
+    "https://x.com/KlemensArt",
+    "https://www.linkedin.com/company/klemens-art",
+    "https://www.youtube.com/@KlemensArt",
+  ],
+  priceRange: "$$",
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    opens: "00:00",
+    closes: "23:59",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,6 +130,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
         />
         {children}
         <SpeedInsights />

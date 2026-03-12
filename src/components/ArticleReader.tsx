@@ -4,41 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import type { ParsedArticle } from "@/lib/markdown";
-
-const relatedArticles = [
-  {
-    slug: "#",
-    category: "Psikoloji & Sosyoloji",
-    title: "Ekran Karşısında Empati: Dijital Çağda Duygusal Bağ",
-    summary: "Sosyal medya etkileşimleri gerçek empatiyi besliyor mu, yoksa onu aşındırıyor mu?",
-    readTime: "6 dk",
-    date: "2026-02-18",
-  },
-  {
-    slug: "#",
-    category: "Felsefe",
-    title: "Sartre'dan Algoritmalara: 'Başkaları Cehennemdir' mi?",
-    summary: "Varoluşçuluğun bakış açısıyla yapay zeka çağında öteki kavramını yeniden okumak.",
-    readTime: "10 dk",
-    date: "2026-01-30",
-  },
-  {
-    slug: "#",
-    category: "Kültür & Sanat",
-    title: "Hopper'ın Işığında: Yalnızlığın Estetik Bir Dile Dönüşmesi",
-    summary: "Edward Hopper yalnızlığı neden bu kadar tanıdık hissettiriyor? Resim ve psikoloji üzerine.",
-    readTime: "7 dk",
-    date: "2026-01-12",
-  },
-];
+import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function ArticleReader({ article }: { article: ParsedArticle }) {
+export default function ArticleReader({ article, relatedArticles = [] }: { article: ParsedArticle; relatedArticles?: ArticleMeta[] }) {
   const { meta, contentHtml } = article;
   const [darkMode, setDarkMode] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
@@ -323,7 +296,7 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
         </div>
 
         {/* Related articles */}
-        {!readingMode && (
+        {!readingMode && relatedArticles.length > 0 && (
           <section className={`py-16 px-6 ${darkMode ? "bg-[#111111]" : "bg-white"}`}>
             <div className="max-w-4xl mx-auto">
               <p className={`text-xs font-semibold tracking-widest uppercase mb-8 ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
@@ -332,8 +305,8 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {relatedArticles.map((r) => (
                   <Link
-                    key={r.title}
-                    href={r.slug}
+                    key={r.slug}
+                    href={`/icerikler/yazi/${r.slug}`}
                     className={`group block p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 ${
                       darkMode
                         ? "border-[#f5f0eb]/10 hover:border-[#f5f0eb]/25 bg-[#1a1a1a]"
@@ -347,7 +320,7 @@ export default function ArticleReader({ article }: { article: ParsedArticle }) {
                       {r.title}
                     </h3>
                     <p className={`text-xs leading-relaxed mb-4 ${darkMode ? "text-[#f5f0eb]/45" : "text-warm-900/45"}`}>
-                      {r.summary}
+                      {r.description}
                     </p>
                     <span className={`text-xs font-medium ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
                       {r.readTime} okuma
