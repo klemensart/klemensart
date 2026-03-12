@@ -107,10 +107,7 @@ const darkModeCSS = `
   u + .body { background-color: #f7f5f2 !important; }
   .km-content img {
     max-width: 100% !important;
-    height: auto !important;
     display: block !important;
-    margin: 16px 0 !important;
-    border-radius: 8px !important;
   }
   @media (prefers-color-scheme: dark) {
     .body { background-color: #f7f5f2 !important; }

@@ -1,0 +1,469 @@
+<!--
+  KLEMENS ART — Yalnızlık Bülteni #1
+  Bu HTML, admin panelindeki free-text editöre yapıştırılacak içerik bölümüdür.
+  KlemensNewsletter şablonu logo header + footer'ı otomatik ekler.
+-->
+
+<style>
+  @media only screen and (max-width: 480px) {
+    .article-row td { display: block !important; width: 100% !important; padding-right: 0 !important; }
+    .article-img { margin-top: 16px !important; }
+  }
+</style>
+
+<!-- ═══ HERO BANNER ═══ -->
+<div style="margin: -8px -40px 0 -40px; line-height: 0;">
+  <img src="https://klemensart.com/images/bulten/yalnizlik-banner.png" alt="Klemens Art — Yalnızlık Bülteni" width="600" style="width: 100%; max-width: 600px; height: auto; display: block;" />
+</div>
+
+<!-- ═══ ÖZLÜ SÖZ ═══ -->
+<div style="padding: 48px 0 32px 0; text-align: center;">
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; font-style: italic; color: #8C857E; line-height: 1.8; margin: 0 0 8px 0; letter-spacing: 0.3px;">
+    &ldquo;De&#287;eri bilmeden yaln&#305;zl&#305;&#287;&#305;ndan kurtulmak istiyorsan;<br>kurtulsan da yaln&#305;zs&#305;n.&rdquo;
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 12px; color: #b0a99f; letter-spacing: 1px; margin: 0;">&mdash; Aziz Nesin</p>
+</div>
+
+<!-- ═══ KARŞILAMA YAZISI ═══ -->
+<div style="padding: 0 0 40px 0;">
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    <strong style="color: #2D2926;">Sevgili Okuyucumuz,</strong>
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    &#304;lk say&#305;m&#305;zda sizi kar&#351;&#305;laman&#305;n heyecan&#305; i&ccedil;erisindeyiz.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    Klemens B&uuml;lten olarak ekibimiz, g&ouml;n&uuml;ll&uuml; yazar ve edit&ouml;rlerden olu&#351;makta. Ba&#351;lang&#305;&ccedil; i&ccedil;in, hep birlikte d&uuml;&#351;&uuml;nd&uuml;k ta&#351;&#305;nd&#305;k ve ilk say&#305;m&#305;zda, k&#305;&#351; so&#287;uklar&#305;n&#305; u&#287;urlamak &uuml;zere, &ldquo;yaln&#305;zl&#305;k&rdquo; temas&#305;n&#305; se&ccedil;tik.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    Kendi perspektiflerimize bir prizma tutar gibi, de&#287;i&#351;ip d&ouml;n&uuml;&#351;en fikirlerle kar&#351;&#305;n&#305;zday&#305;z. Bazen bir ba&#287;, bazen bir s&#305;&#287;&#305;nak, bazen &ouml;yk&uuml;s&uuml;zl&uuml;k; biraz kozmik, biraz da etimolojik olarak kar&#351;&#305;layacak yaln&#305;zl&#305;k sizi burada.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    Foto&#287;raf karelerinden tablolara; m&uuml;zelerden mimariye, &#351;iirlerden tiyatro oyunlar&#305;na&hellip; Kapsay&#305;c&#305;l&#305;k ve g&uuml;venli alan g&ouml;zetti&#287;imiz b&uuml;ltenimizde, dileriz ki her bir kelime bizim kalplerimizden sizinkine bir yol olur.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 16px 0;">
+    Umar&#305;z hi&ccedil;bir okuyucumuz kendi yaln&#305;zl&#305;&#287;&#305;n&#305;n bahsini g&ouml;remeyip h&uuml;z&uuml;nlenmez ya da yaln&#305;zl&#305;&#287;&#305;n&#305; yaln&#305;z b&#305;rakt&#305;&#287;&#305;m&#305;z&#305; d&uuml;&#351;&uuml;nmez; sizin yaln&#305;zl&#305;klar&#305;n&#305;z da bizim i&ccedil;in buradaki her kelimeye dahil.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 4px 0;">
+    &#350;imdiden keyifli okumalar!
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: italic; color: #8C857E; line-height: 1.6; margin: 16px 0 0 0;">
+    Klemens ekibi ad&#305;na,<br>
+    <strong style="font-style: normal; color: #2D2926;">Defne Ege Durucu</strong>
+  </p>
+</div>
+
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: ODAK                        -->
+<!-- ═══════════════════════════════════ -->
+
+<!-- Bonbon section header -->
+<div style="margin-bottom: 8px;">
+  <table cellpadding="0" cellspacing="0" border="0" role="presentation"><tr><td bgcolor="#FF6D60" style="background-color: #FF6D60; background-image: linear-gradient(#FF6D60, #FF6D60); padding: 12px 28px; border-radius: 24px;"><span style="font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #ffffff; letter-spacing: 3px; text-transform: uppercase;">ODAK</span></td></tr></table>
+</div>
+<div style="border-bottom: 2px solid #FF6D60; margin-bottom: 40px;"></div>
+
+<!-- 1. Bütünlüğün Büyüsü -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/butunlugun-buyusu" style="color: #2D2926; text-decoration: none;">B&uuml;t&uuml;nl&uuml;&#287;&uuml;n B&uuml;y&uuml;s&uuml;</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Yaln&#305;zl&#305;k ile tek ba&#351;&#305;na olmak aras&#305;ndaki fark nedir? Hamlet'ten Georgia O'Keeffe'ye uzanan bu sanat yolculu&#287;unda, yaln&#305;zl&#305;&#287;&#305;n yarat&#305;c&#305; g&uuml;c&uuml;n&uuml; ke&#351;fedin.
+        <a href="https://klemensart.com/icerikler/yazi/butunlugun-buyusu" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Defne Ege Durucu</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/butunlugun-buyusu" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/Edwin_Austin_Abbey_-_The_Play_Scene_in_Hamlet.jpg" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 2. Yalnız Çerçeve -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/yalniz-cerceve" style="color: #2D2926; text-decoration: none;">Yaln&#305;z &Ccedil;er&ccedil;eve</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        D&ouml;n&uuml;p bakt&#305;&#287;&#305;m&#305;zda, o an&#305;n i&ccedil;inde olanlar&#305;n hikayesini bizden ba&#351;ka bilen var m&#305;? E&#287;er bir hikayeyi kimse hat&#305;rlam&#305;yorsa, o an m&#305; yaln&#305;z kalm&#305;&#351;t&#305;r; yoksa foto&#287;raf&#305;n kendisi mi?
+        <a href="https://klemensart.com/icerikler/yazi/yalniz-cerceve" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Bar&#305;&#351; Arslan</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/yalniz-cerceve" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/03-Kapak-Izmir-Konvoy-Sahibini-Arayan-Fotograflar.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 3. Dijital Aşk ve Modern Yalnızlık: Her -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/her-film-analiz" style="color: #2D2926; text-decoration: none;">Dijital A&#351;k ve Modern Yaln&#305;zl&#305;k: Her</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Dijital &ccedil;a&#287;da, bir yapay zeka ile insan aras&#305;nda filizlenen bedensiz bir a&#351;k. Ba&#287; kurman&#305;n anlam&#305;n&#305;, dokunman&#305;n yerini ve &lsquo;ger&ccedil;ek&rsquo; olan&#305;n s&#305;n&#305;rlar&#305;n&#305; sorgulayan bir film analizi.
+        <a href="https://klemensart.com/icerikler/yazi/her-film-analiz" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Sevim Ayd&#305;n</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/her-film-analiz" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/08-Kapak.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 4. İzler ve Bağlar Üzerine -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/izler-ve-baglar" style="color: #2D2926; text-decoration: none;">&#304;zler ve Ba&#287;lar &Uuml;zerine</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Her birimiz yaln&#305;z hissettik elbette zaman zaman, ancak ger&ccedil;ekten de fiil&icirc; olarak yaln&#305;z olduk mu hi&ccedil;? Varl&#305;&#287;&#305;m&#305;z&#305; ba&#351;kalar&#305;yla kurdu&#287;umuz ba&#287;lar ve b&#305;rakt&#305;&#287;&#305;m&#305;z izlerle s&uuml;rd&uuml;rd&uuml;k.
+        <a href="https://klemensart.com/icerikler/yazi/izler-ve-baglar" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: G&ouml;zde Murt</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/izler-ve-baglar" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/09_GozdeMurt_Kapak-1-1.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 5. Yalnız Kadın -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/yalniz-kadin-dario-fo" style="color: #2D2926; text-decoration: none;">Yaln&#305;z Kad&#305;n, Yaln&#305;zla&#351;t&#305;r&#305;lan Kad&#305;nlar</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Y&uuml;zy&#305;llardan beri gelen kad&#305;na y&ouml;nelik &#351;iddetlerin hepsi kad&#305;nlar&#305; her d&ouml;nem yaln&#305;zla&#351;t&#305;rd&#305;. Ya&#351;ad&#305;klar&#305;n&#305; b&#305;rak&#305;n &ccedil;evrelerine, kendilerine bile zor anlat&#305;r hale getirdi.
+        <a href="https://klemensart.com/icerikler/yazi/yalniz-kadin-dario-fo" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Do&#287;a U&#287;urel</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/yalniz-kadin-dario-fo" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/01-Kapak-2.jpg" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 6. Yeni Çağın Yalnızlık Ağı -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/yalnizlik-agi" style="color: #2D2926; text-decoration: none;">Yeni &Ccedil;a&#287;&#305;n Yaln&#305;zl&#305;k A&#287;&#305;</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Yapay zeka &ccedil;a&#287;&#305; ve her birimizi i&ccedil;ine alan g&ouml;r&uuml;nmez a&#287;&hellip; Bu a&#287;&#305;n bizi birbirimize ba&#287;lamas&#305; gerekmez miydi? Oysa yaln&#305;zl&#305;k artt&#305;k&ccedil;a yapay zekaya s&#305;&#287;&#305;n&#305;yoruz.
+        <a href="https://klemensart.com/icerikler/yazi/yalnizlik-agi" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Gizem Din&ccedil;</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/yalnizlik-agi" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/02-Kapak.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 7. Yalnızlık İstikameti -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/yalnizlik-istikameti-rota-yeniden-olusturuluyor" style="color: #2D2926; text-decoration: none;">Yaln&#305;zl&#305;k &#304;stikameti: Rota Yeniden Olu&#351;turuluyor</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Kendimizi kar&#351;&#305;m&#305;za al&#305;p ka&ccedil;madan g&ouml;&ccedil;meden bir soral&#305;m: Ben bu yaln&#305;zl&#305;&#287;&#305;n neresindeyim? Belki yaln&#305;zl&#305;&#287;&#305;m&#305;z bizim i&ccedil;in ba&#287;&#305;ms&#305;zl&#305;k, &ouml;zg&uuml;rl&uuml;k ve denge demek.
+        <a href="https://klemensart.com/icerikler/yazi/yalnizlik-istikameti-rota-yeniden-olusturuluyor" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Melis Terzi</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/yalnizlik-istikameti-rota-yeniden-olusturuluyor" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/Gemini_Generated_Image_k3pnik3pnik3pnik-scaled.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 8. Kozmik Yalnızlık -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" style="color: #2D2926; text-decoration: none;">Kozmik Yaln&#305;zl&#305;&#287;&#305;n Ba&#351;lang&#305;c&#305;: Kopernik Devrimi</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Kopernik'in evrenin merkezini yerinden oynatan devrimi, yaln&#305;zca astronomiyi de&#287;il; insan&#305;n kendini anlama bi&ccedil;imini ve sanat&#305;n g&ouml;rme bi&ccedil;imlerini de de&#287;i&#351;tirdi.
+        <a href="https://klemensart.com/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Zeynep Ayd&#305;n</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/01-Kapak-Copernicus.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: KÜLTÜR & SANAT              -->
+<!-- ═══════════════════════════════════ -->
+<div style="padding-top: 40px; margin-bottom: 8px;">
+  <table cellpadding="0" cellspacing="0" border="0" role="presentation"><tr><td bgcolor="#FF6D60" style="background-color: #FF6D60; background-image: linear-gradient(#FF6D60, #FF6D60); padding: 12px 28px; border-radius: 24px;"><span style="font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #ffffff; letter-spacing: 3px; text-transform: uppercase;">K&Uuml;LT&Uuml;R &amp; SANAT</span></td></tr></table>
+</div>
+<div style="border-bottom: 2px solid #FF6D60; margin-bottom: 40px;"></div>
+
+<!-- 1. Artemisia Gentileschi -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/artemisia-gentileschi-hafiza-yalnizlik" style="color: #2D2926; text-decoration: none;">Artemisia Gentileschi: Bedenin Haf&#305;zas&#305;, Yaln&#305;zl&#305;&#287;&#305; ve F&#305;r&ccedil;an&#305;n Direni&#351;i</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        &#304;ki erkek, bir kad&#305;n ve ortada kapanmayan bir mesafe. Susanna kalabal&#305;&#287;&#305;n i&ccedil;indedir ama yaln&#305;zd&#305;r. &Ccedil;&uuml;nk&uuml; kimse onun bakt&#305;&#287;&#305; yerden bakmaz.
+        <a href="https://klemensart.com/icerikler/yazi/artemisia-gentileschi-hafiza-yalnizlik" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Didem Kazan Sol</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/artemisia-gentileschi-hafiza-yalnizlik" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/Kapak-Artemisia_Gentileschi_-_Sleeping_Venus.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 2. Mari Gerekmezyan -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/mari-gerekmezyan-bir-kadinin-tuvale-islenmis-izleri" style="color: #2D2926; text-decoration: none;">Mari Gerekmezyan: Bir Kad&#305;n&#305;n Tuvale &#304;&#351;lenmi&#351; &#304;zleri</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        M&uuml;zenin sessiz salonunda bu resme bakarken, Bedri Rahmi Ey&uuml;bo&#287;lu'nun b&uuml;y&uuml;k a&#351;k&#305; Mari Gerekmezyan'&#305; d&uuml;&#351;&uuml;nd&uuml;m. Kar&#351;&#305;mda duran kad&#305;n fig&uuml;r&uuml; sadece bir model de&#287;ildi.
+        <a href="https://klemensart.com/icerikler/yazi/mari-gerekmezyan-bir-kadinin-tuvale-islenmis-izleri" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Gizem Karakaya &#350;ebero&#287;lu</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/mari-gerekmezyan-bir-kadinin-tuvale-islenmis-izleri" style="text-decoration: none;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/mari-gerekmezyan-bir-kadinin-tuvale-islenmis-izleri/BTH7Fmr4Hme1Grsal4DEZOrpybautcd5KbkApcYR-1772978175612.jpeg" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 3. Korkuyu Beklerken -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/korkuyu-beklerken-bosluk-ilerliyor2" style="color: #2D2926; text-decoration: none;">Korkuyu Beklerken Bo&#351;luk &#304;lerliyor</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        O&#287;uz Atay'&#305;n 'Korkuyu Beklerken' &ouml;yk&uuml;s&uuml;nden s&#305;zan tekinsiz atmosfer, Leyla Ersen K&#305;l&#305;n&ccedil;kaya'n&#305;n yerle&#351;tirmeleriyle eski bir banka kasas&#305;nda hayat buluyor.
+        <a href="https://klemensart.com/icerikler/yazi/korkuyu-beklerken-bosluk-ilerliyor2" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Asl&#305; Alpar</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/korkuyu-beklerken-bosluk-ilerliyor2" style="text-decoration: none;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/korkuyu-beklerken-bosluk-ilerliyor2/Gemini_Generated_Image_p5ds5ip5ds5ip5ds-1772977170653.jpeg" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 4. Kalabalıklar Çağında Müze -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/kalabaliklar-caginda-muze" style="color: #2D2926; text-decoration: none;">Kalabal&#305;klar &Ccedil;a&#287;&#305;nda M&uuml;ze ve Yaln&#305;zl&#305;k</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Estetik hazz&#305;n galip gelemedi&#287;i bir &ccedil;e&#351;it yabanc&#305;la&#351;ma hali; toplum i&ccedil;inde yaln&#305;z hissetme duygusunu en &ccedil;ok m&uuml;zeleri gezerken deneyimlerim.
+        <a href="https://klemensart.com/icerikler/yazi/kalabaliklar-caginda-muze" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: H&uuml;lya Utkuluer</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/kalabaliklar-caginda-muze" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/01-Vaclav-Pluhar-scaled.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 5. Medea'nın İntikamı -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/medeanin-intikami" style="color: #2D2926; text-decoration: none;">&#350;iddetin Cinsiyeti ve Medea'n&#305;n &#304;ntikam&#305;</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        B&uuml;y&uuml;k bir &ccedil;&#305;kmaz&#305;n i&ccedil;inde buluyor kendini Medea. Kaybettiklerini geri alman&#305;n hi&ccedil;bir yolu yok. Medea yapayaln&#305;z ve &ccedil;ok &ouml;fkeli.
+        <a href="https://klemensart.com/icerikler/yazi/medeanin-intikami" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Melis Terzi</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/medeanin-intikami" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/Herbert_James_Draper_The_Golden_Fleece.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 6. Satıcının Ölümü -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/saticinin-olumu" style="color: #2D2926; text-decoration: none;">Zamans&#305;z Bir Metin, G&uuml;ncel Bir Yaln&#305;zl&#305;k: Sat&#305;c&#305;n&#305;n &Ouml;l&uuml;m&uuml;</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Yaln&#305;zl&#305;k, oyunda fiziksel bir izolasyondan &ccedil;ok, anla&#351;&#305;lmama ve duyulmama hali olarak kar&#351;&#305;m&#305;za &ccedil;&#305;kar. Willy'nin sesi vard&#305;r, ancak kar&#351;&#305;l&#305;&#287;&#305; yoktur.
+        <a href="https://klemensart.com/icerikler/yazi/saticinin-olumu" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Ebru Berra Alkan</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/saticinin-olumu" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/01-Kapak.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 7. Konuşma Devam Ediyor -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/konusma-devam-ediyor" style="color: #2D2926; text-decoration: none;">Konu&#351;ma Devam Ediyor</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Don Juan'&#305;n en ay&#305;rt edici yan&#305;, anlatt&#305;&#287;&#305; hikaye de&#287;il, konu&#351;ma bi&ccedil;imidir. Anlat&#305;c&#305;, sahnenin ortas&#305;nda durur; okurla konu&#351;ur, s&ouml;z keser, y&ouml;n de&#287;i&#351;tirir.
+        <a href="https://klemensart.com/icerikler/yazi/konusma-devam-ediyor" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Cansu Kul</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/konusma-devam-ediyor" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/Gemini_Generated_Image_ap82ymap82ymap82.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: KENT & YAŞAM                -->
+<!-- ═══════════════════════════════════ -->
+<div style="padding-top: 40px; margin-bottom: 8px;">
+  <table cellpadding="0" cellspacing="0" border="0" role="presentation"><tr><td bgcolor="#FF6D60" style="background-color: #FF6D60; background-image: linear-gradient(#FF6D60, #FF6D60); padding: 12px 28px; border-radius: 24px;"><span style="font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #ffffff; letter-spacing: 3px; text-transform: uppercase;">KENT &amp; YA&#350;AM</span></td></tr></table>
+</div>
+<div style="border-bottom: 2px solid #FF6D60; margin-bottom: 40px;"></div>
+
+<!-- 1. Edward Hopper -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/edward-hopper-yalnizlik" style="color: #2D2926; text-decoration: none;">Modern Kentin Sessiz &Ccedil;&#305;&#287;l&#305;&#287;&#305;: Edward Hopper ve Yaln&#305;zl&#305;&#287;&#305;n Esteti&#287;i</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        Edward Hopper'&#305;n resimleri, modern kentin vaat etti&#287;i hareket ve &ouml;zg&uuml;rl&uuml;k duygusunun ard&#305;ndaki derin yaln&#305;zl&#305;&#287;&#305; g&ouml;r&uuml;n&uuml;r k&#305;lar.
+        <a href="https://klemensart.com/icerikler/yazi/edward-hopper-yalnizlik" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Mehtap Kurt</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/edward-hopper-yalnizlik" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/09-Kapak-scaled.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 2. Beyoğlu -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 44px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/istanbulda-kendime-ait-bir-oda-beyoglu" style="color: #2D2926; text-decoration: none;">&#304;stanbul'da Kendime Ait Bir Oda: Beyo&#287;lu</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        &#304;stanbul'da en sevdi&#287;im, kendimi ait hissetti&#287;im semt Beyo&#287;lu olmu&#351;tur. Belki eski &#304;stanbul'un ruhunu hala i&ccedil;inde saklad&#305;&#287;&#305;ndand&#305;r.
+        <a href="https://klemensart.com/icerikler/yazi/istanbulda-kendime-ait-bir-oda-beyoglu" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Ecem Civa&#351;</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/istanbulda-kendime-ait-bir-oda-beyoglu" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/01-Kapak-Beyoglu-1-scaled.jpg" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- 3. İzmir Kültürpark -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;" class="article-row">
+  <tr>
+    <td style="vertical-align: top; width: 55%; padding-right: 20px;">
+      <h3 style="font-family: Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #2D2926; line-height: 1.35; margin: 0 0 10px 0;">
+        <a href="https://klemensart.com/icerikler/yazi/izmirin-locus-amoenusu" style="color: #2D2926; text-decoration: none;">&#304;zmir'in Locus Amoenus'u</a>
+      </h3>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.7; margin: 0 0 10px 0;">
+        &#304;zmir K&uuml;lt&uuml;rpark'&#305;n tarihsel d&ouml;n&uuml;&#351;&uuml;m&uuml;, B&uuml;y&uuml;k Yang&#305;n sonras&#305; yeniden do&#287;u&#351;u ve g&uuml;n&uuml;m&uuml;zde kentsel &#305;s&#305; adas&#305;na kar&#351;&#305; oynad&#305;&#287;&#305; kritik ekolojik rol.
+        <a href="https://klemensart.com/icerikler/yazi/izmirin-locus-amoenusu" style="color: #FF6D60; text-decoration: underline; font-size: 13px; white-space: nowrap;">Devam&#305;n&#305; oku (...)</a>
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-style: italic; color: #b0a99f; margin: 0;">Yazan: Ezel Evin Alt&#305;nda&#287;</p>
+    </td>
+    <td style="vertical-align: top; width: 45%;" class="article-img">
+      <a href="https://klemensart.com/icerikler/yazi/izmirin-locus-amoenusu" style="text-decoration: none;">
+        <img src="https://klemensart.com/yazilar/04-Kapak-izmir-Kulturpark-1936.webp" alt="" width="240" height="160" style="width: 100%; height: 160px; object-fit: cover; display: block;" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+<!-- ═══ KAPANIŞ ═══ -->
+<div style="padding: 48px 0 8px 0; text-align: center;">
+  <div style="border-bottom: 1px solid #e8e4df; margin-bottom: 32px;"></div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #8C857E; line-height: 1.8; margin: 0 0 24px 0;">T&uuml;m yaz&#305;lar&#305; ke&#351;fetmek i&ccedil;in</p>
+  <a href="https://klemensart.com/icerikler" style="display: inline-block; font-family: Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #ffffff; background-color: #2D2926; text-decoration: none; padding: 16px 48px; letter-spacing: 1px;">T&Uuml;M &#304;&Ccedil;ER&#304;KLER&#304; G&Ouml;R</a>
+</div>
