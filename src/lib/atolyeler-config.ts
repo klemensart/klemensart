@@ -14,7 +14,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
   "sanat-tarihinde-duygular": {
     id: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
     price: 150000,
-    forSale: true,
+    forSale: false,
     imgCover: "/images/workshops/sanat-tarihinde-duygular-cover.webp",
     imgSquare: "/images/workshops/sanat-tarihinde-duygular-square.webp",
     targetDate: "2026-03-10T20:30:00+03:00",
