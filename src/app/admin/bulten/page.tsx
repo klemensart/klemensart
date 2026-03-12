@@ -278,6 +278,11 @@ export default function BultenGonderPage() {
   const [subject, setSubject] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
 
+  // ── Saved drafts ──
+  type SavedDraft = { slug: string; title: string; subject: string };
+  const [savedDrafts, setSavedDrafts] = useState<SavedDraft[]>([]);
+  const [loadingDraft, setLoadingDraft] = useState(false);
+
   // ── Template state ──
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig | null>(null);
   const [templateProps, setTemplateProps] = useState<Record<string, unknown>>({});
@@ -391,6 +396,14 @@ export default function BultenGonderPage() {
       .then((d) => { if (d.campaigns) setSavedCampaigns(d.campaigns); })
       .catch(() => {});
   }, [sending]);
+
+  // Fetch saved drafts
+  useEffect(() => {
+    fetch("/api/admin/newsletter/drafts")
+      .then((r) => r.json())
+      .then((d) => { if (d.drafts) setSavedDrafts(d.drafts); })
+      .catch(() => {});
+  }, []);
 
   // Fetch workshops for dropdown
   useEffect(() => {
@@ -518,6 +531,31 @@ export default function BultenGonderPage() {
       setHtmlContent(editor.getHTML());
     },
   });
+
+  // ── Load saved draft into editor ──
+  const loadDraft = async (slug: string) => {
+    setLoadingDraft(true);
+    try {
+      const res = await fetch(`/api/admin/newsletter/drafts?slug=${slug}`);
+      const data = await res.json();
+      if (res.ok && data.html) {
+        setPageMode("freetext");
+        setSubject(data.subject || "");
+        setHtmlContent(data.html);
+        if (editor) {
+          editor.commands.setContent(data.html);
+        }
+        setMessage(`"${data.title}" taslağı editöre yüklendi.`);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setMessage("Taslak yüklenemedi.");
+      }
+    } catch {
+      setMessage("Taslak yüklenemedi.");
+    } finally {
+      setLoadingDraft(false);
+    }
+  };
 
   // ── Template selection ──
   const selectTemplate = (tmpl: TemplateConfig) => {
@@ -851,7 +889,34 @@ export default function BultenGonderPage() {
 
       {/* ══════════════ FREE TEXT MODE ══════════════ */}
       {pageMode === "freetext" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          {/* ── Kayıtlı Taslaklar ── */}
+          {savedDrafts.length > 0 && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="text-xs font-semibold text-amber-700 mb-3 uppercase tracking-wide">Kayıtlı Taslaklar</div>
+              <div className="flex flex-wrap gap-2">
+                {savedDrafts.map((d) => (
+                  <button
+                    key={d.slug}
+                    onClick={() => loadDraft(d.slug)}
+                    disabled={loadingDraft}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-amber-300 rounded-lg text-sm font-medium text-amber-800 hover:bg-amber-100 hover:border-amber-400 transition-all disabled:opacity-50"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    {d.title}
+                    {loadingDraft && <span className="animate-spin text-xs">...</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* ── Left: Editor ── */}
           <div>
             <input
@@ -953,6 +1018,7 @@ export default function BultenGonderPage() {
             </div>
           </div>
         </div>
+        </div>
       )}
 
       {/* ══════════════ TEMPLATE MODE ══════════════ */}
@@ -961,6 +1027,22 @@ export default function BultenGonderPage() {
           {!selectedTemplate ? (
             /* ── Template Cards Grid ── */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Tematik E-Bülten — kayıtlı taslakları yükler */}
+              {savedDrafts.map((d) => (
+                <button
+                  key={d.slug}
+                  onClick={() => loadDraft(d.slug)}
+                  disabled={loadingDraft}
+                  className="text-left border-2 border-amber-200 bg-amber-50 rounded-xl p-5 hover:border-amber-400 hover:shadow-sm transition-all group relative"
+                >
+                  <div className="text-2xl mb-3">&#x1f4dc;</div>
+                  <div className="font-semibold text-amber-900 group-hover:text-amber-700 transition-colors">
+                    {d.title}
+                  </div>
+                  <div className="text-sm text-amber-700/70 mt-1">Tematik E-B&uuml;lten</div>
+                  <div className="absolute top-3 right-3 text-[10px] font-medium text-amber-500 bg-amber-100 px-2 py-0.5 rounded-full">Taslak</div>
+                </button>
+              ))}
               {TEMPLATES.map((tmpl) => (
                 <button
                   key={tmpl.name}
