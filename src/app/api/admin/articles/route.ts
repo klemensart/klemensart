@@ -38,6 +38,33 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const body = await req.json();
 
+  let image = body.image ?? "";
+
+  // Dış kaynak görseli Supabase Storage'a yükle (CORS sorununu önler)
+  if (image && !image.includes("supabase.co/")) {
+    try {
+      const imgRes = await fetch(image, {
+        headers: { "User-Agent": "KlemensArt/1.0" },
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (imgRes.ok) {
+        const buffer = Buffer.from(await imgRes.arrayBuffer());
+        const ct = imgRes.headers.get("content-type") || "image/jpeg";
+        const ext = ct.includes("png") ? "png" : ct.includes("webp") ? "webp" : "jpg";
+        const path = `article-covers/${body.slug}.${ext}`;
+        const { error: upErr } = await admin.storage
+          .from("email-assets")
+          .upload(path, buffer, { contentType: ct, upsert: true });
+        if (!upErr) {
+          const { data: pub } = admin.storage.from("email-assets").getPublicUrl(path);
+          image = pub.publicUrl;
+        }
+      }
+    } catch {
+      // Yükleme başarısız olursa orijinal URL'yi koru
+    }
+  }
+
   const row = {
     slug: body.slug,
     title: body.title,
@@ -48,7 +75,7 @@ export async function POST(req: NextRequest) {
     date: body.date || null,
     category: body.category ?? "",
     tags: body.tags ?? [],
-    image: body.image ?? "",
+    image,
     content: body.content ?? "",
     status: body.status ?? "draft",
   };

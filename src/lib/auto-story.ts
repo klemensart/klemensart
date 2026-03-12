@@ -59,6 +59,10 @@ function formatCategory(cat: string): string {
 export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
   const category = formatCategory(article.category || "Odak");
 
+  // Layout sabitleri
+  const PAD = 100; // sol/sağ padding
+  const CONTENT_W = 1080 - PAD * 2; // 880px
+
   const objects: StoryObject[] = [
     // Krem arka plan
     {
@@ -72,23 +76,36 @@ export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
       opacity: 1,
       rotation: 0,
     },
-    // Cover görseli — üst kısım, ferah padding
+    // Cover görseli — yuvarlatılmış köşeler
     {
       type: "image",
-      x: 80,
-      y: 70,
-      width: 920,
-      height: 640,
+      x: PAD,
+      y: 90,
+      width: CONTENT_W,
+      height: 620,
       src: article.image,
+      cornerRadius: 16,
+      opacity: 1,
+      rotation: 0,
+    },
+    // İnce ayraç çizgi — fotoğraf ile kategori arası
+    {
+      type: "shape",
+      x: PAD,
+      y: 750,
+      width: CONTENT_W,
+      height: 1,
+      fill: "#e8e4df",
+      shapeType: "rect",
       opacity: 1,
       rotation: 0,
     },
     // Kategori etiketi — Montserrat Bold, #ff6c5f, yüksek letter-spacing
     {
       type: "text",
-      x: 80,
-      y: 790,
-      width: 920,
+      x: PAD,
+      y: 785,
+      width: CONTENT_W,
       text: category,
       fontSize: 43,
       fontFamily: "Montserrat",
@@ -103,11 +120,11 @@ export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
     // Spot yazısı — Montserrat, #2c3e50, ferah line-height
     {
       type: "text",
-      x: 80,
+      x: PAD,
       y: 870,
-      width: 860,
+      width: CONTENT_W - 40,
       text: article.description || article.title,
-      fontSize: 34,
+      fontSize: 40,
       fontFamily: "Montserrat",
       fontStyle: "normal",
       fill: "#2c3e50",
@@ -117,17 +134,14 @@ export function generateStoryCanvasData(article: ArticleData): StoryCanvasData {
       opacity: 1,
       rotation: 0,
     },
-    // Yazar adı — Montserrat, #2c3e50, gövdenin hemen altında
-    // Not: y konumu spot metninin uzunluğuna göre ayarlanmalı.
-    // Ortalama bir spot (~200 karakter, 36px, 920px genişlik, 1.65 line-height)
-    // yaklaşık 450px yükseklik yapar → 870 + 450 + 40 margin = ~1360
+    // Yazar adı — gövdenin altında
     {
       type: "text",
-      x: 80,
-      y: 1250,
-      width: 920,
+      x: PAD,
+      y: 1280,
+      width: CONTENT_W,
       text: `— ${article.author || "Klemens Art"}`,
-      fontSize: 30,
+      fontSize: 34,
       fontFamily: "Montserrat",
       fontStyle: "italic",
       fill: "#2c3e50",

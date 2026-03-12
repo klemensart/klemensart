@@ -341,6 +341,41 @@ function toSlug(title: string): string {
     .slice(0, 80);
 }
 
+// ── Görseli Supabase Storage'a yükle (CORS sorununu önler) ──────────────────
+async function uploadImageToStorage(
+  imageUrl: string,
+  slug: string,
+  admin: ReturnType<typeof createAdminClient>
+): Promise<string> {
+  if (!imageUrl) return "";
+  try {
+    const res = await fetch(imageUrl, {
+      headers: { "User-Agent": "KlemensArt/1.0 (+https://klemensart.com)" },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return imageUrl; // Yüklenemezse orijinal URL'yi koru
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const contentType = res.headers.get("content-type") || "image/jpeg";
+    const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
+    const path = `article-covers/${slug}.${ext}`;
+
+    const { error } = await admin.storage
+      .from("email-assets")
+      .upload(path, buffer, { contentType, upsert: true });
+
+    if (error) {
+      console.warn(`[curate] Görsel yükleme hatası (${slug}):`, error.message);
+      return imageUrl;
+    }
+
+    const { data: pub } = admin.storage.from("email-assets").getPublicUrl(path);
+    return pub.publicUrl;
+  } catch (e) {
+    console.warn(`[curate] Görsel indirme hatası:`, (e as Error).message);
+    return imageUrl; // Hata durumunda orijinal URL
+  }
+}
+
 // ── Unsplash kapak görseli ──────────────────────────────────────────────────
 async function findCoverImage(query: string): Promise<string> {
   const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY;
@@ -412,6 +447,11 @@ export async function GET(req: NextRequest) {
       if (!image) {
         const searchQuery = article.tags[0] ?? article.title.split(" ").slice(0, 3).join(" ");
         image = await findCoverImage(searchQuery);
+      }
+
+      // Görseli Supabase Storage'a yükle (CORS sorununu önler)
+      if (image) {
+        image = await uploadImageToStorage(image, slug, admin);
       }
 
       // Kaynak bağlantısını içeriğin sonuna ekle

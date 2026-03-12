@@ -7,27 +7,17 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
       const stage = stageRef.current;
       if (!stage) return null;
 
-      // Geçici olarak scale'i 1'e çek — tam çözünürlükte export için
-      const prevScaleX = stage.scaleX();
-      const prevScaleY = stage.scaleY();
-      const prevWidth = stage.width();
-      const prevHeight = stage.height();
-
-      stage.scaleX(1);
-      stage.scaleY(1);
-      stage.width(prevWidth);
-      stage.height(prevHeight);
+      // pixelRatio ile tam tasarım çözünürlüğünde export et
+      // Stage ekranda küçültülmüş olsa bile (scale < 1),
+      // pixelRatio = 1/scale ile gerçek boyutta (örn. 1080×1920) çıkar
+      const currentScale = stage.scaleX();
+      const pixelRatio = 1 / currentScale;
 
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
-        pixelRatio: 1,
+        pixelRatio,
       });
-
-      // Scale'i geri al
-      stage.scaleX(prevScaleX);
-      stage.scaleY(prevScaleY);
-      stage.batchDraw();
 
       return uri;
     },
