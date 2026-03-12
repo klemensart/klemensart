@@ -19,7 +19,10 @@ export default function AuthCallback() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === "SIGNED_IN") {
+      if (event === "PASSWORD_RECOVERY") {
+        // Şifre sıfırlama linki — şifre belirleme sayfasına yönlendir
+        router.replace("/auth/sifre-belirle");
+      } else if (event === "SIGNED_IN") {
         // Satın alma taşıma — başarısız olsa bile profil'e yönlendir
         try {
           await fetch("/api/auth/migrate-purchases", { method: "POST" });

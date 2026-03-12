@@ -32,11 +32,13 @@ export default function LoginScreen({ navigation }: any) {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail);
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+        redirectTo: "https://klemensart.com/auth/callback",
+      });
       if (error) throw error;
       Alert.alert(
         "Bağlantı Gönderildi",
-        "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.",
+        "E-postanıza gelen linke tıklayın ve yeni şifrenizi belirleyin. Ardından bu ekrandan giriş yapabilirsiniz.",
         [{ text: "Tamam" }]
       );
     } catch (err: any) {
