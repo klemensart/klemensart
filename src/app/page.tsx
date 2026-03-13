@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
 const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
 const Bulten = dynamic(() => import("@/components/Bulten"));
+const MuzeRehberBanner = dynamic(() => import("@/components/MuzeRehberBanner"));
 
 export const revalidate = 60;
 
@@ -59,6 +60,7 @@ export default function Home() {
         <Bulten />
       </Suspense>
       <Footer />
+      <MuzeRehberBanner />
     </main>
   );
 }

@@ -12,7 +12,7 @@ const SONNET = "claude-sonnet-4-6"; // içerik üretimi — kaliteli
 
 // ── RSS Kaynakları ──────────────────────────────────────────────────────────
 const SOURCES: { name: string; url: string; lang: "en" | "tr" }[] = [
-  // Küresel
+  // Küresel — Sanat & Kültür
   { name: "Hyperallergic", url: "https://hyperallergic.com/feed/", lang: "en" },
   { name: "Colossal", url: "https://www.thisiscolossal.com/feed/", lang: "en" },
   { name: "ARTnews", url: "https://www.artnews.com/feed/", lang: "en" },
@@ -21,6 +21,13 @@ const SOURCES: { name: string; url: string; lang: "en" | "tr" }[] = [
   { name: "Apollo Magazine", url: "https://www.apollo-magazine.com/feed/", lang: "en" },
   { name: "e-flux", url: "https://www.e-flux.com/rss/", lang: "en" },
   { name: "Dezeen", url: "https://www.dezeen.com/feed/", lang: "en" },
+  // Müze Blogları
+  { name: "The Met", url: "https://www.metmuseum.org/blogs?rss=1", lang: "en" },
+  { name: "Smithsonian Magazine", url: "https://www.smithsonianmag.com/rss/arts-culture/", lang: "en" },
+  // Açık Lisanslı / Editöryal
+  { name: "Aeon", url: "https://aeon.co/feed", lang: "en" },
+  { name: "Open Culture", url: "https://www.openculture.com/feed", lang: "en" },
+  { name: "JSTOR Daily", url: "https://daily.jstor.org/feed/", lang: "en" },
 ];
 
 // ── Tipler ──────────────────────────────────────────────────────────────────

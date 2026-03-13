@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { render } from "@react-email/render";
 import BultenTesekkur from "@/emails/BultenTesekkur";
+import Muzede1SaatTesekkur from "@/emails/Muzede1SaatTesekkur";
 import { sendThankYouEmail } from "@/lib/send-thank-you";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const PDF_URL =
+  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/muzede-1-saat-istanbul-arkeoloji.pdf";
+
 export async function POST(req: NextRequest) {
-  const { email, name } = await req.json();
+  const { email, name, source } = await req.json();
 
   if (!email || typeof email !== "string" || !EMAIL_RE.test(email.trim())) {
     return NextResponse.json(
@@ -18,6 +22,7 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
   const trimmedEmail = email.trim().toLowerCase();
+  const isMuzede1Saat = source === "muzede1saat";
 
   // Check if already subscribed
   const { data: existing } = await admin
@@ -31,20 +36,36 @@ export async function POST(req: NextRequest) {
       // Reactivate
       await admin
         .from("subscribers")
-        .update({ is_active: true })
+        .update({ is_active: true, ...(isMuzede1Saat && { source: "muzede1saat" }) })
         .eq("id", existing.id);
+    }
 
-      // Teşekkür maili (fire-and-forget)
+    // Send appropriate email (even for existing subscribers when source is muzede1saat)
+    if (isMuzede1Saat) {
+      sendMuzede1SaatEmail(trimmedEmail, name?.trim());
+      return NextResponse.json({
+        message: existing.is_active
+          ? "PDF rehberiniz e-postanıza gönderildi!"
+          : "Tekrar hoş geldiniz! PDF rehberiniz e-postanıza gönderildi.",
+        pdfUrl: PDF_URL,
+      });
+    }
+
+    if (!existing.is_active) {
       sendBultenTesekkurEmail(trimmedEmail, name?.trim());
-
       return NextResponse.json({ message: "Tekrar hoş geldiniz! Aboneliğiniz yeniden aktif." });
     }
+
     return NextResponse.json({ message: "Zaten abonesiniz!" });
   }
 
   const { error } = await admin
     .from("subscribers")
-    .insert({ email: trimmedEmail, name: name?.trim() || null });
+    .insert({
+      email: trimmedEmail,
+      name: name?.trim() || null,
+      ...(isMuzede1Saat && { source: "muzede1saat" }),
+    });
 
   if (error) {
     return NextResponse.json(
@@ -53,9 +74,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Teşekkür maili (fire-and-forget)
-  sendBultenTesekkurEmail(trimmedEmail, name?.trim());
+  if (isMuzede1Saat) {
+    sendMuzede1SaatEmail(trimmedEmail, name?.trim());
+    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: PDF_URL });
+  }
 
+  sendBultenTesekkurEmail(trimmedEmail, name?.trim());
   return NextResponse.json({ message: "Abone oldunuz!" });
 }
 
@@ -70,6 +94,21 @@ function sendBultenTesekkurEmail(email: string, name?: string | null) {
       });
     } catch (err) {
       console.error("[Subscribe] Tesekkur maili gonderilemedi:", err);
+    }
+  })();
+}
+
+function sendMuzede1SaatEmail(email: string, name?: string | null) {
+  (async () => {
+    try {
+      const html = await render(Muzede1SaatTesekkur({ name: name || undefined }));
+      await sendThankYouEmail({
+        to: email,
+        subject: "Müzede 1 Saat Rehberiniz Hazır! — Klemens Art",
+        html,
+      });
+    } catch (err) {
+      console.error("[Subscribe] Muzede1Saat maili gonderilemedi:", err);
     }
   })();
 }
