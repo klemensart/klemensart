@@ -8,7 +8,13 @@ const kesfetLinks = [
   { label: "İçerikler",        href: "#"          },
   { label: "Etkinlikler",      href: "/etkinlikler" },
 ];
-const kurumLinks = ["Hakkımızda", "Yaklaşım", "İletişim", "Gizlilik Politikası", "Kullanım Koşulları"];
+const kurumLinks = [
+  { label: "Hakkımızda", href: "/hakkimizda" },
+  { label: "SSS", href: "/sss" },
+  { label: "İletişim", href: "mailto:info@klemensart.com" },
+  { label: "Gizlilik Politikası", href: "/kvkk" },
+  { label: "İade ve İptal", href: "/iade-ve-iptal" },
+];
 
 const socials = [
   { name: "Instagram",   href: "https://instagram.com/klemens.art",                icon: <InstagramIcon /> },
@@ -62,9 +68,9 @@ export default function Footer() {
             <p className="text-white text-sm font-semibold mb-5">Klemens</p>
             <ul className="space-y-3">
               {kurumLinks.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-white/40 text-sm hover:text-coral transition-colors">
-                    {link}
+                <li key={link.label}>
+                  <a href={link.href} className="text-white/40 text-sm hover:text-coral transition-colors">
+                    {link.label}
                   </a>
                 </li>
               ))}

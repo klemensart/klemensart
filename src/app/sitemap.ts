@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/harita`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/hakkimizda`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/sss`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/iade-ve-iptal`, lastModified: new Date("2026-03-10"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE_URL}/kvkk`, lastModified: new Date("2026-03-01"), changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE_URL}/testler/gorsel-algi`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
