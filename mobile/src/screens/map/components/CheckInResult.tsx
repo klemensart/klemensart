@@ -12,9 +12,9 @@ interface Props {
 }
 
 export default function CheckInResult({ status, stars, onDismiss }: Props) {
-  if (status === "idle") return null;
+  if (status === "idle" || status === "loading") return null;
 
-  const config: Record<Exclude<CheckInStatus, "idle">, { icon: string; title: string; sub: string }> = {
+  const config: Record<string, { icon: string; title: string; sub: string }> = {
     success: {
       icon: "🎉",
       title: `+${stars} Yıldız Kazandın!`,
@@ -35,9 +35,15 @@ export default function CheckInResult({ status, stars, onDismiss }: Props) {
       title: "Giriş Gerekli",
       sub: "Check-in yapmak için giriş yapmalısın.",
     },
+    error: {
+      icon: "⚠️",
+      title: "Bir Hata Oluştu",
+      sub: "Lütfen tekrar dene.",
+    },
   };
 
   const c = config[status];
+  if (!c) return null;
 
   return (
     <Modal visible transparent animationType="fade">

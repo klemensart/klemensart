@@ -52,3 +52,13 @@ export function createRequestSupabaseClient(req: NextRequest) {
   // Fallback: cookie-based client (web)
   return null;
 }
+
+/**
+ * Birleşik auth resolver: Bearer token varsa token client, yoksa cookie client.
+ * Mobil + web route'larında tek fonksiyonla kullan.
+ */
+export async function resolveSupabaseClient(req: NextRequest) {
+  const tokenClient = createRequestSupabaseClient(req);
+  if (tokenClient) return tokenClient;
+  return createServerSupabaseClient();
+}

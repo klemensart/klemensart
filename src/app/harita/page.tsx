@@ -219,6 +219,51 @@ export default function HaritaPage() {
 
   useEffect(() => { fetchGamStats(); }, [fetchGamStats]);
 
+  // Supabase Realtime — cross-platform sync
+  useEffect(() => {
+    if (!gamUser) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel("harita-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "map_visits", filter: `user_id=eq.${gamUser.id}` },
+        (payload) => {
+          const slug = payload.new.place_slug as string;
+          setVisitedSlugs((prev) => {
+            const next = new Set(prev);
+            next.add(slug);
+            return next;
+          });
+          setTodaySlugs((prev) => {
+            const visitDate = payload.new.visited_date as string;
+            const todayStr = new Date().toISOString().slice(0, 10);
+            if (visitDate === todayStr) {
+              const next = new Set(prev);
+              next.add(slug);
+              return next;
+            }
+            return prev;
+          });
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "map_user_stats", filter: `user_id=eq.${gamUser.id}` },
+        (payload) => {
+          const newStars = payload.new.total_stars as number;
+          const newRank = payload.new.rank_name as string;
+          setTotalStars(newStars);
+          setRankName(newRank);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [gamUser]);
+
   // Track user position continuously for check-in distance
   useEffect(() => {
     if (!navigator.geolocation) return;

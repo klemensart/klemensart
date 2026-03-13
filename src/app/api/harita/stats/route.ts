@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from "next/server";
+import { resolveSupabaseClient } from "@/lib/supabase-server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = await resolveSupabaseClient(req);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Giriş yapmalısınız" }, { status: 401 });

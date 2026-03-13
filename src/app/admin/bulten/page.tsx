@@ -325,6 +325,14 @@ export default function BultenGonderPage() {
   const [selectedSegmentId, setSelectedSegmentId] = useState("");
   const [showSegmentConfirm, setShowSegmentConfirm] = useState(false);
 
+  // AI Kitle Tahmincisi
+  type AiVariant = { segmentId: string; label: string; count: number; subject: string; body: string; error?: string };
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiSelectedSegments, setAiSelectedSegments] = useState<string[]>([]);
+  const [aiVariants, setAiVariants] = useState<AiVariant[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+
   // Campaign history (saved HTML)
   type SavedCampaign = {
     id: string;
@@ -778,6 +786,37 @@ export default function BultenGonderPage() {
       setLoadingParticipants(false);
     }
     setShowWorkshopConfirm(true);
+  };
+
+  const generateAiVariants = async () => {
+    if (!aiTopic.trim()) { setMessage("Etkinlik/konu açıklaması girin."); return; }
+    if (aiSelectedSegments.length === 0) { setMessage("En az bir hedef kitle seçin."); return; }
+    setAiLoading(true);
+    setAiVariants([]);
+    try {
+      const res = await fetch("/api/admin/newsletter/ai-variants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: aiTopic, segmentIds: aiSelectedSegments }),
+      });
+      const data = await res.json();
+      if (data.variants) setAiVariants(data.variants);
+      else setMessage(data.error || "Varyant üretimi başarısız.");
+    } catch {
+      setMessage("AI varyant üretimi sırasında hata oluştu.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const applyVariantToEditor = (variant: AiVariant) => {
+    setSubject(variant.subject);
+    if (editor) {
+      editor.commands.setContent(`<p>${variant.body}</p>`);
+    }
+    setSelectedSegmentId(variant.segmentId);
+    setShowAiPanel(false);
+    setMessage(`"${variant.label}" varyantı editöre uygulandı. İçeriği düzenleyip gönderebilirsiniz.`);
   };
 
   const handleSendSegment = () => {
@@ -1367,6 +1406,98 @@ export default function BultenGonderPage() {
                     {loadingAbandoned ? "Kontrol ediliyor..." : "Hatırlatma Gönder"}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* ── AI Kitle Tahmincisi ── */}
+            {segments.length > 0 && (
+              <div className="border border-purple-200 rounded-xl p-5 bg-purple-50/30">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-semibold text-purple-700 uppercase tracking-wider">AI Kitle Tahmincisi</div>
+                  <button
+                    onClick={() => setShowAiPanel(!showAiPanel)}
+                    className="text-xs text-purple-600 hover:text-purple-800 font-medium"
+                  >
+                    {showAiPanel ? "Kapat" : "Aç"}
+                  </button>
+                </div>
+                {!showAiPanel && (
+                  <p className="text-xs text-purple-500">Etkinlik veya konu girin, AI her segment için özel bülten varyantı üretsin.</p>
+                )}
+                {showAiPanel && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Etkinlik / Konu Açıklaması</label>
+                      <textarea
+                        value={aiTopic}
+                        onChange={(e) => setAiTopic(e.target.value)}
+                        rows={3}
+                        className="w-full border border-purple-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-400"
+                        placeholder={"Örn: Ankara'nın Antik Sırları başlıklı hafta sonu atölyesi. Katılımcılar antik kalıntıları yerinde ziyaret edecek. Ücret: 250 TL."}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Hedef Segmentler</label>
+                      <div className="flex flex-wrap gap-2">
+                        {segments.filter((s) => s.count > 0).map((s) => (
+                          <button
+                            key={s.id}
+                            onClick={() => {
+                              setAiSelectedSegments((prev) =>
+                                prev.includes(s.id) ? prev.filter((x) => x !== s.id) : [...prev, s.id]
+                              );
+                            }}
+                            className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                              aiSelectedSegments.includes(s.id)
+                                ? "bg-purple-600 text-white border-purple-600"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-purple-300"
+                            }`}
+                          >
+                            {s.label} ({s.count})
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={generateAiVariants}
+                      disabled={aiLoading || !aiTopic.trim() || aiSelectedSegments.length === 0}
+                      className="px-5 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+                    >
+                      {aiLoading ? "AI Üretiyor..." : `${aiSelectedSegments.length} Segment İçin Varyant Üret`}
+                    </button>
+
+                    {/* Üretilen varyantlar */}
+                    {aiVariants.length > 0 && (
+                      <div className="space-y-3 pt-2">
+                        <div className="text-xs font-semibold text-purple-700 uppercase tracking-wider">Üretilen Varyantlar</div>
+                        {aiVariants.map((v) => (
+                          <div key={v.segmentId} className="border border-purple-100 rounded-lg p-4 bg-white">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">{v.label}</span>
+                                <span className="text-xs text-gray-400">{v.count} kişi</span>
+                              </div>
+                              <button
+                                onClick={() => applyVariantToEditor(v)}
+                                className="text-xs px-3 py-1 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+                              >
+                                Editore Uygula
+                              </button>
+                            </div>
+                            {v.error ? (
+                              <p className="text-xs text-red-500">{v.error}</p>
+                            ) : (
+                              <>
+                                <p className="text-sm font-medium text-gray-800 mb-1">{v.subject}</p>
+                                <p className="text-sm text-gray-600 leading-relaxed">{v.body}</p>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

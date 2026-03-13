@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { resolveSupabaseClient } from "@/lib/supabase-server";
 import {
   placeSlug, haversineDistance, findPlaceBySlug, getRank,
   checkRouteCompletion, checkCategoryBadges, checkMilestones,
@@ -8,7 +8,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = await resolveSupabaseClient(req);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Giriş yapmalısınız" }, { status: 401 });

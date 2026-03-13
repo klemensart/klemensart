@@ -14,7 +14,13 @@ export type SegmentId =
   | "multi_buyer"
   | "expiring_soon"
   | "new_7d"
-  | "new_30d";
+  | "new_30d"
+  // Harita davranış segmentleri
+  | "map_tarihi"
+  | "map_sanat"
+  | "map_muzik_tiyatro"
+  | "map_aktif_gezgin"
+  | "map_yeni_kesfifci";
 
 export async function GET(req: NextRequest) {
   const userClient = await createServerSupabaseClient();
@@ -30,7 +36,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
 
   // Fetch all data we need
-  const [logsRes, subsRes, purchasesRes, usersRes] = await Promise.all([
+  const [logsRes, subsRes, purchasesRes, usersRes, mapVisitsRes] = await Promise.all([
     admin
       .from("email_logs")
       .select("subscriber_email, subject, sent_at, opened_at, clicked_at")
@@ -38,12 +44,24 @@ export async function GET(req: NextRequest) {
     admin.from("subscribers").select("email, subscribed_at, is_active").eq("is_active", true),
     admin.from("purchases").select("user_id, workshop_id, expires_at"),
     admin.auth.admin.listUsers({ perPage: 1000 }),
+    admin.from("map_visits").select("user_id, place_type"),
   ]);
 
   const logs = logsRes.data ?? [];
   const subs = subsRes.data ?? [];
   const purchases = purchasesRes.data ?? [];
   const authUsers = usersRes.data?.users ?? [];
+  const mapVisits = mapVisitsRes.data ?? [];
+
+  // Harita davranış analizi: user_id → place_type sayıları
+  const userPlaceTypes = new Map<string, Map<string, number>>();
+  const userVisitCount = new Map<string, number>();
+  for (const v of mapVisits) {
+    const types = userPlaceTypes.get(v.user_id) ?? new Map<string, number>();
+    types.set(v.place_type, (types.get(v.place_type) || 0) + 1);
+    userPlaceTypes.set(v.user_id, types);
+    userVisitCount.set(v.user_id, (userVisitCount.get(v.user_id) || 0) + 1);
+  }
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -199,6 +217,42 @@ export async function GET(req: NextRequest) {
           .filter((s) => s.subscribed_at && s.subscribed_at >= thirtyDaysAgo)
           .map((s) => s.email);
       }
+      // ── Harita Davranış Segmentleri ──
+      case "map_tarihi": {
+        // Tarihi mekan + miras alanlarını 2+ kez ziyaret edenler
+        const userIds = [...userPlaceTypes.entries()]
+          .filter(([, types]) => ((types.get("tarihi") || 0) + (types.get("miras") || 0)) >= 2)
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "map_sanat": {
+        // Müze + galeri ziyaretçileri (2+ ziyaret)
+        const userIds = [...userPlaceTypes.entries()]
+          .filter(([, types]) => ((types.get("müze") || 0) + (types.get("galeri") || 0)) >= 2)
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "map_muzik_tiyatro": {
+        // Konser + tiyatro mekanlarını ziyaret edenler
+        const userIds = [...userPlaceTypes.entries()]
+          .filter(([, types]) => ((types.get("konser") || 0) + (types.get("tiyatro") || 0)) >= 1)
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "map_aktif_gezgin": {
+        // 10+ farklı mekan ziyaret etmiş aktif gezginler
+        const userIds = [...userVisitCount.entries()]
+          .filter(([, count]) => count >= 10)
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "map_yeni_kesfifci": {
+        // 1-3 ziyaret yapmış yeni keşifçiler (potansiyel büyüme)
+        const userIds = [...userVisitCount.entries()]
+          .filter(([, count]) => count >= 1 && count <= 3)
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
       default:
         return [];
     }
@@ -223,6 +277,12 @@ export async function GET(req: NextRequest) {
     { id: "expiring_soon", label: "Süresi Dolmak Üzere", description: "Satın alması 30 gün içinde sona erecek", count: 0, category: "Satın Alma" },
     { id: "new_7d", label: "Yeni Aboneler (7 Gün)", description: "Son 7 günde abone olanlar", count: 0, category: "Yeni Kullanıcılar" },
     { id: "new_30d", label: "Yeni Aboneler (30 Gün)", description: "Son 30 günde abone olanlar", count: 0, category: "Yeni Kullanıcılar" },
+    // Harita davranış segmentleri
+    { id: "map_tarihi", label: "Tarih Meraklıları", description: "Tarihi mekan ve miras alanlarını 2+ kez ziyaret edenler", count: 0, category: "Kültür Haritası" },
+    { id: "map_sanat", label: "Sanat Severler", description: "Müze ve galeri ziyaretçileri (2+ ziyaret)", count: 0, category: "Kültür Haritası" },
+    { id: "map_muzik_tiyatro", label: "Sahne Sanatları", description: "Konser ve tiyatro mekanlarını ziyaret edenler", count: 0, category: "Kültür Haritası" },
+    { id: "map_aktif_gezgin", label: "Aktif Gezginler", description: "10+ farklı mekan keşfetmiş süper gezginler", count: 0, category: "Kültür Haritası" },
+    { id: "map_yeni_kesfifci", label: "Yeni Kaşifler", description: "1-3 ziyaret yapmış, potansiyel büyüme kitlesi", count: 0, category: "Kültür Haritası" },
   ];
 
   for (const seg of allSegments) {
