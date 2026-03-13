@@ -61,12 +61,12 @@ function generateStory1(): StoryCanvasData {
       fontSize: 36, fontFamily: "Cormorant Garamond", fontStyle: "italic",
       fill: "#ffffff", align: "right", opacity: 0.85, rotation: 0,
     },
-    // Rönesans tablosu — el detayı (crop ile yakınlaştırılmış)
+    // Venüs'ün Doğuşu — yüz ve saç detayı (Botticelli, tuval üzeri tablo)
     {
       type: "image",
       x: PAD, y: 160, width: CONTENT_W, height: 820,
-      src: "/images/testler/ronesans/ademin-yaratilisi.webp",
-      cropX: 310, cropY: 60, cropWidth: 220, cropHeight: 200,
+      src: "/images/testler/ronesans/venusun-dogusu.webp",
+      cropX: 280, cropY: 20, cropWidth: 260, cropHeight: 300,
       cornerRadius: 20, opacity: 1, rotation: 0,
     },
     // Soru metni — büyük, italic
