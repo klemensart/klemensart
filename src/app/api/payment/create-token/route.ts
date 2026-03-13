@@ -14,10 +14,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Giriş yapmalısınız" }, { status: 401 });
   }
 
-  const { workshopId, amount, workshopTitle } = await req.json();
+  const { workshopId, amount, workshopTitle, coupon_code } = await req.json();
 
   if (!workshopId || !amount || !workshopTitle) {
     return NextResponse.json({ error: "Eksik parametre" }, { status: 400 });
+  }
+
+  // Validate and apply coupon if provided
+  let finalAmount = parseInt(String(amount), 10);
+  let appliedCouponId: string | null = null;
+
+  if (coupon_code) {
+    const admin = createAdminClient();
+    const { data: coupon } = await admin
+      .from("quiz_coupons")
+      .select("id, discount_percent, workshop_slug, used, expires_at")
+      .eq("code", coupon_code.trim().toUpperCase())
+      .maybeSingle();
+
+    if (!coupon) {
+      return NextResponse.json({ error: "Geçersiz indirim kodu" }, { status: 400 });
+    }
+    if (coupon.used) {
+      return NextResponse.json({ error: "Bu kod daha önce kullanılmış" }, { status: 400 });
+    }
+    if (new Date(coupon.expires_at) < new Date()) {
+      return NextResponse.json({ error: "Bu kodun süresi dolmuş" }, { status: 400 });
+    }
+
+    // Apply discount
+    finalAmount = Math.round(finalAmount * (1 - coupon.discount_percent / 100));
+    appliedCouponId = coupon.id;
   }
 
   const merchant_id = process.env.PAYTR_MERCHANT_ID!;
@@ -36,10 +63,10 @@ export async function POST(req: NextRequest) {
 
   const email = user.email;
   // payment_amount kesinlikle tam sayı string olmalı (örn: "29900", "9900")
-  const payment_amount = String(Math.round(parseInt(String(amount), 10)));
+  const payment_amount = String(Math.round(finalAmount));
 
   // Sepet: [[ürün adı, birim fiyat TL (string), adet (int)]]
-  const basketArr = [[workshopTitle, (parseInt(String(amount), 10) / 100).toFixed(2), 1]];
+  const basketArr = [[workshopTitle, (finalAmount / 100).toFixed(2), 1]];
   const user_basket = Buffer.from(JSON.stringify(basketArr)).toString("base64");
 
   const no_installment = "0";
@@ -117,12 +144,20 @@ export async function POST(req: NextRequest) {
   }
 
   // merchant_oid → workshopId eşlemesini sakla (callback'te kullanılacak)
-  const admin = createAdminClient();
-  await admin.from("payment_intents").insert({
+  const adminForIntent = createAdminClient();
+  await adminForIntent.from("payment_intents").insert({
     merchant_oid,
     workshop_id: workshopId,
     user_id: user.id,
   });
+
+  // Mark coupon as used
+  if (appliedCouponId) {
+    await adminForIntent.from("quiz_coupons").update({
+      used: true,
+      used_at: new Date().toISOString(),
+    }).eq("id", appliedCouponId);
+  }
 
   return NextResponse.json({ token: data.token, merchant_oid });
 }

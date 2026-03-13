@@ -376,6 +376,11 @@ export default function ProfilPage() {
   const [gamReviews, setGamReviews] = useState<GamReview[]>([]);
   const [gamLoading, setGamLoading] = useState(false);
 
+  // Test Geçmişi data
+  type QuizResult = { id: string; quiz_slug: string; score: number; badge: string; mode: string; time_seconds: number | null; created_at: string };
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
+  const [quizLoading, setQuizLoading] = useState(false);
+
   /* ─── Auth ─── */
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -484,6 +489,24 @@ export default function ProfilPage() {
   useEffect(() => {
     if (user && activeTab === "discoveries") fetchGam();
   }, [user, activeTab, fetchGam]);
+
+  const fetchQuizResults = useCallback(async () => {
+    setQuizLoading(true);
+    try {
+      const sb = createClient();
+      const { data } = await sb
+        .from("quiz_results")
+        .select("id, quiz_slug, score, badge, mode, time_seconds, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      setQuizResults(data ?? []);
+    } catch { /* ignore */ }
+    setQuizLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (user && activeTab === "tests") fetchQuizResults();
+  }, [user, activeTab, fetchQuizResults]);
 
   /* ─── Sign out ─── */
   const handleSignOut = async () => {
@@ -695,11 +718,189 @@ export default function ProfilPage() {
 
           {/* ══ TEST GEÇMİŞİ ══ */}
           {activeTab === "tests" && (
-            <div className="text-center py-[60px] text-brand-warm">
-              <ChartIcon size={48} className="text-brand-light mx-auto" />
-              <p className="text-[15px] font-semibold text-brand-dark mt-4">Test Geçmişi</p>
-              <p className="text-[13px]">Çözdüğün testler ve karakter analizlerin burada görünecek.</p>
-              <p className="text-xs italic mt-2">Yakında</p>
+            <div>
+              {quizLoading ? (
+                <div className="flex justify-center py-12">
+                  <div className="w-6 h-6 rounded-full border-2 border-coral border-t-transparent animate-spin" />
+                </div>
+              ) : quizResults.length === 0 ? (
+                <div className="text-center py-[48px]">
+                  {/* 3 empty stars */}
+                  <div className="flex justify-center gap-1 mb-4">
+                    {[1,2,3].map(i => (
+                      <svg key={i} width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d4cfc8" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                    ))}
+                  </div>
+                  <p className="text-[16px] font-bold text-brand-dark">Henüz test çözmediniz</p>
+                  <p className="text-[13px] text-brand-warm mt-1 mb-5">Quiz çözerek yıldız toplayın, rozet kazanın!</p>
+                  <Link href="/testler" className="inline-flex items-center gap-2 bg-coral text-white text-[14px] font-bold px-6 py-3 rounded-full no-underline shadow-md shadow-coral/15 hover:shadow-lg hover:shadow-coral/25 hover:-translate-y-0.5 transition-all">
+                    Testlere Git <ArrowRightIcon size={14} />
+                  </Link>
+                </div>
+              ) : (() => {
+                const bestScore = Math.max(...quizResults.map((r) => r.score));
+                const getStars = (s: number) => s >= 9 ? 3 : s >= 6 ? 2 : s >= 3 ? 1 : 0;
+                const totalStars = quizResults.reduce((acc, r) => acc + getStars(r.score), 0);
+                const uniqueBadges = [...new Set(quizResults.map((r) => r.badge))];
+                const badgeConfig: Record<string, { emoji: string; color: string; bg: string }> = {
+                  "Rönesans Ustası":           { emoji: "\uD83D\uDC51", color: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
+                  "Rönesans Ustası (Hizli)":   { emoji: "\u26A1",       color: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
+                  "Sanat Tarihçisi":           { emoji: "\uD83C\uDFA8", color: "text-rose-700",    bg: "bg-rose-50 border-rose-200" },
+                  "Sanat Tarihçisi (Hizli)":   { emoji: "\uD83C\uDFA8", color: "text-rose-700",    bg: "bg-rose-50 border-rose-200" },
+                  "Koleksiyoner":              { emoji: "\uD83D\uDDBC\uFE0F", color: "text-violet-700", bg: "bg-violet-50 border-violet-200" },
+                  "Koleksiyoner (Hizli)":      { emoji: "\uD83D\uDDBC\uFE0F", color: "text-violet-700", bg: "bg-violet-50 border-violet-200" },
+                  "Meraklı":                   { emoji: "\uD83D\uDD0D", color: "text-sky-700",     bg: "bg-sky-50 border-sky-200" },
+                  "Meraklı (Hizli)":           { emoji: "\uD83D\uDD0D", color: "text-sky-700",     bg: "bg-sky-50 border-sky-200" },
+                  "Çırak":                     { emoji: "\uD83C\uDF31", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+                  "Çırak (Hizli)":             { emoji: "\uD83C\uDF31", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+                };
+                const defaultBadge = { emoji: "\uD83C\uDFC6", color: "text-brand-dark", bg: "bg-brand-light border-brand-light" };
+
+                return (
+                  <div className="flex flex-col gap-4">
+                    {/* ── Summary header ── */}
+                    <div className="relative overflow-hidden rounded-[18px] bg-white border border-brand-light p-5 shadow-sm">
+                      <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center gap-6">
+                          {/* Stars */}
+                          <div className="text-center">
+                            <div className="flex items-center gap-1">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                              <span className="text-[26px] font-extrabold text-brand-dark leading-none">{totalStars}</span>
+                            </div>
+                            <div className="text-[10px] font-bold text-brand-warm/50 uppercase tracking-wider mt-1">Yıldız</div>
+                          </div>
+                          <div className="w-px h-10 bg-brand-light" />
+                          {/* Best */}
+                          <div className="text-center">
+                            <div className="text-[26px] font-extrabold text-coral leading-none">{bestScore}<span className="text-[13px] text-brand-warm/40">/10</span></div>
+                            <div className="text-[10px] font-bold text-brand-warm/50 uppercase tracking-wider mt-1">En İyi</div>
+                          </div>
+                          <div className="w-px h-10 bg-brand-light" />
+                          {/* Count */}
+                          <div className="text-center">
+                            <div className="text-[26px] font-extrabold text-brand-dark leading-none">{quizResults.length}</div>
+                            <div className="text-[10px] font-bold text-brand-warm/50 uppercase tracking-wider mt-1">Quiz</div>
+                          </div>
+                        </div>
+                        {/* Rozet count pill */}
+                        <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/60 rounded-full px-3.5 py-2">
+                          <span className="text-[16px]">{"\uD83C\uDFC6"}</span>
+                          <span className="text-[13px] font-bold text-amber-700">{uniqueBadges.length} rozet</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ── Badge collection ── */}
+                    {uniqueBadges.length > 0 && (
+                      <div className="flex gap-2 flex-wrap">
+                        {uniqueBadges.map((b) => {
+                          const bc = badgeConfig[b] || defaultBadge;
+                          return (
+                            <div key={b} className={`flex items-center gap-1.5 border rounded-full px-3 py-1.5 ${bc.bg}`}>
+                              <span className="text-[15px]">{bc.emoji}</span>
+                              <span className={`text-[12px] font-bold ${bc.color}`}>{b}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* ── Quiz result cards ── */}
+                    {quizResults.map((r) => {
+                      const starCount = getStars(r.score);
+                      const bc = badgeConfig[r.badge] || defaultBadge;
+                      const date = new Date(r.created_at).toLocaleDateString("tr-TR", {
+                        day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                      });
+                      const timeStr = r.time_seconds
+                        ? `${Math.floor(r.time_seconds / 60) > 0 ? Math.floor(r.time_seconds / 60) + "dk " : ""}${r.time_seconds % 60}sn`
+                        : null;
+                      // Ring color based on score tier
+                      const ringColor = r.score >= 9 ? "#f59e0b" : r.score >= 6 ? "#f97316" : r.score >= 3 ? "#6366f1" : "#d4cfc8";
+                      // Stripe color — warm tones
+                      const stripeColor = r.score >= 9 ? "from-amber-400 to-orange-400" : r.score >= 6 ? "from-orange-300 to-coral" : r.score >= 3 ? "from-violet-300 to-fuchsia-300" : "from-gray-300 to-gray-400";
+
+                      return (
+                        <div key={r.id} className="relative bg-white rounded-[16px] shadow-[0_1px_8px_rgba(0,0,0,0.05)] overflow-hidden border border-brand-light/80">
+                          {/* Top stripe */}
+                          <div className={`h-[3px] bg-gradient-to-r ${stripeColor}`} />
+
+                          <div className="p-4 flex gap-4 items-center">
+                            {/* Score ring */}
+                            <div className="relative w-[54px] h-[54px] flex-shrink-0">
+                              <svg viewBox="0 0 54 54" className="w-full h-full -rotate-90">
+                                <circle cx="27" cy="27" r="23" fill="none" stroke="#f3f0eb" strokeWidth="3.5" />
+                                <circle
+                                  cx="27" cy="27" r="23" fill="none"
+                                  stroke={ringColor}
+                                  strokeWidth="3.5" strokeLinecap="round"
+                                  strokeDasharray={`${(r.score / 10) * 144.5} 144.5`}
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-[16px] font-extrabold text-brand-dark leading-none">{r.score}</span>
+                                <span className="text-[8px] font-bold text-brand-warm/40">/10</span>
+                              </div>
+                            </div>
+
+                            {/* Details */}
+                            <div className="flex-1 min-w-0">
+                              {/* Quiz name */}
+                              <div className="text-[13px] font-bold text-brand-dark mb-1.5 truncate">
+                                {r.quiz_slug === "modern-sanat-quiz" ? "Modern Sanat Quizi" : "Rönesans Sanat Quizi"}
+                              </div>
+
+                              {/* Stars */}
+                              <div className="flex items-center gap-[3px] mb-2">
+                                {[1, 2, 3].map((s) => (
+                                  <svg key={s} width="18" height="18" viewBox="0 0 24 24"
+                                    fill={s <= starCount ? "#f59e0b" : "none"}
+                                    stroke={s <= starCount ? "#f59e0b" : "#d4cfc8"}
+                                    strokeWidth={s <= starCount ? "0.5" : "1.5"}
+                                    style={{ filter: s <= starCount ? "drop-shadow(0 1px 2px rgba(245,158,11,0.35))" : "none" }}
+                                  >
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                  </svg>
+                                ))}
+                              </div>
+
+                              {/* Badge + mode + time */}
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`text-[11px] font-bold border rounded-full px-2.5 py-[2px] ${bc.bg} ${bc.color}`}>
+                                  {bc.emoji} {r.badge}
+                                </span>
+                                {r.mode === "timed" && (
+                                  <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200/60 px-2 py-[2px] rounded-full">
+                                    {"\u26A1"} Hızlı
+                                  </span>
+                                )}
+                                {timeStr && (
+                                  <span className="text-[10px] text-brand-warm flex items-center gap-0.5">
+                                    <ClockIcon size={10} /> {timeStr}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Footer */}
+                          <div className="px-4 py-2 bg-cream/60 border-t border-brand-light/60 text-[11px] text-brand-warm/50 font-medium">
+                            {date}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* ── Play more CTA ── */}
+                    <div className="text-center pt-2 pb-1">
+                      <Link href="/testler" className="inline-flex items-center gap-2 bg-coral text-white text-[13px] font-bold px-6 py-2.5 rounded-full no-underline shadow-md shadow-coral/15 hover:shadow-lg hover:shadow-coral/25 hover:-translate-y-0.5 transition-all">
+                        Daha fazla quiz çöz <ArrowRightIcon size={14} />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 

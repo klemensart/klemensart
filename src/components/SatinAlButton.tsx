@@ -7,6 +7,7 @@ type Props = {
   workshopId: string;
   amount: number;
   workshopTitle: string;
+  workshopSlug?: string;
   label?: string;
   size?: "normal" | "large";
 };
@@ -17,6 +18,7 @@ export default function SatinAlButton({
   workshopId,
   amount,
   workshopTitle,
+  workshopSlug,
   label = "Satın Al",
   size = "normal",
 }: Props) {
@@ -26,17 +28,15 @@ export default function SatinAlButton({
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
+    const slugParam = workshopSlug ? `&slug=${encodeURIComponent(workshopSlug)}` : "";
+    const payUrl = `/club/odeme/${workshopId}?amount=${amount}&title=${encodeURIComponent(workshopTitle)}${slugParam}`;
+
     if (!user) {
-      const redirect = encodeURIComponent(
-        `/club/odeme/${workshopId}?amount=${amount}&title=${encodeURIComponent(workshopTitle)}`
-      );
-      router.push(`/club/giris?redirect=${redirect}`);
+      router.push(`/club/giris?redirect=${encodeURIComponent(payUrl)}`);
       return;
     }
 
-    router.push(
-      `/club/odeme/${workshopId}?amount=${amount}&title=${encodeURIComponent(workshopTitle)}`
-    );
+    router.push(payUrl);
   }
 
   const pad = size === "large" ? "14px 40px" : "11px 28px";

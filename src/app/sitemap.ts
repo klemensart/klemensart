@@ -33,6 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/testler/gorsel-algi`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     // oyun/sanat-tahmini henüz yayında değil — sitemap'ten çıkarıldı
     { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/testler/ronesans-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/testler/modern-sanat-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
   ];
 
   // Category pages

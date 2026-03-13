@@ -58,6 +58,7 @@ const psikoloji: PsikolTest[] = [
 type Oyun = {
   title: string;
   description: string;
+  href?: string;
   gradient: string;
   iconBg: string;
   icon: React.ReactNode;
@@ -65,8 +66,9 @@ type Oyun = {
 
 const oyunlar: Oyun[] = [
   {
-    title: "Tabloyu Tahmin Et",
-    description: "Hangi sanatçının eseri?",
+    title: "Rönesans Sanat Quizi",
+    description: "Rönesans başyapıtlarını ne kadar tanıyorsunuz?",
+    href: "/testler/ronesans-quiz",
     gradient: "from-sky-50 to-blue-50/60",
     iconBg: "bg-sky-100 text-sky-600",
     icon: (
@@ -74,6 +76,20 @@ const oyunlar: Oyun[] = [
         <rect x="3" y="3" width="18" height="18" rx="2" />
         <circle cx="8.5" cy="8.5" r="1.5" />
         <path d="m21 15-5-5L5 21" />
+      </svg>
+    ),
+  },
+  {
+    title: "Modern Sanat Quizi",
+    description: "Empresyonizmden soyut sanata: ne kadar biliyorsunuz?",
+    href: "/testler/modern-sanat-quiz",
+    gradient: "from-rose-50 to-orange-50/60",
+    iconBg: "bg-rose-100 text-rose-600",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+        <path d="M2 17l10 5 10-5" />
+        <path d="M2 12l10 5 10-5" />
       </svg>
     ),
   },
@@ -215,9 +231,13 @@ export default function TestlerPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {oyunlar.map((o) => (
-              <YakindaCard key={o.title} {...o} />
-            ))}
+            {oyunlar.map((o) =>
+              o.href ? (
+                <ActiveCard key={o.title} t={o as Oyun & { href: string }} />
+              ) : (
+                <YakindaCard key={o.title} {...o} />
+              )
+            )}
           </div>
         </div>
       </section>

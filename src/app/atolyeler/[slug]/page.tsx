@@ -111,13 +111,13 @@ export default async function AtolyeDetayPage({ params }: Props) {
 
   let page: React.ReactNode;
   if (slug === "sanat-tarihinde-duygular")
-    page = <DuygularPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+    page = <DuygularPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "modern-sanat-atolyesi")
-    page = <ModernSanatPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+    page = <ModernSanatPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "ronesans-okuryazarligi")
-    page = <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} />;
+    page = <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "kapsamli-sanat-tarihi")
-    page = <KapsamliSanatTarihiPage config={config} status={status} />;
+    page = <KapsamliSanatTarihiPage config={config} status={status} slug={slug} />;
   else return <YakindaPage baslik="Bilinmeyen Atölye" />;
 
   return (
@@ -139,6 +139,7 @@ function HeroBanner({
   baslik,
   fiyat,
   workshopTitle,
+  workshopSlug,
   imgPosition = "center center",
   status,
 }: {
@@ -147,6 +148,7 @@ function HeroBanner({
   baslik: string;
   fiyat: string;
   workshopTitle: string;
+  workshopSlug?: string;
   imgPosition?: string;
   status: Status;
 }) {
@@ -235,6 +237,7 @@ function HeroBanner({
                 workshopId={config.id}
                 amount={config.price}
                 workshopTitle={workshopTitle}
+                workshopSlug={workshopSlug}
                 size="large"
               />
             )}
@@ -351,12 +354,14 @@ function EgitmenKart() {
 function AltCTA({
   config,
   workshopTitle,
+  workshopSlug,
   aciklama,
   fiyatLabel,
   status,
 }: {
   config: AtolyeConfig;
   workshopTitle: string;
+  workshopSlug?: string;
   aciklama: string;
   fiyatLabel: string;
   status: Status;
@@ -383,6 +388,7 @@ function AltCTA({
             workshopId={config.id}
             amount={config.price}
             workshopTitle={workshopTitle}
+            workshopSlug={workshopSlug}
             size="large"
           />
         </div>
@@ -442,10 +448,12 @@ function DuygularPage({
   config,
   status,
   nextSessionDate,
+  slug,
 }: {
   config: AtolyeConfig;
   status: Status;
   nextSessionDate: string | null;
+  slug: string;
 }) {
   const oturumlar = [
     { no: 1, konu: "KORKU", tarih: "10 Mart Salı", saat: "20:30–22:30" },
@@ -491,6 +499,7 @@ function DuygularPage({
           fiyat="1.500₺"
           workshopTitle="Sanat Tarihinde Duygular"
           imgPosition="center 30%"
+          workshopSlug={slug}
           status={status}
         />
 
@@ -588,6 +597,7 @@ function DuygularPage({
 
           <AltCTA
             config={config}
+            workshopSlug={slug}
             workshopTitle="Sanat Tarihinde Duygular"
             aciklama="3 oturum · Zoom · 6 aylık kayıt erişimi"
             fiyatLabel="1.500₺"
@@ -606,10 +616,12 @@ function ModernSanatPage({
   config,
   status,
   nextSessionDate,
+  slug,
 }: {
   config: AtolyeConfig;
   status: Status;
   nextSessionDate: string | null;
+  slug: string;
 }) {
   const bloklar = [
     {
@@ -682,6 +694,7 @@ function ModernSanatPage({
           fiyat="6.000₺"
           workshopTitle="Modern Sanat Atolyesi"
           imgPosition="center center"
+          workshopSlug={slug}
           status={status}
         />
 
@@ -819,6 +832,7 @@ function ModernSanatPage({
 
           <AltCTA
             config={config}
+            workshopSlug={slug}
             workshopTitle="Modern Sanat Atolyesi"
             aciklama="10 hafta · Zoom · 6 aylık tekrar izleme"
             fiyatLabel="6.000₺"
@@ -837,10 +851,12 @@ function RonesansPage({
   config,
   status,
   nextSessionDate,
+  slug,
 }: {
   config: AtolyeConfig;
   status: Status;
   nextSessionDate: string | null;
+  slug: string;
 }) {
   const program = [
     { tarih: "11 Aralık 2025 Per", konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
@@ -887,6 +903,7 @@ function RonesansPage({
           fiyat="—"
           workshopTitle="Rönesans Okur-Yazarlığı"
           imgPosition="center 20%"
+          workshopSlug={slug}
           status={status}
         />
 
@@ -993,6 +1010,7 @@ function RonesansPage({
 
           <AltCTA
             config={config}
+            workshopSlug={slug}
             workshopTitle="Rönesans Okur-Yazarlığı"
             aciklama="8 hafta · Zoom · 6 aylık kayıt erişimi"
             fiyatLabel="—"
@@ -1010,9 +1028,11 @@ function RonesansPage({
 function KapsamliSanatTarihiPage({
   config,
   status,
+  slug,
 }: {
   config: AtolyeConfig;
   status: Status;
+  slug: string;
 }) {
   const program = [
     { tarih: "19 Kasım 2025 Çar", konu: "Oturum 1" },
@@ -1039,6 +1059,7 @@ function KapsamliSanatTarihiPage({
           fiyat="6.000₺"
           workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
           imgPosition="center center"
+          workshopSlug={slug}
           status={status}
         />
 
@@ -1179,6 +1200,7 @@ function KapsamliSanatTarihiPage({
 
           <AltCTA
             config={config}
+            workshopSlug={slug}
             workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
             aciklama="10 hafta · Zoom · 6 aylık kayıt erişimi"
             fiyatLabel="6.000₺"

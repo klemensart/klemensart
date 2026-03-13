@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
@@ -10,6 +10,8 @@ const B = {
   dark: "#2D2926",
   warm: "#8C857E",
   light: "#F5F0EB",
+  green: "#22c55e",
+  greenBg: "rgba(34,197,94,0.08)",
 };
 
 export default function OdemePage() {
@@ -20,12 +22,27 @@ export default function OdemePage() {
   // URL: /club/odeme/[workshopId]?amount=29900&title=Atölye+Adı
   const amount = Number(searchParams.get("amount") || "0");
   const workshopTitle = searchParams.get("title") || "Atölye";
+  const workshopSlug = searchParams.get("slug") || "";
 
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "coupon" | "ready" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("");
+  const [couponStatus, setCouponStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
+  const [couponError, setCouponError] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [validatedCoupon, setValidatedCoupon] = useState("");
+
+  const finalAmount = discountPercent > 0 ? Math.round(amount * (1 - discountPercent / 100)) : amount;
+
+  // Check auth & workshop validity
+  const checkedRef = useRef(false);
   useEffect(() => {
+    if (checkedRef.current) return;
+    checkedRef.current = true;
+
     if (!amount || amount <= 0) {
       setErrorMsg("Geçersiz ödeme tutarı.");
       setStatus("error");
@@ -36,11 +53,10 @@ export default function OdemePage() {
 
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) {
-        router.replace(`/club/giris?redirect=/club/odeme/${workshopId}?amount=${amount}&title=${encodeURIComponent(workshopTitle)}`);
+        router.replace(`/club/giris?redirect=/club/odeme/${workshopId}?amount=${amount}&title=${encodeURIComponent(workshopTitle)}${workshopSlug ? `&slug=${workshopSlug}` : ""}`);
         return;
       }
 
-      // Atölye tarihini kontrol et
       const { data: workshopData } = await supabase
         .from("workshops")
         .select("next_session_date")
@@ -53,39 +69,73 @@ export default function OdemePage() {
         return;
       }
 
-      try {
-        const res = await fetch("/api/payment/create-token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ workshopId, amount, workshopTitle }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.token) {
-          throw new Error(data.error || "Token alınamadı");
-        }
-
-        // PayTR iFrame JS'i yükle
-        const script = document.createElement("script");
-        script.src = "https://www.paytr.com/js/iframeResizer.min.js";
-        script.onload = () => {
-          // @ts-expect-error PayTR global
-          window.iFrameResize({}, "#paytr-iframe");
-        };
-        document.body.appendChild(script);
-
-        if (iframeRef.current) {
-          iframeRef.current.src = `https://www.paytr.com/odeme/guvenli/${data.token}`;
-        }
-
-        setStatus("ready");
-      } catch (err: unknown) {
-        setErrorMsg(err instanceof Error ? err.message : "Bir hata oluştu");
-        setStatus("error");
-      }
+      // Show coupon step
+      setStatus("coupon");
     });
-  }, [workshopId, amount, workshopTitle, router]);
+  }, [workshopId, amount, workshopTitle, workshopSlug, router]);
+
+  // Validate coupon
+  const validateCoupon = useCallback(async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponStatus("checking");
+    setCouponError("");
+    try {
+      const res = await fetch(`/api/coupon?code=${encodeURIComponent(code)}&workshop=${encodeURIComponent(workshopSlug)}`);
+      const data = await res.json();
+      if (data.valid) {
+        setCouponStatus("valid");
+        setDiscountPercent(data.discount_percent);
+        setValidatedCoupon(data.code);
+      } else {
+        setCouponStatus("invalid");
+        setCouponError(data.error || "Geçersiz kod");
+      }
+    } catch {
+      setCouponStatus("invalid");
+      setCouponError("Doğrulama yapılamadı");
+    }
+  }, [couponInput, workshopSlug]);
+
+  // Start payment
+  const startPayment = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/payment/create-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workshopId,
+          amount: finalAmount,
+          workshopTitle,
+          coupon_code: validatedCoupon || undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.token) {
+        throw new Error(data.error || "Token alınamadı");
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://www.paytr.com/js/iframeResizer.min.js";
+      script.onload = () => {
+        // @ts-expect-error PayTR global
+        window.iFrameResize({}, "#paytr-iframe");
+      };
+      document.body.appendChild(script);
+
+      if (iframeRef.current) {
+        iframeRef.current.src = `https://www.paytr.com/odeme/guvenli/${data.token}`;
+      }
+
+      setStatus("ready");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Bir hata oluştu");
+      setStatus("error");
+    }
+  }, [workshopId, finalAmount, workshopTitle, validatedCoupon]);
 
   return (
     <div
@@ -103,10 +153,119 @@ export default function OdemePage() {
         <h1 style={{ fontSize: 22, fontWeight: 700, color: B.dark, margin: 0 }}>
           {workshopTitle}
         </h1>
-        <p style={{ color: B.warm, marginTop: 8, fontSize: 15 }}>
-          {(amount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
-        </p>
+        {discountPercent > 0 ? (
+          <div style={{ marginTop: 8 }}>
+            <span style={{ color: B.warm, fontSize: 15, textDecoration: "line-through", marginRight: 8 }}>
+              {(amount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
+            </span>
+            <span style={{ color: B.green, fontSize: 17, fontWeight: 700 }}>
+              {(finalAmount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
+            </span>
+          </div>
+        ) : (
+          <p style={{ color: B.warm, marginTop: 8, fontSize: 15 }}>
+            {(amount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
+          </p>
+        )}
       </div>
+
+      {/* Coupon step */}
+      {status === "coupon" && (
+        <div style={{ maxWidth: 440, width: "100%", marginBottom: 32 }}>
+          {/* Coupon input */}
+          <div style={{
+            background: "#fff", border: `1px solid ${B.light}`, borderRadius: 16,
+            padding: "24px", marginBottom: 20,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: B.dark, marginBottom: 12 }}>
+              İndirim kodunuz var mı?
+            </div>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                placeholder="Kodu girin"
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value.toUpperCase());
+                  if (couponStatus !== "idle") {
+                    setCouponStatus("idle");
+                    setCouponError("");
+                    setDiscountPercent(0);
+                    setValidatedCoupon("");
+                  }
+                }}
+                onKeyDown={(e) => e.key === "Enter" && validateCoupon()}
+                style={{
+                  flex: 1, padding: "12px 14px", borderRadius: 10,
+                  border: `1.5px solid ${couponStatus === "valid" ? B.green : couponStatus === "invalid" ? "#ef4444" : B.light}`,
+                  fontSize: 15, fontFamily: "monospace", letterSpacing: 1,
+                  color: B.dark, outline: "none", background: B.cream,
+                }}
+              />
+              <button
+                onClick={validateCoupon}
+                disabled={couponStatus === "checking" || !couponInput.trim()}
+                style={{
+                  padding: "12px 20px", borderRadius: 10, border: "none",
+                  background: B.coral, color: "#fff", fontSize: 14, fontWeight: 600,
+                  cursor: couponStatus === "checking" || !couponInput.trim() ? "default" : "pointer",
+                  fontFamily: "inherit", opacity: couponStatus === "checking" || !couponInput.trim() ? 0.5 : 1,
+                }}
+              >
+                {couponStatus === "checking" ? "..." : "Uygula"}
+              </button>
+            </div>
+
+            {/* Coupon feedback */}
+            {couponStatus === "valid" && (
+              <div style={{
+                display: "flex", alignItems: "center", gap: 8, marginTop: 10,
+                padding: "8px 12px", borderRadius: 8, background: B.greenBg,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={B.green} strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                <span style={{ fontSize: 13, fontWeight: 600, color: B.green }}>
+                  %{discountPercent} indirim uygulandı!
+                </span>
+              </div>
+            )}
+            {couponStatus === "invalid" && (
+              <div style={{ fontSize: 13, color: "#ef4444", marginTop: 8, fontWeight: 500 }}>
+                {couponError}
+              </div>
+            )}
+          </div>
+
+          {/* Proceed to payment button */}
+          <button
+            onClick={startPayment}
+            style={{
+              width: "100%", padding: "16px", borderRadius: 12, border: "none",
+              background: B.coral, color: "#fff", fontSize: 16, fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit",
+              boxShadow: "0 4px 16px rgba(255,109,96,0.3)",
+            }}
+          >
+            {discountPercent > 0
+              ? `${(finalAmount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL Öde`
+              : `${(amount / 100).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL Öde`
+            }
+          </button>
+
+          <button
+            onClick={() => router.back()}
+            style={{
+              width: "100%", marginTop: 10, padding: "12px", borderRadius: 12,
+              border: `1px solid ${B.light}`, background: "transparent",
+              color: B.warm, fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            Geri Dön
+          </button>
+        </div>
+      )}
 
       {/* Yüklenme */}
       {status === "loading" && (
