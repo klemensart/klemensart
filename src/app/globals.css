@@ -281,6 +281,12 @@ html {
   text-decoration-thickness: 2px;
 }
 
+/* ── Internal links — dotted underline, subtle ── */
+.prose-klemens a.internal-link {
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1.5px;
+}
+
 /* ── Highlight — coral background ── */
 .prose-klemens mark {
   background: rgba(255, 109, 96, 0.2);

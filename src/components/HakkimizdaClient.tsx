@@ -178,6 +178,34 @@ const arrowIcon = (
 );
 
 // ── Main component ─────────────────────────────────────────────────────────────
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+      >
+        <span className="text-[#2D2926] font-medium text-[15px] pr-4">{q}</span>
+        <span className={`text-[#8C857E] text-xl shrink-0 transition-transform duration-200 ${open ? "rotate-45" : ""}`}>+</span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <p className="px-5 pb-4 text-[#8C857E] text-sm leading-relaxed">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -580,6 +608,27 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
                 <span className="text-5xl font-bold text-warm-900 mb-2">{stat}</span>
                 <span className="text-sm text-warm-900/50 font-medium">{label}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SSS (FAQ) ──────────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 bg-[#FFFBF7]">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#2D2926] mb-10 text-center">
+            Sık Sorulan Sorular
+          </h2>
+          <div className="space-y-3">
+            {[
+              { q: "Klemens Art nedir?", a: "Klemens Art, Ankara merkezli bağımsız bir kültür ve sanat platformudur. Sanat tarihi makaleleri, interaktif kültür haritası, atölye çalışmaları ve dijital sergiler aracılığıyla sanatı herkes için erişilebilir kılmayı amaçlıyoruz." },
+              { q: "Klemens Art'ın içerikleri ücretsiz mi?", a: "Evet. Tüm makaleler, interaktif kültür haritası, etkinlik takvimi ve dijital sergiler tamamen ücretsizdir. Atölye çalışmaları ücretli olabilir; detaylar atölye sayfalarında belirtilir." },
+              { q: "Kültür haritası nasıl çalışır?", a: "Ankara'nın müze, galeri, tiyatro, konser mekanı ve tarihi alanlarını gösteren interaktif bir haritadır. Mekanları ziyaret ederek check-in yapabilir, yıldız toplayabilir, rozet kazanabilir ve kültürel rotaları takip edebilirsiniz." },
+              { q: "Atölyelere nasıl kayıt olunur?", a: "Atölyeler sayfasından ilgilendiğiniz atölyeyi seçip online ödeme yaparak kayıt olabilirsiniz. Kayıt sonrası detaylı bilgi ve hazırlık kiti e-posta ile gönderilir." },
+              { q: "Loca Club nedir?", a: "Loca Club, Klemens Art'ın üyelik programıdır. Üyeler atölyelere erken erişim, özel içerikler ve kültür haritasında gelişmiş gamification özellikleri gibi avantajlardan yararlanır." },
+              { q: "Klemens Art'a nasıl katkıda bulunabilirim?", a: "Yazar, fotoğrafçı veya içerik üreticisi olarak ekibimize katılabilirsiniz. Hakkımızda sayfasından ekip üyelerimizi inceleyebilir, sosyal medya hesaplarımız üzerinden bizimle iletişime geçebilirsiniz." },
+            ].map((item, i) => (
+              <FaqItem key={i} q={item.q} a={item.a} />
             ))}
           </div>
         </div>

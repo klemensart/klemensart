@@ -147,6 +147,76 @@ function processYouTubeEmbeds(rawHtml: string): string {
   return result;
 }
 
+/* ──────────────── otomatik iç link sistemi ──────────────── */
+
+// Sabit sayfa linkleri — sıklıkla geçen anahtar kelimeler
+const STATIC_LINKS: { keyword: string; url: string }[] = [
+  { keyword: "kültür haritası", url: "/harita" },
+  { keyword: "interaktif harita", url: "/harita" },
+  { keyword: "sanat tarihi atölye", url: "/atolyeler" },
+  { keyword: "atölye", url: "/atolyeler" },
+  { keyword: "etkinlik takvimi", url: "/etkinlikler" },
+  { keyword: "Loca Club", url: "/club" },
+];
+
+/**
+ * Makale içinde geçen diğer makale başlıklarını ve sabit anahtar kelimeleri
+ * otomatik iç linklere çevirir. Kurallar:
+ * - Zaten bir <a> tag'ı içindeyse dokunma
+ * - Heading'ler içindeyse dokunma
+ * - Aynı link'i en fazla 1 kez ekle (ilk eşleşme)
+ * - Mevcut makaleye link verme (currentSlug)
+ */
+function processInternalLinks(
+  rawHtml: string,
+  otherArticles: { title: string; slug: string }[],
+  currentSlug: string,
+): string {
+  const usedUrls = new Set<string>();
+  let result = rawHtml;
+
+  // Hem makale linklerini hem sabit linkleri birleştir
+  const allLinks: { keyword: string; url: string }[] = [
+    // Makale linkleri (uzun başlıklardan başla — greedy match)
+    ...otherArticles
+      .filter((a) => a.slug !== currentSlug && a.title.length >= 8)
+      .sort((a, b) => b.title.length - a.title.length)
+      .map((a) => ({ keyword: a.title, url: `/icerikler/yazi/${a.slug}` })),
+    // Sabit linkler
+    ...STATIC_LINKS,
+  ];
+
+  for (const { keyword, url } of allLinks) {
+    if (usedUrls.has(url)) continue;
+
+    // Escape special regex chars in keyword
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Sadece <p> tag'ları içindeki eşleşmeleri bul (heading'leri atla)
+    // Zaten <a> içinde değilse değiştir
+    const pattern = new RegExp(
+      `(<p[^>]*>(?:(?!<\\/p>).)*?)\\b(${escaped})\\b((?:(?!<\\/p>).)*?<\\/p>)`,
+      "is",
+    );
+
+    const match = result.match(pattern);
+    if (!match) continue;
+
+    // Eşleşen bölümün bir <a> tag'ı içinde olmadığını doğrula
+    const before = match[1];
+    const openAnchor = (before.match(/<a /g) || []).length;
+    const closeAnchor = (before.match(/<\/a>/g) || []).length;
+    if (openAnchor > closeAnchor) continue; // <a> içindeyiz, atla
+
+    result = result.replace(
+      pattern,
+      `$1<a href="${url}" class="internal-link">$2</a>$3`,
+    );
+    usedUrls.add(url);
+  }
+
+  return result;
+}
+
 /** Markdown content → processed HTML (tüm özel bloklar dahil) */
 export async function markdownToHtml(content: string): Promise<string> {
   // 1. Pre-process: extract custom blocks before remark runs
@@ -179,19 +249,35 @@ export async function markdownToHtml(content: string): Promise<string> {
 
 export async function getArticleBySlug(slug: string): Promise<ParsedArticle | null> {
   const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("articles")
-    .select("*")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .maybeSingle();
+  const [articleRes, otherArticlesRes] = await Promise.all([
+    supabase
+      .from("articles")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle(),
+    supabase
+      .from("articles")
+      .select("slug, title")
+      .eq("status", "published")
+      .neq("slug", slug)
+      .limit(100),
+  ]);
 
+  const { data, error } = articleRes;
   if (error || !data) return null;
 
   const content: string = data.content ?? "";
 
   // Markdown → HTML (tüm özel bloklar korunuyor)
-  const contentHtml = await markdownToHtml(content);
+  let contentHtml = await markdownToHtml(content);
+
+  // İç link sistemi: diğer makalelere + sabit sayfalara otomatik link
+  const otherArticles = (otherArticlesRes.data ?? []).map((a) => ({
+    title: a.title as string,
+    slug: a.slug as string,
+  }));
+  contentHtml = processInternalLinks(contentHtml, otherArticles, slug);
 
   // Auto-calculate read time from word count (200 words/min, min 1 dk)
   const wordCount = content.trim().split(/\s+/).length;

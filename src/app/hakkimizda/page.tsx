@@ -41,11 +41,70 @@ export default async function HakkimizdaPage() {
     ],
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Klemens Art nedir?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Klemens Art, Ankara merkezli bağımsız bir kültür ve sanat platformudur. Sanat tarihi makaleleri, interaktif kültür haritası, atölye çalışmaları ve dijital sergiler aracılığıyla sanatı herkes için erişilebilir kılmayı amaçlıyoruz.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Klemens Art'ın içerikleri ücretsiz mi?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Evet. Tüm makaleler, interaktif kültür haritası, etkinlik takvimi ve dijital sergiler tamamen ücretsizdir. Atölye çalışmaları ücretli olabilir; detaylar atölye sayfalarında belirtilir.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Kültür haritası nasıl çalışır?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Ankara'nın müze, galeri, tiyatro, konser mekanı ve tarihi alanlarını gösteren interaktif bir haritadır. Mekanları ziyaret ederek check-in yapabilir, yıldız toplayabilir, rozet kazanabilir ve kültürel rotaları takip edebilirsiniz.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Atölyelere nasıl kayıt olunur?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Atölyeler sayfasından ilgilendiğiniz atölyeyi seçip online ödeme yaparak kayıt olabilirsiniz. Kayıt sonrası detaylı bilgi ve hazırlık kiti e-posta ile gönderilir.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Loca Club nedir?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Loca Club, Klemens Art'ın üyelik programıdır. Üyeler atölyelere erken erişim, özel içerikler ve kültür haritasında gelişmiş gamification özellikleri gibi avantajlardan yararlanır.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Klemens Art'a nasıl katkıda bulunabilirim?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yazar, fotoğrafçı veya içerik üreticisi olarak ekibimize katılabilirsiniz. Hakkımızda sayfasından ekip üyelerimizi inceleyebilir, sosyal medya hesaplarımız üzerinden bizimle iletişime geçebilirsiniz.",
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <HakkimizdaClient articles={articles} />
     </>

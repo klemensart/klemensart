@@ -28,9 +28,11 @@ export async function generateMetadata({
     ? article.meta.image.startsWith("http") ? article.meta.image : `${BASE}${article.meta.image}`
     : undefined;
 
+  // Görsel yoksa dinamik OG image oluştur
+  const dynamicOgUrl = `${BASE}/api/og?title=${encodeURIComponent(article.meta.title)}&subtitle=${encodeURIComponent(article.meta.description.slice(0, 120))}&category=${encodeURIComponent(article.meta.category)}`;
   const ogImage = absImage
     ? { url: absImage, width: 1200, height: 630, alt: article.meta.title }
-    : undefined;
+    : { url: dynamicOgUrl, width: 1200, height: 630, alt: article.meta.title };
 
   const keywords = [
     article.meta.category,
@@ -51,7 +53,7 @@ export async function generateMetadata({
       description: article.meta.description,
       siteName: "Klemens",
       locale: "tr_TR",
-      ...(ogImage && { images: [ogImage] }),
+      images: [ogImage],
       publishedTime: article.meta.date || undefined,
       authors: article.meta.author ? [article.meta.author] : undefined,
       tags: article.meta.tags.length > 0 ? article.meta.tags : undefined,
@@ -60,7 +62,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: article.meta.title,
       description: article.meta.description,
-      ...(absImage && { images: [absImage] }),
+      images: [absImage || dynamicOgUrl],
     },
   };
 }
@@ -83,7 +85,7 @@ export default async function ArticlePage({
 
   const articleJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     headline: article.meta.title,
     description: article.meta.description,
     url: artUrl,
