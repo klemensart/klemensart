@@ -24,6 +24,10 @@ type StoryObject = {
   letterSpacing?: number;
   lineHeight?: number;
   src?: string;
+  cropX?: number;
+  cropY?: number;
+  cropWidth?: number;
+  cropHeight?: number;
   shapeType?: "rect" | "circle" | "line";
   stroke?: string;
   strokeWidth?: number;
@@ -57,11 +61,12 @@ function generateStory1(): StoryCanvasData {
       fontSize: 36, fontFamily: "Cormorant Garamond", fontStyle: "italic",
       fill: "#ffffff", align: "right", opacity: 0.85, rotation: 0,
     },
-    // Rönesans tablosu — üst yarı
+    // Rönesans tablosu — el detayı (crop ile yakınlaştırılmış)
     {
       type: "image",
       x: PAD, y: 160, width: CONTENT_W, height: 820,
       src: "/images/testler/ronesans/ademin-yaratilisi.webp",
+      cropX: 310, cropY: 60, cropWidth: 220, cropHeight: 200,
       cornerRadius: 20, opacity: 1, rotation: 0,
     },
     // Soru metni — büyük, italic

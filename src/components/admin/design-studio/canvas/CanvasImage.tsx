@@ -34,6 +34,7 @@ export default function CanvasImage({ obj }: { obj: CanvasObject }) {
       opacity={obj.opacity ?? 1}
       rotation={obj.rotation || 0}
       cornerRadius={obj.cornerRadius || 0}
+      crop={obj.cropWidth && obj.cropHeight ? { x: obj.cropX || 0, y: obj.cropY || 0, width: obj.cropWidth, height: obj.cropHeight } : undefined}
       draggable
       onClick={() => setSelectedId(obj.id)}
       onTap={() => setSelectedId(obj.id)}

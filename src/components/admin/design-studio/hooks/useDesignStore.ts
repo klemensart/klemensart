@@ -20,6 +20,10 @@ export type CanvasObject = {
   lineHeight?: number;
   // image
   src?: string;
+  cropX?: number;
+  cropY?: number;
+  cropWidth?: number;
+  cropHeight?: number;
   // shape
   shapeType?: "rect" | "circle" | "line";
   stroke?: string;
