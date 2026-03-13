@@ -198,6 +198,7 @@ const nextConfig: NextConfig = {
       { source: "/cart", destination: "/club/giris", permanent: true },
       { source: "/checkout", destination: "/club/giris", permanent: true },
       { source: "/odeme", destination: "/club/giris", permanent: true },
+      { source: "/odeme-sayfasi", destination: "/atolyeler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
       // 5. ÜRÜNLER
@@ -227,7 +228,14 @@ const nextConfig: NextConfig = {
       { source: "/iptal-ve-iade-kosullari", destination: "/iade-ve-iptal", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 8. ESKİ / GEREKSİZ
+      // 8. GSC 404 DÜZELTME — anlamsız path combo'ları
+      // ═══════════════════════════════════════════════════════
+      { source: "/kvkk/:path*", destination: "/kvkk", permanent: true },
+      { source: "/sepet/:path*", destination: "/atolyeler", permanent: true },
+      { source: "/gizlilik-ve-guvenlik/:path*", destination: "/kvkk", permanent: true },
+
+      // ═══════════════════════════════════════════════════════
+      // 9. ESKİ / GEREKSİZ
       // ═══════════════════════════════════════════════════════
       { source: "/saskin-oyunbazin-okuma-macerasi", destination: "/icerikler", permanent: true },
       { source: "/sanatin-tekel-yonetimi-2", destination: "/icerikler/yazi/sanatin-tekel-yonetimi", permanent: true },
@@ -238,6 +246,9 @@ const nextConfig: NextConfig = {
       { source: "/etn_category/:path*", destination: "/etkinlikler", permanent: true },
       { source: "/etn-tags/:path*", destination: "/etkinlikler", permanent: true },
       { source: "/etn-speaker-category/:path*", destination: "/etkinlikler", permanent: true },
+
+      // WordPress RSS feed URL'leri (GSC noindex — /slug/feed/)
+      { source: "/:slug/feed", destination: "/icerikler/yazi/:slug", permanent: true },
 
       // WordPress yazar sayfaları
       { source: "/author/:path*", destination: "/hakkimizda", permanent: true },
@@ -258,7 +269,7 @@ const nextConfig: NextConfig = {
       { source: "/ajanda/:path*", destination: "/etkinlikler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 9. TARİH ARŞİVLERİ
+      // 10. TARİH ARŞİVLERİ
       // ═══════════════════════════════════════════════════════
       { source: "/2016/:path*", destination: "/icerikler", permanent: true },
       { source: "/2024/:path*", destination: "/icerikler", permanent: true },
@@ -266,7 +277,7 @@ const nextConfig: NextConfig = {
       { source: "/2026/:path*", destination: "/icerikler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 10. GENEL WORDPRESS KALIPLARI (en sona — wildcard)
+      // 11. GENEL WORDPRESS KALIPLARI (en sona — wildcard)
       // ═══════════════════════════════════════════════════════
       { source: "/blog/:slug", destination: "/icerikler/yazi/:slug", permanent: true },
       { source: "/blog", destination: "/icerikler", permanent: true },

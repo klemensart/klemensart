@@ -12,6 +12,10 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.searchParams.has("page_id")) {
     return NextResponse.redirect(new URL("/", request.url), 301);
   }
+  // WooCommerce sepet URL'leri (?add-to-cart=*)
+  if (request.nextUrl.searchParams.has("add-to-cart")) {
+    return NextResponse.redirect(new URL("/atolyeler", request.url), 301);
+  }
 
   // Auth kontrolü yalnızca /club/* rotalarında çalışsın
   // Diğer sayfalarda Supabase auth çağrısı yapma — cache header'ını bozar
@@ -57,5 +61,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/club/:path*"],
+  matcher: [
+    "/club/:path*",
+    // WordPress kalıntı query param'ları (?add-to-cart, ?post_type, ?page_id)
+    "/",
+  ],
 };
