@@ -27,6 +27,26 @@ export default function DesignCanvas({ stageRef }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+  // Fontlar yüklendikten sonra canvas'ı yeniden çiz
+  // (auto-story fontları async yükleniyor, Konva yazıları boş render edebilir)
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      setFontsReady(true);
+      stageRef.current?.batchDraw();
+    });
+  }, [stageRef]);
+
+  // objects değiştiğinde fontlar yeniden kontrol edilsin
+  useEffect(() => {
+    if (!fontsReady) return;
+    // Fontlar zaten yüklüyse kısa bir gecikme ile redraw (yeni fontlar için)
+    const timer = setTimeout(() => {
+      document.fonts.ready.then(() => stageRef.current?.batchDraw());
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [objects, fontsReady, stageRef]);
+
   // fit canvas to container
   const fitCanvas = useCallback(() => {
     const container = containerRef.current;

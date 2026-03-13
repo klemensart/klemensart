@@ -151,7 +151,9 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   },
 
   loadObjects: (objs) => {
-    set({ objects: objs, selectedId: null, history: [objs], historyIndex: 0 });
+    // DB'den gelen objeler id'siz olabilir (auto-story, quiz-promo vb.)
+    const withIds = objs.map((o) => (o.id ? o : { ...o, id: newId() }));
+    set({ objects: withIds, selectedId: null, history: [withIds], historyIndex: 0 });
   },
 
   pushHistory: () => {

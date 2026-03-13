@@ -25,12 +25,12 @@ export default function DesignEditorPage() {
     useDesignStore();
   const { getThumbnail } = useCanvasExport(stageRef);
 
-  // Load design data
+  // Load design data — fontlar hazır olduktan sonra objeleri yükle
   useEffect(() => {
     if (!id) return;
     fetch(`/api/admin/designs/${id}`)
       .then((r) => r.json())
-      .then((d) => {
+      .then(async (d) => {
         if (d.error) {
           alert("Tasarım bulunamadı.");
           router.push("/admin/tasarim");
@@ -46,6 +46,8 @@ export default function DesignEditorPage() {
           backgroundColor: design.canvas_data?.backgroundColor || "#ffffff",
         });
         const objs: CanvasObject[] = design.canvas_data?.objects || [];
+        // Fontlar yüklenene kadar bekle — Konva yazıları doğru render etsin
+        await document.fonts.ready;
         loadObjects(objs);
       })
       .finally(() => setLoading(false));
