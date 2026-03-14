@@ -200,21 +200,35 @@ SADECE JSON dizisi döndür, başka bir şey yazma:
 
     const text =
       response.content[0].type === "text" ? response.content[0].text : "";
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
+
+    // Markdown code block veya düz JSON dizisi
+    const cleaned = text.replace(/```(?:json)?\s*/g, "").replace(/```\s*/g, "").trim();
+    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
 
     if (!jsonMatch) {
+      console.error("AI trending parse fail. Raw text:", text.slice(0, 500));
       return NextResponse.json(
-        { error: "AI yanıtı okunamadı." },
+        { error: `AI yanıtı okunamadı. Ham: ${text.slice(0, 200)}` },
         { status: 500 },
       );
     }
 
-    const formatted = JSON.parse(jsonMatch[0]) as Array<{
+    let formatted: Array<{
       title: string;
       summary: string;
       source_name: string;
       url: string;
     }>;
+
+    try {
+      formatted = JSON.parse(jsonMatch[0]);
+    } catch {
+      console.error("JSON parse fail:", jsonMatch[0].slice(0, 300));
+      return NextResponse.json(
+        { error: "AI yanıtı JSON olarak ayrıştırılamadı." },
+        { status: 500 },
+      );
+    }
 
     const valid = formatted.filter((f) => f.title?.trim());
 
