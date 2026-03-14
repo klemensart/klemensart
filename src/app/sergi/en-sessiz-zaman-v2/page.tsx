@@ -702,7 +702,6 @@ export default function EnSessizZamanV2Page() {
             inset: 0,
             background: "#0a0a0a",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
             zIndex: 40,
             overflowY: "auto",
@@ -713,6 +712,7 @@ export default function EnSessizZamanV2Page() {
               textAlign: "center",
               maxWidth: 560,
               padding: "48px 32px",
+              margin: "auto 0",
             }}
           >
             <div
