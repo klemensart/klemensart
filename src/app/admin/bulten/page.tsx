@@ -623,10 +623,12 @@ export default function BultenGonderPage() {
               source_name: item.source_name || "",
             })
           );
-          // Auto week label
+          // Auto week label (Pazartesi–Pazar, bugünü içeren hafta)
           const now = new Date();
+          const day = now.getDay(); // 0=Pazar
+          const mondayOffset = day === 0 ? -6 : 1 - day;
           const weekStart = new Date(now);
-          weekStart.setDate(now.getDate() - now.getDay() + 1);
+          weekStart.setDate(now.getDate() + mondayOffset);
           const weekEnd = new Date(weekStart);
           weekEnd.setDate(weekStart.getDate() + 6);
           const fmt = (d: Date) => `${d.getDate()} ${d.toLocaleDateString("tr-TR", { month: "long" })}`;
