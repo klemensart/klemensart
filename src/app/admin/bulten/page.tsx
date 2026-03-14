@@ -602,19 +602,17 @@ export default function BultenGonderPage() {
     setTemplatePreviewHtml("");
     setMessage("");
 
-    // Auto-populate HaberlerBulteni with published news from last 7 days
+    // Auto-populate HaberlerBulteni with published news not yet in a newsletter
     if (tmpl.name === "HaberlerBulteni") {
       try {
         const res = await fetch("/api/admin/news?status=published");
         const data = await res.json();
         if (data.items) {
-          const sevenDaysAgo = new Date();
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-          const recent = data.items.filter(
-            (item: { published_at: string }) =>
-              new Date(item.published_at) >= sevenDaysAgo
+          // Sadece henüz bültene eklenmemiş haberleri al
+          const unsent = data.items.filter(
+            (item: { sent_in_newsletter?: boolean }) => !item.sent_in_newsletter
           );
-          const newsItems = (recent.length > 0 ? recent : data.items.slice(0, 10)).map(
+          const newsItems = (unsent.length > 0 ? unsent : data.items.slice(0, 10)).map(
             (item: { title: string; summary: string; url: string; image_url?: string; source_name?: string }) => ({
               title: item.title || "",
               summary: item.summary || "",

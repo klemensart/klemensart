@@ -35,25 +35,22 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // 1. Son 7 günün yayınlanmış haberlerini çek
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
+  // 1. Kullanıcının "Yayınla" dediği ve henüz bültene dahil edilmemiş haberleri çek
   const { data: newsItems } = await admin
     .from("news_items")
-    .select("title, summary, url, image_url, source_name")
+    .select("id, title, summary, url, image_url, source_name")
     .eq("status", "published")
-    .gte("published_at", sevenDaysAgo.toISOString())
+    .eq("sent_in_newsletter", false)
     .order("published_at", { ascending: false });
 
   if (!newsItems || newsItems.length === 0) {
     return NextResponse.json({
       success: false,
-      message: "Son 7 günde yayınlanmış haber yok, bülten gönderilmedi.",
+      message: "Bültene dahil edilecek yeni haber yok, gönderilmedi.",
     });
   }
 
-  // 2. Template'i render et
+  // 3. Template'i render et
   const weekLabel = getWeekLabel();
   const entry = templateRegistry.HaberlerBulteni;
 
@@ -73,7 +70,7 @@ export async function GET(req: NextRequest) {
   const emailHtml = await render(entry.component(templateProps));
   const emailSubject = `${weekLabel} — Haftanın Kültür Sanat Gündemi`;
 
-  // 3. Aktif aboneleri çek
+  // 4. Tüm aktif abonelere gönder
   const { data: subs } = await admin
     .from("subscribers")
     .select("email")
@@ -86,7 +83,6 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 4. Gönder
   const emails = subs.map((s) => ({
     from: FROM,
     to: s.email,
@@ -112,7 +108,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // 5. Kampanya kaydı (otomatik olarak herkese açık)
+  // 5. Kampanya kaydı (otomatik herkese açık)
   if (totalSent > 0) {
     await admin.from("campaigns").insert({
       subject: emailSubject,
@@ -122,11 +118,18 @@ export async function GET(req: NextRequest) {
       sent_count: totalSent,
       is_public: true,
     });
+
+    // 6. Bültene dahil edilen haberleri işaretle
+    const sentIds = newsItems.map((n) => n.id);
+    await admin
+      .from("news_items")
+      .update({ sent_in_newsletter: true })
+      .in("id", sentIds);
   }
 
   return NextResponse.json({
     success: true,
-    message: `Haftalık bülten ${totalSent} aboneye gönderildi.`,
+    message: `Haftalık bülten ${totalSent} aboneye gönderildi (${newsItems.length} haber).`,
     totalSent,
     newsCount: newsItems.length,
     weekLabel,
