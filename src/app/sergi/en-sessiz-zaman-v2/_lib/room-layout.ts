@@ -63,8 +63,8 @@ export function buildAllRooms(ctx: SceneContext): THREE.Group[] {
     // Baseboard trim
     addBaseboard(group, doors, ctx);
 
-    // Klemens embossed plaque
-    addKlemensPlaque(group);
+    // Klemens logo — only in first room
+    if (room.id === 0) addKlemensPlaque(group);
 
     ctx.scene.add(group);
     roomGroups.push(group);
@@ -476,6 +476,6 @@ function addKlemensPlaque(group: THREE.Group): void {
   }
 
   const mesh = new THREE.Mesh(sharedLogoGeo, sharedLogoMat);
-  mesh.position.set(HALF - 0.8, 0.9, -HALF + 0.02);
+  mesh.position.set(HALF - 0.8, 2.2, -HALF + 0.02);
   group.add(mesh);
 }

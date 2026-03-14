@@ -18,7 +18,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Afrodisias, antik donemin en unlu heykeltraslik okuluna ev sahipligi yapmis bir kenttir. 2017'de UNESCO Dunya Mirasi listesine alinmistir.",
     color: "#5B3A6B",
     accent: "#9B6BB0",
-    image: "/sergi/en-sessiz-zaman/afrodisias-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/afrodisias-1.webp",
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Afrodisias Tetrapylon'u, kentin anitsal giris kapisidir. Dort sutun grubundan olusan bu yapi, MS 2. yuzyilda insa edilmistir.",
     color: "#6B5B3A",
     accent: "#B09B6B",
-    image: "/sergi/en-sessiz-zaman/afrodisias-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/afrodisias-2.webp",
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Afrodisias Stadyumu, 262 metre uzunlugu ve 59 metre genisligiyle Roma doneminin en buyuk stadyumlarindan biridir.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/en-sessiz-zaman/afrodisias-3.webp",
+    image: "/sergi/en-sessiz-zaman-v2/afrodisias-3.webp",
   },
   {
     id: 4,
@@ -51,7 +51,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Afrodisias heykeltraslik okulu, Roma Imparatorlugu'nun en onemli mermer isleme merkeziydi.",
     color: "#6B3A5B",
     accent: "#B06B9B",
-    image: "/sergi/en-sessiz-zaman/afrodisias-4.webp",
+    image: "/sergi/en-sessiz-zaman-v2/afrodisias-4.webp",
   },
   // ── Aizanoi (3) ──
   {
@@ -63,7 +63,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Aizanoi Zeus Tapinagi, Anadolu'daki en iyi korunmus Roma tapinagidir. Alt katinda Kybele'ye adanmis bir magara tapinagi barindirir.",
     color: "#8B6914",
     accent: "#D4A843",
-    image: "/sergi/en-sessiz-zaman/aizanoi-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/aizanoi-1.webp",
   },
   {
     id: 6,
@@ -74,7 +74,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Aizanoi, dunyada stadyum ve tiyatronun ic ice gectigi tek antik kenttir.",
     color: "#4A6741",
     accent: "#7BA370",
-    image: "/sergi/en-sessiz-zaman/aizanoi-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/aizanoi-2.webp",
   },
   {
     id: 7,
@@ -85,7 +85,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Aizanoi'nin antik kopruleri, kenti ikiye bolen Penkalas Cayi uzerinde insa edilmistir.",
     color: "#5B6B3A",
     accent: "#9BB06B",
-    image: "/sergi/en-sessiz-zaman/aizanoi-3.webp",
+    image: "/sergi/en-sessiz-zaman-v2/aizanoi-3.webp",
   },
   // ── Asklepion (1) ──
   {
@@ -97,7 +97,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Bergama Asklepion'u, antik cagin en onemli saglik merkezlerinden biriydi. Modern psikoterapinin oncusu sayilir.",
     color: "#3A6B5B",
     accent: "#6BB09B",
-    image: "/sergi/en-sessiz-zaman/asklepion-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/asklepion-1.webp",
   },
   // ── Assos (1) ──
   {
@@ -109,7 +109,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Assos Athena Tapinagi, Arkaik donemde insa edilen tek Dor tapinagidir. Aristoteles MO 347-345 yillarinda burada bir felsefe okulu kurmustur.",
     color: "#14698B",
     accent: "#43A8D4",
-    image: "/sergi/en-sessiz-zaman/assos-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/assos-1.webp",
   },
   // ── Blaundus (1) ──
   {
@@ -121,7 +121,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Blaundus, Usak'in Ulubey ilcesinde, kanyonun kenarinda kurulmus antik bir kenttir.",
     color: "#8B4513",
     accent: "#CD853F",
-    image: "/sergi/en-sessiz-zaman/blaundus-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/blaundus-1.webp",
   },
   // ── Catalhoyuk (2) ──
   {
@@ -133,7 +133,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Catalhoyuk, MO 7500-5700 yillarina tarihlenen, dunyanin en eski ve en buyuk Neolitik yerlesimlerinden biridir.",
     color: "#6B5B4A",
     accent: "#B09B8A",
-    image: "/sergi/en-sessiz-zaman/catalhoyuk-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/catalhoyuk-1.webp",
   },
   {
     id: 12,
@@ -144,7 +144,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Catalhoyuk'te 18 yerlesim katmani tespit edilmistir. En kalabalik doneminde 8.000'e kadar insanin yasadigi tahmin edilmektedir.",
     color: "#5B4A3A",
     accent: "#9B8A6B",
-    image: "/sergi/en-sessiz-zaman/catalhoyuk-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/catalhoyuk-2.webp",
   },
   // ── Kibyra (2) ──
   {
@@ -156,7 +156,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Kibyra, Burdur'un Golhisar ilcesinde yer alan antik kenttir. 2015 yilinda kesfedilen gladyator mozaikleriyle dunya gundemine oturmustur.",
     color: "#6B3A3A",
     accent: "#B06B6B",
-    image: "/sergi/en-sessiz-zaman/kibyra-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/kibyra-1.webp",
   },
   {
     id: 14,
@@ -167,7 +167,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Kibyra'nin Medusa kabartmalari, Roma doneminin en etkileyici tas isçiligi ornekleri arasindadir.",
     color: "#4A3A6B",
     accent: "#8A6BB0",
-    image: "/sergi/en-sessiz-zaman/kibyra-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/kibyra-2.webp",
   },
   // ── Laodikeia (4) ──
   {
@@ -179,7 +179,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Laodikeia, Vahiy Kitabi'nda adi gecen yedi kiliseden biridir. Tekstil, tip ve bankacilikla zenginlesmis onemli bir Roma sehriydi.",
     color: "#3A4A6B",
     accent: "#6B8AB0",
-    image: "/sergi/en-sessiz-zaman/laodikeia-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/laodikeia-1.webp",
   },
   {
     id: 16,
@@ -190,7 +190,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Laodikeia'nin sutunlu caddesi, kentin ana arteriydi. Roma kentsel planlamasinin guzel bir ornegidir.",
     color: "#6B4A3A",
     accent: "#B08A6B",
-    image: "/sergi/en-sessiz-zaman/laodikeia-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/laodikeia-2.webp",
   },
   {
     id: 17,
@@ -201,7 +201,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Laodikeia Stadyumu, 250 metre uzunluguyla antik dunyanin buyuk stadyumlarindan biriydi.",
     color: "#4A6B3A",
     accent: "#8AB06B",
-    image: "/sergi/en-sessiz-zaman/laodikeia-3.webp",
+    image: "/sergi/en-sessiz-zaman-v2/laodikeia-3.webp",
   },
   {
     id: 18,
@@ -212,7 +212,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Laodikeia'daki anitsal cesmeler, kentin su sisteminin gorkemini yansitir.",
     color: "#3A6B4A",
     accent: "#6BB08A",
-    image: "/sergi/en-sessiz-zaman/laodikeia-4.webp",
+    image: "/sergi/en-sessiz-zaman-v2/laodikeia-4.webp",
   },
   // ── Sagalassos (3) ──
   {
@@ -224,7 +224,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Sagalassos, Burdur'un Aglasun ilcesinde, Toros Daglari'nin eteklerinde kurulmus antik bir kenttir. 'Daglarin Roma'si' olarak anilir.",
     color: "#3A5B6B",
     accent: "#6B9BB0",
-    image: "/sergi/en-sessiz-zaman/sagalassos-1.webp",
+    image: "/sergi/en-sessiz-zaman-v2/sagalassos-1.webp",
   },
   {
     id: 20,
@@ -235,7 +235,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Antoninler Cesmesi, MS 2. yuzyilda Imparator Marcus Aurelius doneminde insa edilmistir. 2010'da restore edilerek yeniden suyla bulusmustur.",
     color: "#5B3A4A",
     accent: "#9B6B8A",
-    image: "/sergi/en-sessiz-zaman/sagalassos-2.webp",
+    image: "/sergi/en-sessiz-zaman-v2/sagalassos-2.webp",
   },
   {
     id: 21,
@@ -246,7 +246,7 @@ export const ARTWORKS: Artwork[] = [
     info: "Sagalassos Tiyatrosu, 9.000 kisi kapasitesiyle dag yamacina oyulmustur.",
     color: "#4A5B3A",
     accent: "#8A9B6B",
-    image: "/sergi/en-sessiz-zaman/sagalassos-3.webp",
+    image: "/sergi/en-sessiz-zaman-v2/sagalassos-3.webp",
   },
 ];
 

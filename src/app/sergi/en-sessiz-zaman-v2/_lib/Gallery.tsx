@@ -1159,7 +1159,7 @@ export default function Gallery() {
             />
             <img
               key={selectedArtIndex}
-              src={selectedArt.image}
+              src={selectedArt.image.replace("/en-sessiz-zaman-v2/", "/en-sessiz-zaman/")}
               alt={selectedArt.title}
               style={{
                 maxWidth: "calc(100% - 120px)",
@@ -1370,7 +1370,7 @@ export default function Gallery() {
             />
             <img
               key={slideshowIndex}
-              src={ARTWORKS[slideshowIndex].image}
+              src={ARTWORKS[slideshowIndex].image.replace("/en-sessiz-zaman-v2/", "/en-sessiz-zaman/")}
               alt={ARTWORKS[slideshowIndex].title}
               style={{
                 maxWidth: "calc(100% - 120px)",
