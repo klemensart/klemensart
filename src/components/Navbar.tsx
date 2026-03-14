@@ -11,6 +11,7 @@ const navLinks: { label: string; href: string; badge?: string }[] = [
   { label: "İçerikler",   href: "/icerikler" },
   { label: "Testler",     href: "/testler" },
   { label: "Etkinlikler", href: "/etkinlikler" },
+  { label: "Haberler",    href: "/haberler" },
   { label: "Harita",      href: "/harita",     badge: "Yeni" },
   { label: "Hakkımızda",  href: "/hakkimizda" },
 ];

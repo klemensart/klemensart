@@ -7,6 +7,7 @@ type Stats = {
   workshops: number;
   pendingEvents: number;
   purchases: number;
+  pendingNews: number;
 };
 
 const CARDS = [
@@ -53,6 +54,18 @@ const CARDS = [
       </svg>
     ),
   },
+  {
+    key: "pendingNews" as const,
+    label: "Bekleyen Haber",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+        <path d="M18 14h-8" />
+        <path d="M15 18h-5" />
+        <path d="M10 6h8v4h-8V6Z" />
+      </svg>
+    ),
+  },
 ];
 
 type ActionState = "idle" | "loading" | "success" | "error";
@@ -62,6 +75,7 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [scraper, setScraper] = useState<ActionResult>({ state: "idle", message: "" });
   const [curate, setCurate] = useState<ActionResult>({ state: "idle", message: "" });
+  const [rssFetch, setRssFetch] = useState<ActionResult>({ state: "idle", message: "" });
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -97,7 +111,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
         {CARDS.map((card) => (
           <div
             key={card.key}
@@ -123,7 +137,7 @@ export default function AdminDashboardPage() {
       {/* Quick Actions */}
       <div className="mb-4">
         <h2 className="text-lg font-bold text-warm-900 mb-4">Hızlı İşlemler</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl">
           {/* Scraper */}
           <div className="bg-white rounded-2xl border border-warm-100 p-5">
             <p className="text-sm font-semibold text-warm-900 mb-1">Etkinlik Scraper</p>
@@ -159,6 +173,25 @@ export default function AdminDashboardPage() {
             )}
             {curate.state === "error" && (
               <p className="text-xs text-red-500 mt-3">{curate.message}</p>
+            )}
+          </div>
+
+          {/* RSS Fetch */}
+          <div className="bg-white rounded-2xl border border-warm-100 p-5">
+            <p className="text-sm font-semibold text-warm-900 mb-1">RSS Çekici</p>
+            <p className="text-xs text-warm-900/45 mb-4">Haber kaynaklarından RSS çek</p>
+            <button
+              onClick={() => runAction("/api/admin/news/fetch", setRssFetch)}
+              disabled={rssFetch.state === "loading"}
+              className="px-4 py-2 bg-warm-900 text-white text-sm font-semibold rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {rssFetch.state === "loading" ? "Çalışıyor..." : "RSS Çek"}
+            </button>
+            {rssFetch.state === "success" && (
+              <p className="text-xs text-emerald-600 mt-3">{rssFetch.message}</p>
+            )}
+            {rssFetch.state === "error" && (
+              <p className="text-xs text-red-500 mt-3">{rssFetch.message}</p>
             )}
           </div>
         </div>

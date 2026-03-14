@@ -16,7 +16,7 @@ export async function GET() {
   const admin = createAdminClient();
 
   // Paralel sorgular
-  const [usersRes, workshopsRes, pendingRes, purchasesRes] = await Promise.all([
+  const [usersRes, workshopsRes, pendingRes, purchasesRes, pendingNewsRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1, page: 1 }),
     admin
       .from("workshops")
@@ -28,6 +28,10 @@ export async function GET() {
     admin
       .from("purchases")
       .select("id", { count: "exact", head: true }),
+    admin
+      .from("news_items")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new"),
   ]);
 
   // auth.admin.listUsers total'i response'un total alanında döner
@@ -41,5 +45,6 @@ export async function GET() {
     workshops: workshopsRes.count ?? 0,
     pendingEvents: pendingRes.count ?? 0,
     purchases: purchasesRes.count ?? 0,
+    pendingNews: pendingNewsRes.count ?? 0,
   });
 }

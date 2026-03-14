@@ -10,13 +10,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
 
   // Son içerik tarihlerini çek — statik sayfaların lastModified'ı için
-  const [{ data: latestArticle }, { data: latestEvent }] = await Promise.all([
+  const [{ data: latestArticle }, { data: latestEvent }, { data: latestNews }] = await Promise.all([
     supabase.from("articles").select("date").eq("status", "published").order("date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("events").select("event_date").eq("status", "approved").order("event_date", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("news_items").select("published_at").eq("status", "published").order("published_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   const lastArticleDate = latestArticle?.date ? new Date(latestArticle.date) : now;
   const lastEventDate = latestEvent?.event_date ? new Date(latestEvent.event_date) : now;
+  const lastNewsDate = latestNews?.published_at ? new Date(latestNews.published_at) : now;
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -24,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/icerikler`, lastModified: lastArticleDate, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/atolyeler`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/etkinlikler`, lastModified: lastEventDate, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${BASE_URL}/haberler`, lastModified: lastNewsDate, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/harita`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/hakkimizda`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
