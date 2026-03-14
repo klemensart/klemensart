@@ -148,8 +148,13 @@ export default function Gallery() {
       }
 
       // Door proximity detection (for teleport)
+      // Only show when very close AND facing the door
       let foundDoor: typeof nearDoor = null;
-      let bestDoorDist = 3.0; // detection radius
+      let bestDoorDist = 2.0; // tighter detection radius
+
+      // Camera forward direction (from yaw)
+      const camFwdX = -Math.sin(nav.yaw);
+      const camFwdZ = -Math.cos(nav.yaw);
 
       for (const door of DOORS) {
         const rA = ROOMS[door.roomA];
@@ -164,6 +169,14 @@ export default function Gallery() {
         const dist = Math.sqrt(dx * dx + dz * dz);
 
         if (dist < bestDoorDist && room) {
+          // Check if camera is facing toward the door
+          const toDoorX = mx - ctx.camera.position.x;
+          const toDoorZ = mz - ctx.camera.position.z;
+          const len = Math.sqrt(toDoorX * toDoorX + toDoorZ * toDoorZ);
+          const dot = (camFwdX * toDoorX + camFwdZ * toDoorZ) / (len || 1);
+          // dot > 0.3 ≈ looking roughly toward the door (±72°)
+          if (dot < 0.3) continue;
+
           bestDoorDist = dist;
           const destRoom =
             room.id === door.roomA ? rB : rA;
