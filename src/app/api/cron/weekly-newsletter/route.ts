@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     .select("id, title, summary, url, image_url, source_name")
     .eq("status", "published")
     .eq("sent_in_newsletter", false)
-    .order("published_at", { ascending: false });
+    .order("newsletter_order", { ascending: true });
 
   if (!newsItems || newsItems.length === 0) {
     return NextResponse.json({

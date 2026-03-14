@@ -85,6 +85,17 @@ export default function AdminHaberlerPage() {
     fetchData(tab, page);
   }
 
+  async function reorderItem(id: string, direction: "up" | "down") {
+    setActioning((p) => ({ ...p, [id]: true }));
+    await fetch("/api/admin/news/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, direction }),
+    });
+    setActioning((p) => ({ ...p, [id]: false }));
+    fetchData(tab, page);
+  }
+
   async function deleteItem(id: string) {
     if (!confirm("Bu haberi silmek istediğinizden emin misiniz?")) return;
     setActioning((p) => ({ ...p, [id]: true }));
@@ -347,13 +358,35 @@ export default function AdminHaberlerPage() {
                     </>
                   )}
                   {tab === "published" && (
-                    <button
-                      onClick={() => updateStatus(item.id, "new")}
-                      disabled={actioning[item.id]}
-                      className="px-4 py-2 bg-warm-100 hover:bg-warm-200 text-warm-900/50 text-xs font-semibold rounded-xl transition-colors disabled:opacity-50"
-                    >
-                      Geri Al
-                    </button>
+                    <>
+                      <button
+                        onClick={() => reorderItem(item.id, "up")}
+                        disabled={actioning[item.id]}
+                        className="w-8 h-8 flex items-center justify-center bg-warm-100 hover:bg-warm-200 text-warm-900/50 rounded-lg transition-colors disabled:opacity-30"
+                        title="Yukarı taşı"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 15l-6-6-6 6" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => reorderItem(item.id, "down")}
+                        disabled={actioning[item.id]}
+                        className="w-8 h-8 flex items-center justify-center bg-warm-100 hover:bg-warm-200 text-warm-900/50 rounded-lg transition-colors disabled:opacity-30"
+                        title="Aşağı taşı"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => updateStatus(item.id, "new")}
+                        disabled={actioning[item.id]}
+                        className="px-4 py-2 bg-warm-100 hover:bg-warm-200 text-warm-900/50 text-xs font-semibold rounded-xl transition-colors disabled:opacity-50"
+                      >
+                        Geri Al
+                      </button>
+                    </>
                   )}
                   {tab === "dismissed" && (
                     <>

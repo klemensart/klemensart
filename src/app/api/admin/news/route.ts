@@ -18,12 +18,16 @@ export async function GET(req: NextRequest) {
   const limit = 50;
   const offset = (page - 1) * limit;
 
+  // Yayınlananları newsletter_order'a göre sırala, diğerlerini published_at'e göre
+  const orderColumn = status === "published" ? "newsletter_order" : "published_at";
+  const orderAsc = status === "published";
+
   const [itemsRes, newCount, publishedCount, dismissedCount] = await Promise.all([
     admin
       .from("news_items")
       .select("*")
       .eq("status", status)
-      .order("published_at", { ascending: false })
+      .order(orderColumn, { ascending: orderAsc })
       .range(offset, offset + limit - 1),
     admin.from("news_items").select("id", { count: "exact", head: true }).eq("status", "new"),
     admin.from("news_items").select("id", { count: "exact", head: true }).eq("status", "published"),

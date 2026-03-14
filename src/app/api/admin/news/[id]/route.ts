@@ -23,9 +23,23 @@ export async function PATCH(
   }
 
   const admin = createAdminClient();
+
+  // "published" yapılırken otomatik sıra numarası ata
+  const updateData: Record<string, unknown> = { status };
+  if (status === "published") {
+    const { data: maxRow } = await admin
+      .from("news_items")
+      .select("newsletter_order")
+      .eq("status", "published")
+      .order("newsletter_order", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    updateData.newsletter_order = ((maxRow?.newsletter_order as number) ?? 0) + 1;
+  }
+
   const { error } = await admin
     .from("news_items")
-    .update({ status })
+    .update(updateData)
     .eq("id", id);
 
   if (error) {
