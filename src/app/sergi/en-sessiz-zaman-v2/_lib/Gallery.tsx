@@ -106,35 +106,6 @@ export default function Gallery() {
       ctx.renderer.domElement
     );
 
-    // Click-to-walk: raycast click on artwork → auto-walk toward it
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let autoWalkTarget: THREE.Vector3 | null = null;
-
-    const onCanvasClick = (e: MouseEvent) => {
-      if (overlayOpenRef.current || nav.isDragging) return;
-      const rect = ctx.renderer.domElement.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, ctx.camera);
-      const hits = raycaster.intersectObjects(artMeshes, false);
-      if (hits.length > 0) {
-        // Only allow click-to-walk for artworks in the same room
-        const hitMesh = hits[0].object;
-        const hitInfo = artMeshInfos.find((a) => a.mesh === hitMesh);
-        const currentRoom = getActiveRoom(ctx.camera.position);
-        if (hitInfo && currentRoom && hitInfo.roomId === currentRoom.id) {
-          const target = hits[0].object.position.clone();
-          const toCamera = ctx.camera.position.clone().sub(target);
-          toCamera.y = 0;
-          toCamera.normalize().multiplyScalar(2.5);
-          autoWalkTarget = target.add(toCamera);
-          autoWalkTarget.y = 1.7;
-        }
-      }
-    };
-    ctx.renderer.domElement.addEventListener("click", onCanvasClick);
-
     // Animation loop
     let lazyFrame = 0;
 
@@ -144,29 +115,6 @@ export default function Gallery() {
       // Lazy load artwork textures
       checkLazyLoad(artMeshInfos, ctx.camera, lazyFrame);
       lazyFrame++;
-
-      // Auto-walk toward clicked artwork
-      if (autoWalkTarget) {
-        const diff = autoWalkTarget.clone().sub(ctx.camera.position);
-        diff.y = 0;
-        const dist = diff.length();
-        if (dist < 0.3) {
-          autoWalkTarget = null;
-          nav.velocity.set(0, 0, 0);
-        } else {
-          diff.normalize();
-          nav.velocity.x = diff.x * 0.15;
-          nav.velocity.z = diff.z * 0.15;
-          // Face toward artwork
-          const targetYaw = Math.atan2(-diff.x, -diff.z);
-          let yawDiff = targetYaw - nav.yaw;
-          while (yawDiff > Math.PI) yawDiff -= 2 * Math.PI;
-          while (yawDiff < -Math.PI) yawDiff += 2 * Math.PI;
-          nav.yaw += yawDiff * 0.08;
-        }
-        // Cancel auto-walk if user presses any key
-        if (Object.values(nav.keys).some(Boolean)) autoWalkTarget = null;
-      }
 
       // Navigation
       const { nearestArtIdx } = updateNavigation(
@@ -253,7 +201,6 @@ export default function Gallery() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      ctx.renderer.domElement.removeEventListener("click", onCanvasClick);
       cleanupKeyboard();
       cleanupMouse();
       cleanupTouch();

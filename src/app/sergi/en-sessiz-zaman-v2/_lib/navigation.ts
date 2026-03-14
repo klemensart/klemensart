@@ -28,8 +28,8 @@ export function createNavState(): NavState {
   };
 }
 
-const MAX_SPEED = 0.22;
-const ACCEL_LERP = 0.15;
+const MAX_SPEED = 0.12;
+const ACCEL_LERP = 0.1;
 const DECEL_FACTOR = 0.92;
 const SOFT_BOUNDARY = 1.5;
 const EYE_HEIGHT = 1.7;
