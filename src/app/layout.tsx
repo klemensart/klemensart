@@ -125,6 +125,7 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <link rel="preconnect" href="https://sgabkrzzzszfqrtgkord.supabase.co" />
+        <link rel="alternate" type="application/rss+xml" title="Klemens Art — Kültür Sanat Haberleri" href="/haberler/rss" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-white text-warm-900`}>
         <script
