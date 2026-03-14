@@ -353,8 +353,8 @@ export default function Gallery() {
     },
   });
 
-  const selectedArt =
-    selectedArtIndex !== null ? ARTWORKS[selectedArtIndex] : null;
+  const selectedArt = ARTWORKS[selectedArtIndex ?? 0];
+  const viewerVisible = selectedArtIndex !== null;
 
   return (
     <div
@@ -525,7 +525,7 @@ export default function Gallery() {
       </div>
 
       {/* Minimap */}
-      {!showIntro && !selectedArt && !showSlideshow && (
+      {!showIntro && !viewerVisible && !showSlideshow && (
         <div
           style={{
             position: "absolute",
@@ -659,7 +659,7 @@ export default function Gallery() {
       </div>
 
       {/* Slideshow button (always visible, bottom-left) */}
-      {!showIntro && !selectedArt && !showSlideshow && (
+      {!showIntro && !viewerVisible && !showSlideshow && (
         <button
           onClick={() => {
             setSlideshowIndex(0);
@@ -987,7 +987,7 @@ export default function Gallery() {
       </div>
 
       {/* Door teleport prompt */}
-      {nearDoor && !showIntro && !selectedArt && !showSlideshow && (
+      {nearDoor && !showIntro && !viewerVisible && !showSlideshow && (
         <div
           style={{
             position: "absolute",
@@ -1071,19 +1071,18 @@ export default function Gallery() {
         </div>
       )}
 
-      {/* Fullscreen artwork viewer */}
-      {selectedArt && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "#000",
-            zIndex: 100,
-            display: "flex",
-            flexDirection: "column",
-            willChange: "opacity",
-          }}
-        >
+      {/* Fullscreen artwork viewer — always mounted, toggled via CSS */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "#000",
+          zIndex: viewerVisible ? 100 : -1,
+          display: viewerVisible ? "flex" : "none",
+          flexDirection: "column",
+          pointerEvents: viewerVisible ? "auto" : "none",
+        }}
+      >
           <button
             onClick={() => {
               setSelectedArtIndex(null);
@@ -1283,8 +1282,7 @@ export default function Gallery() {
               </p>
             </div>
           </div>
-        </div>
-      )}
+      </div>
 
       {/* Slideshow */}
       {showSlideshow && (
