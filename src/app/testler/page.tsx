@@ -215,12 +215,62 @@ export default function TestlerPage() {
         </div>
       </section>
 
-      {/* ── Bölüm 2: Sanat & Dikkat Oyunları ── */}
+      {/* ── Bölüm 2: Atölye Quizleri ── */}
       <section className="py-20 px-6 bg-white border-t border-warm-100">
         <div className="max-w-6xl mx-auto">
           <div className="mb-10">
             <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-3">
               Bölüm 2
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-warm-900 mb-3">
+              Atölye Quizleri
+            </h2>
+            <p className="text-warm-900/55 text-base max-w-lg">
+              Modern Sanat Atölyesi katılımcılarına özel blok testleri.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {([
+              { title: "Blok 1: Emp + Küb + Dada", description: "Hafta 1-3 pekiştirme testi (12 soru)", href: "/testler/modern-sanat-blok-1-quiz", gradient: "from-amber-50 to-yellow-50/60", iconBg: "bg-amber-100 text-amber-700" },
+              { title: "Blok 2: Sür + DeS + SoyE", description: "Hafta 4-6 pekiştirme testi (12 soru)", href: "/testler/modern-sanat-blok-2-quiz", gradient: "from-violet-50 to-purple-50/60", iconBg: "bg-violet-100 text-violet-600" },
+              { title: "Blok 3: Pop + Kav + Per", description: "Hafta 7-9 pekiştirme testi (12 soru)", href: "/testler/modern-sanat-blok-3-quiz", gradient: "from-sky-50 to-blue-50/60", iconBg: "bg-sky-100 text-sky-600" },
+              { title: "Final: Genel Tekrar", description: "Tüm 10 haftayı kapsayan final (15 soru)", href: "/testler/modern-sanat-final-quiz", gradient: "from-rose-50 to-orange-50/60", iconBg: "bg-rose-100 text-rose-600" },
+            ] as const).map((q) => (
+              <Link
+                key={q.href}
+                href={q.href}
+                className={`group relative flex flex-col p-7 rounded-3xl bg-gradient-to-br ${q.gradient} border border-warm-200/60 hover:border-warm-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/[0.07] transition-all duration-300 no-underline`}
+              >
+                <div className={`inline-flex p-3 rounded-2xl mb-5 self-start ${q.iconBg}`}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-coral mb-2">
+                  Atölye Özel
+                </span>
+                <h3 className="text-lg font-bold text-warm-900 mb-2">{q.title}</h3>
+                <p className="text-sm text-warm-900/60 leading-relaxed flex-1">{q.description}</p>
+                <div className="mt-5 flex items-center gap-1.5 text-coral text-sm font-semibold opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200">
+                  <span>Başla</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Bölüm 3: Sanat & Dikkat Oyunları ── */}
+      <section className="py-20 px-6 border-t border-warm-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-10">
+            <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-3">
+              Bölüm 3
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-warm-900 mb-3">
               Sanat & Dikkat Oyunları
