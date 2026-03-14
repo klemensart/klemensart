@@ -146,3 +146,46 @@ export function addRoomLighting(
   low.position.set(cx, 2.0, cz);
   scene.add(low);
 }
+
+/**
+ * Create floating dust particles for museum atmosphere.
+ * Returns the Points object — call animateDust() each frame.
+ */
+export function createDustParticles(scene: THREE.Scene): THREE.Points {
+  const count = 300;
+  const positions = new Float32Array(count * 3);
+  const spread = ROOM_SIZE * 3; // cover all rooms
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * spread;
+    positions[i * 3 + 1] = Math.random() * WALL_HEIGHT;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * spread;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  const mat = new THREE.PointsMaterial({
+    color: 0xfff5e6,
+    size: 0.03,
+    transparent: true,
+    opacity: 0.3,
+    depthWrite: false,
+    sizeAttenuation: true,
+  });
+
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+  return points;
+}
+
+export function animateDust(dust: THREE.Points): void {
+  const pos = dust.geometry.attributes.position;
+  const arr = pos.array as Float32Array;
+  for (let i = 0; i < arr.length; i += 3) {
+    arr[i] += Math.sin(performance.now() * 0.0003 + i) * 0.0005;
+    arr[i + 1] += Math.sin(performance.now() * 0.0002 + i * 0.7) * 0.0003;
+    arr[i + 2] += Math.cos(performance.now() * 0.00025 + i * 0.5) * 0.0004;
+  }
+  pos.needsUpdate = true;
+}

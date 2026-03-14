@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import type { WalkRect } from "./types";
 import { isInWalkableArea } from "./room-layout";
-import { playFootstep } from "./audio";
 
 export type NavState = {
   keys: Record<string, boolean>;
@@ -13,7 +12,6 @@ export type NavState = {
   bobPhase: number;
   pinchDist: number;
   dragEndTime: number;
-  lastStepTime: number;
 };
 
 export function createNavState(): NavState {
@@ -27,7 +25,6 @@ export function createNavState(): NavState {
     bobPhase: 0,
     pinchDist: 0,
     dragEndTime: 0,
-    lastStepTime: 0,
   };
 }
 
@@ -45,7 +42,6 @@ export function updateNavigation(
   camera: THREE.PerspectiveCamera,
   walkRects: WalkRect[],
   artMeshes: THREE.Mesh[],
-  audioCtx: AudioContext | null,
   overlayOpen: boolean
 ): { nearestArtIdx: number | null; nearestDist: number } {
   if (overlayOpen) {
@@ -116,15 +112,6 @@ export function updateNavigation(
     nav.bobPhase *= 0.9;
   }
   camera.position.y = EYE_HEIGHT + Math.sin(nav.bobPhase) * 0.005;
-
-  // Footstep sounds
-  if (audioCtx && velMag > 0.02) {
-    const now = performance.now();
-    if (now - nav.lastStepTime > 400) {
-      nav.lastStepTime = now;
-      playFootstep(audioCtx);
-    }
-  }
 
   // Snap assist — soft yaw towards nearest artwork
   const { nearestArtIdx, nearestDist } = findNearestArt(camera, artMeshes);

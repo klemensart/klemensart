@@ -5,12 +5,13 @@ import Link from "next/link";
 import * as THREE from "three";
 import { ARTWORKS } from "./_lib/data";
 import type { Artwork, RoomConfig } from "./_lib/types";
-import { createScene } from "./_lib/scene-setup";
+import { createScene, createDustParticles, animateDust } from "./_lib/scene-setup";
 import { buildAllRooms, getWalkableRects } from "./_lib/room-layout";
 // import { loadGLBModel, cloneGLBForRoom } from "./_lib/glb-loader";
 import {
   placeAllArtworks,
   checkLazyLoad,
+  preloadRoom,
   type ArtMeshInfo,
 } from "./_lib/artwork-placer";
 import {
@@ -21,14 +22,17 @@ import {
   setupTouchEvents,
 } from "./_lib/navigation";
 import { getActiveRoom } from "./_lib/room-tracker";
-import { startAmbient, stopAmbient, type AmbientNodes } from "./_lib/audio";
 import { ROOMS, DOORS, ROOM_SIZE, getRoomCenter } from "./_lib/data";
 
 export default function EnSessizZamanV2Page() {
   const mountRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Teleport fade
+  const [teleportFade, setTeleportFade] = useState(false);
 
   // Artwork interaction
   const [selectedArtIndex, setSelectedArtIndex] = useState<number | null>(null);
@@ -54,10 +58,6 @@ export default function EnSessizZamanV2Page() {
   const [slideshowIndex, setSlideshowIndex] = useState(0);
   const touchStartXRef = useRef(0);
 
-  // Audio
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const ambientNodesRef = useRef<AmbientNodes | null>(null);
-  const [ambientOn, setAmbientOn] = useState(false);
 
   // Refs for animation loop
   const overlayOpenRef = useRef(false);
@@ -73,22 +73,28 @@ export default function EnSessizZamanV2Page() {
   useEffect(() => {
     if (!mountRef.current) return;
 
+    setLoadProgress(10);
     const ctx = createScene(mountRef.current);
     cameraRef.current = ctx.camera;
     setIsMobile(ctx.isMobile);
 
+    setLoadProgress(30);
     // Build procedural rooms
-    const roomGroups = buildAllRooms(ctx);
+    buildAllRooms(ctx);
 
-    // GLB model disabled — Sketchfab model is a single enclosed room
-    // and can't have door openings cut into its walls.
-    // Procedural rooms with door openings are used instead.
-    void roomGroups;
-
+    setLoadProgress(50);
     // Place artworks
     const artMeshInfos = placeAllArtworks(ctx.scene, ctx.renderer);
     const artMeshes = artMeshInfos.map((a) => a.mesh);
 
+    setLoadProgress(70);
+    // Preload starting room textures immediately
+    preloadRoom(artMeshInfos, 0);
+
+    // Dust particles
+    const dust = createDustParticles(ctx.scene);
+
+    setLoadProgress(90);
     // Navigation
     const nav = createNavState();
     navRef.current = nav;
@@ -103,6 +109,30 @@ export default function EnSessizZamanV2Page() {
       ctx.renderer.domElement
     );
 
+    // Click-to-walk: raycast click on artwork → auto-walk toward it
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let autoWalkTarget: THREE.Vector3 | null = null;
+
+    const onCanvasClick = (e: MouseEvent) => {
+      if (overlayOpenRef.current || nav.isDragging) return;
+      const rect = ctx.renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, ctx.camera);
+      const hits = raycaster.intersectObjects(artMeshes, false);
+      if (hits.length > 0) {
+        const target = hits[0].object.position.clone();
+        // Walk to 2.5m in front of artwork
+        const toCamera = ctx.camera.position.clone().sub(target);
+        toCamera.y = 0;
+        toCamera.normalize().multiplyScalar(2.5);
+        autoWalkTarget = target.add(toCamera);
+        autoWalkTarget.y = 1.7;
+      }
+    };
+    ctx.renderer.domElement.addEventListener("click", onCanvasClick);
+
     // Animation loop
     let lazyFrame = 0;
 
@@ -113,13 +143,35 @@ export default function EnSessizZamanV2Page() {
       checkLazyLoad(artMeshInfos, ctx.camera, lazyFrame);
       lazyFrame++;
 
+      // Auto-walk toward clicked artwork
+      if (autoWalkTarget) {
+        const diff = autoWalkTarget.clone().sub(ctx.camera.position);
+        diff.y = 0;
+        const dist = diff.length();
+        if (dist < 0.3) {
+          autoWalkTarget = null;
+          nav.velocity.set(0, 0, 0);
+        } else {
+          diff.normalize();
+          nav.velocity.x = diff.x * 0.15;
+          nav.velocity.z = diff.z * 0.15;
+          // Face toward artwork
+          const targetYaw = Math.atan2(-diff.x, -diff.z);
+          let yawDiff = targetYaw - nav.yaw;
+          while (yawDiff > Math.PI) yawDiff -= 2 * Math.PI;
+          while (yawDiff < -Math.PI) yawDiff += 2 * Math.PI;
+          nav.yaw += yawDiff * 0.08;
+        }
+        // Cancel auto-walk if user presses any key
+        if (Object.values(nav.keys).some(Boolean)) autoWalkTarget = null;
+      }
+
       // Navigation
       const { nearestArtIdx } = updateNavigation(
         nav,
         ctx.camera,
         walkRects,
         artMeshes,
-        audioCtxRef.current,
         overlayOpenRef.current
       );
 
@@ -179,10 +231,12 @@ export default function EnSessizZamanV2Page() {
         setNearDoor(foundDoor);
       }
 
+      animateDust(dust);
       ctx.renderer.render(ctx.scene, ctx.camera);
     };
     animate();
 
+    setLoadProgress(100);
     setIsLoading(false);
 
     // Resize
@@ -198,6 +252,7 @@ export default function EnSessizZamanV2Page() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      ctx.renderer.domElement.removeEventListener("click", onCanvasClick);
       cleanupKeyboard();
       cleanupMouse();
       cleanupTouch();
@@ -207,21 +262,6 @@ export default function EnSessizZamanV2Page() {
         mountRef.current.removeChild(ctx.renderer.domElement);
       }
       ctx.renderer.dispose();
-    };
-  }, []);
-
-  // Init AudioContext on first interaction
-  useEffect(() => {
-    const initAudio = () => {
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new AudioContext();
-      }
-    };
-    window.addEventListener("click", initAudio, { once: true });
-    window.addEventListener("touchstart", initAudio, { once: true });
-    return () => {
-      window.removeEventListener("click", initAudio);
-      window.removeEventListener("touchstart", initAudio);
     };
   }, []);
 
@@ -273,30 +313,21 @@ export default function EnSessizZamanV2Page() {
     const nav = navRef.current;
     if (!door || !camera || !nav) return;
 
-    const [cx, , cz] = door.destCenter;
-    camera.position.set(cx, 1.7, cz);
-    nav.velocity.set(0, 0, 0);
-    nav.keys = {};
+    // Fade out
+    setTeleportFade(true);
+    const dest = door.destCenter;
     nearDoorRef.current = null;
     setNearDoor(null);
-  }, []);
 
-  const toggleAmbient = useCallback(() => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioContext();
-    }
-    const ctx = audioCtxRef.current;
-    if (ambientOn) {
-      if (ambientNodesRef.current) {
-        stopAmbient(ctx, ambientNodesRef.current);
-        ambientNodesRef.current = null;
-      }
-      setAmbientOn(false);
-    } else {
-      ambientNodesRef.current = startAmbient(ctx);
-      setAmbientOn(true);
-    }
-  }, [ambientOn]);
+    setTimeout(() => {
+      camera.position.set(dest[0], 1.7, dest[2]);
+      nav.velocity.set(0, 0, 0);
+      nav.keys = {};
+
+      // Fade in
+      setTimeout(() => setTeleportFade(false), 100);
+    }, 400);
+  }, []);
 
   const navBtn = (key: string) => ({
     onMouseDown: () => {
@@ -345,6 +376,19 @@ export default function EnSessizZamanV2Page() {
         }}
       />
 
+      {/* Teleport fade */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "#000",
+          pointerEvents: "none",
+          zIndex: 45,
+          opacity: teleportFade ? 1 : 0,
+          transition: "opacity 0.4s ease",
+        }}
+      />
+
       {/* Vignette */}
       <div
         style={{
@@ -366,16 +410,55 @@ export default function EnSessizZamanV2Page() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "#1a1a1a",
+            background: "#0a0a0a",
             zIndex: 50,
           }}
         >
-          <div style={{ textAlign: "center", color: "#FF6D60" }}>
-            <div style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>
-              EN SESS&#304;Z ZAMAN
+          <div style={{ textAlign: "center", width: 280 }}>
+            <div
+              style={{
+                fontSize: 11,
+                letterSpacing: 6,
+                color: "#FF6D60",
+                marginBottom: 16,
+              }}
+            >
+              KLEMENS SANAL SERG&#304;
             </div>
-            <div style={{ fontSize: 14, color: "#888" }}>
-              Galeri y&uuml;kleniyor...
+            <div
+              style={{
+                fontSize: 24,
+                fontWeight: 300,
+                fontStyle: "italic",
+                color: "#fff",
+                marginBottom: 24,
+                letterSpacing: 2,
+              }}
+            >
+              En Sessiz Zaman
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: 3,
+                background: "rgba(255,255,255,0.08)",
+                borderRadius: 2,
+                overflow: "hidden",
+                marginBottom: 12,
+              }}
+            >
+              <div
+                style={{
+                  width: `${loadProgress}%`,
+                  height: "100%",
+                  background: "#FF6D60",
+                  borderRadius: 2,
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </div>
+            <div style={{ fontSize: 12, color: "#555" }}>
+              Galeri haz&#305;rlan&#305;yor... %{loadProgress}
             </div>
           </div>
         </div>
@@ -404,26 +487,6 @@ export default function EnSessizZamanV2Page() {
       >
         &larr; Klemens&apos;e D&ouml;n
       </Link>
-
-      {/* Ambient toggle */}
-      <button
-        onClick={toggleAmbient}
-        style={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-          zIndex: 20,
-          background: "rgba(0,0,0,0.5)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 8,
-          padding: "8px 12px",
-          cursor: "pointer",
-          color: "#aaa",
-          fontSize: 18,
-        }}
-      >
-        {ambientOn ? "\uD83D\uDD0A" : "\uD83D\uDD07"}
-      </button>
 
       {/* Gallery title overlay */}
       <div
@@ -459,6 +522,63 @@ export default function EnSessizZamanV2Page() {
           Theo Atay &mdash; 6 Oda, 21 Eser
         </div>
       </div>
+
+      {/* Minimap */}
+      {!showIntro && !selectedArt && !showSlideshow && (
+        <div
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            zIndex: 20,
+            background: "rgba(0,0,0,0.6)",
+            borderRadius: 8,
+            padding: 8,
+            backdropFilter: "blur(6px)",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "36px 36px",
+              gridTemplateRows: "36px 36px 36px",
+              gap: 3,
+            }}
+          >
+            {ROOMS.map((r) => (
+              <div
+                key={r.id}
+                style={{
+                  background:
+                    activeRoom?.id === r.id
+                      ? "rgba(255,109,96,0.4)"
+                      : "rgba(255,255,255,0.06)",
+                  borderRadius: 4,
+                  border:
+                    activeRoom?.id === r.id
+                      ? "1px solid #FF6D60"
+                      : "1px solid rgba(255,255,255,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 7,
+                  color:
+                    activeRoom?.id === r.id
+                      ? "#fff"
+                      : "rgba(255,255,255,0.3)",
+                  fontWeight: activeRoom?.id === r.id ? 700 : 400,
+                  lineHeight: 1.1,
+                  textAlign: "center",
+                  padding: 2,
+                }}
+              >
+                {r.name.split(" / ")[0].slice(0, 6)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Room label overlay */}
       {roomLabel && !showIntro && (

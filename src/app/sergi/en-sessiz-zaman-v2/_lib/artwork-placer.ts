@@ -84,14 +84,16 @@ export function placeAllArtworks(
       artCanvas.userData.maxAniso = maxAniso;
       scene.add(artCanvas);
 
-      // Per-artwork warm light
-      const artLight = new THREE.PointLight(0xffe4c4, 0.5, 5, 2);
-      const lightOffset = getWallNormalOffset(slot.wallSide, 1.5);
-      artLight.position
+      // Per-artwork museum spotlight
+      const spotLight = new THREE.SpotLight(0xffe4c4, 1.5, 8, Math.PI / 6, 0.5, 1);
+      const lightOffset = getWallNormalOffset(slot.wallSide, 2.0);
+      spotLight.position
         .copy(position)
         .add(lightOffset)
-        .setY(slot.height + 1.5);
-      scene.add(artLight);
+        .setY(slot.height + 2.0);
+      spotLight.target.position.copy(position);
+      scene.add(spotLight);
+      scene.add(spotLight.target);
 
       // Label
       const labelMesh = createLabel(artwork, sharedLabelGeo);
@@ -234,6 +236,32 @@ function createPassepartoutMaterial(): THREE.MeshStandardMaterial {
   });
 }
 
+// Singleton loader — reused across all frames
+const sharedLoader = new THREE.TextureLoader();
+
+function loadArtTexture(info: ArtMeshInfo): void {
+  if (info.mesh.userData.loaded) return;
+  info.mesh.userData.loaded = true;
+  const tex = sharedLoader.load(info.mesh.userData.imageSrc);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = info.mesh.userData.maxAniso || 1;
+  (info.mesh.material as THREE.MeshBasicMaterial).map = tex;
+  (info.mesh.material as THREE.MeshBasicMaterial).color.set(0xffffff);
+  (info.mesh.material as THREE.MeshBasicMaterial).needsUpdate = true;
+}
+
+/**
+ * Preload artworks for a specific room immediately.
+ */
+export function preloadRoom(
+  artMeshes: ArtMeshInfo[],
+  roomId: number
+): void {
+  for (const info of artMeshes) {
+    if (info.roomId === roomId) loadArtTexture(info);
+  }
+}
+
 /**
  * Lazy-load artwork textures when camera is near.
  */
@@ -243,21 +271,12 @@ export function checkLazyLoad(
   frameCounter: number,
   loadDist: number = 18
 ): void {
-  const loader = new THREE.TextureLoader();
   // Check 3 artworks per frame
   for (let c = 0; c < 3; c++) {
     const idx = (frameCounter * 3 + c) % artMeshes.length;
     const info = artMeshes[idx];
     if (info.mesh.userData.loaded) continue;
     const dist = camera.position.distanceTo(info.mesh.position);
-    if (dist < loadDist) {
-      info.mesh.userData.loaded = true;
-      const tex = loader.load(info.mesh.userData.imageSrc);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = info.mesh.userData.maxAniso || 1;
-      (info.mesh.material as THREE.MeshBasicMaterial).map = tex;
-      (info.mesh.material as THREE.MeshBasicMaterial).color.set(0xffffff);
-      (info.mesh.material as THREE.MeshBasicMaterial).needsUpdate = true;
-    }
+    if (dist < loadDist) loadArtTexture(info);
   }
 }
