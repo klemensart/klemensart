@@ -5,7 +5,7 @@ import Link from "next/link";
 import * as THREE from "three";
 import { ARTWORKS } from "./_lib/data";
 import type { Artwork, RoomConfig } from "./_lib/types";
-import { createScene, createDustParticles, animateDust } from "./_lib/scene-setup";
+import { createScene } from "./_lib/scene-setup";
 import { buildAllRooms, getWalkableRects } from "./_lib/room-layout";
 // import { loadGLBModel, cloneGLBForRoom } from "./_lib/glb-loader";
 import {
@@ -91,9 +91,6 @@ export default function EnSessizZamanV2Page() {
     // Preload starting room textures immediately
     preloadRoom(artMeshInfos, 0);
 
-    // Dust particles
-    const dust = createDustParticles(ctx.scene);
-
     setLoadProgress(90);
     // Navigation
     const nav = createNavState();
@@ -122,13 +119,18 @@ export default function EnSessizZamanV2Page() {
       raycaster.setFromCamera(mouse, ctx.camera);
       const hits = raycaster.intersectObjects(artMeshes, false);
       if (hits.length > 0) {
-        const target = hits[0].object.position.clone();
-        // Walk to 2.5m in front of artwork
-        const toCamera = ctx.camera.position.clone().sub(target);
-        toCamera.y = 0;
-        toCamera.normalize().multiplyScalar(2.5);
-        autoWalkTarget = target.add(toCamera);
-        autoWalkTarget.y = 1.7;
+        // Only allow click-to-walk for artworks in the same room
+        const hitMesh = hits[0].object;
+        const hitInfo = artMeshInfos.find((a) => a.mesh === hitMesh);
+        const currentRoom = getActiveRoom(ctx.camera.position);
+        if (hitInfo && currentRoom && hitInfo.roomId === currentRoom.id) {
+          const target = hits[0].object.position.clone();
+          const toCamera = ctx.camera.position.clone().sub(target);
+          toCamera.y = 0;
+          toCamera.normalize().multiplyScalar(2.5);
+          autoWalkTarget = target.add(toCamera);
+          autoWalkTarget.y = 1.7;
+        }
       }
     };
     ctx.renderer.domElement.addEventListener("click", onCanvasClick);
@@ -231,7 +233,6 @@ export default function EnSessizZamanV2Page() {
         setNearDoor(foundDoor);
       }
 
-      animateDust(dust);
       ctx.renderer.render(ctx.scene, ctx.camera);
     };
     animate();
