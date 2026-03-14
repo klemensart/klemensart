@@ -1,17 +1,19 @@
-/* ── PPTX Marka Şablonu — Koyu Müze Teması ── */
+/* ── PPTX Marka Şablonu — Klemens Art Kurumsal Renkleri ── */
 
 export const PPTX_COLORS = {
-  bg: "1A1714",
-  bgCard: "252220",
-  text: "F0EBE4",
-  textSec: "D4CFC8",
-  muted: "9B918A",
-  accent: "C9A84C",
+  bg: "2D2926",        // brand-dark
+  bgCard: "3A3530",    // brand-dark lighter
+  text: "FFF8F5",      // warm-50
+  textSec: "F0E4D9",   // warm-200
+  muted: "8C857E",     // brand-warm
+  accent: "FF6D60",    // coral
   correct: "22C55E",
-  border: "3A302A",
+  border: "4A433C",    // brand-dark border
   white: "FFFFFF",
   black: "000000",
-  darkOverlay: "111111",
+  cream: "FFFBF7",     // cream
+  warmLight: "F5F0EB", // brand-light
+  warm900: "2C2319",   // warm-900
 };
 
 export const PPTX_FONTS = {

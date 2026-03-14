@@ -9,15 +9,16 @@ import {
 } from "@react-pdf/renderer";
 import type { WeekConfig, Artwork } from "./types";
 
-/* ── Krem Tema Renkleri ── */
+/* ── Klemens Art Kurumsal Renkleri ── */
 const C = {
-  bg: "#FAF7F2",
-  text: "#1a1714",
+  bg: "#FFFBF7",       // cream
+  text: "#2C2319",      // warm-900
   textSec: "#4a4540",
-  muted: "#9B918A",
-  accent: "#C9A84C",
-  border: "#E8E2D8",
+  muted: "#8C857E",     // brand-warm
+  accent: "#FF6D60",    // coral
+  border: "#F0E4D9",    // warm-200
   white: "#FFFFFF",
+  warmLight: "#F5F0EB", // brand-light
 };
 
 const styles = StyleSheet.create({
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
   keyTerm: {
     fontSize: 8,
     color: C.accent,
-    backgroundColor: "#F5F0E5",
+    backgroundColor: "#FFF0EE",
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 10,
