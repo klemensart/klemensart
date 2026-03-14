@@ -10,7 +10,7 @@ const navLinks: { label: string; href: string; badge?: string }[] = [
   { label: "Atölyeler",   href: "/atolyeler" },
   { label: "İçerikler",   href: "/icerikler" },
   { label: "Testler",     href: "/testler" },
-  { label: "Etkinlikler", href: "#etkinlikler" },
+  { label: "Etkinlikler", href: "/etkinlikler" },
   { label: "Harita",      href: "/harita",     badge: "Yeni" },
   { label: "Hakkımızda",  href: "/hakkimizda" },
 ];

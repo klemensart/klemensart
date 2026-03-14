@@ -82,15 +82,31 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get("limit") || "10"), 50);
 
   const admin = createAdminClient();
-  const { data, error } = await admin
+
+  // Admin kullanıcıları leaderboard'dan gizle
+  const { data: adminRows } = await admin
+    .from("admins")
+    .select("user_id");
+  const adminIds = (adminRows ?? []).map((r) => r.user_id as string);
+
+  let query = admin
     .from("quiz_results")
-    .select("display_name, score, badge, mode, time_seconds, created_at")
+    .select("display_name, score, badge, mode, time_seconds, created_at, user_id")
     .eq("quiz_slug", slug)
     .order("score", { ascending: false })
     .order("time_seconds", { ascending: true, nullsFirst: true })
     .order("created_at", { ascending: true })
-    .limit(limit);
+    .limit(limit + adminIds.length); // fazla çek, sonra filtrele
+
+  const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ results: data ?? [] });
+
+  // Admin skorlarını filtrele ve user_id alanını response'dan çıkar
+  const filtered = (data ?? [])
+    .filter((r) => !r.user_id || !adminIds.includes(r.user_id))
+    .slice(0, limit)
+    .map(({ user_id: _, ...rest }) => rest);
+
+  return NextResponse.json({ results: filtered });
 }
