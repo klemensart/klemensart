@@ -53,6 +53,20 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
 
+// ── Konu filtreleme (futbol vb. istenmeyen içerikler) ────────────────────────
+const BLOCKED_KEYWORDS = [
+  "futbol", "süper lig", "şampiyonlar ligi", "europa league",
+  "transfer", "gol", "maç", "stadyum", "teknik direktör",
+  "galatasaray", "fenerbahçe", "beşiktaş", "trabzonspor",
+  "premier league", "la liga", "bundesliga", "serie a",
+  "fifa", "uefa", "tff",
+];
+
+function isBlockedTopic(title: string, summary: string | null): boolean {
+  const text = `${title} ${summary ?? ""}`.toLocaleLowerCase("tr");
+  return BLOCKED_KEYWORDS.some((kw) => text.includes(kw));
+}
+
 // ── Main GET handler ────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   if (!isAuthorized(req)) {
@@ -104,11 +118,14 @@ export async function GET(req: NextRequest) {
           };
         });
 
+        // Futbol vb. istenmeyen konuları filtrele
+        const filtered = rows.filter((r) => !isBlockedTopic(r.title, r.summary));
+
         // Upsert — guid çakışmasında skip
-        if (rows.length > 0) {
+        if (filtered.length > 0) {
           const { error: upsertErr } = await admin
             .from("news_items")
-            .upsert(rows, { onConflict: "guid", ignoreDuplicates: true });
+            .upsert(filtered, { onConflict: "guid", ignoreDuplicates: true });
 
           if (upsertErr) throw new Error(upsertErr.message);
         }
@@ -119,11 +136,11 @@ export async function GET(req: NextRequest) {
           .update({
             last_fetched_at: new Date().toISOString(),
             last_error: null,
-            item_count: rows.length,
+            item_count: filtered.length,
           })
           .eq("id", feed.id);
 
-        return { feed: feed.name, items: rows.length };
+        return { feed: feed.name, items: filtered.length };
       } catch (err) {
         const msg = (err as Error).message;
         // Hata logla ama diğer feed'leri engelleme
