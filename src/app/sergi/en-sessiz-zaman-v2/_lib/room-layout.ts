@@ -459,25 +459,23 @@ export function isInWalkableArea(
 
 // ── Klemens cut-letter wall logo ──
 
+// Shared logo resources — loaded once, reused in all rooms
+let sharedLogoMat: THREE.MeshBasicMaterial | null = null;
+const sharedLogoGeo = new THREE.PlaneGeometry(0.8, 0.8 / 1.7);
+
 function addKlemensPlaque(group: THREE.Group): void {
-  const loader = new THREE.TextureLoader();
-  const tex = loader.load("/logos/logo-wide-transparent.PNG");
-  tex.colorSpace = THREE.SRGBColorSpace;
+  if (!sharedLogoMat) {
+    const tex = new THREE.TextureLoader().load("/logos/logo-wide-transparent.PNG");
+    tex.colorSpace = THREE.SRGBColorSpace;
+    sharedLogoMat = new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.FrontSide,
+    });
+  }
 
-  const mat = new THREE.MeshBasicMaterial({
-    map: tex,
-    transparent: true,
-    depthWrite: false,
-    side: THREE.FrontSide,
-  });
-
-  // Logo aspect ratio ~1.7:1
-  const w = 0.8;
-  const h = w / 1.7;
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
-
-  // South wall, right corner, low
+  const mesh = new THREE.Mesh(sharedLogoGeo, sharedLogoMat);
   mesh.position.set(HALF - 0.8, 0.9, -HALF + 0.02);
-
   group.add(mesh);
 }
