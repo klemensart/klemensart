@@ -1081,10 +1081,14 @@ export default function Gallery() {
             zIndex: 100,
             display: "flex",
             flexDirection: "column",
+            willChange: "opacity",
           }}
         >
           <button
-            onClick={() => setSelectedArtIndex(null)}
+            onClick={() => {
+              setSelectedArtIndex(null);
+              overlayOpenRef.current = false;
+            }}
             style={{
               position: "absolute",
               top: 16,
@@ -1159,7 +1163,7 @@ export default function Gallery() {
             />
             <img
               key={selectedArtIndex}
-              src={selectedArt.image.replace("/en-sessiz-zaman-v2/", "/en-sessiz-zaman/")}
+              src={selectedArt.image}
               alt={selectedArt.title}
               style={{
                 maxWidth: "calc(100% - 120px)",
@@ -1370,7 +1374,7 @@ export default function Gallery() {
             />
             <img
               key={slideshowIndex}
-              src={ARTWORKS[slideshowIndex].image.replace("/en-sessiz-zaman-v2/", "/en-sessiz-zaman/")}
+              src={ARTWORKS[slideshowIndex].image}
               alt={ARTWORKS[slideshowIndex].title}
               style={{
                 maxWidth: "calc(100% - 120px)",
