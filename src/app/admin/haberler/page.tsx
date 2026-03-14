@@ -39,10 +39,18 @@ export default function AdminHaberlerPage() {
   const [fetcherRunning, setFetcherRunning] = useState(false);
   const [fetcherResult, setFetcherResult] = useState<string | null>(null);
 
+  // Güncel haber çekme
+  const [trendingRunning, setTrendingRunning] = useState(false);
+  const [trendingResult, setTrendingResult] = useState<string | null>(null);
+
   // Manuel haber ekleme
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState({ title: "", summary: "", url: "", image_url: "", source_name: "" });
   const [addLoading, setAddLoading] = useState(false);
+
+  // Basın bülteni formatlama
+  const [rawText, setRawText] = useState("");
+  const [formatting, setFormatting] = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchData = useCallback(async (status: Tab, p: number) => {
@@ -123,6 +131,52 @@ export default function AdminHaberlerPage() {
     }
   }
 
+  async function formatPressRelease() {
+    if (!rawText.trim() || rawText.trim().length < 20) return;
+    setFormatting(true);
+    try {
+      const res = await fetch("/api/admin/news/format", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rawText }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setAddForm((p) => ({
+          ...p,
+          title: json.title || p.title,
+          summary: json.summary || p.summary,
+          source_name: json.source_name || p.source_name,
+        }));
+        setRawText("");
+      } else {
+        alert(json.error || "Formatlama başarısız.");
+      }
+    } catch {
+      alert("Bağlantı hatası.");
+    }
+    setFormatting(false);
+  }
+
+  async function fetchTrending() {
+    setTrendingRunning(true);
+    setTrendingResult(null);
+    try {
+      const res = await fetch("/api/admin/news/trending", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setTrendingResult(json.message);
+        if (json.added > 0) fetchData(tab, page);
+      } else {
+        setTrendingResult(`Hata: ${json.error ?? "bilinmeyen hata"}`);
+      }
+    } catch (err) {
+      setTrendingResult(`Bağlantı hatası: ${String(err)}`);
+    } finally {
+      setTrendingRunning(false);
+    }
+  }
+
   async function addManualNews() {
     if (!addForm.title.trim()) return;
     setAddLoading(true);
@@ -171,6 +225,25 @@ export default function AdminHaberlerPage() {
           </button>
           <div className="flex flex-col items-end">
             <button
+              onClick={fetchTrending}
+              disabled={trendingRunning}
+              className="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {trendingRunning ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Taranıyor...
+                </span>
+              ) : (
+                "Güncel Haberleri Getir"
+              )}
+            </button>
+            {trendingResult && (
+              <p className="text-xs text-warm-900/50 mt-1 max-w-xs text-right">{trendingResult}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-end">
+            <button
               onClick={runFetcher}
               disabled={fetcherRunning}
               className="px-4 py-2 bg-coral text-white text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
@@ -195,6 +268,35 @@ export default function AdminHaberlerPage() {
       {showAddForm && (
         <div className="bg-white rounded-2xl border border-warm-100 p-6 mb-6">
           <h3 className="text-sm font-bold text-warm-900 mb-4">Manuel Haber Ekle</h3>
+
+          {/* Basın bülteni formatlama */}
+          <div className="bg-warm-50 rounded-xl border border-dashed border-warm-200 p-4 mb-5">
+            <p className="text-xs font-semibold text-warm-900/60 mb-2">
+              Basın bülteni yapıştır &rarr; AI ile formatla
+            </p>
+            <textarea
+              placeholder="Ham basın bülteni metnini buraya yapıştırın..."
+              value={rawText}
+              onChange={(e) => setRawText(e.target.value)}
+              rows={4}
+              className="w-full px-3 py-2 text-sm border border-warm-200 rounded-xl focus:outline-none focus:border-coral/50 bg-white resize-none mb-2"
+            />
+            <button
+              onClick={formatPressRelease}
+              disabled={formatting || rawText.trim().length < 20}
+              className="px-4 py-2 bg-warm-900 text-white text-xs font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {formatting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Formatlanıyor...
+                </span>
+              ) : (
+                "AI ile Formatla"
+              )}
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <input
               placeholder="Başlık *"
