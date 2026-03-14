@@ -7,6 +7,7 @@ type Tab = "new" | "published" | "dismissed";
 
 type NewsItem = {
   id: string;
+  guid: string;
   title: string;
   summary: string | null;
   url: string | null;
@@ -414,6 +415,11 @@ export default function AdminHaberlerPage() {
                     {item.is_manual && (
                       <span className="px-2 py-0.5 bg-coral/10 text-coral text-xs font-semibold rounded-full">
                         Manuel
+                      </span>
+                    )}
+                    {item.guid?.startsWith("trending-") && (
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
+                        Güncel
                       </span>
                     )}
                     <span className="text-xs text-warm-900/40">{fmt(item.published_at)}</span>
