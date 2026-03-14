@@ -10,15 +10,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
 
   // Son içerik tarihlerini çek — statik sayfaların lastModified'ı için
-  const [{ data: latestArticle }, { data: latestEvent }, { data: latestNews }] = await Promise.all([
+  const [{ data: latestArticle }, { data: latestEvent }, { data: latestNews }, { data: publicCampaigns }] = await Promise.all([
     supabase.from("articles").select("date").eq("status", "published").order("date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("events").select("event_date").eq("status", "approved").order("event_date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("news_items").select("published_at").eq("status", "published").order("published_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("campaigns").select("id, created_at").eq("is_public", true).order("created_at", { ascending: false }),
   ]);
 
   const lastArticleDate = latestArticle?.date ? new Date(latestArticle.date) : now;
   const lastEventDate = latestEvent?.event_date ? new Date(latestEvent.event_date) : now;
   const lastNewsDate = latestNews?.published_at ? new Date(latestNews.published_at) : now;
+  const lastCampaignDate = publicCampaigns?.[0]?.created_at ? new Date(publicCampaigns[0].created_at) : now;
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -38,6 +40,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/ronesans-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/modern-sanat-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/bulten`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE_URL}/bulten/arsiv`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.6 },
   ];
 
   // Category pages
@@ -86,11 +90,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Public campaign (newsletter archive) pages
+  const campaignPages: MetadataRoute.Sitemap = (publicCampaigns ?? []).map((c) => ({
+    url: `${BASE_URL}/bulten/arsiv/${c.id}`,
+    lastModified: c.created_at ? new Date(c.created_at) : undefined,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
   return [
     ...staticPages,
     ...categoryPages,
     ...workshopPages,
     ...articlePages,
     ...eventPages,
+    ...campaignPages,
   ];
 }

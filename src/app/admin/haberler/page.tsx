@@ -35,6 +35,7 @@ export default function AdminHaberlerPage() {
   const [counts, setCounts] = useState({ new: 0, published: 0, dismissed: 0 });
   const [fetching, setFetching] = useState(false);
   const [actioning, setActioning] = useState<Record<string, boolean>>({});
+  const [page, setPage] = useState(1);
   const [fetcherRunning, setFetcherRunning] = useState(false);
   const [fetcherResult, setFetcherResult] = useState<string | null>(null);
 
@@ -44,10 +45,10 @@ export default function AdminHaberlerPage() {
   const [addLoading, setAddLoading] = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
-  const fetchData = useCallback(async (status: Tab) => {
+  const fetchData = useCallback(async (status: Tab, p: number) => {
     setFetching(true);
     try {
-      const res = await fetch(`/api/admin/news?status=${status}`);
+      const res = await fetch(`/api/admin/news?status=${status}&page=${p}`);
       if (!res.ok) { setFetching(false); return; }
       const json = await res.json();
       setItems(json.items ?? []);
@@ -59,8 +60,18 @@ export default function AdminHaberlerPage() {
   }, []);
 
   useEffect(() => {
-    fetchData(tab);
-  }, [tab, fetchData]);
+    fetchData(tab, page);
+  }, [tab, page, fetchData]);
+
+  // Tab değişince sayfa 1'e dön
+  const switchTab = (newTab: Tab) => {
+    setTab(newTab);
+    setPage(1);
+  };
+
+  const PAGE_SIZE = 50;
+  const totalForTab = counts[tab] ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalForTab / PAGE_SIZE));
 
   // ── Actions ───────────────────────────────────────────────────────────────
   async function updateStatus(id: string, status: string) {
@@ -71,7 +82,7 @@ export default function AdminHaberlerPage() {
       body: JSON.stringify({ status }),
     });
     setActioning((p) => ({ ...p, [id]: false }));
-    fetchData(tab);
+    fetchData(tab, page);
   }
 
   async function deleteItem(id: string) {
@@ -79,7 +90,7 @@ export default function AdminHaberlerPage() {
     setActioning((p) => ({ ...p, [id]: true }));
     await fetch(`/api/admin/news/${id}`, { method: "DELETE" });
     setActioning((p) => ({ ...p, [id]: false }));
-    fetchData(tab);
+    fetchData(tab, page);
   }
 
   async function runFetcher() {
@@ -90,7 +101,7 @@ export default function AdminHaberlerPage() {
       const json = await res.json();
       if (json.success) {
         setFetcherResult(json.message);
-        fetchData(tab);
+        fetchData(tab, page);
       } else {
         setFetcherResult(`Hata: ${json.error ?? "bilinmeyen hata"}`);
       }
@@ -112,7 +123,7 @@ export default function AdminHaberlerPage() {
       });
       setAddForm({ title: "", summary: "", url: "", image_url: "", source_name: "" });
       setShowAddForm(false);
-      fetchData(tab);
+      fetchData(tab, page);
     } catch {
       // ignore
     }
@@ -229,7 +240,7 @@ export default function AdminHaberlerPage() {
         {tabs.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setTab(key)}
+            onClick={() => switchTab(key)}
             className={`px-5 py-2.5 text-sm font-semibold rounded-t-xl border border-b-0 -mb-px transition-colors ${
               tab === key
                 ? "bg-white border-warm-200 text-warm-900"
@@ -258,7 +269,7 @@ export default function AdminHaberlerPage() {
           <p className="text-base">Bu sekmede haber bulunamadı.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3" id="news-list">
           {items.map((item) => (
             <div
               key={item.id}
@@ -366,6 +377,30 @@ export default function AdminHaberlerPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-8 pb-4">
+          <button
+            onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            disabled={page <= 1 || fetching}
+            className="px-4 py-2 bg-warm-100 hover:bg-warm-200 text-warm-900/60 text-sm font-semibold rounded-xl transition-colors disabled:opacity-30"
+          >
+            &larr; Önceki
+          </button>
+          <span className="text-sm text-warm-900/50">
+            Sayfa <span className="font-semibold text-warm-900">{page}</span> / {totalPages}
+            <span className="ml-2 text-warm-900/30">({totalForTab} haber)</span>
+          </span>
+          <button
+            onClick={() => { setPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            disabled={page >= totalPages || fetching}
+            className="px-4 py-2 bg-warm-100 hover:bg-warm-200 text-warm-900/60 text-sm font-semibold rounded-xl transition-colors disabled:opacity-30"
+          >
+            Sonraki &rarr;
+          </button>
         </div>
       )}
     </div>

@@ -8,6 +8,7 @@ import YarimKalanKayit from "@/emails/YarimKalanKayit";
 import AtolyeTesekkur from "@/emails/AtolyeTesekkur";
 import BultenTesekkur from "@/emails/BultenTesekkur";
 import StoryBildirimi from "@/emails/StoryBildirimi";
+import HaberlerBulteni from "@/emails/HaberlerBulteni";
 
 export type TemplateName =
   | "DuyuruBulteni"
@@ -18,7 +19,8 @@ export type TemplateName =
   | "YarimKalanKayit"
   | "AtolyeTesekkur"
   | "BultenTesekkur"
-  | "StoryBildirimi";
+  | "StoryBildirimi"
+  | "HaberlerBulteni";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TemplateEntry = {
@@ -62,5 +64,9 @@ export const templateRegistry: Record<TemplateName, TemplateEntry> = {
   StoryBildirimi: {
     component: StoryBildirimi,
     defaultSubject: "Yeni Story'ler Hazır — Klemens Art",
+  },
+  HaberlerBulteni: {
+    component: HaberlerBulteni,
+    defaultSubject: "Haftanın Kültür Sanat Gündemi — Klemens Art",
   },
 };

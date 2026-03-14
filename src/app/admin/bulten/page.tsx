@@ -196,6 +196,34 @@ const TEMPLATES: TemplateConfig[] = [
       contactEmail: "info@klemensart.com",
     },
   },
+  {
+    name: "HaberlerBulteni",
+    label: "Haftalık Haber Bülteni",
+    description: "Kürate haberlerden otomatik haber digest",
+    icon: "📰",
+    defaultSubject: "Haftanın Kültür Sanat Gündemi — Klemens Art",
+    fields: [
+      { key: "weekLabel", label: "Hafta Etiketi", type: "text" },
+      { key: "editorialIntro", label: "Giriş Yazısı", type: "textarea" },
+      {
+        key: "newsItems",
+        label: "Haberler",
+        type: "array",
+        itemFields: [
+          { key: "title", label: "Başlık", type: "text" },
+          { key: "summary", label: "Özet", type: "textarea" },
+          { key: "url", label: "Link", type: "url" },
+          { key: "image_url", label: "Görsel URL", type: "url" },
+          { key: "source_name", label: "Kaynak", type: "text" },
+        ],
+      },
+    ],
+    defaults: {
+      weekLabel: "",
+      editorialIntro: "Bu hafta kültür-sanat dünyasından öne çıkan gelişmeleri sizin için derledik.",
+      newsItems: [],
+    },
+  },
 ];
 
 /* ── Editor CSS ── */
@@ -341,6 +369,7 @@ export default function BultenGonderPage() {
     template_name: string | null;
     mode: string;
     sent_count: number;
+    is_public: boolean;
   };
   const [savedCampaigns, setSavedCampaigns] = useState<SavedCampaign[]>([]);
   const [previewCampaign, setPreviewCampaign] = useState<{ subject: string; html_content: string } | null>(null);
@@ -566,12 +595,50 @@ export default function BultenGonderPage() {
   };
 
   // ── Template selection ──
-  const selectTemplate = (tmpl: TemplateConfig) => {
+  const selectTemplate = async (tmpl: TemplateConfig) => {
     setSelectedTemplate(tmpl);
     setTemplateProps(structuredClone(tmpl.defaults));
     setTemplateSubject(tmpl.defaultSubject);
     setTemplatePreviewHtml("");
     setMessage("");
+
+    // Auto-populate HaberlerBulteni with published news from last 7 days
+    if (tmpl.name === "HaberlerBulteni") {
+      try {
+        const res = await fetch("/api/admin/news?status=published");
+        const data = await res.json();
+        if (data.items) {
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          const recent = data.items.filter(
+            (item: { published_at: string }) =>
+              new Date(item.published_at) >= sevenDaysAgo
+          );
+          const newsItems = (recent.length > 0 ? recent : data.items.slice(0, 10)).map(
+            (item: { title: string; summary: string; url: string; image_url?: string; source_name?: string }) => ({
+              title: item.title || "",
+              summary: item.summary || "",
+              url: item.url || "",
+              image_url: item.image_url || "",
+              source_name: item.source_name || "",
+            })
+          );
+          // Auto week label
+          const now = new Date();
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - now.getDay() + 1);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          const fmt = (d: Date) => `${d.getDate()} ${d.toLocaleDateString("tr-TR", { month: "long" })}`;
+          const weekLabel = `${fmt(weekStart)}–${fmt(weekEnd)} ${now.getFullYear()}`;
+
+          setTemplateProps((prev) => ({ ...prev, newsItems, weekLabel }));
+          setMessage(`${newsItems.length} haber otomatik yüklendi.`);
+        }
+      } catch {
+        // silently fail auto-populate
+      }
+    }
   };
 
   // ── Update a simple prop ──
@@ -707,6 +774,23 @@ export default function BultenGonderPage() {
     },
     [pageMode, subject, htmlContent, testEmail, excludeInactive, skipAlreadySent, selectedTemplate, templateProps, templateSubject, selectedWorkshopId, selectedSegmentId]
   );
+
+  const toggleCampaignPublic = async (id: string, currentValue: boolean) => {
+    try {
+      const res = await fetch("/api/admin/newsletter/campaigns", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, is_public: !currentValue }),
+      });
+      if (res.ok) {
+        setSavedCampaigns((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, is_public: !currentValue } : c))
+        );
+      }
+    } catch {
+      setMessage("Güncelleme hatası.");
+    }
+  };
 
   const handlePreviewCampaign = async (id: string) => {
     setLoadingPreview(true);
@@ -1644,6 +1728,17 @@ export default function BultenGonderPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => toggleCampaignPublic(c.id, c.is_public)}
+                      className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${
+                        c.is_public
+                          ? "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                          : "border-gray-200 text-gray-400 hover:bg-gray-50"
+                      }`}
+                      title={c.is_public ? "Herkese açık — gizle" : "Gizli — herkese aç"}
+                    >
+                      {c.is_public ? "Açık" : "Gizli"}
+                    </button>
                     <button
                       onClick={() => handlePreviewCampaign(c.id)}
                       disabled={loadingPreview}

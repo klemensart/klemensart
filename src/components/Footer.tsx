@@ -4,7 +4,7 @@ const kesfetLinks = [
   { label: "Atölyeler",        href: "/atolyeler" },
   { label: "Testler ve Oyunlar", href: "#"        },
   { label: "Kültür Haritası",  href: "/harita"    },
-  { label: "E-bülten",         href: "#bulten"    },
+  { label: "E-bülten",         href: "/bulten"    },
   { label: "İçerikler",        href: "#"          },
   { label: "Etkinlikler",      href: "/etkinlikler" },
 ];
