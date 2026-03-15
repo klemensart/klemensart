@@ -32,5 +32,38 @@ export async function PATCH(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Yazı yayınlandığında haber akışına otomatik ekle
+  if (status === "published") {
+    const { data: article } = await admin
+      .from("articles")
+      .select("title, description, slug, image, date")
+      .eq("id", id)
+      .single();
+
+    if (article) {
+      const guid = `klemens-article-${id}`;
+      // Zaten eklenmişse tekrar ekleme
+      const { data: existing } = await admin
+        .from("news_items")
+        .select("id")
+        .eq("guid", guid)
+        .maybeSingle();
+
+      if (!existing) {
+        await admin.from("news_items").insert({
+          guid,
+          title: article.title,
+          summary: article.description || null,
+          url: `https://klemensart.com/icerikler/yazi/${article.slug}`,
+          image_url: article.image || null,
+          source_name: "Klemens",
+          status: "new",
+          is_manual: true,
+          published_at: article.date || new Date().toISOString(),
+        });
+      }
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
