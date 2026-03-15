@@ -116,9 +116,15 @@ export async function POST(req: NextRequest) {
 
   if (action === "set_role") {
     const { user_id, role } = body;
+    // admins tablosu email NOT NULL — auth'dan çek
+    const { data: targetUser } = await admin.auth.admin.getUserById(user_id);
+    const email = targetUser?.user?.email ?? null;
+    if (!email) {
+      return NextResponse.json({ error: "Kullanıcının e-posta adresi bulunamadı" }, { status: 400 });
+    }
     const { error } = await admin
       .from("admins")
-      .upsert({ user_id, role }, { onConflict: "user_id" });
+      .upsert({ user_id, role, email }, { onConflict: "user_id" });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });
   }
