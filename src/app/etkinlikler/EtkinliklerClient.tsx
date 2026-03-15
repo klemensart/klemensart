@@ -27,8 +27,12 @@ const TYPE_LABELS: Record<string, string> = {
   konser: "Konser",
   tiyatro: "Tiyatro",
   soylesi: "Söyleşi",
+  panel: "Panel",
   festival: "Festival",
   "film-festivali": "Film Festivali",
+  performans: "Performans",
+  opera: "Opera",
+  bale: "Bale",
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -36,17 +40,25 @@ const TYPE_COLORS: Record<string, string> = {
   konser:           "bg-amber-100 text-amber-700",
   tiyatro:          "bg-violet-100 text-violet-700",
   soylesi:          "bg-emerald-100 text-emerald-700",
+  panel:            "bg-cyan-100 text-cyan-700",
   festival:         "bg-sky-100 text-sky-700",
   "film-festivali": "bg-rose-100 text-rose-700",
+  performans:       "bg-fuchsia-100 text-fuchsia-700",
+  opera:            "bg-red-100 text-red-700",
+  bale:             "bg-pink-100 text-pink-700",
 };
 
 const TYPE_GRADIENTS: Record<string, string> = {
-  sergi:            "from-coral/80 to-rose-400/80",
-  konser:           "from-amber-400/80 to-orange-500/80",
-  tiyatro:          "from-violet-400/80 to-purple-500/80",
-  soylesi:          "from-emerald-400/80 to-teal-500/80",
-  festival:         "from-sky-400/80 to-blue-500/80",
-  "film-festivali": "from-rose-400/80 to-pink-500/80",
+  sergi:            "from-coral to-rose-500",
+  konser:           "from-amber-500 to-orange-600",
+  tiyatro:          "from-violet-500 to-purple-600",
+  soylesi:          "from-emerald-500 to-teal-600",
+  panel:            "from-cyan-500 to-blue-600",
+  festival:         "from-sky-500 to-indigo-500",
+  "film-festivali": "from-rose-500 to-pink-600",
+  performans:       "from-fuchsia-500 to-purple-600",
+  opera:            "from-red-500 to-rose-600",
+  bale:             "from-pink-400 to-rose-500",
 };
 
 function EventTypeIcon({ type }: { type: string }) {
@@ -101,6 +113,39 @@ function EventTypeIcon({ type }: { type: string }) {
           <line x1="17" y1="17" x2="22" y2="17" />
         </svg>
       );
+    case "panel":
+      return (
+        <svg className={cn} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
+    case "performans":
+      return (
+        <svg className={cn} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polygon points="10 8 16 12 10 16 10 8" />
+        </svg>
+      );
+    case "opera":
+      return (
+        <svg className={cn} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3c-4.97 0-9 3.13-9 7 0 2.38 1.56 4.5 4 5.7V20l3-2 3 2v-4.3c2.44-1.2 4-3.32 4-5.7 0-3.87-4.03-7-9-7z" />
+          <path d="M9 10h.01M15 10h.01" />
+        </svg>
+      );
+    case "bale":
+      return (
+        <svg className={cn} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="4" r="2" />
+          <path d="M12 6v6" />
+          <path d="M8 12c0 0 2 4 4 4s4-4 4-4" />
+          <path d="M9 16l-3 5M15 16l3 5" />
+          <path d="M8 10l-3-2M16 10l3-2" />
+        </svg>
+      );
     default:
       return (
         <svg className={cn} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -137,7 +182,7 @@ function EventCard({ e }: { e: EventRow }) {
   const type = e.event_type ?? "";
   const badge = TYPE_COLORS[type] ?? "bg-warm-100 text-warm-900/50";
   const label = TYPE_LABELS[type] ?? type;
-  const gradient = TYPE_GRADIENTS[type] ?? "from-warm-400/80 to-warm-500/80";
+  const gradient = TYPE_GRADIENTS[type] ?? "from-warm-500 to-warm-600";
 
   const meta = [e.venue, date.time || null].filter(Boolean).join(" · ");
 
