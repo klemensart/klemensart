@@ -312,13 +312,29 @@ export default function AdminHaberlerPage() {
               className="px-3 py-2 text-sm border border-warm-200 rounded-xl focus:outline-none focus:border-coral/50 bg-warm-50"
             />
             <input
-              placeholder="URL"
+              placeholder="Haber linki"
               value={addForm.url}
               onChange={(e) => setAddForm((p) => ({ ...p, url: e.target.value }))}
+              onBlur={async (e) => {
+                const url = e.target.value.trim();
+                if (url && !addForm.image_url) {
+                  try {
+                    const res = await fetch("/api/admin/news/og-image", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ url }),
+                    });
+                    const json = await res.json();
+                    if (json.image_url) {
+                      setAddForm((p) => ({ ...p, image_url: json.image_url }));
+                    }
+                  } catch { /* ignore */ }
+                }
+              }}
               className="px-3 py-2 text-sm border border-warm-200 rounded-xl focus:outline-none focus:border-coral/50 bg-warm-50"
             />
             <input
-              placeholder="Görsel URL"
+              placeholder="Görsel URL (otomatik alınır)"
               value={addForm.image_url}
               onChange={(e) => setAddForm((p) => ({ ...p, image_url: e.target.value }))}
               className="px-3 py-2 text-sm border border-warm-200 rounded-xl focus:outline-none focus:border-coral/50 bg-warm-50"
