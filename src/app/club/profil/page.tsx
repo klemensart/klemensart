@@ -491,18 +491,20 @@ export default function ProfilPage() {
   }, [user, activeTab, fetchGam]);
 
   const fetchQuizResults = useCallback(async () => {
+    if (!user) return;
     setQuizLoading(true);
     try {
       const sb = createClient();
       const { data } = await sb
         .from("quiz_results")
         .select("id, quiz_slug, score, badge, mode, time_seconds, created_at")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(50);
       setQuizResults(data ?? []);
     } catch { /* ignore */ }
     setQuizLoading(false);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (user && activeTab === "tests") fetchQuizResults();
