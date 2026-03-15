@@ -203,6 +203,15 @@ export async function POST(req: NextRequest) {
         mode: "all",
         sent_count: totalSent,
       });
+
+      // HaberlerBulteni gönderildiğinde haberleri arşivle
+      if (template === "HaberlerBulteni") {
+        await admin
+          .from("news_items")
+          .update({ sent_in_newsletter: true, status: "archived" })
+          .eq("status", "published")
+          .eq("sent_in_newsletter", false);
+      }
     }
 
     const skippedMsg = skippedCount > 0 ? ` (${skippedCount} kişi daha önce almıştı, atlandı)` : "";

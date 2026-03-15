@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
     const sentIds = newsItems.map((n) => n.id);
     await admin
       .from("news_items")
-      .update({ sent_in_newsletter: true })
+      .update({ sent_in_newsletter: true, status: "archived" })
       .in("id", sentIds);
   }
 
