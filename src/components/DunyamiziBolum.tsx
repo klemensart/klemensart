@@ -55,7 +55,7 @@ export default function DunyamiziBolum() {
   }, []);
 
   return (
-    <section id="dunyamiz" className="py-24 px-6 bg-white">
+    <section id="dunyamiz" className="hidden md:block py-24 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4">Site Haritası</p>
