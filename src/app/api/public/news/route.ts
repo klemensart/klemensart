@@ -14,13 +14,13 @@ export async function GET(req: NextRequest) {
     supabase
       .from("news_items")
       .select("id, title, summary, url, image_url, source_name, published_at")
-      .eq("status", "published")
+      .in("status", ["published", "archived"])
       .order("published_at", { ascending: false })
       .range(offset, offset + limit - 1),
     supabase
       .from("news_items")
       .select("id", { count: "exact", head: true })
-      .eq("status", "published"),
+      .in("status", ["published", "archived"]),
   ]);
 
   return NextResponse.json({
