@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
   };
 
   const emailHtml = await render(entry.component(templateProps));
-  const emailSubject = `${weekLabel} — Haftanın Kültür Sanat Gündemi`;
+  const emailSubject = `Haftalık Kültür Sanat Bülteni`;
 
   // 4. Tüm aktif abonelere gönder
   const { data: subs } = await admin

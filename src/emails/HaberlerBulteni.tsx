@@ -29,7 +29,7 @@ export default function HaberlerBulteni({
   ],
 }: Props) {
   return (
-    <KlemensLayout preview={`${weekLabel} — Haftanın Kültür Sanat Gündemi`}>
+    <KlemensLayout preview={`${weekLabel} · ${newsItems.length} haber`}>
       <Section style={content}>
         <Text style={eyebrow}>{weekLabel}</Text>
         <Text style={h1}>Haftanın Kültür Sanat Gündemi</Text>
