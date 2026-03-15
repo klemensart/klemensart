@@ -53,6 +53,12 @@ export default function AdminHaberlerPage() {
   const [rawText, setRawText] = useState("");
   const [formatting, setFormatting] = useState(false);
 
+  // Sürükle-bırak sıralama
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [orderChanged, setOrderChanged] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+
   // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchData = useCallback(async (status: Tab, p: number) => {
     setFetching(true);
@@ -94,15 +100,48 @@ export default function AdminHaberlerPage() {
     fetchData(tab, page);
   }
 
-  async function reorderItem(id: string, direction: "up" | "down") {
-    setActioning((p) => ({ ...p, [id]: true }));
-    await fetch("/api/admin/news/reorder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, direction }),
-    });
-    setActioning((p) => ({ ...p, [id]: false }));
-    fetchData(tab, page);
+  function handleDragStart(index: number) {
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    setOverIndex(index);
+  }
+
+  function handleDrop(index: number) {
+    if (dragIndex === null || dragIndex === index) {
+      setDragIndex(null);
+      setOverIndex(null);
+      return;
+    }
+    const reordered = [...items];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(index, 0, moved);
+    setItems(reordered);
+    setOrderChanged(true);
+    setDragIndex(null);
+    setOverIndex(null);
+  }
+
+  function handleDragEnd() {
+    setDragIndex(null);
+    setOverIndex(null);
+  }
+
+  async function saveOrder() {
+    setSavingOrder(true);
+    try {
+      await fetch("/api/admin/news/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderedIds: items.map((i) => i.id) }),
+      });
+      setOrderChanged(false);
+    } catch {
+      alert("Sıralama kaydedilemedi.");
+    }
+    setSavingOrder(false);
   }
 
   async function deleteItem(id: string) {
@@ -400,12 +439,59 @@ export default function AdminHaberlerPage() {
         </div>
       ) : (
         <div className="space-y-3" id="news-list">
-          {items.map((item) => (
+          {/* Sıralama kaydet butonu */}
+          {tab === "published" && orderChanged && (
+            <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+              <span className="text-sm text-amber-800 font-medium">Sıralama değişti.</span>
+              <button
+                onClick={saveOrder}
+                disabled={savingOrder}
+                className="px-4 py-1.5 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 disabled:opacity-50 transition-colors"
+              >
+                {savingOrder ? "Kaydediliyor..." : "Sıralamayı Kaydet"}
+              </button>
+              <button
+                onClick={() => { setOrderChanged(false); fetchData(tab, page); }}
+                className="px-4 py-1.5 bg-warm-100 text-warm-900/60 text-xs font-semibold rounded-lg hover:bg-warm-200 transition-colors"
+              >
+                İptal
+              </button>
+            </div>
+          )}
+
+          {items.map((item, idx) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl border border-warm-100 overflow-hidden"
+              draggable={tab === "published"}
+              onDragStart={() => handleDragStart(idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
+              onDrop={() => handleDrop(idx)}
+              onDragEnd={handleDragEnd}
+              className={`bg-white rounded-2xl border overflow-hidden transition-all ${
+                tab === "published" ? "cursor-grab active:cursor-grabbing" : ""
+              } ${
+                dragIndex === idx
+                  ? "opacity-40 border-warm-300"
+                  : overIndex === idx && dragIndex !== null
+                    ? "border-coral border-2 scale-[1.01]"
+                    : "border-warm-100"
+              }`}
             >
               <div className="px-6 py-4 flex gap-4">
+                {/* Drag handle (sadece published) */}
+                {tab === "published" && (
+                  <div className="flex-shrink-0 flex items-center text-warm-900/20">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="9" cy="5" r="1.5" />
+                      <circle cx="15" cy="5" r="1.5" />
+                      <circle cx="9" cy="12" r="1.5" />
+                      <circle cx="15" cy="12" r="1.5" />
+                      <circle cx="9" cy="19" r="1.5" />
+                      <circle cx="15" cy="19" r="1.5" />
+                    </svg>
+                  </div>
+                )}
+
                 {/* Thumbnail */}
                 {item.image_url && (
                   <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-warm-100">
@@ -483,26 +569,6 @@ export default function AdminHaberlerPage() {
                   )}
                   {tab === "published" && (
                     <>
-                      <button
-                        onClick={() => reorderItem(item.id, "up")}
-                        disabled={actioning[item.id]}
-                        className="w-8 h-8 flex items-center justify-center bg-warm-100 hover:bg-warm-200 text-warm-900/50 rounded-lg transition-colors disabled:opacity-30"
-                        title="Yukarı taşı"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 15l-6-6-6 6" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => reorderItem(item.id, "down")}
-                        disabled={actioning[item.id]}
-                        className="w-8 h-8 flex items-center justify-center bg-warm-100 hover:bg-warm-200 text-warm-900/50 rounded-lg transition-colors disabled:opacity-30"
-                        title="Aşağı taşı"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M6 9l6 6 6-6" />
-                        </svg>
-                      </button>
                       <button
                         onClick={() => updateStatus(item.id, "new")}
                         disabled={actioning[item.id]}
