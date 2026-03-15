@@ -167,48 +167,48 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 4. AI ile formatla (max 20 haber)
-  const toProcess = fresh.slice(0, 20);
+  // 4. AI ile formatla (max 10 haber — token taşmasını önlemek için)
+  const toProcess = fresh.slice(0, 10);
   const anthropic = new Anthropic();
 
   try {
     const response = await anthropic.messages.create({
       model: HAIKU,
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         {
           role: "user",
-          content: `Sen Klemens Art kültür-sanat platformunun editörüsün. Aşağıdaki ham haber listesini, e-bülten ve haber listesinde yayınlanacak formata dönüştür.
+          content: `Aşağıdaki ham haberleri formatla. Her biri için title (Türkçe, kısa), summary (Türkçe, 2 cümle), source_name ve url döndür. Spor/politika/ekonomi haberlerini dahil etme. Sadece kültür-sanat haberleri.
 
-HAM HABERLER:
-${JSON.stringify(toProcess, null, 2)}
+${JSON.stringify(toProcess)}
 
-KURALLAR:
-- Her haber için: title (Türkçe, max 100 karakter), summary (Türkçe, 2-3 cümle, max 300 karakter), source_name, url
-- İngilizce haberleri Türkçe'ye çevir
-- Sadece kültür, sanat, sergi, müze, tiyatro, sinema, edebiyat, müzik, arkeoloji konularını dahil et
-- Spor, politika, ekonomi, magazin haberlerini ÇIKAR (o öğeyi diziye ekleme)
-- Gereksiz promosyon dilini ve abartılı sıfatları temizle
-- url alanını olduğu gibi koru
-- Doğal, gazetecilik diline yakın, samimi bir ton kullan
-
-SADECE JSON dizisi döndür, başka bir şey yazma:
-[{"title": "...", "summary": "...", "source_name": "...", "url": "..."}]`,
+Yanıtın SADECE JSON dizisi olsun, markdown veya açıklama YAZMA:
+[{"title":"...","summary":"...","source_name":"...","url":"..."}]`,
         },
       ],
     });
 
-    const text =
+    let text =
       response.content[0].type === "text" ? response.content[0].text : "";
 
-    // Markdown code block veya düz JSON dizisi
-    const cleaned = text.replace(/```(?:json)?\s*/g, "").replace(/```\s*/g, "").trim();
-    const jsonMatch = cleaned.match(/\[[\s\S]*\]/);
+    // Markdown code block temizle
+    text = text.replace(/^```(?:json)?[\s\n]*/i, "").replace(/[\s\n]*```\s*$/i, "").trim();
+
+    // Yanıt kesildiyse kapanan ] ekle
+    if (text.includes("[") && !text.includes("]")) {
+      // Son tam objeye kadar kes ve kapat
+      const lastBrace = text.lastIndexOf("}");
+      if (lastBrace > 0) {
+        text = text.substring(0, lastBrace + 1) + "]";
+      }
+    }
+
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
 
     if (!jsonMatch) {
-      console.error("AI trending parse fail. Raw text:", text.slice(0, 500));
+      console.error("AI trending parse fail. Cleaned text:", text.slice(0, 500));
       return NextResponse.json(
-        { error: `AI yanıtı okunamadı. Ham: ${text.slice(0, 200)}` },
+        { error: `AI yanıtı okunamadı. Lütfen tekrar deneyin.` },
         { status: 500 },
       );
     }
@@ -223,11 +223,17 @@ SADECE JSON dizisi döndür, başka bir şey yazma:
     try {
       formatted = JSON.parse(jsonMatch[0]);
     } catch {
-      console.error("JSON parse fail:", jsonMatch[0].slice(0, 300));
-      return NextResponse.json(
-        { error: "AI yanıtı JSON olarak ayrıştırılamadı." },
-        { status: 500 },
-      );
+      // Bozuk JSON'u düzeltmeye çalış — son virgülü kaldır
+      const fixedJson = jsonMatch[0].replace(/,\s*\]/, "]");
+      try {
+        formatted = JSON.parse(fixedJson);
+      } catch {
+        console.error("JSON parse fail:", jsonMatch[0].slice(0, 300));
+        return NextResponse.json(
+          { error: "AI yanıtı JSON olarak ayrıştırılamadı. Tekrar deneyin." },
+          { status: 500 },
+        );
+      }
     }
 
     const valid = formatted.filter((f) => f.title?.trim());
