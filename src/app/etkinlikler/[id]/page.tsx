@@ -118,13 +118,16 @@ export default async function EtkinlikDetayPage({ params }: Props) {
     eventStatus: "https://schema.org/EventScheduled",
     startDate: event.event_date ?? undefined,
     endDate: event.end_date ?? event.event_date ?? undefined,
-    ...(event.image_url && { image: event.image_url }),
+    image: event.image_url || "https://klemensart.com/logos/logo-wide-dark.PNG",
     location: {
       "@type": "Place",
       name: event.venue ?? "Ankara",
-      ...(event.address && {
-        address: { "@type": "PostalAddress", streetAddress: event.address },
-      }),
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: event.address ?? event.venue ?? "Ankara",
+        addressLocality: "Ankara",
+        addressCountry: "TR",
+      },
     },
     organizer: {
       "@type": "Organization",

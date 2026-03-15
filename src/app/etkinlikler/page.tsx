@@ -38,7 +38,7 @@ export default async function EtkinliklerPage() {
   const now = new Date().toISOString();
   const { data: events } = await supabase
     .from("events")
-    .select("id, title, event_date, venue")
+    .select("id, title, event_date, venue, address, image_url, source_name")
     .eq("status", "approved")
     .gte("event_date", now)
     .order("event_date", { ascending: true })
@@ -67,9 +67,21 @@ export default async function EtkinliklerPage() {
           name: e.title,
           url: `https://klemensart.com/etkinlikler/${e.id}`,
           startDate: e.event_date ?? undefined,
+          image: e.image_url || "https://klemensart.com/logos/logo-wide-dark.PNG",
           location: {
             "@type": "Place",
             name: e.venue ?? "Ankara",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: e.address ?? e.venue ?? "Ankara",
+              addressLocality: "Ankara",
+              addressCountry: "TR",
+            },
+          },
+          organizer: {
+            "@type": "Organization",
+            name: e.source_name ?? "Klemens Art",
+            url: "https://klemensart.com",
           },
         },
       })),
