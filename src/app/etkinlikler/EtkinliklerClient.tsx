@@ -161,8 +161,18 @@ function EventCard({ e }: { e: EventRow }) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-            <EventTypeIcon type={type} />
+          <div className={`w-full h-full bg-gradient-to-br ${gradient} flex flex-col justify-end p-5 relative`}>
+            {/* Decorative icon — bottom right, faded */}
+            <div className="absolute bottom-4 right-4 opacity-20">
+              <EventTypeIcon type={type} />
+            </div>
+            {/* Title as poster typography */}
+            <h4
+              className="text-white text-xl sm:text-2xl font-bold leading-snug line-clamp-3 drop-shadow-sm relative z-10 pr-12"
+              style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
+            >
+              {e.title}
+            </h4>
           </div>
         )}
 
