@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase";
@@ -25,24 +25,30 @@ export default function Navbar() {
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [user,      setUser]      = useState<User | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
-    // İlk session kontrolü
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
-    });
-    // Auth değişikliklerini dinle
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
+    // Defer auth check — don't block initial render & main thread
+    const timer = setTimeout(() => {
+      const supabase = createClient();
+      supabase.auth.getSession().then(({ data }) => {
+        setUser(data.session?.user ?? null);
+      });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+        setUser(session?.user ?? null);
+      });
+      cleanupRef.current = () => subscription.unsubscribe();
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+      cleanupRef.current?.();
+    };
   }, []);
 
   return (

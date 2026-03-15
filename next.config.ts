@@ -13,7 +13,12 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ["framer-motion"],
+    optimizePackageImports: [
+      "framer-motion",
+      "@supabase/supabase-js",
+      "@vercel/analytics",
+      "@vercel/speed-insights",
+    ],
   },
   async headers() {
     return [

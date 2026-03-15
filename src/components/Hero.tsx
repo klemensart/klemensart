@@ -1,19 +1,17 @@
-import dynamic from "next/dynamic";
-
-const SynapseNetwork = dynamic(() => import("@/components/SynapseNetwork"));
+import SynapseWrapper from "@/components/SynapseWrapper";
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-warm-50">
-      {/* Animated background blobs */}
+      {/* Animated background blobs — GPU accelerated */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden>
         <div className="blob-a absolute -top-32 -right-24 w-[640px] h-[640px] rounded-full bg-coral/[0.07]" />
         <div className="blob-b absolute -bottom-16 -left-16 w-[520px] h-[520px] rounded-full bg-coral/[0.06]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-warm-200/30" />
       </div>
 
-      {/* Synapse network — desktop right half */}
-      <SynapseNetwork />
+      {/* Synapse network — only loaded on desktop, zero JS on mobile */}
+      <SynapseWrapper />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-20 w-full">
         <div className="max-w-3xl lg:w-1/2">

@@ -24,8 +24,16 @@ export default function HaritaBanner() {
   const frameRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
   const visibleRef = useRef(false);
+  const lastDrawRef = useRef(0);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
+    // Throttle to ~30fps (33ms between frames)
+    if (timestamp && timestamp - lastDrawRef.current < 33) {
+      if (visibleRef.current) rafRef.current = requestAnimationFrame(draw);
+      return;
+    }
+    lastDrawRef.current = timestamp || 0;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");

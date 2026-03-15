@@ -49,9 +49,10 @@ html {
 }
 .live-pulse { animation: livePulse 1.5s ease-in-out infinite; }
 
-.blob-a { animation: float-a 14s ease-in-out infinite; }
-.blob-b { animation: float-b 18s ease-in-out infinite; }
-.spin-slow { animation: spin-slow 32s linear infinite; }
+/* GPU-accelerated animations with will-change */
+.blob-a { animation: float-a 14s ease-in-out infinite; will-change: transform; }
+.blob-b { animation: float-b 18s ease-in-out infinite; will-change: transform; }
+.spin-slow { animation: spin-slow 32s linear infinite; will-change: transform; }
 .bounce-slow { animation: bounce-y 2.5s ease-in-out infinite; }
 
 .fade-up   { animation: fade-up 0.75s ease-out both; }
@@ -59,6 +60,24 @@ html {
 .fade-up-2 { animation: fade-up 0.75s ease-out 0.22s both; }
 .fade-up-3 { animation: fade-up 0.75s ease-out 0.36s both; }
 .fade-up-4 { animation: fade-up 0.75s ease-out 0.5s  both; }
+
+/* Reduce animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .blob-a, .blob-b, .spin-slow, .bounce-slow, .live-pulse {
+    animation: none !important;
+  }
+  .fade-up, .fade-up-1, .fade-up-2, .fade-up-3, .fade-up-4 {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Disable heavy blob animations on mobile to save CPU */
+@media (max-width: 767px) {
+  .blob-a, .blob-b {
+    animation: none !important;
+  }
+}
 
 /* ── Article prose styles ── */
 .prose-klemens {
