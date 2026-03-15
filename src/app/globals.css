@@ -314,9 +314,8 @@ html {
   padding: 0.05em 0.15em;
 }
 
-/* Image captions: paragraph right after an image, or text after img in same p */
-.prose-klemens img + p,
-.prose-klemens p:has(> img) {
+/* Image captions: only explicit figcaption elements */
+.prose-klemens figcaption {
   text-align: left;
   font-size: 0.8rem;
   font-style: italic;
@@ -326,7 +325,7 @@ html {
   margin-top: 0.5rem;
   margin-bottom: 2rem;
 }
-.prose-klemens p:has(> img) strong {
+.prose-klemens figcaption strong {
   font-weight: 400;
 }
 

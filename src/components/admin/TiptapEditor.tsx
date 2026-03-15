@@ -394,20 +394,12 @@ const EDITOR_CSS = `
     height: 0;
   }
 
-  /* Image caption — paragraph right after an image */
-  .ProseMirror img + p {
-    text-align: center;
-    font-size: 0.875rem;
-    font-style: italic;
-    color: #78716c;
-    margin-top: -0.25em;
-    margin-bottom: 1.5em;
-  }
-  /* Caption placeholder — normal style */
+  /* Caption placeholder hint — only for empty paragraph after image */
   .ProseMirror img + p.is-empty::before {
     width: 100%;
     text-align: center;
-    font-style: normal;
+    font-style: italic;
+    color: rgba(140,133,126,0.4);
   }
 
   /* Headings */
@@ -594,7 +586,7 @@ export default function TiptapEditor({
 
     const altText = altFromFileName(optimized.name);
 
-    // Insert placeholder image + empty caption paragraph
+    // Insert placeholder image + empty paragraph (no forced italic)
     const placeholderId = `upload-${Date.now()}`;
     ed.chain()
       .focus()
@@ -608,10 +600,6 @@ export default function TiptapEditor({
         },
         { type: "paragraph" },
       ])
-      .command(({ tr }) => {
-        tr.setStoredMarks([ed.schema.marks.italic.create()]);
-        return true;
-      })
       .run();
 
     const url = await onUploadRef.current(optimized);
@@ -645,10 +633,6 @@ export default function TiptapEditor({
           { type: "image", attrs: { src: url, alt: altText } },
           { type: "paragraph" },
         ])
-        .command(({ tr }) => {
-          tr.setStoredMarks([ed.schema.marks.italic.create()]);
-          return true;
-        })
         .run();
     }
   };

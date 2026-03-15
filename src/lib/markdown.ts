@@ -32,6 +32,16 @@ function extractYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
+/** Image + italic paragraph → <figure> + <figcaption> */
+function processImageCaptions(rawHtml: string): string {
+  // Match: <p><img ...></p> followed by <p><em>caption</em></p>
+  return rawHtml.replace(
+    /<p>(<img\s[^>]*>)<\/p>\s*<p><em>([\s\S]*?)<\/em><\/p>/g,
+    (_, img, caption) =>
+      `<figure>${img}<figcaption>${caption}</figcaption></figure>`,
+  );
+}
+
 function processWarningBoxes(rawHtml: string): string {
   // ⚠️ (U+26A0) ile başlayan paragrafları uyarı kutusu olarak işaretle
   return rawHtml.replace(
@@ -238,6 +248,7 @@ export async function markdownToHtml(content: string): Promise<string> {
   }
 
   // 4. Post-process pipeline
+  contentHtml = processImageCaptions(contentHtml);
   contentHtml = processWarningBoxes(contentHtml);
   contentHtml = processYouTubeEmbeds(processBlockquotes(contentHtml));
   contentHtml = processKaynakca(contentHtml);
