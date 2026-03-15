@@ -510,17 +510,13 @@ export default function AdminHaberlerPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     {item.source_name && (
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                        item.source_name.toLowerCase().includes("klemens")
-                          ? "bg-coral text-white"
-                          : "bg-warm-100 text-warm-900/60"
-                      }`}>
+                      <span className="px-2 py-0.5 bg-warm-100 text-warm-900/60 text-xs font-semibold rounded-full">
                         {item.source_name}
                       </span>
                     )}
                     {item.is_manual && (
                       <span className="px-2 py-0.5 bg-coral/10 text-coral text-xs font-semibold rounded-full">
-                        {item.source_name?.toLowerCase().includes("klemens") ? "Klemens" : "Manuel"}
+                        Manuel
                       </span>
                     )}
                     {item.guid?.startsWith("trending-") && (
