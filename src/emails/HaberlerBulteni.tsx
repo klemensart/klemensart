@@ -69,6 +69,23 @@ export default function HaberlerBulteni({
       <KlemensButton href="https://klemensart.com/haberler">
         Tüm Haberleri Görün
       </KlemensButton>
+
+      {/* Quiz CTA — minimal, zarif */}
+      <Section style={quizSection}>
+        <Hr style={lightDivider} />
+        <Text style={quizText}>
+          Sanat tarihi bilginizi test etmek ister misiniz?
+        </Text>
+        <Text style={quizLinks}>
+          <Link href="https://klemensart.com/testler/ronesans-quiz" style={quizLink}>
+            Rönesans Testi
+          </Link>
+          <span style={quizDot}> · </span>
+          <Link href="https://klemensart.com/testler/modern-sanat-quiz" style={quizLink}>
+            Modern Sanat Testi
+          </Link>
+        </Text>
+      </Section>
     </KlemensLayout>
   );
 }
@@ -163,4 +180,34 @@ const coralLink: React.CSSProperties = {
   textDecoration: "none",
   fontWeight: 600,
   fontSize: "14px",
+};
+
+const quizSection: React.CSSProperties = {
+  padding: "0 48px 8px",
+};
+
+const quizText: React.CSSProperties = {
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontSize: "14px",
+  fontStyle: "italic" as const,
+  color: "#999999",
+  textAlign: "center" as const,
+  margin: "16px 0 8px 0",
+};
+
+const quizLinks: React.CSSProperties = {
+  textAlign: "center" as const,
+  margin: "0",
+};
+
+const quizLink: React.CSSProperties = {
+  color: "#FF6D60",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "13px",
+};
+
+const quizDot: React.CSSProperties = {
+  color: "#cccccc",
+  fontSize: "13px",
 };
