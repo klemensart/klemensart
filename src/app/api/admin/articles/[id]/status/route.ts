@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { generateUniqueSlug } from "@/lib/slugify";
 
 export async function PATCH(
   req: NextRequest,
@@ -50,6 +51,8 @@ export async function PATCH(
         .maybeSingle();
 
       if (!existing) {
+        const publishedAt = article.date || new Date().toISOString();
+        const newsSlug = await generateUniqueSlug(article.title, publishedAt, admin);
         await admin.from("news_items").insert({
           guid,
           title: article.title,
@@ -59,7 +62,8 @@ export async function PATCH(
           source_name: "Klemens",
           status: "new",
           is_manual: true,
-          published_at: article.date || new Date().toISOString(),
+          published_at: publishedAt,
+          slug: newsSlug,
         });
       }
     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { generateUniqueSlug } from "@/lib/slugify";
 
 // ── GET: Haber listesi + sayaçlar ───────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -68,6 +69,8 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
   const guid = `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const publishedAt = new Date().toISOString();
+  const slug = await generateUniqueSlug(title, publishedAt, admin);
 
   const { data, error } = await admin
     .from("news_items")
@@ -80,7 +83,8 @@ export async function POST(req: NextRequest) {
       source_name: source_name ?? "Klemens",
       status: "new",
       is_manual: true,
-      published_at: new Date().toISOString(),
+      published_at: publishedAt,
+      slug,
     })
     .select("id")
     .single();

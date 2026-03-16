@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const [itemsRes, countRes] = await Promise.all([
     supabase
       .from("news_items")
-      .select("id, title, summary, url, image_url, source_name, published_at")
+      .select("id, title, summary, url, image_url, source_name, published_at, slug")
       .in("status", ["published", "archived"])
       .order("published_at", { ascending: false })
       .range(offset, offset + limit - 1),

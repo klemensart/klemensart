@@ -90,6 +90,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Dynamic news detail pages from Supabase
+  const { data: newsItems } = await supabase
+    .from("news_items")
+    .select("slug, published_at")
+    .in("status", ["published", "archived"])
+    .order("published_at", { ascending: false });
+
+  const newsPages: MetadataRoute.Sitemap = (newsItems ?? []).map((n) => ({
+    url: `${BASE_URL}/haberler/${n.slug}`,
+    lastModified: n.published_at ? new Date(n.published_at) : undefined,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
   // Public campaign (newsletter archive) pages
   const campaignPages: MetadataRoute.Sitemap = (publicCampaigns ?? []).map((c) => ({
     url: `${BASE_URL}/bulten/arsiv/${c.id}`,
@@ -104,6 +118,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...workshopPages,
     ...articlePages,
     ...eventPages,
+    ...newsPages,
     ...campaignPages,
   ];
 }

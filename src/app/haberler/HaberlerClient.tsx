@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -12,6 +13,7 @@ type NewsItem = {
   image_url: string | null;
   source_name: string | null;
   published_at: string | null;
+  slug: string;
 };
 
 function fmtDate(iso: string | null) {
@@ -94,11 +96,9 @@ export default function HaberlerClient() {
           <>
             <div className="space-y-4">
               {items.map((item) => (
-                <a
+                <Link
                   key={item.id}
-                  href={item.url ?? "#"}
-                  target={item.url ? "_blank" : undefined}
-                  rel={item.url ? "noopener noreferrer" : undefined}
+                  href={`/haberler/${item.slug}`}
                   className="block bg-white rounded-2xl border border-warm-100 overflow-hidden hover:border-warm-200 hover:shadow-sm transition-all group"
                 >
                   <div className="flex gap-4 p-5">
@@ -153,12 +153,11 @@ export default function HaberlerClient() {
                         strokeLinejoin="round"
                         className="text-warm-900/20 group-hover:text-coral transition-colors"
                       >
-                        <line x1="7" y1="17" x2="17" y2="7" />
-                        <polyline points="7 7 17 7 17 17" />
+                        <polyline points="9 18 15 12 9 6" />
                       </svg>
                     </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
 

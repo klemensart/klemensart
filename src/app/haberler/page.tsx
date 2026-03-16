@@ -36,7 +36,7 @@ export default async function HaberlerPage() {
   const supabase = createAdminClient();
   const { data: items } = await supabase
     .from("news_items")
-    .select("id, title, summary, url, image_url, source_name, published_at")
+    .select("id, title, summary, url, image_url, source_name, published_at, slug")
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .limit(20);
@@ -62,7 +62,7 @@ export default async function HaberlerPage() {
         item: {
           "@type": "NewsArticle",
           headline: item.title,
-          url: item.url ?? `https://klemensart.com/haberler`,
+          url: `https://klemensart.com/haberler/${item.slug}`,
           datePublished: item.published_at ?? undefined,
           publisher: {
             "@type": "Organization",

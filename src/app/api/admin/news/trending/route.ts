@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { generateUniqueSlug } from "@/lib/slugify";
 
 const HAIKU = "claude-haiku-4-5-20251001";
 
@@ -247,17 +248,23 @@ Yanıtın SADECE JSON dizisi olsun, markdown veya açıklama YAZMA:
     }
 
     // 5. news_items'a ekle
-    const rows = valid.map((item) => ({
-      guid: `trending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: item.title,
-      summary: item.summary || null,
-      url: item.url || null,
-      image_url: null,
-      source_name: item.source_name || "Web",
-      status: "new",
-      is_manual: false,
-      published_at: new Date().toISOString(),
-    }));
+    const publishedAt = new Date().toISOString();
+    const rows = [];
+    for (const item of valid) {
+      const slug = await generateUniqueSlug(item.title, publishedAt, admin);
+      rows.push({
+        guid: `trending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title: item.title,
+        summary: item.summary || null,
+        url: item.url || null,
+        image_url: null,
+        source_name: item.source_name || "Web",
+        status: "new",
+        is_manual: false,
+        published_at: publishedAt,
+        slug,
+      });
+    }
 
     const { error } = await admin.from("news_items").insert(rows);
 

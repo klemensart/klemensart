@@ -14,7 +14,7 @@ export async function GET() {
 
   const { data: items } = await supabase
     .from("news_items")
-    .select("title, summary, url, image_url, source_name, published_at")
+    .select("title, summary, url, image_url, source_name, published_at, slug")
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .limit(50);
@@ -23,7 +23,7 @@ export async function GET() {
 
   const rssItems = (items ?? [])
     .map((item) => {
-      const link = item.url || "https://klemensart.com/haberler";
+      const link = `https://klemensart.com/haberler/${item.slug}`;
       return `    <item>
       <title>${escapeXml(item.title)}</title>
       <link>${escapeXml(link)}</link>
