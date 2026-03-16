@@ -82,6 +82,14 @@ export async function POST(req: NextRequest) {
       return new NextResponse("OK");
     }
 
+    // 6a) checkout_complete event
+    await supabase.from("user_events").insert({
+      event_type: "checkout_complete",
+      user_id: intent.user_id,
+      workshop_id: intent.workshop_id,
+      metadata: { merchant_oid, amount: Number(total_amount) },
+    });
+
     // 6b) Teşekkür e-postası (fire-and-forget)
     (async () => {
       try {

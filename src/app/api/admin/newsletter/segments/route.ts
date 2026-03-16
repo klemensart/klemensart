@@ -20,7 +20,11 @@ export type SegmentId =
   | "map_sanat"
   | "map_muzik_tiyatro"
   | "map_aktif_gezgin"
-  | "map_yeni_kesfifci";
+  | "map_yeni_kesfifci"
+  // Satın alma hunisi segmentleri
+  | "funnel_viewed_not_bought"
+  | "funnel_carted_not_checked_out"
+  | "funnel_checkout_abandoned";
 
 export async function GET(req: NextRequest) {
   const userClient = await createServerSupabaseClient();
@@ -36,7 +40,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
 
   // Fetch all data we need
-  const [logsRes, subsRes, purchasesRes, usersRes, mapVisitsRes] = await Promise.all([
+  const [logsRes, subsRes, purchasesRes, usersRes, mapVisitsRes, funnelEventsRes] = await Promise.all([
     admin
       .from("email_logs")
       .select("subscriber_email, subject, sent_at, opened_at, clicked_at")
@@ -45,6 +49,7 @@ export async function GET(req: NextRequest) {
     admin.from("purchases").select("user_id, workshop_id, expires_at"),
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin.from("map_visits").select("user_id, place_type"),
+    admin.from("user_events").select("event_type, user_id, anonymous_id"),
   ]);
 
   const logs = logsRes.data ?? [];
@@ -52,6 +57,17 @@ export async function GET(req: NextRequest) {
   const purchases = purchasesRes.data ?? [];
   const authUsers = usersRes.data?.users ?? [];
   const mapVisits = mapVisitsRes.data ?? [];
+  const funnelEvents = funnelEventsRes.data ?? [];
+
+  // Funnel: user_id bazlı event setleri (sadece user_id olanlar — e-posta göndermek için)
+  const funnelUserEvents = new Map<string, Set<string>>();
+  for (const e of funnelEvents) {
+    if (!e.user_id) continue;
+    if (!funnelUserEvents.has(e.user_id)) {
+      funnelUserEvents.set(e.user_id, new Set());
+    }
+    funnelUserEvents.get(e.user_id)!.add(e.event_type);
+  }
 
   // Harita davranış analizi: user_id → place_type sayıları
   const userPlaceTypes = new Map<string, Map<string, number>>();
@@ -253,6 +269,28 @@ export async function GET(req: NextRequest) {
           .map(([uid]) => uid);
         return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
       }
+      // ── Satın Alma Hunisi Segmentleri ──
+      case "funnel_viewed_not_bought": {
+        // Atölye sayfasını gördü ama hiç satın almadı
+        const userIds = [...funnelUserEvents.entries()]
+          .filter(([uid, events]) => events.has("workshop_view") && !buyerUserIds.has(uid))
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "funnel_carted_not_checked_out": {
+        // Sepete ekledi ama ödeme sayfasına girmedi
+        const userIds = [...funnelUserEvents.entries()]
+          .filter(([, events]) => events.has("add_to_cart") && !events.has("checkout_start"))
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
+      case "funnel_checkout_abandoned": {
+        // Ödeme sayfasına girdi ama tamamlamadı
+        const userIds = [...funnelUserEvents.entries()]
+          .filter(([, events]) => events.has("checkout_start") && !events.has("checkout_complete"))
+          .map(([uid]) => uid);
+        return userIds.map((uid) => userIdToEmail.get(uid)).filter((e): e is string => !!e && activeEmails.has(e));
+      }
       default:
         return [];
     }
@@ -283,6 +321,10 @@ export async function GET(req: NextRequest) {
     { id: "map_muzik_tiyatro", label: "Sahne Sanatları", description: "Konser ve tiyatro mekanlarını ziyaret edenler", count: 0, category: "Kültür Haritası" },
     { id: "map_aktif_gezgin", label: "Aktif Gezginler", description: "10+ farklı mekan keşfetmiş süper gezginler", count: 0, category: "Kültür Haritası" },
     { id: "map_yeni_kesfifci", label: "Yeni Kaşifler", description: "1-3 ziyaret yapmış, potansiyel büyüme kitlesi", count: 0, category: "Kültür Haritası" },
+    // Satın alma hunisi segmentleri
+    { id: "funnel_viewed_not_bought", label: "Görüntüleyip Almamış", description: "Atölye sayfasını gördü ama satın almadı", count: 0, category: "Satın Alma Hunisi" },
+    { id: "funnel_carted_not_checked_out", label: "Sepette Bırakmış", description: "Satın Al'a tıkladı ama ödemeye geçmedi", count: 0, category: "Satın Alma Hunisi" },
+    { id: "funnel_checkout_abandoned", label: "Ödemeyi Yarım Bırakmış", description: "Ödeme sayfasına girdi ama tamamlamadı", count: 0, category: "Satın Alma Hunisi" },
   ];
 
   for (const seg of allSegments) {

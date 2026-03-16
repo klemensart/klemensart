@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import SatinAlButton from "@/components/SatinAlButton";
 import CountdownTimer from "@/components/CountdownTimer";
 import { SLUG_TO_ATOLYE, type AtolyeConfig } from "@/lib/atolyeler-config";
+import WorkshopViewTracker from "@/components/WorkshopViewTracker";
 import { createAdminClient } from "@/lib/supabase-admin";
 
 const B = {
@@ -126,6 +127,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
       />
+      <WorkshopViewTracker workshopId={config.id} workshopSlug={slug} />
       {page}
     </>
   );

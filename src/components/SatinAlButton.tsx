@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { trackEvent } from "@/lib/track";
 
 type Props = {
   workshopId: string;
@@ -25,6 +26,8 @@ export default function SatinAlButton({
   const router = useRouter();
 
   async function handleClick() {
+    trackEvent("add_to_cart", { workshopId, workshopSlug });
+
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 

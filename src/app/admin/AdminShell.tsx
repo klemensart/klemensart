@@ -10,6 +10,7 @@ type NavItem = {
   icon: React.ReactNode;
   adminOnly?: boolean;
   editorAllowed?: boolean;
+  hideFromEditor?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -132,6 +133,17 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: "/admin/izleme",
+    label: "Kullanıcı İzleme",
+    adminOnly: true,
+    hideFromEditor: true,
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+  },
+  {
     href: "/admin/tasarim",
     label: "Tasarım",
     adminOnly: true,
@@ -178,7 +190,7 @@ export default function AdminShell({
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter((item) => !(isEditor && item.hideFromEditor)).map((item) => {
             const active = isActive(item.href);
             const isLocked = isEditor && item.adminOnly && !item.editorAllowed;
             return (

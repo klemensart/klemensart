@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
+import { trackEvent } from "@/lib/track";
 
 const B = {
   coral: "#FF6D60",
@@ -71,6 +72,7 @@ export default function OdemePage() {
 
       // Show coupon step
       setStatus("coupon");
+      trackEvent("checkout_start", { workshopId, workshopSlug });
     });
   }, [workshopId, amount, workshopTitle, workshopSlug, router]);
 
