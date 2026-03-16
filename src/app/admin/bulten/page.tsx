@@ -1104,13 +1104,12 @@ export default function BultenGonderPage() {
 
           {/* ── Right: Live Preview ── */}
           <div>
-            <div className="text-xs text-gray-400 mb-2 font-medium">CANLI ÖNİZLEME</div>
-            <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto p-6">
+            <div className="text-xs text-gray-400 mb-2 font-medium border-l-2 border-[#FF6D60] pl-2">CANLI ÖNİZLEME</div>
+            <div className="border border-gray-200 rounded-xl overflow-hidden bg-[#f7f5f2] max-h-[calc(100vh-200px)] overflow-y-auto p-6 shadow-sm">
               <div style={{ maxWidth: 600, margin: "0 auto", backgroundColor: "#ffffff" }}>
                 {/* Header */}
                 <div style={{ textAlign: "center", padding: "48px 40px 0 40px" }}>
-                  <div style={{ fontSize: 28, letterSpacing: 6, color: "#2D2926", fontFamily: "Georgia, serif" }}>KLEMENS</div>
-                  <div style={{ fontSize: 11, letterSpacing: 3, color: "#8C857E", textTransform: "uppercase", marginTop: 6 }}>art &amp; culture</div>
+                  <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon.PNG" alt="Klemens Art" width="160" style={{ display: "block", margin: "0 auto" }} />
                 </div>
                 <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "28px auto", width: "86%" }} />
                 {subject && (
@@ -1124,17 +1123,24 @@ export default function BultenGonderPage() {
                 />
                 <hr style={{ border: "none", borderTop: "1px solid #e8e4df", margin: "28px auto", width: "86%" }} />
                 <div style={{ textAlign: "center", padding: "24px 40px 40px 40px" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: "#2D2926" }}>Klemens Art</div>
-                  <div style={{ fontSize: 11, color: "#8C857E", marginTop: 4 }}>Ankara, Türkiye</div>
-                  <div style={{ fontSize: 12, marginTop: 16 }}>
-                    <span style={{ color: "#FF6D60" }}>Instagram</span>&nbsp;&middot;&nbsp;
-                    <span style={{ color: "#FF6D60" }}>YouTube</span>&nbsp;&middot;&nbsp;
-                    <span style={{ color: "#FF6D60" }}>Web</span>
+                  <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 16 }}>
+                    {[
+                      { label: "in", href: "https://instagram.com/klemens.art" },
+                      { label: "x", href: "https://x.com/KlemensArt" },
+                      { label: "yt", href: "https://www.youtube.com/@KlemensArt" },
+                      { label: "li", href: "https://www.linkedin.com/company/klemens-art" },
+                    ].map(s => (
+                      <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", width: 32, height: 32, lineHeight: "32px", borderRadius: "50%", backgroundColor: "#1A1A1A", color: "#ffffff", fontSize: 12, fontFamily: "Helvetica, Arial, sans-serif", textAlign: "center", textDecoration: "none" }}>
+                        {s.label}
+                      </a>
+                    ))}
                   </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "#1A1A1A" }}>Klemens Art</div>
+                  <div style={{ fontSize: 11, color: "#999", marginTop: 4 }}>Ankara, Türkiye</div>
                   <div style={{ fontSize: 11, color: "#b0a99f", marginTop: 16, lineHeight: "1.6" }}>
                     Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
                     <br />
-                    <span style={{ color: "#8C857E", textDecoration: "underline" }}>Abonelikten çıkmak için tıklayın</span>
+                    <span style={{ color: "#999", textDecoration: "underline" }}>Abonelikten çıkmak için tıklayın</span>
                   </div>
                 </div>
               </div>

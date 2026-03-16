@@ -10,6 +10,8 @@ import {
   Img,
   Font,
   Preview,
+  Row,
+  Column,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -66,26 +68,32 @@ export default function KlemensNewsletter({
           <Hr style={divider} />
 
           <Section style={footer}>
+            {/* Social Icons */}
+            <Row style={socialRow}>
+              <Column style={socialCol}>
+                <Link href="https://instagram.com/klemens.art" style={socialCircleLink}>
+                  <span style={socialCircle}>in</span>
+                </Link>
+              </Column>
+              <Column style={socialCol}>
+                <Link href="https://x.com/KlemensArt" style={socialCircleLink}>
+                  <span style={socialCircle}>x</span>
+                </Link>
+              </Column>
+              <Column style={socialCol}>
+                <Link href="https://www.youtube.com/@KlemensArt" style={socialCircleLink}>
+                  <span style={socialCircle}>yt</span>
+                </Link>
+              </Column>
+              <Column style={socialCol}>
+                <Link href="https://www.linkedin.com/company/klemens-art" style={socialCircleLink}>
+                  <span style={socialCircle}>li</span>
+                </Link>
+              </Column>
+            </Row>
+
             <Text style={footerBrand}>Klemens Art</Text>
             <Text style={footerAddress}>Ankara, Türkiye</Text>
-
-            <Text style={socialLinks}>
-              <Link href="https://instagram.com/klemens.art" style={socialLink}>
-                Instagram
-              </Link>
-              &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <Link href="https://www.youtube.com/@KlemensArt" style={socialLink}>
-                YouTube
-              </Link>
-              &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <Link href="https://x.com/KlemensArt" style={socialLink}>
-                X
-              </Link>
-              &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-              <Link href="https://www.linkedin.com/company/klemens-art" style={socialLink}>
-                LinkedIn
-              </Link>
-            </Text>
 
             <Text style={unsubscribeText}>
               Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
@@ -178,28 +186,47 @@ const footer: React.CSSProperties = {
   padding: "24px 40px 40px 40px",
 };
 
+const socialRow: React.CSSProperties = {
+  width: "160px",
+  margin: "0 auto 20px auto",
+};
+
+const socialCol: React.CSSProperties = {
+  textAlign: "center" as const,
+  width: "40px",
+};
+
+const socialCircleLink: React.CSSProperties = {
+  textDecoration: "none",
+};
+
+const socialCircle: React.CSSProperties = {
+  display: "inline-block",
+  width: "32px",
+  height: "32px",
+  lineHeight: "32px",
+  borderRadius: "50%",
+  backgroundColor: "#1A1A1A",
+  color: "#ffffff",
+  fontSize: "12px",
+  fontFamily: "Helvetica, Arial, sans-serif",
+  textAlign: "center" as const,
+  textDecoration: "none",
+};
+
 const footerBrand: React.CSSProperties = {
-  fontSize: "13px",
+  fontSize: "12px",
   fontWeight: 700,
   letterSpacing: "2px",
-  color: "#2D2926",
+  textTransform: "uppercase" as const,
+  color: "#1A1A1A",
   margin: "0",
 };
 
 const footerAddress: React.CSSProperties = {
   fontSize: "11px",
-  color: "#8C857E",
-  margin: "4px 0 16px 0",
-};
-
-const socialLinks: React.CSSProperties = {
-  fontSize: "12px",
-  margin: "0 0 16px 0",
-};
-
-const socialLink: React.CSSProperties = {
-  color: "#FF6D60",
-  textDecoration: "none",
+  color: "#999999",
+  margin: "4px 0 20px 0",
 };
 
 const unsubscribeText: React.CSSProperties = {
@@ -210,6 +237,6 @@ const unsubscribeText: React.CSSProperties = {
 };
 
 const unsubscribeLink: React.CSSProperties = {
-  color: "#8C857E",
+  color: "#999999",
   textDecoration: "underline",
 };
