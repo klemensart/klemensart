@@ -12,7 +12,7 @@ type Funnel = {
 type Journey = {
   user_id: string;
   email: string | null;
-  steps: { event_type: string; workshop_slug: string | null; created_at: string }[];
+  steps: { event_type: string; workshop_slug: string | null; workshop_title: string | null; created_at: string }[];
 };
 
 const STEPS = [
@@ -226,6 +226,9 @@ export default function IzlemePage() {
                                       : s.event_type === "checkout_start"
                                         ? "Ödeme"
                                         : "Tamamlandı"}
+                                  {s.workshop_title && (
+                                    <span className="opacity-60 ml-0.5">({s.workshop_title})</span>
+                                  )}
                                 </span>
                                 {idx < j.steps.length - 1 && (
                                   <span className="text-warm-900/20">→</span>

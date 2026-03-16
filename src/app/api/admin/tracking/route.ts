@@ -63,6 +63,23 @@ export async function GET(req: NextRequest) {
     checkout_complete: uniqueSets.checkout_complete.size,
   };
 
+  // workshop_id → title eşleştirmesi
+  const workshopIds = new Set<string>();
+  for (const e of allEvents) {
+    if (e.workshop_id) workshopIds.add(e.workshop_id);
+  }
+
+  const workshopIdToTitle = new Map<string, string>();
+  if (workshopIds.size > 0) {
+    const { data: workshops } = await admin
+      .from("workshops")
+      .select("id, title")
+      .in("id", [...workshopIds]);
+    for (const w of workshops ?? []) {
+      workshopIdToTitle.set(w.id, w.title);
+    }
+  }
+
   // user_id → e-posta eşleştirmesi
   const userIds = new Set<string>();
   for (const e of allEvents) {
@@ -104,6 +121,7 @@ export async function GET(req: NextRequest) {
         .map((e) => ({
           event_type: e.event_type,
           workshop_slug: e.workshop_slug,
+          workshop_title: (e.workshop_id && workshopIdToTitle.get(e.workshop_id)) || null,
           created_at: e.created_at,
         })),
     }));
