@@ -198,7 +198,7 @@ html {
 .prose-klemens img {
   max-width: 100%;
   border-radius: 1rem;
-  margin: 1.5rem auto 0.5rem;
+  margin: 1.5rem 0 0.5rem;
   object-fit: cover;
   display: block;
 }
@@ -322,7 +322,7 @@ html {
 
 /* Image captions: only explicit figcaption elements */
 .prose-klemens figcaption {
-  text-align: center;
+  text-align: left;
   font-size: 0.8rem;
   font-style: italic;
   font-weight: 400;
