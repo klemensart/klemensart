@@ -167,12 +167,11 @@ function HeroBanner({
         src={config.imgCover}
         alt={baslik}
         fill
-        quality={95}
+        quality={80}
         priority
         placeholder="blur"
         blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSIyNCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjMkQyOTI2Ii8+PC9zdmc+"
         sizes="100vw"
-        unoptimized
         style={{
           objectFit: "cover",
           objectPosition: imgPosition,

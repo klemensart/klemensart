@@ -206,8 +206,14 @@ const nextConfig: NextConfig = {
       { source: "/odeme-sayfasi", destination: "/atolyeler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 5. ÜRÜNLER
+      // 5. ÜRÜNLER (spesifik ürün redirectleri önce)
       // ═══════════════════════════════════════════════════════
+      { source: "/urun/modern-sanat-atolyesi", destination: "/atolyeler/modern-sanat-atolyesi", permanent: true },
+      { source: "/urun/modern-sanat-atolyesi/", destination: "/atolyeler/modern-sanat-atolyesi", permanent: true },
+      { source: "/urun/sanat-tarihinde-duygular", destination: "/atolyeler/sanat-tarihinde-duygular", permanent: true },
+      { source: "/urun/sanat-tarihinde-duygular/", destination: "/atolyeler/sanat-tarihinde-duygular", permanent: true },
+      { source: "/urun/ozbekistan-sanat-ve-tarih-turu", destination: "/atolyeler/ozbekistan-sanat-ve-tarih-turu", permanent: true },
+      { source: "/urun/ozbekistan-sanat-ve-tarih-turu/", destination: "/atolyeler/ozbekistan-sanat-ve-tarih-turu", permanent: true },
       { source: "/urun/:path*", destination: "/atolyeler", permanent: true },
       { source: "/product/:path*", destination: "/atolyeler", permanent: true },
       { source: "/shop", destination: "/atolyeler", permanent: true },
