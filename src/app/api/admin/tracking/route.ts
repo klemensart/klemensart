@@ -63,6 +63,22 @@ export async function GET(req: NextRequest) {
     checkout_complete: uniqueSets.checkout_complete.size,
   };
 
+  // user_id → e-posta eşleştirmesi
+  const userIds = new Set<string>();
+  for (const e of allEvents) {
+    if (e.user_id) userIds.add(e.user_id);
+  }
+
+  const userIdToEmail = new Map<string, string>();
+  if (userIds.size > 0) {
+    const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    for (const u of usersData?.users ?? []) {
+      if (userIds.has(u.id) && u.email) {
+        userIdToEmail.set(u.id, u.email);
+      }
+    }
+  }
+
   // Son 50 kullanıcı yolculuğu
   const journeyMap = new Map<string, { id: string; events: typeof allEvents }>();
   for (const e of allEvents) {
@@ -82,6 +98,7 @@ export async function GET(req: NextRequest) {
     .slice(0, 50)
     .map((j) => ({
       user_id: j.id,
+      email: userIdToEmail.get(j.id) || null,
       steps: j.events
         .sort((a, b) => a.created_at.localeCompare(b.created_at))
         .map((e) => ({

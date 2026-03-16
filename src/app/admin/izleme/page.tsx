@@ -11,6 +11,7 @@ type Funnel = {
 
 type Journey = {
   user_id: string;
+  email: string | null;
   steps: { event_type: string; workshop_slug: string | null; created_at: string }[];
 };
 
@@ -195,9 +196,13 @@ export default function IzlemePage() {
                         className="border-b border-warm-50 last:border-0 hover:bg-warm-50/50 transition-colors"
                       >
                         <td className="px-6 py-3">
-                          <span className="text-xs font-mono text-warm-900/50">
-                            {j.user_id.slice(0, 8)}…
-                          </span>
+                          {j.email ? (
+                            <span className="text-xs text-warm-900">{j.email}</span>
+                          ) : (
+                            <span className="text-xs font-mono text-warm-900/40">
+                              {j.user_id.slice(0, 8)}… <span className="text-warm-900/25">(anonim)</span>
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-3">
                           <div className="flex items-center gap-1 flex-wrap">
