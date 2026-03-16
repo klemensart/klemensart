@@ -1179,7 +1179,7 @@ export default function EnSessizZamanSergiPage() {
         color: "#fff", zIndex: 10
       }}>
         <div style={{ fontSize: 11, letterSpacing: 4, color: "#FF6D60", marginBottom: 4 }}>KLEMENS SANAL SERGİ</div>
-        <div style={{ fontSize: 20, fontWeight: 300, letterSpacing: 4, fontStyle: "italic" }}>En Sessiz Zaman</div>
+        <h1 style={{ fontSize: 20, fontWeight: 300, letterSpacing: 4, fontStyle: "italic", margin: 0 }}>En Sessiz Zaman</h1>
         <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>Theo Atay</div>
       </div>
 

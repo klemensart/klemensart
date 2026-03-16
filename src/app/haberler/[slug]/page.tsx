@@ -270,7 +270,7 @@ export default async function HaberDetayPage({ params }: Props) {
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={item.image_url}
-                            alt=""
+                            alt={item.title}
                             className="w-full h-full object-cover"
                           />
                         </div>

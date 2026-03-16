@@ -107,7 +107,7 @@ export default function HaberlerClient() {
                       <div className="flex-shrink-0 w-24 h-24 md:w-32 md:h-24 rounded-xl overflow-hidden bg-warm-100">
                         <img
                           src={item.image_url}
-                          alt=""
+                          alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = "none";

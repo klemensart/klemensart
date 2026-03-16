@@ -248,9 +248,9 @@ function EventCard({ e }: { e: EventRow }) {
 
       {/* ── Content area ── */}
       <div className="flex-1 p-5">
-        <h3 className="text-base font-bold text-warm-900 leading-snug line-clamp-2 group-hover:text-coral transition-colors duration-200">
+        <h2 className="text-base font-bold text-warm-900 leading-snug line-clamp-2 group-hover:text-coral transition-colors duration-200">
           {e.title}
-        </h3>
+        </h2>
         {meta && (
           <p className="text-xs text-warm-900/45 font-medium mt-1.5 truncate">
             {meta}

@@ -202,7 +202,7 @@ export default function GorselAlgiTesti() {
             <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",background:`${r.palette[1]}08`,top:-60,right:-40}}/>
             <div style={{position:"absolute",width:120,height:120,borderRadius:"50%",background:`${r.palette[2]}08`,bottom:-30,left:-20}}/>
             <p style={{fontSize:13,color:BRAND.muted,letterSpacing:1.5,textTransform:"uppercase",margin:"0 0 8px",fontWeight:600}}>Senin Sanat Profilin</p>
-            <h1 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2}}>{r.label}</h1>
+            <h2 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2}}>{r.label}</h2>
             <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6,maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>"{r.tagline}"</p>
             <div style={{display:"flex",justifyContent:"center",gap:8}}>
               {r.palette.map((c,i)=>(<div key={i} style={{width:40,height:40,borderRadius:99,background:c,border:"3px solid #fff",boxShadow:"0 2px 8px rgba(0,0,0,.1)"}}/>))}
