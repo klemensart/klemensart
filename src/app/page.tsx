@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     title: "Klemens — Yeni Nesil Kültür, Sanat ve Düşünce Ekosistemi",
     description:
       "Yeni nesil kültür, sanat ve düşünce ekosistemi. Sanat tarihi atölyeleri, kültür testleri, interaktif harita, dijital sergiler ve derinlemesine içerikler.",
+    url: "https://klemensart.com",
+    type: "website",
+    images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
