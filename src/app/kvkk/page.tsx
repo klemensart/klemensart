@@ -60,7 +60,7 @@ export default function KvkkPage() {
           KVKK Aydınlatma Metni
         </h1>
         <p style={{ color: B.warm, fontSize: 14, marginBottom: 40 }}>
-          Son güncelleme: 10 Mart 2026
+          Son güncelleme: 16 Mart 2026
         </p>
 
         <div
@@ -143,7 +143,32 @@ export default function KvkkPage() {
             </ul>
           </Section>
 
-          <Section title="7. İletişim">
+          <Section title="7. Çerezler ve İzleme Teknolojileri">
+            <p>
+              Platformumuzda aşağıdaki çerez kullanılmaktadır:
+            </p>
+            <ul style={{ paddingLeft: 20, margin: "8px 0" }}>
+              <li>
+                <strong>ka_anon_id</strong> — Anonim ziyaretçi tanımlama çerezi.
+                Satın alma hunisi analizinde kullanılır. Süre: 1 yıl. Yalnızca
+                kullanıcının açık onayı ile set edilir.
+              </li>
+            </ul>
+            <p>
+              Site ilk ziyaretinizde alt kısımda bir çerez onay banner&apos;ı
+              görüntülenir. &quot;Kabul Et&quot; seçeneğini tercih etmeniz
+              halinde yukarıdaki çerez tarayıcınıza kaydedilir.
+              &quot;Reddet&quot; seçeneğini tercih etmeniz halinde hiçbir izleme
+              çerezi oluşturulmaz ve anonim izleme yapılmaz.
+            </p>
+            <p>
+              Tercihleriniz tarayıcınızın yerel depolama alanında (localStorage)
+              saklanır ve istediğiniz zaman tarayıcı ayarlarınızdan
+              temizlenebilir.
+            </p>
+          </Section>
+
+          <Section title="8. İletişim">
             <p>
               Haklarınıza ilişkin taleplerinizi{" "}
               <a

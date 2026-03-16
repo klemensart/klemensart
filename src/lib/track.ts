@@ -1,9 +1,12 @@
 "use client";
 
+import { hasConsent } from "./consent";
+
 const ANON_KEY = "ka_anon_id";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "";
+  if (!hasConsent()) return "";
 
   let id = localStorage.getItem(ANON_KEY);
   if (id) return id;
@@ -33,6 +36,8 @@ export function trackEvent(
     metadata?: Record<string, unknown>;
   },
 ) {
+  if (!hasConsent()) return;
+
   try {
     const body = {
       event_type: eventType,
