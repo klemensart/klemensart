@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
+import { notifyGoogleIndex } from "@/lib/google-indexing";
 
 // ── PATCH: Status güncelle ──────────────────────────────────────────────────
 export async function PATCH(
@@ -44,6 +45,18 @@ export async function PATCH(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Yayınlandığında Google'a anında bildir
+  if (status === "published") {
+    const { data: item } = await admin
+      .from("news_items")
+      .select("slug")
+      .eq("id", id)
+      .single();
+    if (item?.slug) {
+      notifyGoogleIndex(`https://klemensart.com/haberler/${item.slug}`);
+    }
   }
 
   return NextResponse.json({ success: true });

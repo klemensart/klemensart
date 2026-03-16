@@ -1,0 +1,56 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lighthouse audit
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            https://klemensart.com/
+            https://klemensart.com/icerikler
+            https://klemensart.com/haberler
+            https://klemensart.com/atolyeler
+            https://klemensart.com/etkinlikler
+          temporaryPublicStorage: true
+          runs: 1
+
+      - name: Format results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.lighthouseci';
+            if (!fs.existsSync(path)) return;
+            const files = fs.readdirSync(path).filter(f => f.endsWith('.json') && !f.includes('manifest'));
+
+            let summary = '## Lighthouse Results\n\n';
+            summary += '| Page | Performance | SEO | Accessibility | Best Practices |\n';
+            summary += '|------|------------|-----|---------------|----------------|\n';
+
+            for (const file of files) {
+              try {
+                const data = JSON.parse(fs.readFileSync(`${path}/${file}`, 'utf8'));
+                const url = new URL(data.finalUrl || data.requestedUrl);
+                const pathname = url.pathname || '/';
+                const perf = Math.round((data.categories?.performance?.score || 0) * 100);
+                const seo = Math.round((data.categories?.seo?.score || 0) * 100);
+                const a11y = Math.round((data.categories?.accessibility?.score || 0) * 100);
+                const bp = Math.round((data.categories?.['best-practices']?.score || 0) * 100);
+                const emoji = (s) => s >= 90 ? '🟢' : s >= 50 ? '🟡' : '🔴';
+                summary += `| ${pathname} | ${emoji(perf)} ${perf} | ${emoji(seo)} ${seo} | ${emoji(a11y)} ${a11y} | ${emoji(bp)} ${bp} |\n`;
+              } catch {}
+            }
+
+            core.summary.addRaw(summary);
+            await core.summary.write();

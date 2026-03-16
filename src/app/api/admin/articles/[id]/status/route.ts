@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
 import { generateUniqueSlug } from "@/lib/slugify";
+import { notifyGoogleIndex } from "@/lib/google-indexing";
 
 export async function PATCH(
   req: NextRequest,
@@ -66,6 +67,18 @@ export async function PATCH(
           slug: newsSlug,
         });
       }
+    }
+  }
+
+  // Yayınlandığında Google'a anında bildir
+  if (status === "published") {
+    const { data: art } = await admin
+      .from("articles")
+      .select("slug")
+      .eq("id", id)
+      .single();
+    if (art?.slug) {
+      notifyGoogleIndex(`https://klemensart.com/icerikler/yazi/${art.slug}`);
     }
   }
 
