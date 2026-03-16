@@ -3,6 +3,9 @@
 # source assets (large binaries)
 /assets
 
+# Google service account key
+gsc-key.json
+
 # dependencies
 /node_modules
 /.pnp
