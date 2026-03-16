@@ -5,6 +5,7 @@ import TextPanel from "./panels/TextPanel";
 import ShapesPanel from "./panels/ShapesPanel";
 import ImagesPanel from "./panels/ImagesPanel";
 import TemplatesPanel from "./panels/TemplatesPanel";
+import StoryEditPanel from "./panels/StoryEditPanel";
 import { useDesignStore } from "./hooks/useDesignStore";
 
 const TABS = [
@@ -65,35 +66,45 @@ export default function SidePanel() {
   const objects = useDesignStore((s) => s.objects);
   const deleteObject = useDesignStore((s) => s.deleteObject);
   const moveLayer = useDesignStore((s) => s.moveLayer);
+  const designName = useDesignStore((s) => s.designName);
 
   const selected = objects.find((o) => o.id === selectedId);
+  const isStory = designName.startsWith("Story —");
 
   return (
     <div className="w-72 bg-white border-r border-warm-100 flex flex-col h-full overflow-hidden">
-      {/* Tabs */}
-      <div className="flex border-b border-warm-100">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
-              activeTab === tab.id
-                ? "text-coral border-b-2 border-coral"
-                : "text-warm-900/40 hover:text-warm-900/70"
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Tabs — Story modunda gizle */}
+      {!isStory && (
+        <div className="flex border-b border-warm-100">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
+                activeTab === tab.id
+                  ? "text-coral border-b-2 border-coral"
+                  : "text-warm-900/40 hover:text-warm-900/70"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Panel content */}
       <div className="flex-1 overflow-y-auto">
-        {activeTab === "text" && <TextPanel />}
-        {activeTab === "shapes" && <ShapesPanel />}
-        {activeTab === "images" && <ImagesPanel />}
-        {activeTab === "templates" && <TemplatesPanel />}
+        {isStory ? (
+          <StoryEditPanel />
+        ) : (
+          <>
+            {activeTab === "text" && <TextPanel />}
+            {activeTab === "shapes" && <ShapesPanel />}
+            {activeTab === "images" && <ImagesPanel />}
+            {activeTab === "templates" && <TemplatesPanel />}
+          </>
+        )}
       </div>
 
       {/* Bottom section: Background color + Layer controls */}
