@@ -32,14 +32,30 @@ function extractYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-/** Image + italic paragraph → <figure> + <figcaption> */
+/** Image → <figure> + optional <figcaption> from title attr or italic caption */
 function processImageCaptions(rawHtml: string): string {
-  // Match: <p><img ...></p> followed by <p><em>caption</em></p>
-  return rawHtml.replace(
-    /<p>(<img\s[^>]*>)<\/p>\s*<p><em>([\s\S]*?)<\/em><\/p>/g,
+  // 1. NEW FORMAT: <p><img title="caption"></p> → <figure><figcaption>
+  let result = rawHtml.replace(
+    /<p>(<img\s[^>]*>)<\/p>/g,
+    (match, imgTag) => {
+      const titleMatch = imgTag.match(/\btitle="([^"]*)"/);
+      const title = titleMatch?.[1];
+      const cleanImg = imgTag.replace(/\s*title="[^"]*"/, "");
+      if (title?.trim()) {
+        return `<figure>${cleanImg}<figcaption>${title}</figcaption></figure>`;
+      }
+      return `<figure>${cleanImg}</figure>`;
+    },
+  );
+
+  // 2. OLD FORMAT (backward compat): <figure><img></figure> + <p><em>caption</em></p>
+  result = result.replace(
+    /<figure>(<img\s[^>]*>)<\/figure>\s*<p><em>([\s\S]*?)<\/em><\/p>/g,
     (_, img, caption) =>
       `<figure>${img}<figcaption>${caption}</figcaption></figure>`,
   );
+
+  return result;
 }
 
 function processWarningBoxes(rawHtml: string): string {

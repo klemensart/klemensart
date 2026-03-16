@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Editor, EditorContent, useEditor } from "@tiptap/react";
+import { Editor, EditorContent, useEditor, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
+import type { ReactNodeViewProps } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import TiptapImage from "@tiptap/extension-image";
@@ -33,7 +34,68 @@ const ResizableImage = TiptapImage.extend({
       },
     };
   },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView);
+  },
 });
+
+/* ── Image Node View (caption + size controls) ── */
+function ImageNodeView({
+  node,
+  updateAttributes,
+  selected,
+  editor,
+  getPos,
+}: ReactNodeViewProps) {
+  const src = node.attrs.src ?? "";
+  const alt = node.attrs.alt ?? "";
+  const title = node.attrs.title ?? "";
+  const dataSize = node.attrs["data-size"] ?? "large";
+  const isPlaceholder = src.startsWith("data:image/svg+xml");
+
+  return (
+    <NodeViewWrapper className="image-node-view" data-size={dataSize}>
+      {selected && !isPlaceholder && (
+        <div className="image-size-controls">
+          <span className="image-size-label">Boyut:</span>
+          {[
+            { key: "small", label: "Küçük" },
+            { key: "medium", label: "Orta" },
+            { key: "large", label: "Büyük" },
+          ].map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => updateAttributes({ "data-size": s.key })}
+              className={`image-size-btn ${dataSize === s.key ? "active" : ""}`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <img src={src} alt={alt} draggable={false} />
+      {!isPlaceholder && (
+        <input
+          className="image-caption-input"
+          value={title}
+          placeholder="Açıklama ekle..."
+          onChange={(e) => updateAttributes({ title: e.target.value })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === "Tab") {
+              e.preventDefault();
+              const pos = getPos();
+              if (pos != null) {
+                editor.chain().focus().setTextSelection(pos + node.nodeSize).run();
+              }
+            }
+          }}
+        />
+      )}
+    </NodeViewWrapper>
+  );
+}
 
 /* ── Image optimization helpers ── */
 const TR_CHAR_MAP: Record<string, string> = {
@@ -219,45 +281,6 @@ function TSep() {
   return <div className="w-px h-5 bg-warm-200 mx-0.5" />;
 }
 
-/* ── Image size picker bar ── */
-function ImageSizeBar({ editor }: { editor: Editor }) {
-  const currentSize =
-    (editor.getAttributes("image")["data-size"] as string) || "large";
-
-  const sizes = [
-    { key: "small", label: "Küçük" },
-    { key: "medium", label: "Orta" },
-    { key: "large", label: "Büyük" },
-  ];
-
-  return (
-    <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-xl shadow-lg border border-warm-100 text-xs">
-      <span className="text-warm-900/40 font-medium">Boyut:</span>
-      {sizes.map((s) => (
-        <button
-          key={s.key}
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() =>
-            editor
-              .chain()
-              .focus()
-              .updateAttributes("image", { "data-size": s.key })
-              .run()
-          }
-          className={`px-2 py-0.5 rounded-lg font-medium transition ${
-            currentSize === s.key
-              ? "bg-coral text-white"
-              : "bg-warm-100 text-warm-900/60 hover:bg-warm-200"
-          }`}
-        >
-          {s.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 /* ── "+" insert menu (always visible, top-right) ── */
 function InsertMenu({
   editor,
@@ -394,14 +417,6 @@ const EDITOR_CSS = `
     height: 0;
   }
 
-  /* Caption placeholder hint — only for empty paragraph after image */
-  .ProseMirror img + p.is-empty::before {
-    width: 100%;
-    text-align: center;
-    font-style: italic;
-    color: rgba(140,133,126,0.4);
-  }
-
   /* Headings */
   .ProseMirror h2 {
     font-size: 1.5em;
@@ -502,21 +517,30 @@ const EDITOR_CSS = `
     margin: 1.5em 0;
   }
 
-  /* Images */
-  .ProseMirror img {
+  /* Images — NodeView wrapper */
+  .ProseMirror .image-node-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0.75em auto;
+    position: relative;
+  }
+  .ProseMirror .image-node-view[data-size="small"]  { max-width: 33%; }
+  .ProseMirror .image-node-view[data-size="medium"] { max-width: 66%; }
+  .ProseMirror .image-node-view[data-size="large"]  { max-width: 100%; }
+  .ProseMirror .image-node-view img {
     max-width: 100%;
     max-height: 400px;
     object-fit: contain;
     cursor: pointer;
     border-radius: 0.75rem;
     display: block;
-    margin: 0.75em auto;
     transition: outline 0.15s;
   }
-  .ProseMirror img.ProseMirror-selectednode {
+  .ProseMirror .image-node-view.ProseMirror-selectednode img {
     outline: 2px solid #FF6D60;
   }
-  .ProseMirror img[src^="data:image/svg+xml"] {
+  .ProseMirror .image-node-view img[src^="data:image/svg+xml"] {
     animation: pulse-placeholder 1.5s ease-in-out infinite;
     max-height: 80px;
     pointer-events: none;
@@ -525,9 +549,62 @@ const EDITOR_CSS = `
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
   }
-  .ProseMirror img[data-size="small"]  { max-width: 33%; }
-  .ProseMirror img[data-size="medium"] { max-width: 66%; }
-  .ProseMirror img[data-size="large"]  { max-width: 100%; }
+
+  /* Image size controls (inside NodeView) */
+  .image-size-controls {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #FAF3EE;
+    font-size: 12px;
+  }
+  .image-size-label {
+    color: rgba(44,35,25,0.4);
+    font-weight: 500;
+  }
+  .image-size-btn {
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.15s;
+    background: #FAF3EE;
+    color: rgba(44,35,25,0.6);
+    border: none;
+    cursor: pointer;
+  }
+  .image-size-btn:hover { background: #F0E4D9; }
+  .image-size-btn.active { background: #FF6D60; color: white; }
+
+  /* Image caption input */
+  .image-caption-input {
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: #8a8279;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 4px 8px;
+    margin-top: 4px;
+    transition: background 0.15s;
+  }
+  .image-caption-input:focus {
+    background: rgba(245, 240, 235, 0.5);
+    border-radius: 6px;
+  }
+  .image-caption-input::placeholder {
+    color: rgba(138, 130, 121, 0.4);
+  }
 
   /* Code */
   .ProseMirror code {
@@ -566,7 +643,6 @@ export default function TiptapEditor({
   onUploadRef.current = onUploadImage;
   const editorRef = useRef<Editor | null>(null);
 
-  const [imageActive, setImageActive] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
 
   const handleImageUpload = async (file: File) => {
@@ -651,16 +727,8 @@ export default function TiptapEditor({
       Highlight.configure({ multicolor: false }),
       Placeholder.configure({
         showOnlyCurrent: false,
-        placeholder: ({ node, pos, editor: ed }) => {
+        placeholder: ({ node, editor: ed }) => {
           if (node.type.name !== "paragraph" || node.childCount > 0) return "";
-          // Caption placeholder for empty paragraphs right after images
-          try {
-            const $pos = ed.state.doc.resolve(pos);
-            if ($pos.nodeBefore?.type.name === "image") {
-              return "Görsel açıklaması ekleyin...";
-            }
-          } catch { /* pos out of range */ }
-          // Default placeholder only when editor is empty
           if (
             ed.state.doc.childCount === 1 &&
             ed.state.doc.firstChild?.childCount === 0
@@ -715,18 +783,6 @@ export default function TiptapEditor({
   // Keep ref in sync
   useEffect(() => {
     editorRef.current = editor ?? null;
-  }, [editor]);
-
-  // Track image selection
-  useEffect(() => {
-    if (!editor) return;
-    const handler = () => setImageActive(editor.isActive("image"));
-    editor.on("selectionUpdate", handler);
-    editor.on("transaction", handler);
-    return () => {
-      editor.off("selectionUpdate", handler);
-      editor.off("transaction", handler);
-    };
   }, [editor]);
 
   // Sync external content changes (e.g., after fetch)
@@ -933,9 +989,6 @@ export default function TiptapEditor({
         onImageClick={() => fileRef.current?.click()}
         uploading={uploading || optimizing}
       />
-
-      {/* Image size picker — shown when image selected */}
-      {imageActive && <ImageSizeBar editor={editor} />}
 
       <input
         ref={fileRef}
