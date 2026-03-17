@@ -17,7 +17,7 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
-        pixelRatio: 1,
+        pixelRatio: 2,
       });
 
       stage.scaleX(prevScaleX);
@@ -31,7 +31,7 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
 
   const downloadImage = useCallback(
     (filename: string, format: "png" | "jpeg" = "png") => {
-      const uri = exportImage(format, format === "jpeg" ? 0.92 : 1);
+      const uri = exportImage(format, format === "jpeg" ? 0.95 : 1);
       if (!uri) return;
       const link = document.createElement("a");
       link.download = `${filename}.${format === "jpeg" ? "jpg" : "png"}`;

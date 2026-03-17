@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useDesignStore } from "../hooks/useDesignStore";
 
-const CATEGORY_OPTIONS = ["ODAK", "KÜLTÜR & SANAT", "İLHAM VERENLER", "KENT & YAŞAM"] as const;
+const CATEGORY_OPTIONS = ["ODAK", "KÜLTÜR & SANAT", "İLHAM VERENLER", "KENT & YAŞAM", "SERGİ", "FESTİVAL"] as const;
 
 export default function StoryEditPanel() {
   const objects = useDesignStore((s) => s.objects);
