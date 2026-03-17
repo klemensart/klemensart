@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHmac } from "crypto";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { render } from "@react-email/render";
 import Muzede1SaatTesekkur from "@/emails/Muzede1SaatTesekkur";
@@ -34,11 +35,9 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
   if (signature) {
-    const crypto = await import("crypto");
     const expected =
       "sha256=" +
-      crypto
-        .createHmac("sha256", appSecret)
+      createHmac("sha256", appSecret)
         .update(rawBody)
         .digest("hex");
 
@@ -69,19 +68,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true, leads: 0 });
   }
 
-  const accessToken = process.env.META_ACCESS_TOKEN;
-  if (!accessToken) {
-    console.error("[meta-leadgen] META_ACCESS_TOKEN tanımlı değil");
+  const pageToken = process.env.META_PAGE_ACCESS_TOKEN;
+  if (!pageToken) {
+    console.error("[meta-leadgen] META_PAGE_ACCESS_TOKEN tanımlı değil");
     return NextResponse.json({ error: "Config error" }, { status: 500 });
   }
+
+  // appsecret_proof oluştur (Graph API güvenlik gereksinimi)
+  const appsecretProof = createHmac("sha256", appSecret)
+    .update(pageToken)
+    .digest("hex");
 
   const admin = createAdminClient();
 
   for (const { leadgenId, formId, pageId } of leadgenIds) {
     try {
-      // 3. Meta Graph API'den lead detaylarını çek
+      // 3. Meta Graph API'den lead detaylarını çek (Page Token + appsecret_proof)
       const graphRes = await fetch(
-        `https://graph.facebook.com/v21.0/${leadgenId}?fields=field_data&access_token=${accessToken}`,
+        `https://graph.facebook.com/v21.0/${leadgenId}?fields=field_data&access_token=${pageToken}&appsecret_proof=${appsecretProof}`,
       );
 
       if (!graphRes.ok) {
@@ -96,13 +100,13 @@ export async function POST(req: NextRequest) {
       const fields: Array<{ name: string; values: string[] }> =
         graphData.field_data || [];
 
-      const email = fields
-        .find((f) => f.name === "email")
-        ?.values?.[0]?.trim()
-        .toLowerCase();
-      const firstName = fields.find((f) => f.name === "first_name")?.values?.[0]?.trim();
-      const lastName = fields.find((f) => f.name === "last_name")?.values?.[0]?.trim();
-      const fullName = fields.find((f) => f.name === "full_name")?.values?.[0]?.trim();
+      const findField = (...names: string[]) =>
+        fields.find((f) => names.includes(f.name))?.values?.[0]?.trim();
+
+      const email = findField("email", "e-posta")?.toLowerCase();
+      const firstName = findField("first_name", "adı");
+      const lastName = findField("last_name", "soyadı");
+      const fullName = findField("full_name", "adı_soyadı");
 
       if (!email) {
         console.warn(`[meta-leadgen] Lead ${leadgenId} — email bulunamadı`);
