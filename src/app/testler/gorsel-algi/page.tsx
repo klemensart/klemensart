@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import type { Metadata } from "next";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase";
 
 const BRAND = {
   coral: "#FF6D60", coralLight: "#FF6D6015", coralMid: "#FF6D6030",
   cream: "#FFFBF7", dark: "#2D2926", warm: "#5C524D", muted: "#9B918A", border: "#E8E0D8",
+};
+
+const IMAGES: Record<string, { src: string; alt: string }> = {
+  analitik: { src: "/images/testler/ronesans/atina-okulu.webp", alt: "Atina Okulu — Raphael" },
+  tutkulu: { src: "/images/testler/gorsel-algi/davut-golyat.webp", alt: "Davut ve Golyat — Caravaggio" },
+  melankolik: { src: "/images/testler/gorsel-algi/bulutlar-uzerinde.webp", alt: "Bulutların Üzerinde Yolculuk — C.D. Friedrich" },
+  sezgisel: { src: "/images/testler/gorsel-algi/izlenim-gun-dogumu.webp", alt: "İzlenim: Gün Doğumu — Claude Monet" },
+  isyankar: { src: "/images/testler/gorsel-algi/yildizli-gece.webp", alt: "Yıldızlı Gece — Vincent van Gogh" },
 };
 
 const TYPES: Record<string, {
@@ -36,6 +45,14 @@ const QUESTIONS = [
 ];
 
 const ease = "cubic-bezier(.4,0,.2,1)";
+const UNLOCK_COOKIE = "gorsel_algi_unlocked";
+
+function hasCookie(name: string) {
+  return document.cookie.includes(name + "=1");
+}
+function setCookie(name: string, days: number) {
+  document.cookie = `${name}=1; max-age=${days * 86400}; path=/`;
+}
 
 function ProgressDots({ total, current, answered }: { total: number; current: number; answered: number }) {
   return (
@@ -78,6 +95,34 @@ export default function GorselAlgiTesti() {
   const [resultType, setResultType] = useState<string | null>(null);
   const [fadeIn, setFadeIn] = useState(true);
 
+  // Email gate states
+  const [accessGranted, setAccessGranted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [kvkkChecked, setKvkkChecked] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "done" | "error" | "registered">("idle");
+
+  // Check auth + cookie on mount
+  useEffect(() => {
+    async function checkAccess() {
+      // Check cookie first (fast path)
+      if (hasCookie(UNLOCK_COOKIE)) {
+        setAccessGranted(true);
+        return;
+      }
+      // Check Supabase auth
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setAccessGranted(true);
+        }
+      } catch {
+        // Not logged in, no access
+      }
+    }
+    checkAccess();
+  }, []);
+
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const handleSelect = (optType: string, optKey: string) => {
@@ -104,6 +149,33 @@ export default function GorselAlgiTesti() {
         scrollTop();
       }
     }, 600);
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!email || !kvkkChecked || emailStatus === "sending" || !resultType) return;
+    setEmailStatus("sending");
+    try {
+      const res = await fetch("/api/quiz/gorsel-algi-results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          resultType,
+        }),
+      });
+      const data = await res.json();
+      if (data.registered) {
+        setEmailStatus("registered");
+      } else if (data.sent) {
+        setEmailStatus("done");
+        setAccessGranted(true);
+        setCookie(UNLOCK_COOKIE, 365);
+      } else {
+        setEmailStatus("error");
+      }
+    } catch {
+      setEmailStatus("error");
+    }
   };
 
   const restart = () => {
@@ -192,72 +264,192 @@ export default function GorselAlgiTesti() {
 
   if (phase === "result" && resultType) {
     const r = TYPES[resultType];
+    const img = IMAGES[resultType];
+    const showFull = accessGranted;
+
     return (
       <div style={{minHeight:"100vh",background:BRAND.cream,fontFamily:"'Segoe UI','Helvetica Neue',sans-serif"}}>
         <div style={{maxWidth:640,margin:"0 auto",padding:"96px 20px 80px"}}>
           <div style={{textAlign:"center",marginBottom:24}}>
             <div style={{display:"inline-block",background:BRAND.coralLight,color:BRAND.coral,fontSize:11,fontWeight:800,letterSpacing:2,textTransform:"uppercase",padding:"6px 18px",borderRadius:99}}>Sanat Kişilik Analizin Tamamlandı</div>
           </div>
+
+          {/* Hero card — always visible */}
           <div style={{background:`linear-gradient(135deg, ${r.palette[0]}22, ${r.palette[1]}18, ${r.palette[2]}15)`,borderRadius:28,padding:"44px 32px",textAlign:"center",marginBottom:24,border:`1px solid ${BRAND.border}`,position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",background:`${r.palette[1]}08`,top:-60,right:-40}}/>
             <div style={{position:"absolute",width:120,height:120,borderRadius:"50%",background:`${r.palette[2]}08`,bottom:-30,left:-20}}/>
             <p style={{fontSize:13,color:BRAND.muted,letterSpacing:1.5,textTransform:"uppercase",margin:"0 0 8px",fontWeight:600}}>Senin Sanat Profilin</p>
             <h2 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2}}>{r.label}</h2>
-            <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6,maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>"{r.tagline}"</p>
+            <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6,maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>&ldquo;{r.tagline}&rdquo;</p>
             <div style={{display:"flex",justifyContent:"center",gap:8}}>
               {r.palette.map((c,i)=>(<div key={i} style={{width:40,height:40,borderRadius:99,background:c,border:"3px solid #fff",boxShadow:"0 2px 8px rgba(0,0,0,.1)"}}/>))}
             </div>
           </div>
-          <div style={{background:`linear-gradient(135deg, ${r.palette[0]}40, ${r.palette[1]}30)`,borderRadius:20,height:240,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:24,border:`1px solid ${BRAND.border}`}}>
-            <div style={{textAlign:"center",opacity:.5}}>
-              <div style={{fontSize:40,marginBottom:8}}>🖼️</div>
-              <p style={{fontSize:13,color:BRAND.muted}}>Sonuç görseli yakında eklenecek</p>
-            </div>
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:16}}>
-            <SectionCard icon="🔍" title={`Karakter Analizi: ${r.subtitle}`} accent={r.palette[1]}>
-              <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.analysis}</p>
-            </SectionCard>
-            <SectionCard icon="👁️" title={`Algı Kanalın: ${r.channel}`}>
-              <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.channelDesc}</p>
-            </SectionCard>
-            <SectionCard icon="🎨" title="Ruh Eşi Eserin" accent={BRAND.coral}>
-              <p style={{fontSize:18,fontWeight:700,color:BRAND.dark,margin:"0 0 8px"}}>{r.soulArt}</p>
-              <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.soulWhy}</p>
-            </SectionCard>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <SectionCard icon="⚡" title="Aşil Topuğun">
-                <p style={{fontSize:15,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.heel}</p>
-                <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.heelDesc}</p>
-              </SectionCard>
-              <SectionCard icon="💎" title="Süper Gücün">
-                <p style={{fontSize:15,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.power}</p>
-                <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.powerDesc}</p>
-              </SectionCard>
-            </div>
-            <SectionCard icon="🎨" title="Renk Paletin">
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                {r.palette.map((c,i)=><PaletteChip key={i} color={c} name={r.paletteNames[i]}/>)}
+
+          {/* Artwork image */}
+          <div style={{borderRadius:20,overflow:"hidden",marginBottom:24,border:`1px solid ${BRAND.border}`,position:"relative"}}>
+            <Image
+              src={img.src}
+              alt={img.alt}
+              width={640}
+              height={400}
+              style={{width:"100%",height:"auto",display:"block",filter:showFull?"none":"blur(8px)"}}
+            />
+            {!showFull && (
+              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,248,245,0.3)"}}>
+                <div style={{background:"#fff",borderRadius:99,padding:"10px 24px",boxShadow:"0 2px 12px rgba(0,0,0,.1)",fontSize:14,fontWeight:700,color:BRAND.dark,display:"flex",alignItems:"center",gap:8}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 6H4a1 1 0 00-1 1v6a1 1 0 001 1h8a1 1 0 001-1V7a1 1 0 00-1-1z" stroke={BRAND.coral} strokeWidth="1.5"/><path d="M5.5 6V4.5a2.5 2.5 0 015 0V6" stroke={BRAND.coral} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  {r.soulArt}
+                </div>
               </div>
-            </SectionCard>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <SectionCard icon="🏛️" title="Ait Olduğun Dönem">
-                <p style={{fontSize:16,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.era}</p>
-                <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.eraDesc}</p>
-              </SectionCard>
-              <SectionCard icon="🗺️" title="Müze Gezme Tarzın">
-                <p style={{fontSize:16,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.museum}</p>
-                <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.museumDesc}</p>
-              </SectionCard>
-            </div>
-            <div style={{background:`linear-gradient(135deg, ${BRAND.coral}08, ${BRAND.coral}04)`,borderRadius:20,padding:"28px 24px",border:`1px solid ${BRAND.coral}20`}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-                <span style={{fontSize:20}}>📜</span>
-                <span style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,color:BRAND.coral}}>Klemens&apos;in Reçetesi</span>
-              </div>
-              <p style={{fontSize:15,lineHeight:1.75,color:BRAND.warm,margin:0,fontStyle:"italic"}}>{r.recipe}</p>
-            </div>
+            )}
           </div>
+
+          {/* ── EMAIL GATE ── */}
+          {!showFull && (
+            <div style={{background:"#fff",borderRadius:24,padding:"36px 28px",border:`1px solid ${BRAND.border}`,marginBottom:24,boxShadow:"0 4px 24px rgba(0,0,0,.06)"}}>
+              <div style={{textAlign:"center",marginBottom:24}}>
+                <div style={{width:56,height:56,borderRadius:99,background:BRAND.coralLight,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 8l9 6 9-6" stroke={BRAND.coral} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke={BRAND.coral} strokeWidth="2"/></svg>
+                </div>
+                <h3 style={{fontSize:20,fontWeight:800,color:BRAND.dark,margin:"0 0 8px"}}>Detaylı Analizini Gör</h3>
+                <p style={{fontSize:15,color:BRAND.warm,margin:0,lineHeight:1.6}}>
+                  Karakter analizi, ruh eşi eserin, süper gücün ve daha fazlası e-postana gelsin.
+                </p>
+              </div>
+
+              {emailStatus === "registered" ? (
+                <div style={{textAlign:"center",padding:"16px 0"}}>
+                  <p style={{fontSize:15,color:BRAND.warm,margin:"0 0 16px"}}>
+                    Bu e-posta ile zaten üyesiniz!
+                  </p>
+                  <a
+                    href="/club/giris"
+                    style={{display:"inline-block",background:BRAND.coral,color:"#fff",border:"none",borderRadius:99,padding:"14px 36px",fontSize:15,fontWeight:700,textDecoration:"none",fontFamily:"inherit"}}
+                  >
+                    Giriş Yap
+                  </a>
+                </div>
+              ) : emailStatus === "done" ? (
+                <div style={{textAlign:"center",padding:"16px 0"}}>
+                  <div style={{width:48,height:48,borderRadius:99,background:"rgba(34,197,94,.1)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  <p style={{fontSize:16,fontWeight:700,color:BRAND.dark,margin:"0 0 4px"}}>Sonuçların Açıldı!</p>
+                  <p style={{fontSize:14,color:BRAND.warm,margin:0}}>Detaylı analiz e-postana da gönderildi.</p>
+                </div>
+              ) : (
+                <>
+                  <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                    <input
+                      type="email"
+                      required
+                      placeholder="E-posta adresiniz"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") handleEmailSubmit(); }}
+                      style={{width:"100%",padding:"14px 18px",borderRadius:12,border:`1.5px solid ${BRAND.border}`,fontSize:15,color:BRAND.dark,background:"#fff",fontFamily:"inherit",outline:"none",boxSizing:"border-box"}}
+                    />
+                    <label style={{display:"flex",alignItems:"flex-start",gap:8,cursor:"pointer"}}>
+                      <input
+                        type="checkbox"
+                        checked={kvkkChecked}
+                        onChange={e => setKvkkChecked(e.target.checked)}
+                        style={{marginTop:3,accentColor:BRAND.coral}}
+                      />
+                      <span style={{fontSize:12,color:BRAND.muted,lineHeight:1.5}}>
+                        <a href="/kvkk" target="_blank" rel="noopener noreferrer" style={{color:BRAND.coral,textDecoration:"underline"}}>KVKK Aydınlatma Metni</a>&apos;ni okudum ve kabul ediyorum.
+                      </span>
+                    </label>
+                    {emailStatus === "error" && (
+                      <p style={{fontSize:13,color:"#ef4444",margin:0}}>Bir hata oluştu. Lütfen tekrar deneyin.</p>
+                    )}
+                    <button
+                      onClick={handleEmailSubmit}
+                      disabled={emailStatus === "sending" || !kvkkChecked || !email}
+                      style={{background:BRAND.coral,color:"#fff",border:"none",borderRadius:99,padding:"16px 0",fontSize:16,fontWeight:700,cursor:emailStatus==="sending"||!kvkkChecked||!email?"not-allowed":"pointer",opacity:emailStatus==="sending"||!kvkkChecked||!email?.5:1,fontFamily:"inherit",transition:`all .2s ${ease}`}}
+                    >
+                      {emailStatus === "sending" ? "Gönderiliyor..." : "Sonuçlarımı Gör"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── FULL RESULTS (visible when access granted) ── */}
+          {showFull && (
+            <div style={{display:"flex",flexDirection:"column",gap:16}}>
+              <SectionCard icon="🔍" title={`Karakter Analizi: ${r.subtitle}`} accent={r.palette[1]}>
+                <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.analysis}</p>
+              </SectionCard>
+              <SectionCard icon="👁️" title={`Algı Kanalın: ${r.channel}`}>
+                <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.channelDesc}</p>
+              </SectionCard>
+              <SectionCard icon="🎨" title="Ruh Eşi Eserin" accent={BRAND.coral}>
+                <p style={{fontSize:18,fontWeight:700,color:BRAND.dark,margin:"0 0 8px"}}>{r.soulArt}</p>
+                <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>{r.soulWhy}</p>
+              </SectionCard>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+                <SectionCard icon="⚡" title="Aşil Topuğun">
+                  <p style={{fontSize:15,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.heel}</p>
+                  <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.heelDesc}</p>
+                </SectionCard>
+                <SectionCard icon="💎" title="Süper Gücün">
+                  <p style={{fontSize:15,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.power}</p>
+                  <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.powerDesc}</p>
+                </SectionCard>
+              </div>
+              <SectionCard icon="🎨" title="Renk Paletin">
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  {r.palette.map((c,i)=><PaletteChip key={i} color={c} name={r.paletteNames[i]}/>)}
+                </div>
+              </SectionCard>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+                <SectionCard icon="🏛️" title="Ait Olduğun Dönem">
+                  <p style={{fontSize:16,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.era}</p>
+                  <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.eraDesc}</p>
+                </SectionCard>
+                <SectionCard icon="🗺️" title="Müze Gezme Tarzın">
+                  <p style={{fontSize:16,fontWeight:700,color:BRAND.dark,margin:"0 0 6px"}}>{r.museum}</p>
+                  <p style={{fontSize:14,lineHeight:1.65,color:BRAND.warm,margin:0}}>{r.museumDesc}</p>
+                </SectionCard>
+              </div>
+              <div style={{background:`linear-gradient(135deg, ${BRAND.coral}08, ${BRAND.coral}04)`,borderRadius:20,padding:"28px 24px",border:`1px solid ${BRAND.coral}20`}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+                  <span style={{fontSize:20}}>📜</span>
+                  <span style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,color:BRAND.coral}}>Klemens&apos;in Reçetesi</span>
+                </div>
+                <p style={{fontSize:15,lineHeight:1.75,color:BRAND.warm,margin:0,fontStyle:"italic"}}>{r.recipe}</p>
+              </div>
+            </div>
+          )}
+
+          {/* ── TEASER CARDS (blurred, when no access) ── */}
+          {!showFull && (
+            <div style={{position:"relative"}}>
+              <div style={{display:"flex",flexDirection:"column",gap:16,filter:"blur(6px)",pointerEvents:"none",userSelect:"none"}}>
+                <SectionCard icon="🔍" title="Karakter Analizi" accent={r.palette[1]}>
+                  <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </SectionCard>
+                <SectionCard icon="👁️" title="Algı Kanalın">
+                  <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
+                </SectionCard>
+                <SectionCard icon="🎨" title="Ruh Eşi Eserin" accent={BRAND.coral}>
+                  <p style={{fontSize:18,fontWeight:700,color:BRAND.dark,margin:"0 0 8px"}}>Eser Adı</p>
+                  <p style={{fontSize:15,lineHeight:1.7,color:BRAND.warm,margin:0}}>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</p>
+                </SectionCard>
+              </div>
+              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <div style={{background:"#fff",borderRadius:16,padding:"20px 28px",boxShadow:"0 4px 24px rgba(0,0,0,.12)",textAlign:"center"}}>
+                  <svg width="24" height="24" viewBox="0 0 16 16" fill="none" style={{margin:"0 auto 8px",display:"block"}}><path d="M12 6H4a1 1 0 00-1 1v6a1 1 0 001 1h8a1 1 0 001-1V7a1 1 0 00-1-1z" stroke={BRAND.coral} strokeWidth="1.5"/><path d="M5.5 6V4.5a2.5 2.5 0 015 0V6" stroke={BRAND.coral} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  <p style={{fontSize:15,fontWeight:700,color:BRAND.dark,margin:"0 0 4px"}}>Sonuçların Kilitli</p>
+                  <p style={{fontSize:13,color:BRAND.muted,margin:0}}>Yukarıdaki formu doldurarak aç</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,marginTop:40,paddingTop:32,borderTop:`1px solid ${BRAND.border}`}}>
             <button
               onClick={restart}

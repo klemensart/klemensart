@@ -40,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/ronesans-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/modern-sanat-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/rehber`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/bulten`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/bulten/arsiv`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.6 },
   ];
