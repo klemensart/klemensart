@@ -20,7 +20,7 @@ function getInitials(email: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
-export default function Navbar() {
+export default function Navbar({ dark = false }: { dark?: boolean }) {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -51,6 +51,9 @@ export default function Navbar() {
     };
   }, []);
 
+  // When dark=true and not scrolled, use light text for dark hero backgrounds
+  const useDark = dark && !scrolled;
+
   return (
     <nav
       aria-label="Ana navigasyon"
@@ -65,10 +68,10 @@ export default function Navbar() {
         {/* Logo */}
         <a href="/" aria-label="Klemens Ana Sayfa" className="flex items-center opacity-90 hover:opacity-100 transition-opacity">
           {logoError ? (
-            <span className="text-xl font-bold tracking-tight text-warm-900">klemens</span>
+            <span className={`text-xl font-bold tracking-tight ${useDark ? "text-white" : "text-warm-900"}`}>klemens</span>
           ) : (
             <Image
-              src="/logos/logo-wide-dark.PNG"
+              src={useDark ? "/logos/logo-wide-light.PNG" : "/logos/logo-wide-dark.PNG"}
               alt="Klemens"
               width={120}
               height={36}
@@ -84,7 +87,11 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-warm-900/60 hover:text-warm-900 transition-colors flex items-center gap-1.5"
+              className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                useDark
+                  ? "text-white/70 hover:text-white"
+                  : "text-warm-900/60 hover:text-warm-900"
+              }`}
             >
               {link.label}
               {link.badge && (
@@ -112,7 +119,11 @@ export default function Navbar() {
             /* Giriş yapılmamış → link */
             <Link
               href="/club/giris"
-              className="text-sm font-medium text-warm-900/60 hover:text-warm-900 transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                useDark
+                  ? "text-white/70 hover:text-white"
+                  : "text-warm-900/60 hover:text-warm-900"
+              }`}
             >
               Giriş Yap
             </Link>
@@ -128,7 +139,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 -mr-2 text-warm-900"
+          className={`md:hidden p-2 -mr-2 ${useDark ? "text-white" : "text-warm-900"}`}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label={menuOpen ? "Menüyü kapat" : "Menüyü aç"}
           aria-expanded={menuOpen}

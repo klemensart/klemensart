@@ -125,7 +125,7 @@ export default function SinemaKlubuPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
       />
-      <Navbar />
+      <Navbar dark />
       <main style={{ background: B.cream, minHeight: "100vh" }}>
         {/* ═══ HERO ═══════════════════════════════════ */}
         <section
