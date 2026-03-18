@@ -531,12 +531,13 @@ export default function SinemaKlubuPage() {
                     style={{
                       color: B.warm,
                       fontSize: 13,
-                      margin: "0 0 24px",
+                      margin: 0,
                     }}
                   >
                     {plan.sub}
                   </p>
 
+                  <div style={{ marginTop: "auto", paddingTop: 24 }}>
                   <SatinAlButton
                     workshopId={cfg.id}
                     amount={cfg.price}
@@ -544,6 +545,7 @@ export default function SinemaKlubuPage() {
                     workshopSlug={plan.slug}
                     label="Satın Al"
                   />
+                  </div>
                 </div>
               );
             })}
