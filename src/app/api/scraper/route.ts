@@ -59,16 +59,16 @@ function isRelevant(event: Pick<ScrapedEvent, "title" | "description" | "event_t
 }
 
 // ── Scraper 1: CerModern ──────────────────────────────────────────────────────
-// cermodern.org — Etkinlikler (.event-box) ve Sergiler (.exhibition-box)
+// cermodern.org — Etkinlikler ve Sergiler: <a> elementlerinden yapısal parse
 async function scrapeCerModern(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
 
-  const sources: { url: string; selector: string; isExhibition: boolean }[] = [
-    { url: "https://www.cermodern.org/etkinlikler", selector: ".event-box", isExhibition: false },
-    { url: "https://www.cermodern.org/sergiler?filter=current", selector: ".exhibition-box", isExhibition: true },
+  const sources: { url: string; isExhibition: boolean }[] = [
+    { url: "https://www.cermodern.org/etkinlikler", isExhibition: false },
+    { url: "https://www.cermodern.org/sergiler?filter=current", isExhibition: true },
   ];
 
-  for (const { url, selector, isExhibition } of sources) {
+  for (const { url, isExhibition } of sources) {
     try {
       const res = await fetch(url, {
         headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
@@ -79,39 +79,31 @@ async function scrapeCerModern(): Promise<ScrapedEvent[]> {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      $(selector).each((_, el) => {
-        const $el = $(el);
+      // Her etkinlik/sergi bir <a> elementi — içinde img, h3, tarih metni var
+      $("a[href]").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") ?? "";
+        // Sadece detay sayfalarına yönlenen linkleri al
+        if (!href.includes("/etkinlik/") && !href.includes("/sergi/") && !href.includes("/exhibition/")) return;
 
-        // Events: .event-info > h3, Exhibitions: .ex > h3
-        const title = isExhibition
-          ? $el.find(".ex h3").first().text().trim()
-          : $el.find(".event-info h3").first().text().trim();
+        const title = $a.find("h3").first().text().trim();
         if (!title) return;
 
-        // Category hint from events
-        const category = $el.find(".event-info .category, .category").first().text().trim().toLowerCase();
+        const desc = $a.find("p").first().text().trim();
 
-        const desc = isExhibition
-          ? $el.find(".ex p").first().text().trim()
-          : "";
+        // Tarih: tüm metin içinden tarih kalıbı ara
+        const allText = $a.text();
+        const dateMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4})/);
+        const dateRangeMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4})\s*[-–]\s*(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4})/);
 
-        // Date: span.date (both event-info and .ex have it)
-        const dateStr = isExhibition
-          ? $el.find(".ex .date").first().text().trim()
-          : $el.find(".event-info .date").first().text().trim();
-
-        // "01 Mart 2026 - 30 Nisan 2026" → split
-        const dateParts = dateStr.split(/\s*[-–]\s*/);
-        const eventDate = parseTurkishDate(dateParts[0]);
+        const eventDate = dateMatch ? parseTurkishDate(dateMatch[1]) : null;
         if (!eventDate) return;
-        const endDate = dateParts.length > 1 ? parseTurkishDate(dateParts[dateParts.length - 1]) : null;
+        const endDate = dateRangeMatch ? parseTurkishDate(dateRangeMatch[2]) : null;
 
-        const href = $el.find("a").first().attr("href") ?? "";
-        const imgSrc = $el.find("img").first().attr("src") ?? null;
-
+        const imgSrc = $a.find("img").first().attr("src") ?? null;
         const source_url = href.startsWith("http") ? href : `https://www.cermodern.org${href.startsWith("/") ? href : "/" + href}`;
 
-        const inferredType = isExhibition ? "sergi" : inferEventType(title, desc, category || url);
+        const inferredType = isExhibition ? "sergi" : inferEventType(title, desc, url);
         if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
 
         events.push({
@@ -137,7 +129,7 @@ async function scrapeCerModern(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 2: Ankara Büyükşehir Belediyesi ───────────────────────────────────
-// ABB etkinlik sayfası — a.event-list-item kartları
+// ABB etkinlik sayfası — a[href^="/etkinlik/"] linkleri: <strong> başlık, <span> tarih/mekan
 async function scrapeAnkaraBB(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://www.ankara.bel.tr/etkinlikler";
@@ -152,27 +144,43 @@ async function scrapeAnkaraBB(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    $("a.event-list-item").each((_, el) => {
-      const $a = $(el);
+    const seen = new Set<string>();
 
-      const title = ($a.attr("title") ?? $a.find(".info strong").first().text()).trim();
+    $('a[href*="/etkinlik/"]').each((_, el) => {
+      const $a = $(el);
+      const href = $a.attr("href") ?? "";
+      if (!href.startsWith("/etkinlik/")) return;
+      if (seen.has(href)) return;
+      seen.add(href);
+
+      // Başlık: title attr, <strong>, veya img alt
+      const title = ($a.attr("title") ?? $a.find("strong").first().text() ?? $a.find("img").attr("alt") ?? "").trim();
       if (!title) return;
 
-      const href = $a.attr("href") ?? "";
-      const imgSrc = $a.find(".image img").first().attr("src") ?? null;
-      const category = $a.find("span.category").first().text().trim();
+      const imgSrc = $a.find("img").first().attr("src") ?? null;
 
-      // Tarih: .info içindeki ikinci div > span (takvim ikonlu)
-      const dateStr = $a.find(".info div").eq(1).find("span").first().text().trim();
+      // Kategori: <span> içinde "Konser", "Tiyatro" vb.
+      const spans: string[] = [];
+      $a.find("span").each((__, sp) => { spans.push($(sp).text().trim()); });
+
+      // Tarih: span'lardan tarih kalıbı ara
+      let dateStr = "";
+      let venue = "";
+      let category = "";
+      for (const s of spans) {
+        if (/\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4}/.test(s) || /\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+/.test(s)) {
+          if (!dateStr) dateStr = s.replace(/\s+\d{2}:\d{2}.*/, "").trim();
+        } else if (!category && ["Konser", "Tiyatro", "Sergi", "Söyleşi", "Festival", "Panel", "Opera", "Bale"].some(c => s.includes(c))) {
+          category = s;
+        } else if (!venue && s.length > 3 && !s.match(/^\d/)) {
+          venue = s;
+        }
+      }
+
       const eventDate = parseTurkishDate(dateStr);
       if (!eventDate || !isFutureDate(eventDate)) return;
 
-      // Mekan: .info içindeki üçüncü div > span (konum ikonlu)
-      const venue = $a.find(".info div").eq(2).find("span").first().text().trim();
-
-      const source_url = href.startsWith("http")
-        ? href
-        : `https://www.ankara.bel.tr${href.startsWith("/") ? href : "/" + href}`;
+      const source_url = `https://www.ankara.bel.tr${href}`;
 
       const inferredType = category
         ? inferEventType(category, title, url)
@@ -373,7 +381,7 @@ async function scrapeBiletix(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 4: Çankaya Belediyesi ────────────────────────────────────────────
-// Çankaya Belediyesi kültür-sanat sayfası — sunucu taraflı HTML.
+// Çankaya Belediyesi kültür-sanat sayfası — .event-featured-card kartları
 async function scrapeCankaya(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://www.cankaya.bel.tr/kultur-sanat";
@@ -388,47 +396,55 @@ async function scrapeCankaya(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Her .event-card bir <a> tag'ı içinde sarılı
-    $(".event-card").each((_, el) => {
+    // Yeni yapı: .event-featured-card — içinde .event-featured-title, .event-featured-meta
+    $(".event-featured-card").each((_, el) => {
       const $el = $(el);
-      const $link = $el.closest("a");
+      const $link = $el.closest("a").length ? $el.closest("a") : $el.find("a").first();
 
-      const title = $el.find(".event-title").first().text().trim();
+      const title = $el.find(".event-featured-title").first().text().trim();
       if (!title) return;
+
+      const category = $el.find(".event-featured-category").first().text().trim();
 
       // Meta item'lardan tarih, mekan, fiyat çek
       let dateStr = "";
       let venue = "";
       let priceInfo: string | null = null;
 
-      $el.find(".event-meta-item").each((__, metaEl) => {
+      $el.find(".event-featured-meta-item").each((__, metaEl) => {
         const $meta = $(metaEl);
-        const icon = $meta.find(".material-icons").text().trim();
-        const value = $meta.find("span").not(".material-icons").text().trim();
-
-        if (icon === "calendar_today") dateStr = value;
-        else if (icon === "location_on") venue = value;
-        else if (icon === "stars" || icon === "confirmation_number") priceInfo = value || null;
+        const text = $meta.text().trim();
+        // SVG ikon kullanıyorlar — metinden tür tahmin et
+        if (/\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+/.test(text) || /\d{1,2}[./]\d{1,2}/.test(text)) {
+          if (!dateStr) dateStr = text;
+        } else if (text.length > 3 && !dateStr) {
+          venue = text;
+        } else if (!venue && text.length > 3) {
+          venue = text;
+        }
       });
+
+      // Fallback: tüm meta metninden tarih ara
+      if (!dateStr) {
+        const metaText = $el.find(".event-featured-meta").text();
+        const m = metaText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s*\d{0,4})/);
+        if (m) dateStr = m[1];
+      }
 
       const eventDate = parseTurkishDate(dateStr);
       if (!eventDate) return;
-
-      // Geçmiş etkinlikleri atla
       if (new Date(eventDate) < new Date()) return;
 
       const href = $link.attr("href") ?? "";
       const source_url = href.startsWith("http") ? href : `https://www.cankaya.bel.tr${href.startsWith("/") ? href : "/" + href}`;
-      const imgSrc = $el.find(".event-image img").first().attr("src") ?? null;
+      const imgSrc = $el.find(".event-featured-image img").first().attr("src") ?? null;
 
-      // Çankaya kültür-sanat sayfası zaten küratörlü — tür tespiti yap ama filtre gevşet
-      let inferredType = inferEventType(title, "", url);
-      // Bilinmeyen türler: mekana göre tahmin et, yoksa "tiyatro" (sayfanın %80+'ı tiyatro)
+      let inferredType = category ? inferEventType(category, title, url) : inferEventType(title, "", url);
       if (inferredType === "etkinlik") {
         const venueLower = venue.toLowerCase();
         if (venueLower.includes("salon") || venueLower.includes("sahne")) inferredType = "tiyatro";
         else if (venueLower.includes("galeri") || venueLower.includes("sergi")) inferredType = "sergi";
-        else inferredType = "tiyatro"; // Çankaya kültür-sanat default
+        else inferredType = "tiyatro";
       }
 
       events.push({
@@ -453,14 +469,17 @@ async function scrapeCankaya(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 5: Bilkent Konser Salonu ─────────────────────────────────────────
-// bilet.bilkent.edu.tr — sunucu taraflı HTML, klasik müzik & sanat etkinlikleri.
+// bilet.bilkent.edu.tr — JS-rendered site; SSR HTML'den yapısal parse
 async function scrapeBilkent(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://bilet.bilkent.edu.tr/";
 
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+      },
       signal: AbortSignal.timeout(12000),
     });
     if (!res.ok) return events;
@@ -468,55 +487,70 @@ async function scrapeBilkent(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    $(".concert").each((_, el) => {
-      const $el = $(el);
+    const seen = new Set<string>();
 
-      const title = $el.find(".concert-name").first().text().trim();
-      if (!title) return;
+    // Bilet linkleri: a[href*="/bilet/"] veya yapısal etkinlik elementleri
+    // Ayrıca .concert class hâlâ çalışabilir (fallback)
+    const selectors = [".concert", 'a[href*="/bilet/"]'];
 
-      const dateRaw = $el.find(".concert-date").first().text().trim();
-      // "07 Mart 2026 - Cumartesi, 20:00" → tarih kısmını al
-      const dateClean = dateRaw.split("-")[0]?.trim() ?? dateRaw;
-      const eventDate = parseTurkishDate(dateClean);
-      if (!eventDate) return;
+    for (const sel of selectors) {
+      $(sel).each((_, el) => {
+        const $el = $(el);
+        const isLink = el.tagName === "a";
 
-      // Geçmiş etkinlikleri atla
-      if (new Date(eventDate) < new Date()) return;
+        // Başlık
+        let title = "";
+        if (isLink) {
+          title = ($el.attr("title") ?? $el.text()).trim();
+        } else {
+          title = ($el.find(".concert-name").first().text() || $el.find("h3, h2").first().text()).trim();
+        }
+        if (!title || title.length < 3) return;
+        if (seen.has(title)) return;
+        seen.add(title);
 
-      const venue = $el.find(".concert-place").first().text().trim().replace(/^\s*/, "");
-      const desc = $el.find(".concert-extra-info").first().text().trim();
-      const concertType = $el.find(".concert-type").first().text().trim();
+        // Tarih: metin içinden tarih kalıbı ara
+        const allText = isLink ? $el.parent().text() : $el.text();
+        const dateMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4})/);
+        const eventDate = dateMatch ? parseTurkishDate(dateMatch[1]) : null;
+        if (!eventDate || !isFutureDate(eventDate)) return;
 
-      // Bilet linki
-      const href = $el.find(".buy-buttons a").first().attr("href") ?? "";
-      const source_url = href.startsWith("http") ? href : `https://bilet.bilkent.edu.tr${href}`;
+        // Mekan
+        const venue = ($el.find(".concert-place").first().text() || "").trim();
+        const desc = ($el.find(".concert-extra-info").first().text() || "").trim();
 
-      // Resim: background-image: url('...') şeklinde
-      const styleAttr = $el.find(".concert-image").first().attr("style") ?? "";
-      const imgMatch = styleAttr.match(/url\(['"]?([^'")\s]+)['"]?\)/);
-      const imgSrc = imgMatch?.[1] ?? null;
-      const image_url = imgSrc
-        ? (imgSrc.startsWith("http") ? imgSrc : `https://bilet.bilkent.edu.tr${imgSrc}`)
-        : null;
+        // Bilet linki
+        const href = isLink
+          ? ($el.attr("href") ?? "")
+          : ($el.find('a[href*="/bilet/"]').first().attr("href") ?? "");
+        const source_url = href.startsWith("http") ? href : `https://bilet.bilkent.edu.tr${href}`;
 
-      // Bilkent genelde klasik müzik, bale, opera — tür tahmini
-      const inferredType = inferEventType(title, `${desc} ${concertType}`, url);
-      if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
+        // Resim: background-image veya img
+        const styleAttr = $el.find("[style*='background']").first().attr("style") ?? "";
+        const imgMatch = styleAttr.match(/url\(['"]?([^'")\s]+)['"]?\)/);
+        const imgSrc = imgMatch?.[1] ?? $el.find("img").first().attr("src") ?? null;
+        const image_url = imgSrc
+          ? (imgSrc.startsWith("http") ? imgSrc : `https://bilet.bilkent.edu.tr${imgSrc}`)
+          : null;
 
-      events.push({
-        title,
-        description: desc.slice(0, 400),
-        event_type: inferredType,
-        venue: venue || "Bilkent Konser Salonu",
-        address: "Bilkent, Ankara",
-        event_date: eventDate,
-        end_date: null,
-        source_url,
-        source_name: "Bilkent",
-        image_url,
-        price_info: null,
+        const inferredType = inferEventType(title, desc, url);
+        if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
+
+        events.push({
+          title,
+          description: desc.slice(0, 400),
+          event_type: inferredType,
+          venue: venue || "Bilkent Konser Salonu",
+          address: "Bilkent, Ankara",
+          event_date: eventDate,
+          end_date: null,
+          source_url,
+          source_name: "Bilkent",
+          image_url,
+          price_info: null,
+        });
       });
-    });
+    }
   } catch (err) {
     console.error(`[Bilkent] hatası:`, err);
   }
@@ -619,14 +653,17 @@ async function scrapeLavarla(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Yol 1: Elementor Loop Grid — category-etkinlik kartları
-    $("div.e-loop-item").each((_, el) => {
+    const seen = new Set<string>();
+
+    // Yol 1: Elementor Loop Grid — div.e-loop-item veya .elementor-loop-item
+    $("div.e-loop-item, .elementor-loop-item").each((_, el) => {
       const $el = $(el);
 
-      const title = $el.find(".elementor-heading-title").first().text().trim();
-      if (!title) return;
+      const title = ($el.find(".elementor-heading-title").first().text() || $el.find("h3, h2").first().text()).trim();
+      if (!title || seen.has(title)) return;
+      seen.add(title);
 
-      // Link: data-premium-element-link JSON attribute
+      // Link: data-premium-element-link JSON attribute veya ilk a
       const linkData = $el.attr("data-premium-element-link");
       let href = "";
       if (linkData) {
@@ -634,7 +671,7 @@ async function scrapeLavarla(): Promise<ScrapedEvent[]> {
       }
       if (!href) href = $el.find("a").first().attr("href") ?? "";
 
-      const dateStr = $el.find(".elementor-post-info__item--type-date time").first().text().trim();
+      const dateStr = ($el.find(".elementor-post-info__item--type-date time").first().text() || $el.find("time").first().text() || $el.find(".elementor-post-date").first().text()).trim();
       const imgSrc = $el.find("img").first().attr("src") ?? null;
 
       const eventDate = parseTurkishDate(dateStr);
@@ -660,16 +697,17 @@ async function scrapeLavarla(): Promise<ScrapedEvent[]> {
       });
     });
 
-    // Yol 2: Elementor Post widget (üst grid)
-    $("article.elementor-post").each((_, el) => {
+    // Yol 2: Elementor Post widget — .elementor-post (div veya article)
+    $(".elementor-post").each((_, el) => {
       const $el = $(el);
 
-      const $titleLink = $el.find("h3.elementor-post__title a").first();
-      const title = $titleLink.text().trim();
-      if (!title) return;
+      const $titleLink = $el.find(".elementor-post__title a").first();
+      const title = ($titleLink.text() || $el.find("h3, h2").first().text()).trim();
+      if (!title || seen.has(title)) return;
+      seen.add(title);
 
-      const href = $titleLink.attr("href") ?? "";
-      const dateStr = $el.find("span.elementor-post-date").first().text().trim();
+      const href = $titleLink.attr("href") ?? $el.find("a").first().attr("href") ?? "";
+      const dateStr = ($el.find("span.elementor-post-date").first().text() || $el.find(".elementor-post__meta-data span").first().text()).trim();
       const imgSrc = $el.find(".elementor-post__thumbnail img").first().attr("src") ?? null;
 
       const eventDate = parseTurkishDate(dateStr);
@@ -841,7 +879,7 @@ async function scrapeBiletinial(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 9: Ankara Masası ──────────────────────────────────────────────────
-// ankaramasasi.com.tr — Bootstrap layout, lazy-loaded images
+// ankaramasasi.com.tr — a[href*="/haber/"] linkleri, lazy-loaded images
 async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://www.ankaramasasi.com.tr/haberler/kultur-sanat";
@@ -858,29 +896,27 @@ async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
 
     const seen = new Set<string>();
 
-    // Ana haber kutusu + liste haberleri
-    $("a.desktop-link").each((_, el) => {
+    // Haber linkleri: a[href*="/haber/"]
+    $('a[href*="/haber/"]').each((_, el) => {
       const $link = $(el);
       const href = $link.attr("href") ?? "";
       if (!href.includes("/haber/")) return;
       if (seen.has(href)) return;
       seen.add(href);
 
-      // Başlık: üst blokta h2, listede h2.category-title, veya img alt
-      const $parent = $link.closest(".main-box, .row, .col-md-12, div");
-      const title = $parent.find("h2").first().text().trim()
-        || $link.find("img").attr("alt")?.trim() || "";
+      // Başlık: h2, h3, img alt, veya link text
+      const $parent = $link.parent();
+      const title = ($parent.find("h2").first().text() || $parent.find("h3").first().text()
+        || $link.find("img").attr("alt") || $link.text()).trim();
       if (!title || title.length < 10) return;
 
       // Resim: data-src (lazy load) veya src
-      const $img = $parent.find("img").first();
+      const $img = $link.find("img").first().length ? $link.find("img").first() : $parent.find("img").first();
       const imgSrc = $img.attr("data-src") ?? $img.attr("src") ?? null;
-      // Placeholder'ı atla
       const image_url = imgSrc && !imgSrc.includes("lazy.webp") ? imgSrc : null;
 
       const source_url = href.startsWith("http") ? href : `https://www.ankaramasasi.com.tr${href}`;
 
-      // Ankara Masası haber sitesi — tarih genellikle yok, bugünün tarihini ata
       const eventDate = new Date().toISOString();
 
       const inferredType = inferEventType(title, "", url);
@@ -908,83 +944,85 @@ async function scrapeAnkaraMasasi(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 10: Bubilet ──────────────────────────────────────────────────────
-// bubilet.com.tr — Next.js SSR, HTML'den etkinlik kartları parse
+// bubilet.com.tr — Next.js SSR, a[href*="/ankara/etkinlik/"] linkleri
 async function scrapeBubilet(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
-  const url = "https://www.bubilet.com.tr/ankara-etkinlikleri";
+  // URL değişti: /ankara-etkinlikleri → /ankara
+  const urls = [
+    "https://www.bubilet.com.tr/ankara",
+    "https://www.bubilet.com.tr/ankara-etkinlikleri",
+  ];
 
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) return events;
-
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    // Her etkinlik kartı: a[href*="/etkinlik/"] linkli blok
-    $('a[href*="/etkinlik/"]').each((_, el) => {
-      const $a = $(el);
-      const href = $a.attr("href") ?? "";
-      if (!href.includes("/ankara/etkinlik/")) return;
-
-      // Başlık: title attr veya h3
-      const title = ($a.attr("title") ?? $a.find("h3").first().text() ?? "").trim();
-      if (!title || title.length < 3) return;
-
-      // Mekan ve tarih: p.text-xs elementleri (venue + date)
-      const textEls: string[] = [];
-      $a.find("p").each((__, p) => {
-        const t = $(p).text().trim();
-        if (t) textEls.push(t);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml",
+        },
+        signal: AbortSignal.timeout(15000),
       });
+      if (!res.ok) continue;
 
-      // Son p genellikle tarih ("12 Nisan Paz - 20:00"), ondan önceki mekan
-      let dateStr = "";
-      let venue = "";
-      for (const t of textEls) {
-        // Tarih: Ay ismi + gün kalıbı
-        if (/\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]{3,}/.test(t) || /[A-ZİĞÜŞÖÇa-zığüşöç]{3,}\s+\d/.test(t)) {
-          dateStr = t.replace(/\s*-\s*\d{2}:\d{2}.*/, "").trim(); // Saat kısmını kaldır
-        } else if (!venue && t.length > 2) {
-          venue = t;
+      const html = await res.text();
+      const $ = cheerio.load(html);
+
+      const seen = new Set<string>();
+
+      $('a[href*="/etkinlik/"]').each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") ?? "";
+        if (seen.has(href)) return;
+        seen.add(href);
+
+        const title = ($a.attr("title") ?? $a.find("h3, h2").first().text() ?? "").trim();
+        if (!title || title.length < 3) return;
+
+        const textEls: string[] = [];
+        $a.find("p, span").each((__, p) => {
+          const t = $(p).text().trim();
+          if (t && t !== title) textEls.push(t);
+        });
+
+        let dateStr = "";
+        let venue = "";
+        for (const t of textEls) {
+          if (/\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]{3,}/.test(t) || /[A-ZİĞÜŞÖÇa-zığüşöç]{3,}\s+\d/.test(t)) {
+            dateStr = t.replace(/\s*-\s*\d{2}:\d{2}.*/, "").trim();
+          } else if (!venue && t.length > 2 && !t.includes("TL")) {
+            venue = t;
+          }
         }
-      }
 
-      const eventDate = parseTurkishDate(dateStr);
-      if (!eventDate || !isFutureDate(eventDate)) return;
+        const eventDate = parseTurkishDate(dateStr);
+        if (!eventDate || !isFutureDate(eventDate)) return;
 
-      // Fiyat: "TL" içeren span
-      const priceEl = $a.find("span").filter((__, s) => $(s).text().includes("TL")).first().text().trim();
-      const price = priceEl || null;
+        const priceEl = $a.find("span").filter((__, s) => $(s).text().includes("TL")).first().text().trim();
+        const price = priceEl || null;
+        const imgSrc = $a.find("img").first().attr("src") ?? null;
+        const source_url = href.startsWith("http") ? href : `https://www.bubilet.com.tr${href}`;
+        const inferredType = inferEventType(title, "", url);
+        if (!isRelevant({ title, description: "", event_type: inferredType })) return;
 
-      // Resim
-      const imgSrc = $a.find("img").first().attr("src") ?? null;
-
-      const source_url = href.startsWith("http") ? href : `https://www.bubilet.com.tr${href}`;
-      const inferredType = inferEventType(title, "", url);
-      if (!isRelevant({ title, description: "", event_type: inferredType })) return;
-
-      events.push({
-        title,
-        description: "",
-        event_type: inferredType,
-        venue: venue || "Ankara",
-        address: "Ankara",
-        event_date: eventDate,
-        end_date: null,
-        source_url,
-        source_name: "Bubilet",
-        image_url: imgSrc,
-        price_info: price,
+        events.push({
+          title,
+          description: "",
+          event_type: inferredType,
+          venue: venue || "Ankara",
+          address: "Ankara",
+          event_date: eventDate,
+          end_date: null,
+          source_url,
+          source_name: "Bubilet",
+          image_url: imgSrc,
+          price_info: price,
+        });
       });
-    });
-  } catch (err) {
-    console.error("[Bubilet] hatası:", err);
+
+      if (events.length > 0) break; // İlk çalışan URL yeterli
+    } catch (err) {
+      console.error("[Bubilet] hatası:", err);
+    }
   }
 
   return events;
@@ -1103,7 +1141,7 @@ async function scrapeMobilet(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 12: Unite Ortak Mekan ────────────────────────────────────────────
-// uniteankara.com — Squarespace calendar page
+// uniteankara.com — Squarespace; a[href*="/calendar/"] linkleri
 async function scrapeUnite(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const url = "https://uniteankara.com/calendar";
@@ -1118,29 +1156,59 @@ async function scrapeUnite(): Promise<ScrapedEvent[]> {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    $(".eventlist-event").each((_, el) => {
+    const seen = new Set<string>();
+
+    // Eski yapı fallback + yeni yapı: a[href*="/calendar/"]
+    const candidates = $(".eventlist-event, a[href*='/calendar/']");
+
+    candidates.each((_, el) => {
       const $el = $(el);
+      const isLink = el.tagName === "a";
 
-      const title = $el.find(".eventlist-title-link").first().text().trim();
-      if (!title) return;
+      // Başlık
+      let title = "";
+      if (isLink) {
+        title = ($el.find("h3").first().text() || $el.attr("title") || $el.text().split("\n")[0]).trim();
+      } else {
+        title = ($el.find(".eventlist-title-link").first().text() || $el.find("h3").first().text()).trim();
+      }
+      if (!title || title.length < 3 || seen.has(title)) return;
+      seen.add(title);
 
-      // Tarih: ay + gün span'ları
-      const month = $el.find(".eventlist-datetag-startdate--month").first().text().trim();
-      const day = $el.find(".eventlist-datetag-startdate--day").first().text().trim();
-      const dateStr = `${day} ${month}`;
-      const eventDate = parseTurkishDate(dateStr);
+      // Tarih: eski yapıdan veya metin parse
+      let eventDate: string | null = null;
+      if (!isLink) {
+        const month = $el.find(".eventlist-datetag-startdate--month").first().text().trim();
+        const day = $el.find(".eventlist-datetag-startdate--day").first().text().trim();
+        eventDate = parseTurkishDate(`${day} ${month}`);
+      }
+      if (!eventDate) {
+        const allText = isLink ? $el.parent().text() : $el.text();
+        const dateMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s*\d{0,4})/);
+        if (dateMatch) eventDate = parseTurkishDate(dateMatch[1]);
+      }
+      // Fallback: p element'lerden tarih ara
+      if (!eventDate) {
+        $el.find("p").each((__, p) => {
+          if (eventDate) return;
+          const t = $(p).text().trim();
+          const m = t.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+)/);
+          if (m) eventDate = parseTurkishDate(m[1]);
+        });
+      }
       if (!eventDate || !isFutureDate(eventDate)) return;
 
-      const href = $el.find(".eventlist-title-link").first().attr("href") ?? "";
-      const source_url = href ? `https://uniteankara.com${href}` : url;
+      const href = isLink
+        ? ($el.attr("href") ?? "")
+        : ($el.find(".eventlist-title-link, a").first().attr("href") ?? "");
+      const source_url = href
+        ? (href.startsWith("http") ? href : `https://uniteankara.com${href}`)
+        : url;
 
-      // Resim: thumbnail img
-      const imgSrc = $el.find(".eventlist-column-thumbnail img").first().attr("data-src")
-        ?? $el.find(".eventlist-column-thumbnail img").first().attr("src")
+      const imgSrc = $el.find("img").first().attr("data-src")
+        ?? $el.find("img").first().attr("src")
         ?? null;
-
-      // Açıklama
-      const desc = $el.find(".eventlist-excerpt").first().text().trim();
+      const desc = ($el.find(".eventlist-excerpt, p").first().text() || "").trim();
 
       const inferredType = inferEventType(title, desc, url);
       if (!isRelevant({ title, description: desc, event_type: inferredType })) return;
@@ -1221,7 +1289,7 @@ async function scrapeKultKavaklidere(): Promise<ScrapedEvent[]> {
     console.error("[Kült] Biletinial hatası:", err);
   }
 
-  // Yol 2: Ana sayfa carousel (etkinlikler sunucu tarafında render edilmişse)
+  // Yol 2: Ana sayfa — <a> elementlerinden yapısal parse (carousel/kart)
   try {
     const res = await fetch("https://www.kultkavaklidere.org/", {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
@@ -1231,19 +1299,34 @@ async function scrapeKultKavaklidere(): Promise<ScrapedEvent[]> {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      $(".news__item, .news-slider__item").each((_, el) => {
-        const $el = $(el);
-        const title = $el.find("h3, .title, a").first().text().trim();
-        if (!title || title.length < 3) return;
+      const seen = new Set<string>();
 
-        const href = $el.find("a").first().attr("href") ?? "";
-        const imgSrc = $el.find("img").first().attr("src") ?? null;
+      // Tüm linkleri tara: biletinial linkleri veya etkinlik detay linkleri
+      $("a[href]").each((_, el) => {
+        const $a = $(el);
+        const href = $a.attr("href") ?? "";
 
-        const dateStr = $el.find(".date, time, .event-date").first().text().trim();
-        const eventDate = parseTurkishDate(dateStr) || new Date().toISOString();
+        // Biletinial etkinlik linkleri veya kendi detay sayfaları
+        const isBiletinial = href.includes("biletinial.com/tr-tr/") && href.match(/\/(tiyatro|muzik|sahne|sergi|soylesi|dans|opera|bale|goster|performans|etkinlik|sinema)\//);
+        const isDetail = href.startsWith("/") && href.length > 5 && !href.includes("/hakkimizda") && !href.includes("/iletisim");
+
+        if (!isBiletinial && !isDetail) return;
+
+        // Başlık: img alt, title attr, veya metin
+        const title = ($a.find("img").attr("alt") ?? $a.attr("title") ?? $a.text()).trim();
+        if (!title || title.length < 3 || title === "Afiş") return;
+        if (seen.has(title)) return;
+        seen.add(title);
+
+        const imgSrc = $a.find("img").attr("src") ?? null;
+
+        // Tarih: metin içinden veya parent'tan
+        const allText = $a.parent().text();
+        const dateMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+)/);
+        const eventDate = dateMatch ? parseTurkishDate(dateMatch[1]) : new Date().toISOString();
 
         const source_url = href.startsWith("http") ? href : `https://www.kultkavaklidere.org${href}`;
-        const inferredType = inferEventType(title, "", "");
+        const inferredType = inferEventType(title, "", href);
         if (!isRelevant({ title, description: "", event_type: inferredType })) return;
 
         events.push({
@@ -1368,7 +1451,7 @@ async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
 }
 
 // ── Scraper 14: Erimtan Arkeoloji ve Sanat Müzesi ──────────────────────────
-// erimtanmuseum.org/tr/takvim — Aylık takvim, temiz <time datetime> etiketleri
+// erimtanmuseum.org/tr/takvim — Aylık takvim, <ul> <li> yapısı, <time> etiketleri
 async function scrapeErimtan(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const now = new Date();
@@ -1391,32 +1474,47 @@ async function scrapeErimtan(): Promise<ScrapedEvent[]> {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      $("section.content li").each((_, el) => {
+      // Yapısal: li elementleri — section.content olsun olmasın tüm li'leri tara
+      $("li").each((_, el) => {
         const $li = $(el);
         const $a = $li.find("a").first();
         const $time = $li.find("time").first();
 
-        // <time datetime="2026-03-10 20:00">
+        // <time datetime="..."> etiketi olmalı
         const datetime = $time.attr("datetime") ?? "";
-        const eventDate = datetime ? new Date(datetime.replace(" ", "T")).toISOString() : null;
+        let eventDate: string | null = null;
+        if (datetime) {
+          try {
+            eventDate = new Date(datetime.replace(" ", "T")).toISOString();
+          } catch { /* */ }
+        }
+        // Fallback: metin içinden tarih parse
+        if (!eventDate) {
+          const text = $li.text();
+          const dateMatch = text.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+\s+\d{4})/);
+          if (dateMatch) eventDate = parseTurkishDate(dateMatch[1]);
+        }
         if (!eventDate || !isFutureDate(eventDate)) return;
 
-        // h3 = kategori (Müze'de Müzik, Atölye, Konferans vb.), h2 = etkinlik adı
-        const category = $li.find("h3").first().text().trim();
-        const title = $li.find("h2").first().text().trim();
+        // h3 = kategori, h2 = başlık (veya tersi)
+        const h3Text = $li.find("h3").first().text().trim();
+        const h2Text = $li.find("h2").first().text().trim();
+        // Başlık: h2 veya h3 — hangisi daha uzunsa başlık
+        let title = h2Text || h3Text;
+        let category = h2Text && h3Text ? (h2Text.length > h3Text.length ? h3Text : h2Text) : "";
+        if (title === category) category = "";
         if (!title) return;
 
-        // Çocuk atölyelerini atla (5-9 Yaş, 2-4 Yaş vb.)
-        const detail = $li.find("span.h5").text();
+        // Çocuk atölyelerini atla
+        const detail = $li.find("span, .h5").text();
         if (/\b\d+-\d+\s*yaş/i.test(detail) && !detail.toLowerCase().includes("yetişkin")) return;
 
         const href = $a.attr("href") ?? "";
+        if (!href) return; // Navigasyon li'lerini atla
         const source_url = href.startsWith("http") ? href : `https://erimtanmuseum.org${href}`;
 
-        // Tür tespiti: kategori + başlık
         const combined = `${category} ${title}`.toLowerCase();
-        let inferredType = inferEventType(category, title, "");
-        // Erimtan'a özel: müze müzik/caz/konser kategorileri
+        let inferredType = inferEventType(category || title, title, "");
         if (inferredType === "etkinlik") {
           if (combined.includes("konser") || combined.includes("müzik") || combined.includes("caz")) {
             inferredType = "konser";
@@ -1425,15 +1523,15 @@ async function scrapeErimtan(): Promise<ScrapedEvent[]> {
           } else if (combined.includes("rehber") || combined.includes("tur")) {
             inferredType = "soylesi";
           } else if (combined.includes("atölye") || combined.includes("eğitim")) {
-            inferredType = "performans"; // atölye → performans olarak kabul et
+            inferredType = "performans";
           }
         }
 
         if (!isRelevant({ title, description: category, event_type: inferredType })) return;
 
         events.push({
-          title: `${title}`,
-          description: category ? `${category}` : "",
+          title,
+          description: category || "",
           event_type: inferredType,
           venue: "Erimtan Arkeoloji ve Sanat Müzesi",
           address: "Gözcü Sokak No:2, Kale, Altındağ, Ankara",
