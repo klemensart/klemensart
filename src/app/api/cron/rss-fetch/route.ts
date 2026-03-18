@@ -176,12 +176,57 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // 4. Kendi yazılarımızı (articles) da news_items'a senkronize et
+  let articlesSynced = 0;
+  try {
+    const { data: published } = await admin
+      .from("articles")
+      .select("id,title,slug,description,image,date")
+      .eq("status", "published");
+
+    if (published && published.length > 0) {
+      const guids = published.map((a) => `klemens-article-${a.id}`);
+      const { data: existing } = await admin
+        .from("news_items")
+        .select("guid")
+        .in("guid", guids);
+
+      const existingSet = new Set((existing ?? []).map((e) => e.guid));
+
+      const toInsert = published
+        .filter((a) => !existingSet.has(`klemens-article-${a.id}`))
+        .map((a) => ({
+          guid: `klemens-article-${a.id}`,
+          title: a.title,
+          summary: a.description || null,
+          url: `https://klemensart.com/icerikler/yazi/${a.slug}`,
+          image_url: a.image || null,
+          source_name: "Klemens",
+          status: "published" as const,
+          is_manual: true,
+          published_at: a.date || new Date().toISOString(),
+          slug: a.slug,
+        }));
+
+      if (toInsert.length > 0) {
+        await admin.from("news_items").upsert(toInsert, {
+          onConflict: "guid",
+          ignoreDuplicates: true,
+        });
+        articlesSynced = toInsert.length;
+      }
+    }
+  } catch (e) {
+    console.warn("[rss-fetch] Article sync hatası:", (e as Error).message);
+  }
+
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
 
   return NextResponse.json({
     success: true,
-    message: `${totalItems} haber çekildi (${successCount} kaynak başarılı, ${errorCount} hata) — ${elapsed}s`,
+    message: `${totalItems} haber çekildi, ${articlesSynced} yazı senkronize edildi (${successCount} kaynak başarılı, ${errorCount} hata) — ${elapsed}s`,
     totalItems,
+    articlesSynced,
     successCount,
     errorCount,
     errors: errors.slice(0, 10),

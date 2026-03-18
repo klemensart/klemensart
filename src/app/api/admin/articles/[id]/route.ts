@@ -73,6 +73,39 @@ export async function PUT(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Yazı published ise news_items'a da senkronize et
+  if (row.status === "published" && row.slug) {
+    const guid = `klemens-article-${id}`;
+    const { data: existing } = await admin
+      .from("news_items")
+      .select("id")
+      .eq("guid", guid)
+      .maybeSingle();
+
+    if (!existing) {
+      await admin.from("news_items").insert({
+        guid,
+        title: row.title,
+        summary: row.description || null,
+        url: `https://klemensart.com/icerikler/yazi/${row.slug}`,
+        image_url: row.image || null,
+        source_name: "Klemens",
+        status: "published",
+        is_manual: true,
+        published_at: row.date || new Date().toISOString(),
+        slug: row.slug,
+      });
+    } else {
+      // Mevcut kaydı güncelle (başlık/açıklama değişmiş olabilir)
+      await admin.from("news_items").update({
+        title: row.title,
+        summary: row.description || null,
+        url: `https://klemensart.com/icerikler/yazi/${row.slug}`,
+        image_url: row.image || null,
+      }).eq("guid", guid);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
 
