@@ -1323,7 +1323,7 @@ async function scrapeKultKavaklidere(): Promise<ScrapedEvent[]> {
         // Tarih: metin içinden veya parent'tan
         const allText = $a.parent().text();
         const dateMatch = allText.match(/(\d{1,2}\s+[A-ZİĞÜŞÖÇa-zığüşöç]+)/);
-        const eventDate = dateMatch ? parseTurkishDate(dateMatch[1]) : new Date().toISOString();
+        const eventDate = (dateMatch ? parseTurkishDate(dateMatch[1]) : null) ?? new Date().toISOString();
 
         const source_url = href.startsWith("http") ? href : `https://www.kultkavaklidere.org${href}`;
         const inferredType = inferEventType(title, "", href);
