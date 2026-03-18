@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
 import { generateUniqueSlug } from "@/lib/slugify";
+import * as cheerio from "cheerio";
 
 // ── GET: Haber listesi + sayaçlar ───────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -72,6 +73,24 @@ export async function POST(req: NextRequest) {
   const publishedAt = new Date().toISOString();
   const slug = await generateUniqueSlug(title, publishedAt, admin);
 
+  // Görsel yoksa ve URL varsa otomatik OG image çek
+  let finalImage = image_url ?? null;
+  if (!finalImage && url) {
+    try {
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensArt/1.0)" },
+        signal: AbortSignal.timeout(8000),
+      });
+      const html = await res.text();
+      const $ = cheerio.load(html);
+      finalImage =
+        $('meta[property="og:image"]').attr("content") ||
+        $('meta[name="twitter:image"]').attr("content") ||
+        $('meta[property="og:image:url"]').attr("content") ||
+        null;
+    } catch { /* görselsiz devam et */ }
+  }
+
   const { data, error } = await admin
     .from("news_items")
     .insert({
@@ -79,7 +98,7 @@ export async function POST(req: NextRequest) {
       title,
       summary: summary ?? null,
       url: url ?? null,
-      image_url: image_url ?? null,
+      image_url: finalImage,
       source_name: source_name ?? "Klemens",
       status: "new",
       is_manual: true,

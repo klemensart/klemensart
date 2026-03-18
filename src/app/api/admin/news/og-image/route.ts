@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "KlemensArt/1.0 (+https://klemensart.com)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensArt/1.0)" },
       signal: AbortSignal.timeout(8000),
     });
     const html = await res.text();
