@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Giriş yapmalısınız" }, { status: 401 });
   }
 
-  const { workshopId, amount, workshopTitle, coupon_code } = await req.json();
+  const { workshopId, amount, workshopTitle, coupon_code, phone } = await req.json();
 
   if (!workshopId || !amount || !workshopTitle) {
     return NextResponse.json({ error: "Eksik parametre" }, { status: 400 });
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     max_installment,
     user_name: user.user_metadata?.full_name || email,
     user_address: "Türkiye",
-    user_phone: "05000000000",
+    user_phone: phone || "05000000000",
     merchant_ok_url,
     merchant_fail_url,
     merchant_notify_url,
@@ -149,6 +149,7 @@ export async function POST(req: NextRequest) {
     merchant_oid,
     workshop_id: workshopId,
     user_id: user.id,
+    phone: phone || null,
   });
 
   // Mark coupon as used

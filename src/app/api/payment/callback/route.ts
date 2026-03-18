@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     // 5) payment_intents lookup
     const { data: intent, error: intentErr } = await supabase
       .from("payment_intents")
-      .select("workshop_id, user_id")
+      .select("workshop_id, user_id, phone")
       .eq("merchant_oid", merchant_oid)
       .single();
 
@@ -68,12 +68,13 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setMonth(expiresAt.getMonth() + 6);
 
-    const purchaseData = {
+    const purchaseData: Record<string, unknown> = {
       user_id: intent.user_id,
       workshop_id: intent.workshop_id,
       purchased_at: new Date().toISOString(),
       expires_at: expiresAt.toISOString(),
     };
+    if (intent.phone) purchaseData.phone = intent.phone;
 
     const { error: insertErr } = await supabase.from("purchases").insert(purchaseData);
 
@@ -90,9 +91,15 @@ export async function POST(req: NextRequest) {
       metadata: { merchant_oid, amount: Number(total_amount) },
     });
 
-    // 6b) Teşekkür e-postası (fire-and-forget)
+    // 6b) Telefon bilgisini kullanıcı meta verisine kaydet + Teşekkür e-postası (fire-and-forget)
     (async () => {
       try {
+        if (intent.phone) {
+          await supabase.auth.admin.updateUserById(intent.user_id, {
+            user_metadata: { phone: intent.phone },
+          });
+        }
+
         const { data: userData } = await supabase.auth.admin.getUserById(intent.user_id);
         const userName = userData?.user?.user_metadata?.full_name || userData?.user?.email || "Sanat Sever";
 

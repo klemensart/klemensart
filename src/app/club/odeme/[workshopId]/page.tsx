@@ -36,6 +36,10 @@ export default function OdemePage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [validatedCoupon, setValidatedCoupon] = useState("");
 
+  // Phone state
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
   const finalAmount = discountPercent > 0 ? Math.round(amount * (1 - discountPercent / 100)) : amount;
 
   // Check auth & workshop validity
@@ -99,8 +103,30 @@ export default function OdemePage() {
     }
   }, [couponInput, workshopSlug]);
 
+  // Format phone: "5321234567" → "532 123 45 67"
+  const formatPhone = (val: string) => {
+    const digits = val.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    if (digits.length <= 8) return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 8)} ${digits.slice(8)}`;
+  };
+
+  const handlePhoneChange = (val: string) => {
+    const digits = val.replace(/\D/g, "").slice(0, 10);
+    setPhone(digits);
+    setPhoneError("");
+  };
+
   // Start payment
   const startPayment = useCallback(async () => {
+    // Validate phone
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length !== 10 || !digits.startsWith("5")) {
+      setPhoneError("Geçerli bir telefon numarası girin (5XX XXX XX XX)");
+      return;
+    }
+
     setStatus("loading");
     try {
       const res = await fetch("/api/payment/create-token", {
@@ -111,6 +137,7 @@ export default function OdemePage() {
           amount: finalAmount,
           workshopTitle,
           coupon_code: validatedCoupon || undefined,
+          phone: `0${digits}`,
         }),
       });
 
@@ -137,7 +164,7 @@ export default function OdemePage() {
       setErrorMsg(err instanceof Error ? err.message : "Bir hata oluştu");
       setStatus("error");
     }
-  }, [workshopId, finalAmount, workshopTitle, validatedCoupon]);
+  }, [workshopId, finalAmount, workshopTitle, validatedCoupon, phone]);
 
   return (
     <div
@@ -236,6 +263,46 @@ export default function OdemePage() {
             {couponStatus === "invalid" && (
               <div style={{ fontSize: 13, color: "#ef4444", marginTop: 8, fontWeight: 500 }}>
                 {couponError}
+              </div>
+            )}
+          </div>
+
+          {/* Phone input */}
+          <div style={{
+            background: "#fff", border: `1px solid ${B.light}`, borderRadius: 16,
+            padding: "24px", marginBottom: 20,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: B.dark, marginBottom: 4 }}>
+              Telefon Numarası
+            </div>
+            <div style={{ fontSize: 12, color: B.warm, marginBottom: 12 }}>
+              WhatsApp grubuna eklenmek için gerekli
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{
+                padding: "12px 10px", borderRadius: "10px 0 0 10px",
+                border: `1.5px solid ${phoneError ? "#ef4444" : B.light}`,
+                borderRight: "none", fontSize: 15, color: B.warm, background: B.cream,
+              }}>
+                +90
+              </span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                placeholder="5XX XXX XX XX"
+                value={formatPhone(phone)}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                style={{
+                  flex: 1, padding: "12px 14px", borderRadius: "0 10px 10px 0",
+                  border: `1.5px solid ${phoneError ? "#ef4444" : B.light}`,
+                  fontSize: 15, color: B.dark, outline: "none", background: B.cream,
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
+            {phoneError && (
+              <div style={{ fontSize: 13, color: "#ef4444", marginTop: 8, fontWeight: 500 }}>
+                {phoneError}
               </div>
             )}
           </div>

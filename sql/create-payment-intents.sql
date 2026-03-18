@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS payment_intents (
   workshop_id UUID REFERENCES workshops(id),
   single_video_id UUID,
   amount DECIMAL,
+  phone TEXT,
   created_at TIMESTAMP DEFAULT now()
 );
 

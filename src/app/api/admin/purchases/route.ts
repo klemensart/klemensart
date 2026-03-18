@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
       single_video_id,
       purchased_at,
       expires_at,
+      phone,
       workshops ( id, title ),
       single_videos ( id, title )
     `,
@@ -73,6 +74,7 @@ export async function GET(req: NextRequest) {
       user_id: p.user_id,
       user_email: u.email,
       user_name: u.name,
+      user_phone: (p as Record<string, unknown>).phone as string || "",
       workshop_id: p.workshop_id,
       single_video_id: p.single_video_id,
       title:
