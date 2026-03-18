@@ -259,7 +259,30 @@ export default function ArtworkArchivePage() {
                         {art.museum}
                       </span>
                     </td>
-                    <td className="py-2">
+                    <td className="py-2 flex items-center gap-2">
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(art.image_url);
+                            const blob = await res.blob();
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
+                            a.download = `${art.artist_name} - ${art.artwork_title}.${ext}`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          } catch {
+                            window.open(art.image_url, '_blank');
+                          }
+                        }}
+                        className="text-blue-400 hover:text-blue-600 transition-colors text-xs"
+                        title="İndir"
+                      >
+                        İndir
+                      </button>
                       <button
                         onClick={() => deleteArtwork(art.id, art.artwork_title)}
                         className="text-red-400 hover:text-red-600 transition-colors text-xs"
