@@ -74,7 +74,9 @@ export async function POST(req: NextRequest) {
   const slug = await generateUniqueSlug(title, publishedAt, admin);
 
   // Görsel yoksa ve URL varsa otomatik çek (OG image → ilk content görseli fallback)
-  let finalImage = image_url ?? null;
+  // Kullanıcı yanlışlıkla haber URL'sini görsel alanına yapıştırmış olabilir — resim uzantısı yoksa yoksay
+  const isImageUrl = image_url && /\.(jpe?g|png|webp|gif|avif|svg)(\?|$)/i.test(image_url);
+  let finalImage = isImageUrl ? image_url : null;
   if (!finalImage && url) {
     try {
       const res = await fetch(url, {
