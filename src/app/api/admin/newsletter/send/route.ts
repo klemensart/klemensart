@@ -331,6 +331,115 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // ── Cinema-club mode ──
+  if (mode === "cinema-club") {
+    const SINEMA_KLUBU_IDS = [
+      "a1e2f3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a", // tekli
+      "b2f3a4e5-6c7d-4e8f-9a0b-1c2d3e4f5a6b", // tekli-ogrenci
+      "c3a4b5f6-7d8e-4f9a-0b1c-2d3e4f5a6b7c", // yillik
+      "d4b5c6a7-8e9f-4a0b-1c2d-3e4f5a6b7c8d", // yillik-ogrenci
+    ];
+
+    // Get active purchases (not expired) for all cinema club workshops
+    const { data: purchases, error: purchaseError } = await admin
+      .from("purchases")
+      .select("user_id")
+      .in("workshop_id", SINEMA_KLUBU_IDS)
+      .gt("expires_at", new Date().toISOString());
+
+    if (purchaseError) {
+      return NextResponse.json(
+        { error: `Veritabanı hatası: ${purchaseError.message}` },
+        { status: 500 }
+      );
+    }
+
+    if (!purchases || purchases.length === 0) {
+      return NextResponse.json(
+        { error: "Aktif sinema kulübü üyesi bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    // Deduplicate by user_id
+    const userIds = [...new Set(purchases.map((p) => p.user_id))];
+
+    // Resolve emails via Supabase Auth admin
+    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
+      perPage: 1000,
+    });
+
+    if (usersError) {
+      return NextResponse.json(
+        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
+        { status: 500 }
+      );
+    }
+
+    const userIdSet = new Set(userIds);
+    const memberEmails = users
+      .filter((u) => userIdSet.has(u.id) && u.email)
+      .map((u) => u.email!);
+
+    if (memberEmails.length === 0) {
+      return NextResponse.json(
+        { error: "Üyelerin e-posta adresi bulunamadı." },
+        { status: 400 }
+      );
+    }
+
+    const emails = memberEmails.map((email) => ({
+      from: FROM,
+      to: email,
+      subject: emailSubject,
+      html: emailHtml,
+    }));
+
+    let totalSent = 0;
+    const batchSize = 100;
+    const errors: string[] = [];
+
+    for (let i = 0; i < emails.length; i += batchSize) {
+      const batch = emails.slice(i, i + batchSize);
+      const { data, error } = await resend.batch.send(batch);
+      if (error) {
+        errors.push(error.message);
+      } else {
+        totalSent += batch.length;
+        const ids = data?.data ?? [];
+        const batchLogs = batch.map((email, j) => ({
+          resend_email_id: ids[j]?.id || null,
+          subscriber_email: email.to as string,
+          subject: emailSubject,
+        }));
+        await admin.from("email_logs").insert(batchLogs);
+      }
+    }
+
+    if (errors.length > 0 && totalSent === 0) {
+      return NextResponse.json(
+        { error: `Gönderim hatası: ${errors[0]}` },
+        { status: 500 }
+      );
+    }
+
+    if (totalSent > 0) {
+      await admin.from("campaigns").insert({
+        subject: emailSubject,
+        html_content: emailHtml,
+        template_name: template && template in templateRegistry ? template : "SeminerHatirlatici",
+        mode: "cinema-club",
+        sent_count: totalSent,
+      });
+    }
+
+    return NextResponse.json({
+      message: `${totalSent} sinema kulübü üyesine e-posta gönderildi.`,
+      sent: totalSent,
+      total: memberEmails.length,
+    });
+  }
+
   // ── Abandoned mode ──
   if (mode === "abandoned") {
     if (!workshopId) {

@@ -65,8 +65,21 @@ export async function POST(req: NextRequest) {
     }
 
     // 6) purchases INSERT
+    // Sinema kulübü workshop ID'leri
+    const SINEMA_KLUBU_IDS = [
+      "a1e2f3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a", // sinema-klubu-tekli
+      "b2f3a4e5-6c7d-4e8f-9a0b-1c2d3e4f5a6b", // sinema-klubu-tekli-ogrenci
+      "c3a4b5f6-7d8e-4f9a-0b1c-2d3e4f5a6b7c", // sinema-klubu-yillik
+      "d4b5c6a7-8e9f-4a0b-1c2d-3e4f5a6b7c8d", // sinema-klubu-yillik-ogrenci
+    ];
+    // Yıllık sinema kulübü paketleri 12 ay, diğerleri 6 ay
+    const YILLIK_WORKSHOP_IDS = [
+      "c3a4b5f6-7d8e-4f9a-0b1c-2d3e4f5a6b7c", // sinema-klubu-yillik
+      "d4b5c6a7-8e9f-4a0b-1c2d-3e4f5a6b7c8d", // sinema-klubu-yillik-ogrenci
+    ];
+    const expiryMonths = YILLIK_WORKSHOP_IDS.includes(intent.workshop_id) ? 12 : 6;
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 6);
+    expiresAt.setMonth(expiresAt.getMonth() + expiryMonths);
 
     const purchaseData: Record<string, unknown> = {
       user_id: intent.user_id,
@@ -111,7 +124,12 @@ export async function POST(req: NextRequest) {
 
         const workshopTitle = workshop?.title || "Atolye";
 
-        const html = await render(AtolyeTesekkur({ name: userName, workshopTitle }));
+        const isSinemaKlubu = SINEMA_KLUBU_IDS.includes(intent.workshop_id);
+        const whatsappLink = isSinemaKlubu
+          ? process.env.SINEMA_KLUBU_WHATSAPP_LINK
+          : undefined;
+
+        const html = await render(AtolyeTesekkur({ name: userName, workshopTitle, whatsappLink }));
         await sendThankYouEmail({
           to: userData?.user?.email || "",
           subject: "Atölye Satın Alma Onayı — Klemens Art",

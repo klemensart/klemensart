@@ -5,11 +5,13 @@ import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 type Props = {
   name?: string;
   workshopTitle?: string;
+  whatsappLink?: string;
 };
 
 export default function AtolyeTesekkur({
   name = "Sanat Sever",
   workshopTitle = "Atölye",
+  whatsappLink,
 }: Props) {
   return (
     <KlemensLayout preview={`${workshopTitle} atölyesini satın aldığınız için teşekkürler!`}>
@@ -27,6 +29,19 @@ export default function AtolyeTesekkur({
           <Text style={infoItem}>Canlı Zoom oturumlarında katılım hakkı</Text>
           <Text style={infoItem}>PDF materyaller ve ek kaynaklar</Text>
         </div>
+
+        {whatsappLink && (
+          <div style={whatsappBox}>
+            <Text style={whatsappTitle}>WHATSAPP GRUBU</Text>
+            <Text style={whatsappDesc}>
+              Topluluğumuza katılmak için aşağıdaki butona tıklayın. Grup üzerinden etkinlik
+              duyuruları, film önerileri ve sohbetlere erişebilirsiniz.
+            </Text>
+            <KlemensButton href={whatsappLink}>
+              WhatsApp Grubuna Katıl
+            </KlemensButton>
+          </div>
+        )}
 
         <Text style={paragraph}>
           Giriş yaptıktan sonra profil sayfanızdaki <strong style={strong}>Loca</strong> sekmesinden
@@ -104,6 +119,31 @@ const infoItem: React.CSSProperties = {
   lineHeight: "1.8",
   color: "#3d3833",
   margin: "0 0 6px 0",
+};
+
+const whatsappBox: React.CSSProperties = {
+  background: "#E8F5E9",
+  borderRadius: "12px",
+  padding: "28px 32px",
+  margin: "0 0 28px 0",
+  borderLeft: "3px solid #25D366",
+  textAlign: "center" as const,
+};
+
+const whatsappTitle: React.CSSProperties = {
+  fontSize: "14px",
+  fontWeight: 700,
+  letterSpacing: "2px",
+  color: "#25D366",
+  textTransform: "uppercase" as const,
+  margin: "0 0 12px 0",
+};
+
+const whatsappDesc: React.CSSProperties = {
+  fontSize: "15px",
+  lineHeight: "1.8",
+  color: "#3d3833",
+  margin: "0 0 16px 0",
 };
 
 const closing: React.CSSProperties = {
