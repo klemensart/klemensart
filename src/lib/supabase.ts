@@ -9,6 +9,6 @@ const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
  */
 export function createClient() {
   return createBrowserClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { flowType: "implicit" },
+    auth: { flowType: "implicit", detectSessionInUrl: true },
   });
 }

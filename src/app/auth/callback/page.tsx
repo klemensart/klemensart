@@ -15,25 +15,45 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const supabase = createClient();
+    let handled = false;
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event) => {
+    const handle = async (event: string) => {
+      if (handled) return;
+      handled = true;
+
       if (event === "PASSWORD_RECOVERY") {
-        // Şifre sıfırlama linki — şifre belirleme sayfasına yönlendir
         router.replace("/auth/sifre-belirle");
       } else if (event === "SIGNED_IN") {
-        // Satın alma taşıma — başarısız olsa bile profil'e yönlendir
         try {
           await fetch("/api/auth/migrate-purchases", { method: "POST" });
         } catch {}
         router.replace("/club/profil");
-      } else if (event === "SIGNED_OUT") {
+      } else {
         router.replace("/club/giris");
       }
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      handle(event);
     });
 
-    return () => subscription.unsubscribe();
+    // Fallback: event kaçarsa (race condition), 2sn sonra session kontrol et
+    const timer = setTimeout(async () => {
+      if (handled) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        handle("SIGNED_IN");
+      } else {
+        handle("SIGNED_OUT");
+      }
+    }, 2000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
