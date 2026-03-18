@@ -61,7 +61,7 @@ export async function PATCH(
           url: `https://klemensart.com/icerikler/yazi/${article.slug}`,
           image_url: article.image || null,
           source_name: "Klemens",
-          status: "published",
+          status: "new",
           is_manual: true,
           published_at: publishedAt,
           slug: newsSlug,

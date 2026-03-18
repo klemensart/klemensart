@@ -90,7 +90,7 @@ export async function PUT(
         url: `https://klemensart.com/icerikler/yazi/${row.slug}`,
         image_url: row.image || null,
         source_name: "Klemens",
-        status: "published",
+        status: "new",
         is_manual: true,
         published_at: row.date || new Date().toISOString(),
         slug: row.slug,

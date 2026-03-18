@@ -202,7 +202,7 @@ export async function GET(req: NextRequest) {
           url: `https://klemensart.com/icerikler/yazi/${a.slug}`,
           image_url: a.image || null,
           source_name: "Klemens",
-          status: "published" as const,
+          status: "new" as const,
           is_manual: true,
           published_at: a.date || new Date().toISOString(),
           slug: a.slug,
