@@ -224,6 +224,19 @@ const TEMPLATES: TemplateConfig[] = [
       newsItems: [],
     },
   },
+  {
+    name: "DogumGunuTebrik",
+    label: "Doğum Günü Tebriği",
+    description: "Abonelere kişisel doğum günü kutlaması",
+    icon: "🎂",
+    defaultSubject: "Doğum Günün Kutlu Olsun! ✨ — Klemens Art",
+    fields: [
+      { key: "name", label: "İsim", type: "text" },
+    ],
+    defaults: {
+      name: "",
+    },
+  },
 ];
 
 /* ── Editor CSS ── */

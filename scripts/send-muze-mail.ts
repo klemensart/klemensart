@@ -65,7 +65,7 @@ async function main() {
         Muzede1SaatTesekkur({ name: lead.name || undefined })
       );
 
-      const { error } = await resend.emails.send({
+      const { data, error } = await resend.emails.send({
         from: "Klemens Art <info@klemensart.com>",
         to: lead.email,
         subject: "Müzede 1 Saat Rehberiniz Hazır! — Klemens Art",
@@ -76,6 +76,12 @@ async function main() {
         console.error(`HATA (${lead.email}):`, error.message);
         failed++;
       } else {
+        // email_logs'a kaydet — admin panelde açma/tıklama takibi için
+        await sb.from("email_logs").insert({
+          resend_email_id: data?.id || null,
+          subscriber_email: lead.email,
+          subject: "Müzede 1 Saat Rehberiniz Hazır! — Klemens Art",
+        });
         console.log(`✓ ${lead.email}`);
         sent++;
       }

@@ -9,6 +9,7 @@ import AtolyeTesekkur from "@/emails/AtolyeTesekkur";
 import BultenTesekkur from "@/emails/BultenTesekkur";
 import StoryBildirimi from "@/emails/StoryBildirimi";
 import HaberlerBulteni from "@/emails/HaberlerBulteni";
+import DogumGunuTebrik from "@/emails/DogumGunuTebrik";
 
 export type TemplateName =
   | "DuyuruBulteni"
@@ -20,7 +21,8 @@ export type TemplateName =
   | "AtolyeTesekkur"
   | "BultenTesekkur"
   | "StoryBildirimi"
-  | "HaberlerBulteni";
+  | "HaberlerBulteni"
+  | "DogumGunuTebrik";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TemplateEntry = {
@@ -68,5 +70,9 @@ export const templateRegistry: Record<TemplateName, TemplateEntry> = {
   HaberlerBulteni: {
     component: HaberlerBulteni,
     defaultSubject: "Haftanın Kültür Sanat Gündemi — Klemens Art",
+  },
+  DogumGunuTebrik: {
+    component: DogumGunuTebrik,
+    defaultSubject: "Doğum Günün Kutlu Olsun! ✨ — Klemens Art",
   },
 };
