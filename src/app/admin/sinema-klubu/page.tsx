@@ -5,14 +5,14 @@ import { useState } from "react";
 export default function SinemaKlubuAdmin() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [eventTime, setEventTime] = useState("20:30 (TSI)");
+  const [eventTime, setEventTime] = useState("20:30 (TSİ)");
   const [zoomLink, setZoomLink] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   async function handleSend(isTest: boolean) {
     if (!eventTitle || !eventDate || !zoomLink) {
-      setResult({ ok: false, message: "Tum alanlar doldurulmali." });
+      setResult({ ok: false, message: "Tüm alanlar doldurulmalı." });
       return;
     }
 
@@ -33,24 +33,24 @@ export default function SinemaKlubuAdmin() {
             eventTime,
             zoomLink,
           },
-          subject: `Hatirlatma: ${eventTitle} — Klemens Sinema Klubu`,
+          subject: `Hatırlatma: ${eventTitle} — Klemens Sinema Kulübü`,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setResult({ ok: false, message: data.error || "Bir hata olustu." });
+        setResult({ ok: false, message: data.error || "Bir hata oluştu." });
       } else {
         setResult({
           ok: true,
           message: isTest
-            ? "Test maili gonderildi."
-            : `${data.sent} kisi(ye) basariyla gonderildi.`,
+            ? "Test maili gönderildi."
+            : `${data.sent} kişiye başarıyla gönderildi.`,
         });
       }
     } catch {
-      setResult({ ok: false, message: "Ag hatasi." });
+      setResult({ ok: false, message: "Ağ hatası." });
     } finally {
       setSending(false);
     }
@@ -59,18 +59,18 @@ export default function SinemaKlubuAdmin() {
   return (
     <div style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px" }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: "#2D2926" }}>
-        Sinema Klubu — Zoom Linki Gonder
+        Sinema Kulübü — Zoom Linki Gönder
       </h1>
       <p style={{ fontSize: 14, color: "#888", marginBottom: 32 }}>
-        Aktif sinema klubu uyelerine Zoom hatirlatma maili gonderir.
+        Aktif sinema kulübü üyelerine Zoom hatırlatma maili gönderir.
       </p>
 
-      <label style={labelStyle}>Etkinlik Basligi</label>
+      <label style={labelStyle}>Etkinlik Başlığı</label>
       <input
         type="text"
         value={eventTitle}
         onChange={(e) => setEventTitle(e.target.value)}
-        placeholder="Ornek: Stalker (1979) — Tarkovski"
+        placeholder="Örnek: Stalker (1979) — Tarkovski"
         style={inputStyle}
       />
 
@@ -79,7 +79,7 @@ export default function SinemaKlubuAdmin() {
         type="text"
         value={eventDate}
         onChange={(e) => setEventDate(e.target.value)}
-        placeholder="Ornek: 25 Nisan 2026, Cuma"
+        placeholder="Örnek: 25 Nisan 2026, Cuma"
         style={inputStyle}
       />
 
@@ -88,7 +88,7 @@ export default function SinemaKlubuAdmin() {
         type="text"
         value={eventTime}
         onChange={(e) => setEventTime(e.target.value)}
-        placeholder="20:30 (TSI)"
+        placeholder="20:30 (TSİ)"
         style={inputStyle}
       />
 
@@ -112,7 +112,7 @@ export default function SinemaKlubuAdmin() {
             border: "1px solid #ddd",
           }}
         >
-          {sending ? "Gonderiliyor..." : "Test Gonder"}
+          {sending ? "Gönderiliyor..." : "Test Gönder"}
         </button>
         <button
           onClick={() => handleSend(false)}
@@ -124,7 +124,7 @@ export default function SinemaKlubuAdmin() {
             border: "1px solid #FF6D60",
           }}
         >
-          {sending ? "Gonderiliyor..." : "Tum Uyelere Gonder"}
+          {sending ? "Gönderiliyor..." : "Tüm Üyelere Gönder"}
         </button>
       </div>
 
