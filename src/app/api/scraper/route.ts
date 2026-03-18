@@ -496,7 +496,7 @@ async function scrapeBilkent(): Promise<ScrapedEvent[]> {
     for (const sel of selectors) {
       $(sel).each((_, el) => {
         const $el = $(el);
-        const isLink = el.tagName === "a";
+        const isLink = "tagName" in el && el.tagName === "a";
 
         // Başlık
         let title = "";
@@ -1163,7 +1163,7 @@ async function scrapeUnite(): Promise<ScrapedEvent[]> {
 
     candidates.each((_, el) => {
       const $el = $(el);
-      const isLink = el.tagName === "a";
+      const isLink = "tagName" in el && el.tagName === "a";
 
       // Başlık
       let title = "";
