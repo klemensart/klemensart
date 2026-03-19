@@ -55,7 +55,7 @@ export default function GirisPage() {
     } else {
       setOtpSent(true);
       setSuccess(
-        "Giriş kodu e-posta adresinize gönderildi. Maildeki linke tıklayabilir veya aşağıya 6 haneli kodu girebilirsiniz."
+        "Giriş kodu e-posta adresinize gönderildi. Maildeki linke tıklayabilir veya aşağıya 8 haneli kodu girebilirsiniz."
       );
     }
 
@@ -165,31 +165,31 @@ export default function GirisPage() {
               <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-warm-900/50 uppercase tracking-wide">
-                    6 Haneli Kod
+                    Giriş Kodu
                   </label>
                   <input
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    maxLength={6}
+                    maxLength={8}
                     required
                     value={otp}
                     onChange={(e) =>
-                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))
                     }
-                    placeholder="123456"
+                    placeholder="12345678"
                     autoFocus
                     className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 text-sm text-center text-lg tracking-[0.3em] font-mono placeholder:text-warm-900/30 placeholder:tracking-[0.3em] focus:outline-none focus:border-coral focus:bg-white transition-colors"
                   />
                   <p className="text-xs text-warm-900/35 leading-relaxed mt-1">
-                    <strong>{email}</strong> adresine gönderilen 6 haneli kodu
+                    <strong>{email}</strong> adresine gönderilen 8 haneli kodu
                     girin. Spam klasörünü de kontrol edin.
                   </p>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={verifying || otp.length < 6}
+                  disabled={verifying || otp.length < 8}
                   className="w-full py-3.5 bg-coral text-white font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-all duration-150 mt-1"
                 >
                   {verifying ? "Doğrulanıyor..." : "Giriş Yap"}
