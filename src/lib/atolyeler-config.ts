@@ -43,6 +43,36 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
     targetDate: "2026-01-28T20:30:00+03:00",
   },
+
+  /* ─── Sinema Kulübü ──────────────────────────── */
+  "sinema-klubu-tekli": {
+    id: "a1e2f3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a",
+    price: 40000,
+    forSale: true,
+    imgCover: "",
+    imgSquare: "",
+  },
+  "sinema-klubu-tekli-ogrenci": {
+    id: "b2f3a4e5-6c7d-4e8f-9a0b-1c2d3e4f5a6b",
+    price: 15000,
+    forSale: true,
+    imgCover: "",
+    imgSquare: "",
+  },
+  "sinema-klubu-yillik": {
+    id: "c3a4b5f6-7d8e-4f9a-0b1c-2d3e4f5a6b7c",
+    price: 360000,
+    forSale: true,
+    imgCover: "",
+    imgSquare: "",
+  },
+  "sinema-klubu-yillik-ogrenci": {
+    id: "d4b5c6a7-8e9f-4a0b-1c2d-3e4f5a6b7c8d",
+    price: 135000,
+    forSale: true,
+    imgCover: "",
+    imgSquare: "",
+  },
 };
 
 // Reverse: workshopId → slug
