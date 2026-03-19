@@ -170,7 +170,7 @@ const nextConfig: NextConfig = {
       { source: "/odak", destination: "/icerikler/odak", permanent: true },
       { source: "/soylesi", destination: "/icerikler", permanent: true },
       { source: "/zihin-oyun", destination: "/testler", permanent: true },
-      { source: "/sanat-ve-estetik-testi", destination: "/testler", permanent: true },
+      { source: "/sanat-ve-estetik-testi", destination: "/testler/gorsel-algi", permanent: true },
       { source: "/e-bulten", destination: "/", permanent: true },
       { source: "/kanal", destination: "/", permanent: true },
       // /rehber artık landing page — redirect kaldırıldı
