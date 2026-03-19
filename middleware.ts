@@ -63,6 +63,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/club/:path*",
+    "/auth/callback",
     // WordPress kalıntı query param'ları (?add-to-cart, ?post_type, ?page_id)
     "/",
   ],
