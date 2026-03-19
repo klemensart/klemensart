@@ -109,6 +109,7 @@ export function checkCategoryBadges(
   const categoryLabels: Record<string, string> = {
     müze: "Müze", galeri: "Galeri", konser: "Konser",
     tiyatro: "Tiyatro", tarihi: "Tarih", edebiyat: "Edebiyat", miras: "Miras",
+    doğa: "Doğa", gastronomi: "Gastronomi", mimari: "Mimari",
   };
 
   for (const [type, count] of Object.entries(typeCounts)) {

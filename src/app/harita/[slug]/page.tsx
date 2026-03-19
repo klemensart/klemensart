@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PLACES, TYPE_LABELS, type PlaceType } from "@/lib/harita-data";
+import { PLACES, TYPE_LABELS, ERA_LABELS, type PlaceType, type EraType } from "@/lib/harita-data";
 import { placeSlug, findPlaceBySlug } from "@/lib/harita-gamification";
 import { createAdminClient } from "@/lib/supabase-admin";
 import Navbar from "@/components/Navbar";
@@ -29,6 +29,19 @@ const TYPE_BADGE: Record<PlaceType, string> = {
   tarihi: "bg-amber-100 text-amber-700",
   edebiyat: "bg-violet-100 text-violet-700",
   miras: "bg-stone-200 text-stone-700",
+  doğa: "bg-green-100 text-green-700",
+  gastronomi: "bg-orange-100 text-orange-700",
+  mimari: "bg-stone-100 text-stone-600",
+};
+
+const ERA_BADGE: Record<EraType, string> = {
+  paleolitik: "bg-stone-100 text-stone-600",
+  hitit: "bg-orange-100 text-orange-700",
+  frig: "bg-yellow-100 text-yellow-700",
+  roma: "bg-red-100 text-red-700",
+  selcuklu: "bg-blue-100 text-blue-700",
+  osmanli: "bg-green-100 text-green-700",
+  cumhuriyet: "bg-coral/10 text-coral",
 };
 
 /* ───────── Helpers ───────── */
@@ -70,7 +83,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const typeLabel = TYPE_LABELS[place.type];
   const title = `${place.name} — Ankara Kültür Haritası — Klemens`;
-  const description = `${place.desc} ${typeLabel} — Ankara kültür haritasında keşfet.`;
+  const metaDesc = place.longDesc ? place.longDesc.slice(0, 155) + "…" : place.desc;
+  const description = `${metaDesc} ${typeLabel} — Ankara kültür haritasında keşfet.`;
 
   return {
     title: place.name,
@@ -120,7 +134,7 @@ export default async function MekanDetayPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "TouristAttraction",
     name: place.name,
-    description: place.desc,
+    description: place.longDesc || place.desc,
     geo: {
       "@type": "GeoCoordinates",
       latitude: place.lat,
@@ -180,9 +194,20 @@ export default async function MekanDetayPage({ params }: Props) {
           </Link>
 
           {/* Category badge */}
-          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 ${badge}`}>
+          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-2 ${badge}`}>
             {typeLabel}
           </span>
+
+          {/* Era badges */}
+          {place.era && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {(Array.isArray(place.era) ? place.era : [place.era]).map((era) => (
+                <span key={era} className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${ERA_BADGE[era]}`}>
+                  {ERA_LABELS[era]}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold text-warm-900 leading-tight mb-6">
@@ -200,10 +225,38 @@ export default async function MekanDetayPage({ params }: Props) {
 
           {/* Description */}
           <div className="bg-white rounded-2xl border border-warm-100 p-8 mb-8">
-            <p className="text-warm-900 text-base leading-relaxed">
-              {place.desc}
-            </p>
+            {place.longDesc ? (
+              <div className="space-y-4">
+                {place.longDesc.split("\n\n").map((para, i) => (
+                  <p key={i} className="text-warm-900 text-base leading-relaxed">
+                    {para}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-warm-900 text-base leading-relaxed">
+                {place.desc}
+              </p>
+            )}
           </div>
+
+          {/* Fun Facts */}
+          {place.funFacts && place.funFacts.length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">💡</span>
+                <h2 className="text-base font-bold text-amber-900">Biliyor Musun?</h2>
+              </div>
+              <ol className="space-y-2">
+                {place.funFacts.map((fact, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-amber-900/80 leading-relaxed">
+                    <span className="font-bold text-amber-600 flex-shrink-0">{i + 1}.</span>
+                    {fact}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           {/* Rating summary */}
           {reviews.length > 0 && (

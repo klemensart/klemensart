@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
-import { PLACES, ROUTES, TYPE_LABELS, type PlaceType, type CulturePlace, type Route } from "@/lib/harita-data";
+import { PLACES, ROUTES, TYPE_LABELS, ERA_LABELS, ERA_ORDER, type PlaceType, type EraType, type CulturePlace, type Route } from "@/lib/harita-data";
 import { placeSlug, haversineDistance, getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
 
 /* ───────── Types ───────── */
@@ -45,6 +45,19 @@ const TYPE_COLORS: Record<PlaceType, string> = {
   tarihi: "#FFB300",
   edebiyat: "#8B5CF6",
   miras: "#795548",
+  doğa: "#43A047",
+  gastronomi: "#E65100",
+  mimari: "#5D4037",
+};
+
+const ERA_COLORS: Record<EraType, string> = {
+  paleolitik: "#795548",
+  hitit: "#D84315",
+  frig: "#FFC107",
+  roma: "#C62828",
+  selcuklu: "#1565C0",
+  osmanli: "#2E7D32",
+  cumhuriyet: "#FF6D60",
 };
 
 const TYPE_SVGS: Record<PlaceType, string> = {
@@ -55,6 +68,9 @@ const TYPE_SVGS: Record<PlaceType, string> = {
   tarihi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 21V11l4-4 4 4 4-4 4 4v10"/><path d="M9 21v-4h6v4"/><path d="M3 11h18"/></svg>`,
   edebiyat: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h6"/></svg>`,
   miras: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+  doğa: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14c.3-1 .7-2.2.7-3.5C17.7 6.9 15 4 12 4S6.3 6.9 6.3 10.5c0 1.3.4 2.5.7 3.5"/><path d="M12 4V2"/><path d="M7 20h10"/><path d="M9.5 14l2.5 6 2.5-6"/></svg>`,
+  gastronomi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+  mimari: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7"/><path d="M19 21V7"/><path d="M5 7h14"/><path d="M8 7V4h3v3"/><path d="M13 7V4h3v3"/><path d="M8 21v-4h3v4"/><path d="M13 21v-4h3v4"/></svg>`,
 };
 
 const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
@@ -66,6 +82,9 @@ const FILTER_OPTIONS: { key: PlaceType | "all"; label: string }[] = [
   { key: "tarihi", label: "Tarihi" },
   { key: "edebiyat", label: "Edebiyat" },
   { key: "miras", label: "Kültürel Miras" },
+  { key: "doğa", label: "Doğa & Park" },
+  { key: "gastronomi", label: "Gastronomi" },
+  { key: "mimari", label: "Mimari" },
 ];
 
 
@@ -86,6 +105,11 @@ const ROUTE_ICON_PATHS: Record<number, string> = {
   11: '<path d="M2 16h20 M5 16c0-5 3-9 7-9s7 4 7 9"/>',
   12: '<circle cx="9" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/><path d="M7 8l-3-3 M17 8l3-3 M11.5 12h1"/>',
   13: '<path d="M13 2L6 13h5l-2 9 7-11h-5z"/>',
+  14: '<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/>',
+  15: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  16: '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>',
+  17: '<path d="M3 21h18"/><path d="M5 21V7"/><path d="M19 21V7"/><path d="M5 7h14"/><path d="M9 7V4h6v3"/>',
+  18: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/>',
 };
 
 function renderRouteIcon(id: number, color: string, size = 24) {
@@ -129,6 +153,7 @@ export default function HaritaPage() {
 
   // Explore mode state
   const [activeFilter, setActiveFilter] = useState<PlaceType | "all">("all");
+  const [activeEra, setActiveEra] = useState<EraType | "all">("all");
   const [selectedPlace, setSelectedPlace] = useState<CulturePlace | null>(null);
   const [panelEvents, setPanelEvents] = useState<SupabaseEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
@@ -652,6 +677,12 @@ export default function HaritaPage() {
 
     const filtered = PLACES.filter((p) => {
       if (activeFilter !== "all" && p.type !== activeFilter) return false;
+      if (activeEra !== "all" && p.era) {
+        const eras = Array.isArray(p.era) ? p.era : [p.era];
+        if (!eras.includes(activeEra)) return false;
+      } else if (activeEra !== "all" && !p.era) {
+        return false;
+      }
       if (p.minZoom && currentZoom < p.minZoom) return false;
       return true;
     });
@@ -697,7 +728,7 @@ export default function HaritaPage() {
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [activeFilter, currentZoom, mapReady, selectPlace, mode, isDark, visitedSlugs]);
+  }, [activeFilter, activeEra, currentZoom, mapReady, selectPlace, mode, isDark, visitedSlugs]);
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
@@ -1509,6 +1540,7 @@ export default function HaritaPage() {
 
           {/* Filters (explore only) */}
           {mode === "explore" && (
+            <>
             <div style={{ display: "flex", gap: 10, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 4 }}>
               {FILTER_OPTIONS.map((f) => (
                 <button
@@ -1558,6 +1590,38 @@ export default function HaritaPage() {
                 </button>
               ))}
             </div>
+            {/* Era filter */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "nowrap", overflowX: "auto", paddingTop: 4, paddingBottom: 2 }}>
+              <button
+                onClick={() => setActiveEra("all")}
+                style={{
+                  padding: "3px 10px", borderRadius: 14, fontSize: 10, fontWeight: 600,
+                  border: isDark ? `1px solid ${activeEra === "all" ? "#FF6D60" : "rgba(255,255,255,0.08)"}` : `1px solid ${activeEra === "all" ? "#FF6D60" : "#e0e0e0"}`,
+                  background: isDark ? (activeEra === "all" ? "rgba(255,109,96,0.15)" : "rgba(0,0,0,0.4)") : (activeEra === "all" ? "#FFF0EE" : "#f9f9f9"),
+                  color: isDark ? (activeEra === "all" ? "#FF6D60" : "#777") : (activeEra === "all" ? "#FF6D60" : "#666"),
+                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.2s",
+                }}
+              >
+                Tüm Dönemler
+              </button>
+              {ERA_ORDER.map((era) => (
+                <button
+                  key={era}
+                  onClick={() => setActiveEra(era)}
+                  style={{
+                    padding: "3px 10px", borderRadius: 14, fontSize: 10, fontWeight: 600,
+                    border: isDark ? `1px solid ${activeEra === era ? ERA_COLORS[era] : "rgba(255,255,255,0.08)"}` : `1px solid ${activeEra === era ? ERA_COLORS[era] : "#e0e0e0"}`,
+                    background: isDark ? (activeEra === era ? `${ERA_COLORS[era]}20` : "rgba(0,0,0,0.4)") : (activeEra === era ? `${ERA_COLORS[era]}15` : "#f9f9f9"),
+                    color: isDark ? (activeEra === era ? ERA_COLORS[era] : "#777") : (activeEra === era ? ERA_COLORS[era] : "#666"),
+                    cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.2s",
+                  }}
+                >
+                  <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: ERA_COLORS[era], marginRight: 4, verticalAlign: "middle" }} />
+                  {ERA_LABELS[era]}
+                </button>
+              ))}
+            </div>
+            </>
           )}
         </div>
       </div>
