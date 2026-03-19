@@ -1724,9 +1724,41 @@ export default function HaritaPage() {
                 <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: "0 0 12px 0", lineHeight: 1.3 }}>
                   {selectedPlace.name}
                 </h2>
-                <p style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px 0" }}>
-                  {selectedPlace.desc}
-                </p>
+                {selectedPlace.longDesc ? (
+                  <div style={{ margin: "0 0 20px 0" }}>
+                    {selectedPlace.longDesc.split("\n\n").slice(0, 2).map((para, i) => (
+                      <p key={i} style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: i === 0 ? 0 : "10px 0 0 0" }}>
+                        {para}
+                      </p>
+                    ))}
+                    <Link
+                      href={`/harita/${placeSlug(selectedPlace.name)}`}
+                      style={{ color: "#FF6D60", fontSize: 13, fontWeight: 500, display: "inline-block", marginTop: 8 }}
+                    >
+                      Devamını oku →
+                    </Link>
+                  </div>
+                ) : (
+                  <p style={{ color: "#999", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px 0" }}>
+                    {selectedPlace.desc}
+                  </p>
+                )}
+                {selectedPlace.funFacts && selectedPlace.funFacts.length > 0 && (
+                  <div style={{
+                    background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)",
+                    borderRadius: 14, padding: "14px 16px", marginBottom: 16,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                      <span style={{ fontSize: 14 }}>💡</span>
+                      <span style={{ color: "#FFB300", fontSize: 12, fontWeight: 700 }}>Biliyor Musun?</span>
+                    </div>
+                    {selectedPlace.funFacts.slice(0, 2).map((fact, i) => (
+                      <p key={i} style={{ color: "rgba(255,179,0,0.8)", fontSize: 12, lineHeight: 1.6, margin: i === 0 ? 0 : "6px 0 0 0" }}>
+                        <span style={{ color: "#FFB300", fontWeight: 700 }}>{i + 1}.</span> {fact}
+                      </p>
+                    ))}
+                  </div>
+                )}
                 {renderCheckInButton(selectedPlace)}
                 {renderDirectionsButton(selectedPlace)}
                 {renderEventsSection()}
@@ -1776,9 +1808,39 @@ export default function HaritaPage() {
           <h3 style={{ color: "#fff", fontSize: 18, fontWeight: 600, margin: "0 0 8px 0", lineHeight: 1.3 }}>
             {selectedPlace.name}
           </h3>
-          <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: "0 0 14px 0" }}>
-            {selectedPlace.desc}
-          </p>
+          {selectedPlace.longDesc ? (
+            <div style={{ margin: "0 0 14px 0" }}>
+              <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                {selectedPlace.longDesc.split("\n\n")[0]}
+              </p>
+              <Link
+                href={`/harita/${placeSlug(selectedPlace.name)}`}
+                style={{ color: "#FF6D60", fontSize: 12, fontWeight: 500, display: "inline-block", marginTop: 6 }}
+              >
+                Devamını oku →
+              </Link>
+            </div>
+          ) : (
+            <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: "0 0 14px 0" }}>
+              {selectedPlace.desc}
+            </p>
+          )}
+          {selectedPlace.funFacts && selectedPlace.funFacts.length > 0 && (
+            <div style={{
+              background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)",
+              borderRadius: 12, padding: "12px 14px", marginBottom: 12,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                <span style={{ fontSize: 13 }}>💡</span>
+                <span style={{ color: "#FFB300", fontSize: 11, fontWeight: 700 }}>Biliyor Musun?</span>
+              </div>
+              {selectedPlace.funFacts.slice(0, 2).map((fact, i) => (
+                <p key={i} style={{ color: "rgba(255,179,0,0.8)", fontSize: 11, lineHeight: 1.5, margin: i === 0 ? 0 : "5px 0 0 0" }}>
+                  <span style={{ color: "#FFB300", fontWeight: 700 }}>{i + 1}.</span> {fact}
+                </p>
+              ))}
+            </div>
+          )}
           {renderCheckInButton(selectedPlace, true)}
           {renderDirectionsButton(selectedPlace, true)}
           {renderEventsSection(true)}
