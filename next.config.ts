@@ -242,7 +242,7 @@ const nextConfig: NextConfig = {
       // ═══════════════════════════════════════════════════════
       // 8. GSC 404 DÜZELTME — anlamsız path combo'ları
       // ═══════════════════════════════════════════════════════
-      { source: "/kvkk/:path*", destination: "/kvkk", permanent: true },
+      { source: "/kvkk/:slug+", destination: "/kvkk", permanent: true },
       { source: "/sepet/:path*", destination: "/atolyeler", permanent: true },
       { source: "/gizlilik-ve-guvenlik/:path*", destination: "/kvkk", permanent: true },
 
