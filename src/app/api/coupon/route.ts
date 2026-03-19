@@ -34,6 +34,21 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
+  // Quiz sonucunu doğrula — sahte skor göndermeyi engelle
+  const verifyQuery = admin
+    .from("quiz_results")
+    .select("id")
+    .eq("quiz_slug", quiz_slug)
+    .eq("score", score);
+
+  if (user_id) verifyQuery.eq("user_id", user_id);
+  else if (user_email) verifyQuery.eq("user_email", user_email);
+
+  const { data: verified } = await verifyQuery.limit(1).maybeSingle();
+  if (!verified) {
+    return NextResponse.json({ error: "Quiz sonucu doğrulanamadı" }, { status: 403 });
+  }
+
   // Check if user already has an active coupon for this quiz+workshop
   if (user_id || user_email) {
     const query = admin
