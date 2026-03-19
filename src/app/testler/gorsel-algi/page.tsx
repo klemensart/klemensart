@@ -274,32 +274,44 @@ export default function GorselAlgiTesti() {
             <div style={{display:"inline-block",background:BRAND.coralLight,color:BRAND.coral,fontSize:11,fontWeight:800,letterSpacing:2,textTransform:"uppercase",padding:"6px 18px",borderRadius:99}}>Sanat Kişilik Analizin Tamamlandı</div>
           </div>
 
-          {/* Hero card — always visible */}
+          {/* Hero card — locked unless email given */}
           <div style={{background:`linear-gradient(135deg, ${r.palette[0]}22, ${r.palette[1]}18, ${r.palette[2]}15)`,borderRadius:28,padding:"44px 32px",textAlign:"center",marginBottom:24,border:`1px solid ${BRAND.border}`,position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",background:`${r.palette[1]}08`,top:-60,right:-40}}/>
             <div style={{position:"absolute",width:120,height:120,borderRadius:"50%",background:`${r.palette[2]}08`,bottom:-30,left:-20}}/>
-            <p style={{fontSize:13,color:BRAND.muted,letterSpacing:1.5,textTransform:"uppercase",margin:"0 0 8px",fontWeight:600}}>Senin Sanat Profilin</p>
-            <h2 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2}}>{r.label}</h2>
-            <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6,maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>&ldquo;{r.tagline}&rdquo;</p>
-            <div style={{display:"flex",justifyContent:"center",gap:8}}>
-              {r.palette.map((c,i)=>(<div key={i} style={{width:40,height:40,borderRadius:99,background:c,border:"3px solid #fff",boxShadow:"0 2px 8px rgba(0,0,0,.1)"}}/>))}
-            </div>
+            <p style={{fontSize:13,color:BRAND.muted,letterSpacing:1.5,textTransform:"uppercase",margin:"0 0 8px",fontWeight:600}}>Sanat Kişilik Analizin Hazır</p>
+            {showFull ? (
+              <>
+                <h2 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2}}>{r.label}</h2>
+                <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6,maxWidth:420,marginLeft:"auto",marginRight:"auto"}}>&ldquo;{r.tagline}&rdquo;</p>
+                <div style={{display:"flex",justifyContent:"center",gap:8}}>
+                  {r.palette.map((c,i)=>(<div key={i} style={{width:40,height:40,borderRadius:99,background:c,border:"3px solid #fff",boxShadow:"0 2px 8px rgba(0,0,0,.1)"}}/>))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 style={{fontSize:"clamp(26px,6vw,38px)",fontWeight:900,color:BRAND.dark,margin:"0 0 16px",letterSpacing:-.5,lineHeight:1.2,filter:"blur(12px)",userSelect:"none"}}>██████ ████</h2>
+                <p style={{fontSize:17,fontStyle:"italic",color:BRAND.warm,margin:"0 0 24px",lineHeight:1.6}}>Sonucun hazır! Görmek için e-postanı gir.</p>
+                <div style={{display:"flex",justifyContent:"center",gap:8}}>
+                  {[BRAND.coral,"#999","#ccc"].map((c,i)=>(<div key={i} style={{width:40,height:40,borderRadius:99,background:c,border:"3px solid #fff",boxShadow:"0 2px 8px rgba(0,0,0,.1)",opacity:.3}}/>))}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Artwork image */}
+          {/* Artwork image — fully locked */}
           <div style={{borderRadius:20,overflow:"hidden",marginBottom:24,border:`1px solid ${BRAND.border}`,position:"relative"}}>
             <Image
               src={img.src}
-              alt={img.alt}
+              alt={showFull ? img.alt : "Sonuç görseli"}
               width={640}
               height={400}
-              style={{width:"100%",height:"auto",display:"block",filter:showFull?"none":"blur(8px)"}}
+              style={{width:"100%",height:"auto",display:"block",filter:showFull?"none":"blur(20px)"}}
             />
             {!showFull && (
-              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,248,245,0.3)"}}>
+              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,248,245,0.5)"}}>
                 <div style={{background:"#fff",borderRadius:99,padding:"10px 24px",boxShadow:"0 2px 12px rgba(0,0,0,.1)",fontSize:14,fontWeight:700,color:BRAND.dark,display:"flex",alignItems:"center",gap:8}}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 6H4a1 1 0 00-1 1v6a1 1 0 001 1h8a1 1 0 001-1V7a1 1 0 00-1-1z" stroke={BRAND.coral} strokeWidth="1.5"/><path d="M5.5 6V4.5a2.5 2.5 0 015 0V6" stroke={BRAND.coral} strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  {r.soulArt}
+                  Sonucu Görmek İçin E-postanı Gir
                 </div>
               </div>
             )}
@@ -312,9 +324,9 @@ export default function GorselAlgiTesti() {
                 <div style={{width:56,height:56,borderRadius:99,background:BRAND.coralLight,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 8l9 6 9-6" stroke={BRAND.coral} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke={BRAND.coral} strokeWidth="2"/></svg>
                 </div>
-                <h3 style={{fontSize:20,fontWeight:800,color:BRAND.dark,margin:"0 0 8px"}}>Detaylı Analizini Gör</h3>
+                <h3 style={{fontSize:20,fontWeight:800,color:BRAND.dark,margin:"0 0 8px"}}>Sonucunu Aç</h3>
                 <p style={{fontSize:15,color:BRAND.warm,margin:0,lineHeight:1.6}}>
-                  Karakter analizi, ruh eşi eserin, süper gücün ve daha fazlası e-postana gelsin.
+                  Sanat profilin, karakter analizin, ruh eşi eserin ve süper gücün seni bekliyor.
                 </p>
               </div>
 
