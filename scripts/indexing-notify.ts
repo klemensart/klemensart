@@ -99,6 +99,23 @@ async function main() {
   } else if (arg === "--all-news") {
     urls = await getAllNews();
     console.log(`Toplam ${urls.length} haber URL'si:\n`);
+  } else if (arg === "--harita") {
+    const { PLACES, ROUTES } = await import("../src/lib/harita-data");
+    const { placeSlug, routeSlug } = await import("../src/lib/harita-gamification");
+    const seen = new Set<string>();
+    // Mekan sayfaları
+    for (const p of PLACES) {
+      const s = placeSlug(p.name);
+      if (!seen.has(s)) { seen.add(s); urls.push(`${BASE}/harita/${s}`); }
+    }
+    // Rota sayfaları
+    for (const r of ROUTES) {
+      const s = routeSlug(r.title);
+      urls.push(`${BASE}/harita/rotalar/${s}`);
+    }
+    // Ana harita sayfası
+    urls.unshift(`${BASE}/harita`);
+    console.log(`Toplam ${urls.length} harita URL'si (${seen.size} mekan + ${ROUTES.length} rota + 1 ana):\n`);
   } else {
     urls = [arg.startsWith("http") ? arg : `${BASE}${arg}`];
   }

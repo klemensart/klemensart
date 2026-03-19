@@ -4,6 +4,7 @@ import { categories } from "@/lib/icerikler";
 import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 import { PLACES, ROUTES } from "@/lib/harita-data";
 import { placeSlug, routeSlug } from "@/lib/harita-gamification";
+import { campaignWeekSlug } from "@/lib/bulten-helpers";
 
 const BASE_URL = "https://klemensart.com";
 
@@ -16,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase.from("articles").select("date").eq("status", "published").order("date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("events").select("event_date").eq("status", "approved").order("event_date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("news_items").select("published_at").eq("status", "published").order("published_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("campaigns").select("id, created_at").eq("is_public", true).order("created_at", { ascending: false }),
+    supabase.from("campaigns").select("id, created_at, template_name").eq("is_public", true).order("created_at", { ascending: false }),
   ]);
 
   const lastArticleDate = latestArticle?.date ? new Date(latestArticle.date) : now;
@@ -109,12 +110,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Public campaign (newsletter archive) pages
-  const campaignPages: MetadataRoute.Sitemap = (publicCampaigns ?? []).map((c) => ({
-    url: `${BASE_URL}/bulten/arsiv/${c.id}`,
-    lastModified: c.created_at ? new Date(c.created_at) : undefined,
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
+  // HaberlerBulteni → SEO-friendly /bulten/[slug], diğerleri → /bulten/arsiv/[id]
+  const campaignPages: MetadataRoute.Sitemap = (publicCampaigns ?? []).map((c) => {
+    const isWeekly = c.template_name === "HaberlerBulteni";
+    return {
+      url: isWeekly
+        ? `${BASE_URL}/bulten/${campaignWeekSlug(c.created_at)}`
+        : `${BASE_URL}/bulten/arsiv/${c.id}`,
+      lastModified: c.created_at ? new Date(c.created_at) : undefined,
+      changeFrequency: isWeekly ? ("weekly" as const) : ("monthly" as const),
+      priority: isWeekly ? 0.6 : 0.5,
+    };
+  });
 
   // Kültür Haritası mekan sayfaları
   const seenSlugs = new Set<string>();

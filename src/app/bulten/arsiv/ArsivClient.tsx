@@ -7,6 +7,7 @@ type Campaign = {
   subject: string;
   template_name: string | null;
   created_at: string;
+  weekSlug?: string | null;
 };
 
 export default function ArsivClient({ campaigns }: { campaigns: Campaign[] }) {
@@ -42,10 +43,13 @@ export default function ArsivClient({ campaigns }: { campaigns: Campaign[] }) {
             <div className="space-y-3">
               {campaigns.map((c) => {
                 const date = new Date(c.created_at);
+                const href = c.weekSlug
+                  ? `/bulten/${c.weekSlug}`
+                  : `/bulten/arsiv/${c.id}`;
                 return (
                   <Link
                     key={c.id}
-                    href={`/bulten/arsiv/${c.id}`}
+                    href={href}
                     className="flex items-center gap-4 border border-warm-200 bg-white rounded-xl px-6 py-4 hover:border-coral/40 hover:shadow-sm transition-all group"
                   >
                     <div className="flex-1 min-w-0">

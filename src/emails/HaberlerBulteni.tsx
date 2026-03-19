@@ -14,6 +14,7 @@ type Props = {
   weekLabel?: string;
   editorialIntro?: string;
   newsItems?: NewsItem[];
+  weekSlug?: string;
 };
 
 export default function HaberlerBulteni({
@@ -27,6 +28,7 @@ export default function HaberlerBulteni({
       source_name: "Artnet",
     },
   ],
+  weekSlug,
 }: Props) {
   return (
     <KlemensLayout preview={`${weekLabel} · ${newsItems.length} haber`}>
@@ -66,8 +68,8 @@ export default function HaberlerBulteni({
         ))}
       </Section>
 
-      <KlemensButton href="https://klemensart.com/haberler">
-        Tüm Haberleri Görün
+      <KlemensButton href={weekSlug ? `https://klemensart.com/bulten/${weekSlug}` : "https://klemensart.com/haberler"}>
+        Bu Haftanın Tüm Haberleri
       </KlemensButton>
 
       {/* Quiz CTA — minimal, zarif */}

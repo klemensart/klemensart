@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase-admin";
 import Link from "next/link";
+import {
+  campaignWeekSlug,
+  extractEmailBody,
+  stripHtmlTags,
+} from "@/lib/bulten-helpers";
 import SignupCTA from "./SignupCTA";
 
 type Params = { params: Promise<{ id: string }> };
@@ -22,13 +27,24 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const campaign = await getCampaign(id);
   if (!campaign) return { title: "Bülten Bulunamadı" };
 
+  // HaberlerBulteni → yeni slug URL'ye yönlendir (canonical)
+  if (campaign.template_name === "HaberlerBulteni") {
+    return {
+      title: campaign.subject,
+      alternates: { canonical: `/bulten/${campaignWeekSlug(campaign.created_at)}` },
+    };
+  }
+
+  const plainText = stripHtmlTags(campaign.html_content);
+  const description = plainText.slice(0, 155) + "…";
+
   return {
     title: `${campaign.subject} — Klemens Art E-Bülten`,
-    description: `Klemens Art e-bülten arşivi: ${campaign.subject}`,
+    description,
     alternates: { canonical: `/bulten/arsiv/${id}` },
     openGraph: {
       title: `${campaign.subject} — Klemens Art`,
-      description: `Klemens Art e-bülten arşivi: ${campaign.subject}`,
+      description,
       url: `https://klemensart.com/bulten/arsiv/${id}`,
     },
   };
@@ -38,6 +54,14 @@ export default async function CampaignViewPage({ params }: Params) {
   const { id } = await params;
   const campaign = await getCampaign(id);
   if (!campaign) notFound();
+
+  // HaberlerBulteni kampanyalarını yeni SEO-friendly URL'ye yönlendir
+  if (campaign.template_name === "HaberlerBulteni") {
+    redirect(`/bulten/${campaignWeekSlug(campaign.created_at)}`);
+  }
+
+  const bodyHtml = extractEmailBody(campaign.html_content);
+  const date = new Date(campaign.created_at);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -49,8 +73,6 @@ export default async function CampaignViewPage({ params }: Params) {
       { "@type": "ListItem", position: 4, name: campaign.subject, item: `https://klemensart.com/bulten/arsiv/${id}` },
     ],
   };
-
-  const date = new Date(campaign.created_at);
 
   return (
     <>
@@ -85,16 +107,27 @@ export default async function CampaignViewPage({ params }: Params) {
           </div>
         </section>
 
-        {/* Content */}
+        {/* Content — real HTML, not iframe */}
         <section className="py-10 px-6">
           <div className="max-w-3xl mx-auto">
             <div className="border border-warm-200 rounded-2xl overflow-hidden bg-[#f7f5f2]">
-              <iframe
-                srcDoc={campaign.html_content}
-                title={campaign.subject}
-                className="w-full border-0"
-                style={{ minHeight: 700 }}
-                sandbox="allow-same-origin"
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    .campaign-body { padding: 24px; }
+                    .campaign-body table { width: 100% !important; max-width: 100% !important; }
+                    .campaign-body td { word-break: break-word; }
+                    .campaign-body img { max-width: 100%; height: auto; }
+                    .campaign-body a { color: #FF6D60; }
+                    @media (max-width: 640px) {
+                      .campaign-body { padding: 16px; }
+                    }
+                  `,
+                }}
+              />
+              <div
+                className="campaign-body"
+                dangerouslySetInnerHTML={{ __html: bodyHtml }}
               />
             </div>
           </div>

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase-admin";
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import { templateRegistry } from "@/lib/email-templates";
+import { campaignWeekSlug } from "@/lib/bulten-helpers";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 function isAuthorized(req: NextRequest) {
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
 
   // 3. Template'i render et
   const weekLabel = getWeekLabel();
+  const weekSlug = campaignWeekSlug(new Date());
   const entry = templateRegistry.HaberlerBulteni;
 
   const templateProps = {
@@ -65,6 +67,7 @@ export async function GET(req: NextRequest) {
       image_url: item.image_url || "",
       source_name: item.source_name || "",
     })),
+    weekSlug,
   };
 
   const emailHtml = await render(entry.component(templateProps));

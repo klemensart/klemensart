@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { campaignWeekSlug } from "@/lib/bulten-helpers";
 import ArsivClient from "./ArsivClient";
 
 export const metadata: Metadata = {
@@ -56,7 +57,15 @@ export default async function ArsivPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <ArsivClient campaigns={campaigns ?? []} />
+      <ArsivClient
+        campaigns={(campaigns ?? []).map((c) => ({
+          ...c,
+          weekSlug:
+            c.template_name === "HaberlerBulteni"
+              ? campaignWeekSlug(c.created_at)
+              : null,
+        }))}
+      />
     </>
   );
 }
