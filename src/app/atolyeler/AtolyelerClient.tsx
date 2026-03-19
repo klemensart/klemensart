@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
+import AnnouncementBar, { useAnnouncementBadges } from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase";
 import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
@@ -122,7 +123,7 @@ function computeStatus(nextSessionDate: string | null | undefined): Status {
   return new Date(nextSessionDate) > new Date() ? "open" : "closed";
 }
 
-function SeriesKart({ w, status }: { w: SeriesWorkshop; status: Status }) {
+function SeriesKart({ w, status, badgeText }: { w: SeriesWorkshop; status: Status; badgeText?: string }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -263,6 +264,22 @@ function SeriesKart({ w, status }: { w: SeriesWorkshop; status: Status }) {
                 }}
               >
                 <VideoIcon /> Zoom
+              </span>
+            )}
+            {badgeText && (
+              <span
+                className="live-pulse"
+                style={{
+                  background: B.coral,
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  letterSpacing: "0.07em",
+                }}
+              >
+                {badgeText}
               </span>
             )}
           </div>
@@ -443,7 +460,7 @@ function TekliKart({ v }: { v: DbSingleVideoCard }) {
 
 /* ─── Kulüp kartı ──────────────────────────────── */
 
-function ClubKart({ club }: { club: ClubItem }) {
+function ClubKart({ club, badgeText }: { club: ClubItem; badgeText?: string }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -542,6 +559,22 @@ function ClubKart({ club }: { club: ClubItem }) {
             >
               <VideoIcon /> Zoom
             </span>
+            {badgeText && (
+              <span
+                className="live-pulse"
+                style={{
+                  background: B.coral,
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  letterSpacing: "0.07em",
+                }}
+              >
+                {badgeText}
+              </span>
+            )}
           </div>
         </div>
 
@@ -656,8 +689,11 @@ export default function AtolyelerClient() {
       });
   }, []);
 
+  const announcementBadges = useAnnouncementBadges("atolyeler");
+
   return (
     <>
+      <AnnouncementBar page="atolyeler" />
       <Navbar />
       <main style={{ background: B.cream, minHeight: "100vh" }}>
 
@@ -717,7 +753,7 @@ export default function AtolyelerClient() {
             }}
           >
             {SERILER.map((w) => (
-              <SeriesKart key={w.slug} w={w} status={statusMap[w.workshopId] ?? "soon"} />
+              <SeriesKart key={w.slug} w={w} status={statusMap[w.workshopId] ?? "soon"} badgeText={announcementBadges[w.slug]} />
             ))}
           </div>
         </section>
@@ -741,7 +777,7 @@ export default function AtolyelerClient() {
             }}
           >
             {KLUBLER.map((club) => (
-              <ClubKart key={club.slug} club={club} />
+              <ClubKart key={club.slug} club={club} badgeText={announcementBadges[club.slug]} />
             ))}
           </div>
         </section>

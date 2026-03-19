@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Hero from "@/components/Hero";
 import Hizmetler from "@/components/Hizmetler";
 import IceriklerSection from "@/components/IceriklerSection";
@@ -47,6 +48,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main>
+      <AnnouncementBar page="homepage" />
       <Navbar />
       <Hero />
       <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>

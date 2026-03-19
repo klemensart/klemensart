@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
           email,
           name,
           source: "meta_leadgen",
+          is_active: true,
         });
       }
 
