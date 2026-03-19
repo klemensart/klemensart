@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -40,6 +40,10 @@ async function fetchNextSessionDate(workshopId: string): Promise<string | null> 
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+
+  // Sinema kulübü slug'ları bu dynamic route'tan servis edilmez
+  if (slug.startsWith("sinema-klubu")) return {};
+
   const meta: Record<string, { title: string; description: string }> = {
     "sanat-tarihinde-duygular": {
       title: "Sanat Tarihinde Duygular",
@@ -75,6 +79,10 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function AtolyeDetayPage({ params }: Props) {
   const { slug } = await params;
+
+  // Sinema kulübü alt slug'ları → ana sayfaya yönlendir
+  if (slug.startsWith("sinema-klubu")) redirect("/atolyeler/sinema-klubu");
+
   const config = SLUG_TO_ATOLYE[slug];
   if (!config) notFound();
 

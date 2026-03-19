@@ -94,6 +94,29 @@ const SERILER: SeriesWorkshop[] = [
   },
 ];
 
+/* ─── Kulüpler ─────────────────────────────────────── */
+
+type ClubItem = {
+  slug: string;
+  title: string;
+  description: string;
+  frequency: string;
+  priceRange: string;
+  imgSquare: string | null;
+};
+
+const KLUBLER: ClubItem[] = [
+  {
+    slug: "sinema-klubu",
+    title: "Sinema Kulübü",
+    description:
+      "Sinema topluluğumuzla ayda bir Zoom'da buluşuyoruz. Film analizleri, tartışmalar ve derinlemesine sinema sohbetleri.",
+    frequency: "Ayda 1 · Zoom",
+    priceRange: "150 – 3.600 TL",
+    imgSquare: null,
+  },
+];
+
 function computeStatus(nextSessionDate: string | null | undefined): Status {
   if (!nextSessionDate) return "soon";
   return new Date(nextSessionDate) > new Date() ? "open" : "closed";
@@ -418,6 +441,173 @@ function TekliKart({ v }: { v: DbSingleVideoCard }) {
   );
 }
 
+/* ─── Kulüp kartı ──────────────────────────────── */
+
+function ClubKart({ club }: { club: ClubItem }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link href={`/atolyeler/${club.slug}`} style={{ textDecoration: "none" }}>
+      <article
+        style={{
+          background: "#fff",
+          borderRadius: 18,
+          overflow: "hidden",
+          boxShadow: hovered
+            ? "0 20px 48px rgba(0,0,0,0.16), 0 8px 20px rgba(0,0,0,0.08)"
+            : "0 2px 14px rgba(0,0,0,0.06)",
+          transform: hovered ? "translateY(-4px)" : "translateY(0)",
+          transition: "box-shadow 0.3s ease, transform 0.3s ease",
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {/* Görsel / Gradient */}
+        <div
+          style={{
+            position: "relative",
+            aspectRatio: "16/7",
+            overflow: "hidden",
+            background:
+              "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #1a1a2e 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <span
+            style={{
+              color: "rgba(255,255,255,0.25)",
+              fontSize: 48,
+            }}
+          >
+            🎬
+          </span>
+
+          {/* Overlay gradient */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(to top, rgba(45,41,38,0.38) 0%, transparent 55%)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Badge */}
+          <div
+            style={{
+              position: "absolute",
+              top: 14,
+              left: 14,
+              display: "flex",
+              gap: 7,
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                background: "#22c55e",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: 20,
+                letterSpacing: "0.07em",
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              ● KAYIT AÇIK
+            </span>
+            <span
+              style={{
+                background: "rgba(255,255,255,0.18)",
+                backdropFilter: "blur(6px)",
+                color: "#fff",
+                fontSize: 10,
+                fontWeight: 600,
+                padding: "3px 8px",
+                borderRadius: 20,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                letterSpacing: "0.04em",
+              }}
+            >
+              <VideoIcon /> Zoom
+            </span>
+          </div>
+        </div>
+
+        {/* İçerik */}
+        <div
+          style={{
+            padding: "24px 26px 22px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 0,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              color: B.dark,
+              margin: "0 0 8px",
+              lineHeight: 1.25,
+            }}
+          >
+            {club.title}
+          </h2>
+          <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.7, margin: "0 0 18px" }}>
+            {club.description}
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingTop: 16,
+              borderTop: `1px solid ${B.light}`,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={{ color: B.warm, fontSize: 13 }}>{club.frequency}</span>
+              <span
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: B.coral,
+                }}
+              >
+                {club.priceRange}
+              </span>
+            </div>
+            <span
+              style={{
+                color: B.coral,
+                fontSize: 13,
+                fontWeight: 700,
+                opacity: hovered ? 1 : 0.8,
+                transition: "opacity 0.15s",
+              }}
+            >
+              Detayları Gör →
+            </span>
+          </div>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
 /* ─── Ana Sayfa ───────────────────────────────── */
 
 export default function AtolyelerClient() {
@@ -532,7 +722,31 @@ export default function AtolyelerClient() {
           </div>
         </section>
 
-        {/* ═══ BÖLÜM 2: Tekli Oturumlar ════════════════════ */}
+        {/* ═══ BÖLÜM 2: Kulüpler ════════════════════════════ */}
+        <section style={{ maxWidth: 920, margin: "0 auto", padding: "0 24px 72px" }}>
+          <div style={{ marginBottom: 28 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: B.dark, margin: "0 0 6px" }}>
+              Kulüpler
+            </h2>
+            <p style={{ color: B.warm, fontSize: 14, margin: 0 }}>
+              Aylık Zoom buluşmalarıyla süregelen topluluklar
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))",
+              gap: 22,
+            }}
+          >
+            {KLUBLER.map((club) => (
+              <ClubKart key={club.slug} club={club} />
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ BÖLÜM 3: Tekli Oturumlar ════════════════════ */}
         <section
           style={{
             maxWidth: 920,
