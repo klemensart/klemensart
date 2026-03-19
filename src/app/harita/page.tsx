@@ -723,7 +723,18 @@ export default function HaritaPage() {
       const marker = Leaf.marker([place.lat, place.lng], { icon });
       marker.on("click", () => {
         selectPlace(place);
-        map.flyTo([place.lat, place.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
+        const zoom = Math.max(map.getZoom(), 15);
+        // Mobilde: haritayı yukarı kaydır ki marker alt panelin üstünde kalsın
+        const isMob = window.innerWidth <= 640;
+        if (isMob) {
+          const panelH = window.innerHeight * 0.5; // alt panel ~%50
+          const targetPoint = map.project([place.lat, place.lng], zoom);
+          targetPoint.y += panelH / 2; // marker'ı panel üstüne taşı
+          const offsetLatLng = map.unproject(targetPoint, zoom);
+          map.flyTo(offsetLatLng, zoom, { duration: 0.6 });
+        } else {
+          map.flyTo([place.lat, place.lng], zoom, { duration: 0.6 });
+        }
       });
       marker.addTo(map);
       markersRef.current.push(marker);
