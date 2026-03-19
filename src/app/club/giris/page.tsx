@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
 export default function GirisPage() {
   const supabase = createClient();
   const router = useRouter();
+
+  // Zaten giriş yapmışsa profil'e yönlendir (Google OAuth callback sonrası güvenlik ağı)
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) router.replace("/club/profil");
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session) router.replace("/club/profil");
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);

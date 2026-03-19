@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import type { CookieOptions } from "@supabase/ssr";
 
 /**
  * PKCE callback — server-side kod değişimi.
@@ -18,6 +19,10 @@ export async function GET(request: Request) {
 
   if (code) {
     const cookieStore = await cookies();
+
+    // Cookie'leri ayrı bir listede tut — redirect response'a açıkça eklemek için
+    const pendingCookies: { name: string; value: string; options: CookieOptions }[] = [];
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,6 +30,7 @@ export async function GET(request: Request) {
         cookies: {
           getAll: () => cookieStore.getAll(),
           setAll: (toSet) => {
+            pendingCookies.push(...toSet);
             try {
               toSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
@@ -40,6 +46,20 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Şifre sıfırlama ise özel sayfaya yönlendir
+      const type = searchParams.get("type");
+      const redirectUrl =
+        type === "recovery"
+          ? `${origin}/auth/sifre-belirle`
+          : `${origin}${next}`;
+
+      const response = NextResponse.redirect(redirectUrl);
+
+      // Session cookie'lerini redirect response'a açıkça ekle
+      pendingCookies.forEach(({ name, value, options }) => {
+        response.cookies.set(name, value, options);
+      });
+
       // Satın alma taşıma (anonim → üye)
       try {
         await fetch(`${origin}/api/auth/migrate-purchases`, {
@@ -50,13 +70,7 @@ export async function GET(request: Request) {
         // Başarısız olsa bile devam et
       }
 
-      // Şifre sıfırlama ise özel sayfaya yönlendir
-      const type = searchParams.get("type");
-      if (type === "recovery") {
-        return NextResponse.redirect(`${origin}/auth/sifre-belirle`);
-      }
-
-      return NextResponse.redirect(`${origin}${next}`);
+      return response;
     }
   }
 
