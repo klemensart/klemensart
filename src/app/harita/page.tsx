@@ -727,9 +727,9 @@ export default function HaritaPage() {
         // Mobilde: haritayı yukarı kaydır ki marker alt panelin üstünde kalsın
         const isMob = window.innerWidth <= 640;
         if (isMob) {
-          const panelH = window.innerHeight * 0.5; // alt panel ~%50
+          const panelH = window.innerHeight * 0.45; // alt panel ~%45
           const targetPoint = map.project([place.lat, place.lng], zoom);
-          targetPoint.y += panelH / 2; // marker'ı panel üstüne taşı
+          targetPoint.y += panelH / 3; // marker'ı panelin hemen üstüne konumla
           const offsetLatLng = map.unproject(targetPoint, zoom);
           map.flyTo(offsetLatLng, zoom, { duration: 0.6 });
         } else {
