@@ -20,11 +20,35 @@ export const metadata: Metadata = {
   description:
     "400 kişilik sinema kulübümüze katılın. Ayda 1 Zoom buluşma, 90 dakika derinlemesine sinema sohbeti. Tekli veya yıllık paket seçenekleriyle.",
   alternates: { canonical: "/atolyeler/sinema-klubu" },
+  keywords: [
+    "sinema kulübü",
+    "film analizi",
+    "sinema sohbeti",
+    "film tartışması",
+    "zoom sinema",
+    "klemens art",
+    "online sinema kulübü",
+  ],
   openGraph: {
     title: "Sinema Kulübü — Klemens Art",
     description:
       "Ayda 1 Zoom buluşma, 90 dakika derinlemesine sinema sohbeti.",
     url: "https://klemensart.com/atolyeler/sinema-klubu",
+    type: "website",
+    images: [
+      {
+        url: "/api/og?title=Sinema%20Kul%C3%BCb%C3%BC&subtitle=Ayda%201%20Zoom%20bulu%C5%9Fma%2C%2090%20dakika%20sinema%20sohbeti&category=Sinema",
+        width: 1200,
+        height: 630,
+        alt: "Sinema Kulübü — Klemens Art",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sinema Kulübü — Klemens Art",
+    description:
+      "Ayda 1 Zoom buluşma, 90 dakika derinlemesine sinema sohbeti.",
   },
 };
 

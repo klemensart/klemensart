@@ -40,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/sergi/en-sessiz-zaman`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/ronesans-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler/modern-sanat-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/atolyeler/sinema-klubu`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/rehber`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/bulten`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/bulten/arsiv`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.6 },
@@ -53,15 +54,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Workshop detail pages
-  const workshopPages: MetadataRoute.Sitemap = Object.keys(SLUG_TO_ATOLYE).map(
-    (slug) => ({
+  // Workshop detail pages (sinema-klubu alt slug'ları hariç — onlar redirect veriyor)
+  const workshopPages: MetadataRoute.Sitemap = Object.keys(SLUG_TO_ATOLYE)
+    .filter((slug) => !slug.startsWith("sinema-klubu"))
+    .map((slug) => ({
       url: `${BASE_URL}/atolyeler/${slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
-    })
-  );
+    }));
 
   // Dynamic article pages from Supabase
   const { data: articles } = await supabase
