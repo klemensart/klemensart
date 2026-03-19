@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PLACES, ROUTES, TYPE_LABELS } from "@/lib/harita-data";
+import { placeSlug } from "@/lib/harita-gamification";
 
 export const metadata: Metadata = {
   title: "Kültür Haritası",
@@ -47,6 +48,7 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
         "@type": "TouristAttraction",
         name: p.name,
         description: p.desc,
+        url: `https://klemensart.com/harita/${placeSlug(p.name)}`,
         geo: {
           "@type": "GeoCoordinates",
           latitude: p.lat,
@@ -138,7 +140,10 @@ export default function HaritaLayout({ children }: { children: React.ReactNode }
         <ul>
           {PLACES.map((p, i) => (
             <li key={`${p.name}-${i}`}>
-              <strong>{p.name}</strong> ({TYPE_LABELS[p.type]}) — {p.desc}
+              <a href={`/harita/${placeSlug(p.name)}`}>
+                <strong>{p.name}</strong>
+              </a>{" "}
+              ({TYPE_LABELS[p.type]}) — {p.desc}
             </li>
           ))}
         </ul>

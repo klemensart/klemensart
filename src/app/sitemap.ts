@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { categories } from "@/lib/icerikler";
 import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
+import { PLACES } from "@/lib/harita-data";
+import { placeSlug } from "@/lib/harita-gamification";
 
 const BASE_URL = "https://klemensart.com";
 
@@ -114,6 +116,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
+  // Kültür Haritası mekan sayfaları
+  const seenSlugs = new Set<string>();
+  const placePages: MetadataRoute.Sitemap = PLACES
+    .map((p) => {
+      const s = placeSlug(p.name);
+      if (seenSlugs.has(s)) return null;
+      seenSlugs.add(s);
+      return {
+        url: `${BASE_URL}/harita/${s}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      };
+    })
+    .filter(Boolean) as MetadataRoute.Sitemap;
+
   return [
     ...staticPages,
     ...categoryPages,
@@ -122,5 +140,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...eventPages,
     ...newsPages,
     ...campaignPages,
+    ...placePages,
   ];
 }
