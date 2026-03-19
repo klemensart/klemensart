@@ -17,15 +17,8 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/club/profil";
 
-  console.log("[auth/callback] origin:", origin, "code:", code ? "YES" : "NO");
-
   if (code) {
     const cookieStore = await cookies();
-    const allCookies = cookieStore.getAll();
-    console.log(
-      "[auth/callback] request cookies:",
-      allCookies.map((c) => c.name)
-    );
 
     // Cookie'leri ayrı bir listede tut — redirect response'a açıkça eklemek için
     const pendingCookies: { name: string; value: string; options: CookieOptions }[] = [];
@@ -37,17 +30,13 @@ export async function GET(request: Request) {
         cookies: {
           getAll: () => cookieStore.getAll(),
           setAll: (toSet) => {
-            console.log(
-              "[auth/callback] setAll called, cookies:",
-              toSet.map((c) => c.name)
-            );
             pendingCookies.push(...toSet);
             try {
               toSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
               );
-            } catch (e) {
-              console.error("[auth/callback] cookieStore.set error:", e);
+            } catch {
+              // Edge case: Server Component context
             }
           },
         },
@@ -56,11 +45,7 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (error) {
-      console.error("[auth/callback] exchangeCodeForSession FAILED:", error.message, error.status);
-    } else {
-      console.log("[auth/callback] exchangeCodeForSession SUCCESS, pendingCookies:", pendingCookies.length);
-
+    if (!error) {
       // Şifre sıfırlama ise özel sayfaya yönlendir
       const type = searchParams.get("type");
       const redirectUrl =
@@ -75,8 +60,6 @@ export async function GET(request: Request) {
         response.cookies.set(name, value, options);
       });
 
-      console.log("[auth/callback] redirecting to:", redirectUrl);
-
       // Satın alma taşıma (anonim → üye)
       try {
         await fetch(`${origin}/api/auth/migrate-purchases`, {
@@ -89,11 +72,8 @@ export async function GET(request: Request) {
 
       return response;
     }
-  } else {
-    console.error("[auth/callback] NO code in URL, searchParams:", Object.fromEntries(searchParams));
   }
 
   // Kod yoksa veya hata varsa → giriş sayfasına
-  console.log("[auth/callback] falling back to /club/giris");
   return NextResponse.redirect(`${origin}/club/giris`);
 }
