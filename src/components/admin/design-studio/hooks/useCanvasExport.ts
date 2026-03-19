@@ -14,10 +14,12 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
       stage.scaleX(1);
       stage.scaleY(1);
 
+      // pixelRatio: 1 — 1080×1920 çıktı, Instagram Story için ideal boyut.
+      // pixelRatio: 2 gereksiz 2160×3840 üretiyordu → Instagram işleme sorunları.
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
-        pixelRatio: 2,
+        pixelRatio: 1,
       });
 
       stage.scaleX(prevScaleX);

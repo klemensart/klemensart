@@ -101,13 +101,23 @@ export default function Toolbar({ stageRef, onSave, saving }: Props) {
           </button>
 
           {showExport && (
-            <div className="absolute top-full right-0 mt-1 bg-white border border-warm-100 rounded-xl shadow-lg py-1 z-50 min-w-[140px]">
+            <div className="absolute top-full right-0 mt-1 bg-white border border-warm-100 rounded-xl shadow-lg py-1 z-50 min-w-[180px]">
+              <button
+                onClick={() => {
+                  downloadImage(designName, "jpeg");
+                  setShowExport(false);
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-warm-900 hover:bg-warm-50 transition-colors font-medium"
+              >
+                Instagram Story (JPG)
+              </button>
+              <hr className="my-1 border-warm-100" />
               <button
                 onClick={() => {
                   downloadImage(designName, "png");
                   setShowExport(false);
                 }}
-                className="w-full text-left px-4 py-2.5 text-sm text-warm-900 hover:bg-warm-50 transition-colors"
+                className="w-full text-left px-4 py-2.5 text-sm text-warm-900/60 hover:bg-warm-50 transition-colors"
               >
                 PNG olarak indir
               </button>
@@ -116,7 +126,7 @@ export default function Toolbar({ stageRef, onSave, saving }: Props) {
                   downloadImage(designName, "jpeg");
                   setShowExport(false);
                 }}
-                className="w-full text-left px-4 py-2.5 text-sm text-warm-900 hover:bg-warm-50 transition-colors"
+                className="w-full text-left px-4 py-2.5 text-sm text-warm-900/60 hover:bg-warm-50 transition-colors"
               >
                 JPG olarak indir
               </button>
