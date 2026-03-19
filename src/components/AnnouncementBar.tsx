@@ -114,7 +114,7 @@ export default function AnnouncementBar({ page }: { page: string }) {
         <span
           className={`text-center transition-opacity duration-300 ${fading ? "opacity-0" : "opacity-100"}`}
         >
-          <span className="live-pulse inline-block w-1.5 h-1.5 rounded-full bg-white/80 mr-2 align-middle" />
+          <span className="live-pulse inline-block w-1.5 h-1.5 rounded-full bg-green-300 mr-2 align-middle" />
           {current.title}
           {current.link_url && (
             <>
