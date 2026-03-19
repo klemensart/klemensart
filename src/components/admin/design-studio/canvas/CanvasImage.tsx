@@ -18,7 +18,14 @@ export default function CanvasImage({ obj }: { obj: CanvasObject }) {
     img.crossOrigin = "anonymous";
     img.src = obj.src;
     img.onload = () => {
-      setImage(img);
+      // Progressive JPEG'lerde onload tetiklense de piksel verisi
+      // henüz decode edilmemiş olabiliyor → canvas export'u siyah çıkıyor.
+      // decode() tüm scan'ler bitene kadar bekler.
+      if (typeof img.decode === "function") {
+        img.decode().then(() => setImage(img)).catch(() => setImage(img));
+      } else {
+        setImage(img);
+      }
     };
   }, [obj.src]);
 

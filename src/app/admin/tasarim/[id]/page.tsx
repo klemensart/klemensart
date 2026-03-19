@@ -59,7 +59,7 @@ export default function DesignEditorPage() {
     try {
       // Generate thumbnail
       let thumbnailUrl: string | undefined;
-      const thumbData = getThumbnail(400);
+      const thumbData = await getThumbnail(400);
       if (thumbData) {
         // Upload thumbnail to Supabase
         const { createClient } = await import("@/lib/supabase");

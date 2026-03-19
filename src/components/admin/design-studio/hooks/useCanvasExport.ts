@@ -1,11 +1,36 @@
 import { useCallback } from "react";
 import type Konva from "konva";
 
+/**
+ * Canvas'taki tüm Image node'larının piksel verisinin decode edilmiş
+ * olduğunu garanti eder. Progressive JPEG'lerde onload tetiklense de
+ * piksel verisi hazır olmayabiliyor → toDataURL() siyah çıkıyor.
+ */
+async function waitForAllImages(stage: Konva.Stage) {
+  const images = stage.find("Image") as Konva.Image[];
+  const promises: Promise<void>[] = [];
+
+  for (const img of images) {
+    const htmlImg = img.image() as HTMLImageElement | undefined;
+    if (htmlImg && typeof htmlImg.decode === "function") {
+      promises.push(htmlImg.decode().catch(() => {}));
+    }
+  }
+
+  if (promises.length > 0) {
+    await Promise.all(promises);
+    stage.batchDraw();
+  }
+}
+
 export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
   const exportImage = useCallback(
-    (format: "png" | "jpeg" = "png", quality = 1) => {
+    async (format: "png" | "jpeg" = "png", quality = 1) => {
       const stage = stageRef.current;
       if (!stage) return null;
+
+      // Tüm görsellerin tamamen decode olmasını bekle
+      await waitForAllImages(stage);
 
       // Scale'i geçici olarak 1'e çek — aksi halde
       // içerik küçültülmüş hâliyle export edilir (sol üst köşeye sıkışır)
@@ -15,7 +40,6 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
       stage.scaleY(1);
 
       // pixelRatio: 1 — 1080×1920 çıktı, Instagram Story için ideal boyut.
-      // pixelRatio: 2 gereksiz 2160×3840 üretiyordu → Instagram işleme sorunları.
       const uri = stage.toDataURL({
         mimeType: format === "png" ? "image/png" : "image/jpeg",
         quality,
@@ -32,8 +56,8 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
   );
 
   const downloadImage = useCallback(
-    (filename: string, format: "png" | "jpeg" = "png") => {
-      const uri = exportImage(format, format === "jpeg" ? 0.95 : 1);
+    async (filename: string, format: "png" | "jpeg" = "png") => {
+      const uri = await exportImage(format, format === "jpeg" ? 0.95 : 1);
       if (!uri) return;
       const link = document.createElement("a");
       link.download = `${filename}.${format === "jpeg" ? "jpg" : "png"}`;
@@ -46,9 +70,11 @@ export function useCanvasExport(stageRef: React.RefObject<Konva.Stage | null>) {
   );
 
   const getThumbnail = useCallback(
-    (maxSize = 400) => {
+    async (maxSize = 400) => {
       const stage = stageRef.current;
       if (!stage) return null;
+
+      await waitForAllImages(stage);
 
       const prevScaleX = stage.scaleX();
       const prevScaleY = stage.scaleY();
