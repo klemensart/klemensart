@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import CookieConsent from "@/components/CookieConsent";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import PageTracker from "@/components/PageTracker";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -145,6 +146,7 @@ export default function RootLayout({
         {children}
         <CookieConsent />
         <GoogleAnalytics />
+        <PageTracker />
         <SpeedInsights />
         <Analytics />
       </body>

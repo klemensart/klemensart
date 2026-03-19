@@ -14,9 +14,111 @@ export async function GET(req: NextRequest) {
 
   const days = Number(req.nextUrl.searchParams.get("days") || "30");
   const workshopId = req.nextUrl.searchParams.get("workshopId");
+  const tab = req.nextUrl.searchParams.get("tab");
 
   const admin = createAdminClient();
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+  // ─── Sayfa Ziyaretleri Tab ───
+  if (tab === "pageviews") {
+    const { data: pageViews } = await admin
+      .from("user_events")
+      .select("*")
+      .eq("event_type", "page_view")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+
+    const { data: pageLeaves } = await admin
+      .from("user_events")
+      .select("*")
+      .eq("event_type", "page_leave")
+      .gte("created_at", since)
+      .limit(5000);
+
+    const views = pageViews ?? [];
+    const leaves = pageLeaves ?? [];
+
+    // page_view_id → page_leave eşleştir
+    const leaveMap = new Map<string, { duration_ms: number }>();
+    for (const l of leaves) {
+      const pvId = l.metadata?.page_view_id;
+      if (pvId) leaveMap.set(pvId, { duration_ms: l.metadata.duration_ms ?? 0 });
+    }
+
+    // user_id → e-posta eşleştir
+    const pvUserIds = new Set<string>();
+    for (const v of views) {
+      if (v.user_id) pvUserIds.add(v.user_id);
+    }
+    const pvUserEmails = new Map<string, string>();
+    if (pvUserIds.size > 0) {
+      const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      for (const u of usersData?.users ?? []) {
+        if (pvUserIds.has(u.id) && u.email) {
+          pvUserEmails.set(u.id, u.email);
+        }
+      }
+    }
+
+    // Path bazlı agregasyon
+    const pathStats = new Map<string, { views: number; uniqueIds: Set<string>; durations: number[] }>();
+    for (const v of views) {
+      const path = v.metadata?.path || "/";
+      const pvId = v.metadata?.page_view_id;
+      const uid = v.user_id || v.anonymous_id || "unknown";
+
+      if (!pathStats.has(path)) {
+        pathStats.set(path, { views: 0, uniqueIds: new Set(), durations: [] });
+      }
+      const stat = pathStats.get(path)!;
+      stat.views++;
+      stat.uniqueIds.add(uid);
+
+      if (pvId && leaveMap.has(pvId)) {
+        stat.durations.push(leaveMap.get(pvId)!.duration_ms);
+      }
+    }
+
+    const topPages = [...pathStats.entries()]
+      .map(([path, s]) => ({
+        path,
+        views: s.views,
+        unique: s.uniqueIds.size,
+        avg_duration_ms: s.durations.length > 0
+          ? Math.round(s.durations.reduce((a, b) => a + b, 0) / s.durations.length)
+          : null,
+      }))
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 50);
+
+    // Toplam istatistikler
+    const allUniqueIds = new Set<string>();
+    for (const v of views) {
+      allUniqueIds.add(v.user_id || v.anonymous_id || "unknown");
+    }
+
+    // Son 100 bireysel ziyaret
+    const recentVisits = views.slice(0, 100).map((v) => {
+      const pvId = v.metadata?.page_view_id;
+      const leave = pvId ? leaveMap.get(pvId) : null;
+      return {
+        path: v.metadata?.path || "/",
+        referrer: v.metadata?.referrer || null,
+        user_id: v.user_id || v.anonymous_id || null,
+        email: v.user_id ? pvUserEmails.get(v.user_id) || null : null,
+        duration_ms: leave?.duration_ms ?? null,
+        created_at: v.created_at,
+      };
+    });
+
+    return NextResponse.json({
+      totalViews: views.length,
+      uniqueVisitors: allUniqueIds.size,
+      topPages,
+      recentVisits,
+    });
+  }
 
   let query = admin
     .from("user_events")

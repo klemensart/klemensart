@@ -28,6 +28,59 @@ function getAnonymousId(): string {
   return id;
 }
 
+export function trackPageView(path: string, referrer?: string): string | null {
+  if (!hasConsent()) return null;
+
+  const pageViewId = crypto.randomUUID();
+  try {
+    const body = {
+      event_type: "page_view",
+      anonymous_id: getAnonymousId(),
+      metadata: { page_view_id: pageViewId, path, referrer: referrer || null },
+    };
+
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // sessizce yut
+  }
+  return pageViewId;
+}
+
+export function trackPageLeave(
+  pageViewId: string,
+  path: string,
+  durationMs: number,
+): void {
+  if (!hasConsent()) return;
+  if (durationMs < 500) return; // bounce noise filtrele
+
+  const body = JSON.stringify({
+    event_type: "page_leave",
+    anonymous_id: getAnonymousId(),
+    metadata: { page_view_id: pageViewId, path, duration_ms: Math.round(durationMs) },
+  });
+
+  // sendBeacon tercih — sayfa kapanırken güvenilir
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(
+      "/api/track",
+      new Blob([body], { type: "application/json" }),
+    );
+  } else {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    }).catch(() => {});
+  }
+}
+
 export function trackEvent(
   eventType: string,
   data?: {

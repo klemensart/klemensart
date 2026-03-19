@@ -6,6 +6,8 @@ const ALLOWED_EVENTS = new Set([
   "add_to_cart",
   "checkout_start",
   "checkout_complete",
+  "page_view",
+  "page_leave",
 ]);
 
 export async function POST(req: NextRequest) {
