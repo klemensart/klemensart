@@ -76,6 +76,15 @@ export function findPlaceBySlug(slug: string) {
   return PLACES.find((p) => placeSlug(p.name) === slug) ?? null;
 }
 
+/* ─── Route lookup ─── */
+export function routeSlug(title: string): string {
+  return placeSlug(title);
+}
+
+export function findRouteBySlug(slug: string) {
+  return ROUTES.find((r) => routeSlug(r.title) === slug) ?? null;
+}
+
 /* ─── Route completion check ─── */
 export function checkRouteCompletion(
   visitedSlugs: Set<string>,

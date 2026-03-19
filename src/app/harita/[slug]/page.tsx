@@ -86,22 +86,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const metaDesc = place.longDesc ? place.longDesc.slice(0, 155) + "…" : place.desc;
   const description = `${metaDesc} ${typeLabel} — Ankara kültür haritasında keşfet.`;
 
+  // Dinamik OG image
+  const ogImageUrl = `/api/og?${new URLSearchParams({ title: place.name, subtitle: place.desc, category: typeLabel })}`;
+
+  // Era-bazlı zengin keywords
+  const eraKeywords = place.era
+    ? (Array.isArray(place.era) ? place.era : [place.era]).map((e) => ERA_LABELS[e])
+    : [];
+  const keywords = [
+    place.name,
+    typeLabel,
+    `Ankara ${typeLabel.toLowerCase()}`,
+    "Ankara",
+    "kültür haritası",
+    "gezilecek yerler",
+    ...eraKeywords,
+    ...(place.type === "müze" ? ["Ankara müzeleri"] : []),
+    ...(place.type === "tarihi" || place.type === "miras" ? ["tarihi yerler Ankara"] : []),
+    ...(place.type === "mimari" ? ["Ankara mimari", "tarihi yapılar"] : []),
+    ...(place.type === "doğa" ? ["Ankara parkları", "doğa"] : []),
+    ...(place.type === "gastronomi" ? ["Ankara yemek kültürü", "lezzetler"] : []),
+  ];
+
   return {
     title: place.name,
     description,
-    keywords: [place.name, typeLabel, "Ankara", "kültür haritası", "gezilecek yerler"],
+    keywords,
     alternates: { canonical: `/harita/${slug}` },
     openGraph: {
       title,
       description,
       url: `https://klemensart.com/harita/${slug}`,
-      images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: `${place.name} — ${typeLabel}` }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/logos/logo-wide-dark.PNG"],
+      images: [ogImageUrl],
     },
   };
 }
@@ -135,6 +157,7 @@ export default async function MekanDetayPage({ params }: Props) {
     "@type": "TouristAttraction",
     name: place.name,
     description: place.longDesc || place.desc,
+    image: `https://klemensart.com/api/og?${new URLSearchParams({ title: place.name, subtitle: place.desc, category: typeLabel })}`,
     geo: {
       "@type": "GeoCoordinates",
       latitude: place.lat,
