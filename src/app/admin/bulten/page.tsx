@@ -204,6 +204,7 @@ const TEMPLATES: TemplateConfig[] = [
     defaultSubject: "Haftanın Kültür Sanat Gündemi — Klemens Art",
     fields: [
       { key: "weekLabel", label: "Hafta Etiketi", type: "text" },
+      { key: "weekSlug", label: "Hafta Slug (ör: 16-mart-2026)", type: "text" },
       { key: "editorialIntro", label: "Giriş Yazısı", type: "textarea" },
       {
         key: "newsItems",
@@ -220,6 +221,7 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     defaults: {
       weekLabel: "",
+      weekSlug: "",
       editorialIntro: "Bu hafta kültür-sanat dünyasından öne çıkan gelişmeleri sizin için derledik.",
       newsItems: [],
     },
@@ -632,7 +634,7 @@ export default function BultenGonderPage() {
               source_name: item.source_name || "",
             })
           );
-          // Auto week label (Pazartesi–Pazar, bugünü içeren hafta)
+          // Auto week label + slug (Pazartesi–Pazar, bugünü içeren hafta)
           const now = new Date();
           const day = now.getDay(); // 0=Pazar
           const mondayOffset = day === 0 ? -6 : 1 - day;
@@ -643,7 +645,11 @@ export default function BultenGonderPage() {
           const fmt = (d: Date) => `${d.getDate()} ${d.toLocaleDateString("tr-TR", { month: "long" })}`;
           const weekLabel = `${fmt(weekStart)}–${fmt(weekEnd)} ${now.getFullYear()}`;
 
-          setTemplateProps((prev) => ({ ...prev, newsItems, weekLabel }));
+          // weekSlug: "16-mart-2026" formatında — e-postadaki buton linki için
+          const monthNames = ["ocak","subat","mart","nisan","mayis","haziran","temmuz","agustos","eylul","ekim","kasim","aralik"];
+          const weekSlug = `${weekStart.getDate()}-${monthNames[weekStart.getMonth()]}-${weekStart.getFullYear()}`;
+
+          setTemplateProps((prev) => ({ ...prev, newsItems, weekLabel, weekSlug }));
           setMessage(`${newsItems.length} haber otomatik yüklendi.`);
         }
       } catch {
