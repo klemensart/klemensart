@@ -621,11 +621,9 @@ export default function BultenGonderPage() {
         const res = await fetch("/api/admin/news?status=published");
         const data = await res.json();
         if (data.items) {
-          // Sadece henüz bültene eklenmemiş haberleri al
-          const unsent = data.items.filter(
-            (item: { sent_in_newsletter?: boolean }) => !item.sent_in_newsletter
-          );
-          const newsItems = (unsent.length > 0 ? unsent : data.items.slice(0, 10)).map(
+          // Tüm yayınlanmış haberleri yükle (sent_in_newsletter filtresi kaldırıldı —
+          // kullanıcı admin panelden istediğini seçebilsin)
+          const newsItems = data.items.map(
             (item: { title: string; summary: string; url: string; image_url?: string; source_name?: string }) => ({
               title: item.title || "",
               summary: item.summary || "",

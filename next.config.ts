@@ -58,6 +58,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       // ═══════════════════════════════════════════════════════
+      // 0. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
+      // ═══════════════════════════════════════════════════════
+      { source: "/haberler", destination: "/bulten/arsiv", permanent: true },
+      { source: "/haberler/:slug", destination: "/bulten/arsiv", permanent: true },
+      { source: "/haberler/rss", destination: "/bulten/arsiv", permanent: true },
+
+      // ═══════════════════════════════════════════════════════
       // 1. YAZILAR — WordPress bare-slug → /icerikler/yazi/slug
       // ═══════════════════════════════════════════════════════
 

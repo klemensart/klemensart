@@ -24,7 +24,7 @@ export default function HaberlerBulteni({
     {
       title: "İstanbul Modern Yeni Sergisiyle Kapılarını Açtı",
       summary: "Müze, çağdaş Türk sanatının son on yılına odaklanan kapsamlı bir seçkiyle ziyaretçilerini karşılıyor.",
-      url: "https://klemensart.com/haberler",
+      url: "https://klemensart.com/bulten/arsiv",
       source_name: "Artnet",
     },
   ],
@@ -68,7 +68,7 @@ export default function HaberlerBulteni({
         ))}
       </Section>
 
-      <KlemensButton href={weekSlug ? `https://klemensart.com/bulten/${weekSlug}` : "https://klemensart.com/haberler"}>
+      <KlemensButton href={weekSlug ? `https://klemensart.com/bulten/${weekSlug}` : "https://klemensart.com/bulten/arsiv"}>
         Bu Haftanın Tüm Haberleri
       </KlemensButton>
 

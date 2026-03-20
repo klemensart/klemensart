@@ -9,9 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/auth/", "/club/", "/api/", "/abonelik-iptal", "/oyun/"],
       },
     ],
-    sitemap: [
-      "https://klemensart.com/sitemap.xml",
-      "https://klemensart.com/news-sitemap.xml",
-    ],
+    sitemap: "https://klemensart.com/sitemap.xml",
   };
 }

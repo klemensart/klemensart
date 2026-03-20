@@ -13,16 +13,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createAdminClient();
 
   // Son içerik tarihlerini çek — statik sayfaların lastModified'ı için
-  const [{ data: latestArticle }, { data: latestEvent }, { data: latestNews }, { data: publicCampaigns }] = await Promise.all([
+  const [{ data: latestArticle }, { data: latestEvent }, { data: publicCampaigns }] = await Promise.all([
     supabase.from("articles").select("date").eq("status", "published").order("date", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("events").select("event_date").eq("status", "approved").order("event_date", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("news_items").select("published_at").eq("status", "published").order("published_at", { ascending: false }).limit(1).maybeSingle(),
     supabase.from("campaigns").select("id, created_at, template_name").eq("is_public", true).order("created_at", { ascending: false }),
   ]);
 
   const lastArticleDate = latestArticle?.date ? new Date(latestArticle.date) : now;
   const lastEventDate = latestEvent?.event_date ? new Date(latestEvent.event_date) : now;
-  const lastNewsDate = latestNews?.published_at ? new Date(latestNews.published_at) : now;
   const lastCampaignDate = publicCampaigns?.[0]?.created_at ? new Date(publicCampaigns[0].created_at) : now;
 
   // Static pages
@@ -31,7 +29,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/icerikler`, lastModified: lastArticleDate, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/atolyeler`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/etkinlikler`, lastModified: lastEventDate, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${BASE_URL}/haberler`, lastModified: lastNewsDate, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/harita`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/hakkimizda`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
@@ -95,19 +92,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // Dynamic news detail pages from Supabase
-  const { data: newsItems } = await supabase
-    .from("news_items")
-    .select("slug, published_at")
-    .in("status", ["published", "archived"])
-    .order("published_at", { ascending: false });
-
-  const newsPages: MetadataRoute.Sitemap = (newsItems ?? []).map((n) => ({
-    url: `${BASE_URL}/haberler/${n.slug}`,
-    lastModified: n.published_at ? new Date(n.published_at) : undefined,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
 
   // Public campaign (newsletter archive) pages
   // HaberlerBulteni → SEO-friendly /bulten/[slug], diğerleri → /bulten/arsiv/[id]
@@ -161,7 +145,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...workshopPages,
     ...articlePages,
     ...eventPages,
-    ...newsPages,
     ...campaignPages,
     ...placePages,
     ...routePages,
