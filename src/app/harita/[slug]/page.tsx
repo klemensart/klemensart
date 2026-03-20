@@ -246,6 +246,18 @@ export default async function MekanDetayPage({ params }: Props) {
             Ankara
           </div>
 
+          {/* Image */}
+          {place.image && (
+            <div className="rounded-2xl overflow-hidden border border-warm-100 mb-8">
+              <img
+                src={place.image}
+                alt={`${place.name} — bilgi görseli`}
+                className="w-full h-auto"
+                loading="eager"
+              />
+            </div>
+          )}
+
           {/* Description */}
           <div className="bg-white rounded-2xl border border-warm-100 p-8 mb-8">
             {place.longDesc ? (
