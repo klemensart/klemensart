@@ -740,9 +740,16 @@ export default function ProfilPage() {
                   </Link>
                 </div>
               ) : (() => {
+                const isSanatRaundu = (r: QuizResult) => r.quiz_slug === "sanat-raundu";
+                const classicResults = quizResults.filter((r) => !isSanatRaundu(r));
+                const bestClassicScore = classicResults.length > 0 ? Math.max(...classicResults.map((r) => r.score)) : null;
+                const bestSanatScore = quizResults.filter(isSanatRaundu).length > 0 ? Math.max(...quizResults.filter(isSanatRaundu).map((r) => r.score)) : null;
                 const bestScore = Math.max(...quizResults.map((r) => r.score));
-                const getStars = (s: number) => s >= 9 ? 3 : s >= 6 ? 2 : s >= 3 ? 1 : 0;
-                const totalStars = quizResults.reduce((acc, r) => acc + getStars(r.score), 0);
+                const getStars = (s: number, slug: string) => {
+                  if (slug === "sanat-raundu") return s >= 2000 ? 3 : s >= 1200 ? 2 : s >= 500 ? 1 : 0;
+                  return s >= 9 ? 3 : s >= 6 ? 2 : s >= 3 ? 1 : 0;
+                };
+                const totalStars = quizResults.reduce((acc, r) => acc + getStars(r.score, r.quiz_slug), 0);
                 const uniqueBadges = [...new Set(quizResults.map((r) => r.badge))];
                 const badgeConfig: Record<string, { emoji: string; color: string; bg: string }> = {
                   "Rönesans Ustası":           { emoji: "\uD83D\uDC51", color: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
@@ -755,6 +762,10 @@ export default function ProfilPage() {
                   "Meraklı (Hizli)":           { emoji: "\uD83D\uDD0D", color: "text-sky-700",     bg: "bg-sky-50 border-sky-200" },
                   "Çırak":                     { emoji: "\uD83C\uDF31", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
                   "Çırak (Hizli)":             { emoji: "\uD83C\uDF31", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+                  "Sanat Ustası":              { emoji: "\uD83D\uDC51", color: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
+                  "Kültür Gururu":             { emoji: "\uD83C\uDFC6", color: "text-amber-700",   bg: "bg-amber-50 border-amber-200" },
+                  "Bilgi Koleksiyoncusu":      { emoji: "\uD83C\uDF96\uFE0F", color: "text-violet-700", bg: "bg-violet-50 border-violet-200" },
+                  "Meraklı Kaşif":             { emoji: "\uD83D\uDD0D", color: "text-sky-700",     bg: "bg-sky-50 border-sky-200" },
                 };
                 const defaultBadge = { emoji: "\uD83C\uDFC6", color: "text-brand-dark", bg: "bg-brand-light border-brand-light" };
 
@@ -775,7 +786,13 @@ export default function ProfilPage() {
                           <div className="w-px h-10 bg-brand-light" />
                           {/* Best */}
                           <div className="text-center">
-                            <div className="text-[26px] font-extrabold text-coral leading-none">{bestScore}<span className="text-[13px] text-brand-warm/40">/10</span></div>
+                            {bestSanatScore !== null && bestClassicScore === null ? (
+                              <div className="text-[26px] font-extrabold text-coral leading-none">{bestSanatScore}<span className="text-[13px] text-brand-warm/40"> p</span></div>
+                            ) : bestClassicScore !== null && bestSanatScore === null ? (
+                              <div className="text-[26px] font-extrabold text-coral leading-none">{bestClassicScore}<span className="text-[13px] text-brand-warm/40">/10</span></div>
+                            ) : (
+                              <div className="text-[26px] font-extrabold text-coral leading-none">{bestClassicScore}<span className="text-[13px] text-brand-warm/40">/10</span></div>
+                            )}
                             <div className="text-[10px] font-bold text-brand-warm/50 uppercase tracking-wider mt-1">En İyi</div>
                           </div>
                           <div className="w-px h-10 bg-brand-light" />
@@ -810,7 +827,8 @@ export default function ProfilPage() {
 
                     {/* ── Quiz result cards ── */}
                     {quizResults.map((r) => {
-                      const starCount = getStars(r.score);
+                      const sr = isSanatRaundu(r);
+                      const starCount = getStars(r.score, r.quiz_slug);
                       const bc = badgeConfig[r.badge] || defaultBadge;
                       const date = new Date(r.created_at).toLocaleDateString("tr-TR", {
                         day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
@@ -819,9 +837,16 @@ export default function ProfilPage() {
                         ? `${Math.floor(r.time_seconds / 60) > 0 ? Math.floor(r.time_seconds / 60) + "dk " : ""}${r.time_seconds % 60}sn`
                         : null;
                       // Ring color based on score tier
-                      const ringColor = r.score >= 9 ? "#f59e0b" : r.score >= 6 ? "#f97316" : r.score >= 3 ? "#6366f1" : "#d4cfc8";
+                      const ringColor = sr
+                        ? (r.score >= 2000 ? "#f59e0b" : r.score >= 1200 ? "#f97316" : r.score >= 500 ? "#6366f1" : "#d4cfc8")
+                        : (r.score >= 9 ? "#f59e0b" : r.score >= 6 ? "#f97316" : r.score >= 3 ? "#6366f1" : "#d4cfc8");
+                      // Ring fill ratio
+                      const ringMax = sr ? 3500 : 10;
+                      const ringFill = Math.min(r.score / ringMax, 1);
                       // Stripe color — warm tones
-                      const stripeColor = r.score >= 9 ? "from-amber-400 to-orange-400" : r.score >= 6 ? "from-orange-300 to-coral" : r.score >= 3 ? "from-violet-300 to-fuchsia-300" : "from-gray-300 to-gray-400";
+                      const stripeColor = sr
+                        ? (r.score >= 2000 ? "from-amber-400 to-orange-400" : r.score >= 1200 ? "from-orange-300 to-coral" : r.score >= 500 ? "from-violet-300 to-fuchsia-300" : "from-gray-300 to-gray-400")
+                        : (r.score >= 9 ? "from-amber-400 to-orange-400" : r.score >= 6 ? "from-orange-300 to-coral" : r.score >= 3 ? "from-violet-300 to-fuchsia-300" : "from-gray-300 to-gray-400");
 
                       return (
                         <div key={r.id} className="relative bg-white rounded-[16px] shadow-[0_1px_8px_rgba(0,0,0,0.05)] overflow-hidden border border-brand-light/80">
@@ -837,12 +862,13 @@ export default function ProfilPage() {
                                   cx="27" cy="27" r="23" fill="none"
                                   stroke={ringColor}
                                   strokeWidth="3.5" strokeLinecap="round"
-                                  strokeDasharray={`${(r.score / 10) * 144.5} 144.5`}
+                                  strokeDasharray={`${ringFill * 144.5} 144.5`}
                                 />
                               </svg>
                               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-[16px] font-extrabold text-brand-dark leading-none">{r.score}</span>
-                                <span className="text-[8px] font-bold text-brand-warm/40">/10</span>
+                                <span className={`font-extrabold text-brand-dark leading-none ${sr ? "text-[13px]" : "text-[16px]"}`}>{r.score}</span>
+                                {!sr && <span className="text-[8px] font-bold text-brand-warm/40">/10</span>}
+                                {sr && <span className="text-[7px] font-bold text-brand-warm/40">puan</span>}
                               </div>
                             </div>
 
@@ -850,7 +876,7 @@ export default function ProfilPage() {
                             <div className="flex-1 min-w-0">
                               {/* Quiz name */}
                               <div className="text-[13px] font-bold text-brand-dark mb-1.5 truncate">
-                                {r.quiz_slug === "modern-sanat-quiz" ? "Modern Sanat Quizi" : "Rönesans Sanat Quizi"}
+                                {r.quiz_slug === "sanat-raundu" ? "Sanat Raundu" : r.quiz_slug === "modern-sanat-quiz" ? "Modern Sanat Quizi" : "Rönesans Sanat Quizi"}
                               </div>
 
                               {/* Stars */}

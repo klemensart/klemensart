@@ -66,6 +66,18 @@ type Oyun = {
 
 const oyunlar: Oyun[] = [
   {
+    title: "Sanat Raundu",
+    description: "Hız bonuslu, süreli trivia: 3 kategori, seri çarpanı!",
+    href: "/testler/sanat-raundu",
+    gradient: "from-amber-50 to-yellow-50/60",
+    iconBg: "bg-amber-100 text-amber-700",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    ),
+  },
+  {
     title: "Rönesans Sanat Quizi",
     description: "Rönesans başyapıtlarını ne kadar tanıyorsunuz?",
     href: "/testler/ronesans-quiz",
