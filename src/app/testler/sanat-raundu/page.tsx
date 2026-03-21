@@ -290,7 +290,9 @@ export default function SanatRaundu() {
     fetch("/api/trivia/categories")
       .then((r) => r.json())
       .then((d) => {
-        setCategories(d.categories ?? []);
+        // leonardo-atolyesi'nin kendi sayfası var, Sanat Raundu'ndan hariç tut
+        const all: Category[] = d.categories ?? [];
+        setCategories(all.filter((c) => c.slug !== "leonardo-atolyesi"));
         setPhase("intro");
       })
       .catch(() => setPhase("intro"));
@@ -579,7 +581,7 @@ export default function SanatRaundu() {
      INTRO — 3D Küp ile Kategori Seçimi
      ══════════════════════════════════════════════ */
   if (phase === "intro") {
-    const faceCategories = categories.slice(0, 3);
+    const faceCategories = categories.slice(0, 4);
     const activeFaceIdx = ((Math.round(cubeRotation / 90) % 4) + 4) % 4;
     const activeCategory = activeFaceIdx < faceCategories.length ? faceCategories[activeFaceIdx] : null;
 
@@ -664,7 +666,7 @@ export default function SanatRaundu() {
                     transform: `rotateY(${-cubeRotation}deg)`,
                     transition: `transform 0.6s ${ease}`,
                   }}>
-                    {/* Category faces */}
+                    {/* Category faces (4 yüz) */}
                     {faceCategories.map((cat, i) => (
                       <div key={cat.slug} style={cubeFaceStyle(i * 90)} onClick={() => selectCategory(cat)}>
                         <div style={{ fontSize: 48, marginBottom: 12 }}>{cat.icon_emoji}</div>
@@ -672,11 +674,6 @@ export default function SanatRaundu() {
                         <div style={{ fontSize: 13, color: cat.color, fontWeight: 600 }}>{cat.question_count} soru</div>
                       </div>
                     ))}
-                    {/* Logo face */}
-                    <div style={cubeFaceStyle(270)}>
-                      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 3, color: T.accent, textTransform: "uppercase" }}>KLEMENS</div>
-                      <div style={{ fontSize: 11, color: T.muted, marginTop: 4 }}>ART</div>
-                    </div>
                   </div>
                 </div>
 
