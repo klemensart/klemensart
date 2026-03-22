@@ -326,18 +326,18 @@ export default function EtkinliklerClient() {
         {/* ── Hero ── */}
         <section className="pt-32 pb-14 px-6 text-center">
           <div className="max-w-2xl mx-auto">
-            <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-5">Takvim</p>
+            <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-5">Ankara Kültür-Sanat Takvimi</p>
             <h1
               className="text-5xl sm:text-6xl font-bold leading-tight text-warm-900 mb-5"
               style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
             >
-              Kültür &amp; Sanat<br />Takvimi
+              Ankara Kültür &amp; Sanat<br />Takvimi
             </h1>
             <p
               className="text-warm-900/45 text-lg leading-relaxed italic"
               style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
             >
-              Ruhunuzun aradığı o karşılaşma belki de bu akşamdır...
+              Başkentin nabzını tutan etkinlik rehberiniz — sergiden konsere, tiyatrodan festivale...
             </p>
           </div>
         </section>

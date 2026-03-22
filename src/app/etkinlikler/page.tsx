@@ -3,32 +3,33 @@ import { createAdminClient } from "@/lib/supabase-admin";
 import EtkinliklerClient from "./EtkinliklerClient";
 
 export const metadata: Metadata = {
-  title: "Kültür & Sanat Takvimi",
+  title: "Ankara Kültür & Sanat Takvimi",
   description:
-    "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+    "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
   keywords: [
+    "Ankara kültür sanat takvimi",
     "Ankara etkinlikler",
     "Ankara sergileri",
     "Ankara konser",
     "Ankara tiyatro",
-    "kültür sanat takvimi",
     "Ankara festival",
-    "sanat etkinlikleri",
-    "söyleşi etkinlik",
+    "Ankara sanat etkinlikleri",
+    "Ankara söyleşi",
+    "başkent etkinlik rehberi",
   ],
   alternates: { canonical: "/etkinlikler" },
   openGraph: {
-    title: "Kültür & Sanat Takvimi — Klemens",
+    title: "Ankara Kültür & Sanat Takvimi — Klemens",
     description:
-      "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+      "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
     url: "https://klemensart.com/etkinlikler",
     images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kültür & Sanat Takvimi — Klemens",
+    title: "Ankara Kültür & Sanat Takvimi — Klemens",
     description:
-      "Ankara ve çevresindeki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin.",
+      "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
     images: ["/logos/logo-wide-dark.PNG"],
   },
 };
