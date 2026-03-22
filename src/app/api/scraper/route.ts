@@ -1381,6 +1381,7 @@ function inferEventType(title: string, desc: string, url: string): string {
 
 // ── Scraper 15: Ankara Devlet Opera ve Balesi ──────────────────────────────
 // operabale.gov.tr — JSON API, Ankara müdürlüğü (id=1)
+// Eser detay API'sinden grup bilgisi (Opera/Bale/Müzikal) alınıyor
 async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
   const events: ScrapedEvent[] = [];
   const apiUrl = "https://apimain.operabale.gov.tr/v1/web/temsil/mudurluk/listele/1";
@@ -1394,6 +1395,7 @@ async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
 
     const data: Array<{
       oyunTarihi: string;
+      eserKodu: number;
       eserAdi: string;
       eserKonu: string;
       sahneAdi: string;
@@ -1402,6 +1404,24 @@ async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
       afisler: string[];
     }> = await res.json();
 
+    // Eser kodlarından grup bilgisini çek (toplu, deduplicate)
+    const grupCache = new Map<number, string>();
+    const uniqueKodlar = [...new Set(data.map((d) => d.eserKodu).filter(Boolean))];
+    await Promise.all(
+      uniqueKodlar.slice(0, 30).map(async (kod) => {
+        try {
+          const r = await fetch(`https://apimain.operabale.gov.tr/v1/web/eser/${kod}`, {
+            headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+            signal: AbortSignal.timeout(5000),
+          });
+          if (r.ok) {
+            const detail = await r.json();
+            if (detail.grup) grupCache.set(kod, String(detail.grup).toLowerCase());
+          }
+        } catch { /* timeout tolerans */ }
+      })
+    );
+
     for (const item of data) {
       const title = item.eserAdi?.trim();
       if (!title) continue;
@@ -1409,23 +1429,27 @@ async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
       const eventDate = new Date(item.oyunTarihi).toISOString();
       if (!isFutureDate(eventDate)) continue;
 
-      // Tür tespiti: başlık + sahne adından
-      const combined = `${title} ${item.sahneAdi ?? ""}`.toLowerCase();
+      // Tür tespiti: önce API grup bilgisi, sonra başlık + sahne adı
+      const apiGrup = grupCache.get(item.eserKodu) ?? "";
       let inferredType: string;
-      if (combined.includes("opera") || combined.includes("opera sahnesi")) inferredType = "opera";
-      else if (combined.includes("bale") || combined.includes("ballet")) inferredType = "bale";
-      else if (combined.includes("konser") || combined.includes("müzik") || combined.includes("trio") || combined.includes("duo")) inferredType = "konser";
-      else if (combined.includes("tiyatro") || combined.includes("oyun")) inferredType = "tiyatro";
-      else inferredType = inferEventType(title, item.eserKonu ?? "", "opera bale");
+      if (apiGrup.includes("opera")) inferredType = "opera";
+      else if (apiGrup.includes("bale") || apiGrup.includes("ballet")) inferredType = "bale";
+      else if (apiGrup.includes("konser") || apiGrup.includes("müzik")) inferredType = "konser";
+      else {
+        const combined = `${title} ${item.sahneAdi ?? ""}`.toLowerCase();
+        if (combined.includes("opera") || combined.includes("opera sahnesi")) inferredType = "opera";
+        else if (combined.includes("bale") || combined.includes("ballet")) inferredType = "bale";
+        else if (combined.includes("konser") || combined.includes("müzik") || combined.includes("trio") || combined.includes("duo")) inferredType = "konser";
+        else inferredType = inferEventType(title, item.eserKonu ?? "", "opera bale");
+      }
 
       // Opera/bale scraper'ından gelen her şey kültür-sanata uygun
       if (!isRelevant({ title, description: item.eserKonu ?? "", event_type: inferredType })) {
-        // Fallback: opera/bale kaynağından gelen bilinmeyen türleri kabul et
         if (inferredType === "etkinlik") inferredType = "performans";
         else continue;
       }
 
-      const source_url = item.seoFullUrl || `https://www.operabale.gov.tr/shows/${item.seoUrl}`;
+      const source_url = item.seoFullUrl || `https://www.operabale.gov.tr/${item.seoUrl}`;
       const image_url = item.afisler?.[0] ?? null;
       const desc = (item.eserKonu ?? "").replace(/\r\n/g, " ").trim().slice(0, 400);
 
@@ -1445,6 +1469,124 @@ async function scrapeOperaBale(): Promise<ScrapedEvent[]> {
     }
   } catch (err) {
     console.error(`[OperaBale] hatası:`, err);
+  }
+
+  return events;
+}
+
+// ── Scraper 16: Devlet Tiyatroları Ankara ───────────────────────────────────
+// devtiyatro.gov.tr — HTML tablo, Ankara programı (id=1)
+// Sahne bazlı tablo: tarih satırları (td.tarih-gun) + sahne sütunları (td.sahneOyun_N)
+async function scrapeDevletTiyatro(): Promise<ScrapedEvent[]> {
+  const events: ScrapedEvent[] = [];
+  const url = "https://www.devtiyatro.gov.tr/DevletTiyatro/tr/genelprogramlar/1";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(30000), // DT sitesi yavaş (~20s)
+    });
+    if (!res.ok) return events;
+
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    // Sahne adlarını header'dan al (th.sahne-title, id=sahne_0..sahne_N)
+    const sahneNames: string[] = [];
+    $("th.sahne-title").each((_, th) => {
+      sahneNames.push($(th).text().trim());
+    });
+
+    const seen = new Set<string>();
+    const currentYear = new Date().getFullYear();
+
+    // Her tarih satırını dolaş
+    $("table.program-table > tbody > tr, table.program-table > tr").each((_, tr) => {
+      const $tr = $(tr);
+      const $tarih = $tr.find("td.tarih-gun");
+      if (!$tarih.length) return;
+
+      // Tarih parse: "23MartPazartesi" veya "23\nMart\nPazartesi" formatı
+      const tarihText = $tarih.text().trim().replace(/\s+/g, "");
+      const tarihMatch = tarihText.match(/(\d{1,2})([A-ZİĞÜŞÖÇa-zığüşöç]+?)(?:Pazartesi|Salı|Çarşamba|Perşembe|Cuma|Cumartesi|Pazar|pazartesi|salı|çarşamba|perşembe|cuma|cumartesi|pazar)/i);
+      if (!tarihMatch) return;
+
+      const dateStr = `${tarihMatch[1]} ${tarihMatch[2]} ${currentYear}`;
+      const eventDate = parseTurkishDate(dateStr);
+      if (!eventDate || !isFutureDate(eventDate)) return;
+
+      // Her sahne sütunundaki oyunları çek
+      $tr.find("[class^='sahneOyun_']").each((colIdx, td) => {
+        $(td).find(".oyun-cell").each((_, cell) => {
+          const $cell = $(cell);
+
+          // Başlık ve link
+          const $link = $cell.find("a[href*='oyundetay']").first();
+          if (!$link.length) return;
+
+          const title = $link.text().trim();
+          if (!title || title.length < 3) return;
+
+          // Deduplicate: aynı oyun aynı gün birden fazla seans olabilir
+          const dedup = `${title}|${eventDate}`;
+          if (seen.has(dedup)) return;
+          seen.add(dedup);
+
+          const href = $link.attr("href") ?? "";
+          const source_url = href.startsWith("http")
+            ? href
+            : `https://www.devtiyatro.gov.tr${href}`;
+
+          // Saat
+          const timeText = $cell.find(".oyun-cell-bilgi p").first().text().trim();
+
+          // Sahne adı
+          const sahneIdx = parseInt(($(td).attr("class") ?? "").replace("sahneOyun_", ""), 10);
+          const venue = sahneNames[sahneIdx] || "Devlet Tiyatrosu";
+
+          // Tür: çoğu tiyatro, ikon sınıflarından ek bilgi
+          let inferredType = "tiyatro";
+          const hasIcons = $cell.find(".oyun-program-icon").length > 0;
+          if ($cell.find(".oyun-program-icon-cocuk").length > 0) {
+            inferredType = "tiyatro"; // çocuk tiyatrosu da tiyatro
+          }
+          if ($cell.find(".oyun-program-icon-muzikal").length > 0) {
+            inferredType = "performans"; // müzikal
+          }
+
+          // Bilet linki (varsa)
+          const biletHref = $cell.find("a[href*='biletinial']").attr("href") ?? "";
+
+          // Saat'i tarihe ekle
+          let fullDate = eventDate;
+          const timeMatch = timeText.match(/(\d{1,2})[.:](\d{2})/);
+          if (timeMatch) {
+            const d = new Date(eventDate);
+            d.setHours(parseInt(timeMatch[1], 10), parseInt(timeMatch[2], 10));
+            fullDate = d.toISOString();
+          }
+
+          events.push({
+            title,
+            description: "",
+            event_type: inferredType,
+            venue,
+            address: "Ankara",
+            event_date: fullDate,
+            end_date: null,
+            source_url: biletHref || source_url,
+            source_name: "Devlet Tiyatroları",
+            image_url: null,
+            price_info: null,
+          });
+        });
+      });
+    });
+  } catch (err) {
+    console.error(`[DevletTiyatro] hatası:`, err);
   }
 
   return events;
@@ -1774,11 +1916,11 @@ export async function GET(req: NextRequest) {
   const results: Record<string, StatEntry> = {
     biletix: mk(), cerModern: mk(), ankaraBB: mk(), cankaya: mk(),
     bilkent: mk(), csoAda: mk(), lavarla: mk(), biletinial: mk(), ankaraMasasi: mk(),
-    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(), erimtan: mk(), operaBale: mk(),
+    bubilet: mk(), mobilet: mk(), unite: mk(), kultKavaklidere: mk(), erimtan: mk(), operaBale: mk(), devletTiyatro: mk(),
   };
 
   // 2. Her scraper'ı bağımsız çalıştır
-  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere", "erimtan", "operaBale"] as const;
+  const scraperKeys = ["biletix", "cerModern", "ankaraBB", "cankaya", "bilkent", "csoAda", "lavarla", "biletinial", "ankaraMasasi", "bubilet", "mobilet", "unite", "kultKavaklidere", "erimtan", "operaBale", "devletTiyatro"] as const;
   const settled = await Promise.allSettled([
     scrapeBiletix(),
     scrapeCerModern(),
@@ -1795,6 +1937,7 @@ export async function GET(req: NextRequest) {
     scrapeKultKavaklidere(),
     scrapeErimtan(),
     scrapeOperaBale(),
+    scrapeDevletTiyatro(),
   ]);
 
   const scraperResults: [StatEntry, ScrapedEvent[]][] = scraperKeys.map((key, i) => {

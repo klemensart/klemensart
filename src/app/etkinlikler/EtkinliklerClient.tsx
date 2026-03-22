@@ -158,12 +158,16 @@ function EventTypeIcon({ type }: { type: string }) {
   }
 }
 
-type Filter = "Tümü" | "Atölyeler" | "Sergi" | "Konser" | "Tiyatro" | "Söyleşi" | "Festival";
-const FILTERS: Filter[] = ["Tümü", "Atölyeler", "Sergi", "Konser", "Tiyatro", "Söyleşi", "Festival"];
+type Filter = "Tümü" | "Atölyeler" | "Sergi" | "Konser" | "Sahne Sanatları" | "Söyleşi & Panel" | "Festival";
+const FILTERS: Filter[] = ["Tümü", "Atölyeler", "Sergi", "Konser", "Sahne Sanatları", "Söyleşi & Panel", "Festival"];
 
-const FILTER_TO_TYPE: Partial<Record<Filter, string>> = {
-  Sergi: "sergi", Konser: "konser", Tiyatro: "tiyatro",
-  Söyleşi: "soylesi", Festival: "festival",
+// Birden fazla event_type'ı kapsayan filtreler
+const FILTER_TO_TYPES: Partial<Record<Filter, string[]>> = {
+  Sergi: ["sergi"],
+  Konser: ["konser"],
+  "Sahne Sanatları": ["tiyatro", "opera", "bale", "performans"],
+  "Söyleşi & Panel": ["soylesi", "panel"],
+  Festival: ["festival", "film-festivali"],
 };
 
 function fmtDate(iso: string | null) {
@@ -305,10 +309,9 @@ export default function EtkinliklerClient() {
 
       if (filter === "Atölyeler") {
         q = q.eq("is_klemens_event", true);
-      } else if (filter === "Festival") {
-        q = q.in("event_type", ["festival", "film-festivali"]);
       } else if (filter !== "Tümü") {
-        q = q.eq("event_type", FILTER_TO_TYPE[filter] ?? filter.toLowerCase());
+        const types = FILTER_TO_TYPES[filter];
+        if (types) q = q.in("event_type", types);
       }
 
       const { data } = await q;
