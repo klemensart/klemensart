@@ -58,7 +58,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       // ═══════════════════════════════════════════════════════
-      // 0. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
+      // 0a. WWW → NON-WWW (canonical domain)
+      // ═══════════════════════════════════════════════════════
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.klemensart.com" }],
+        destination: "https://klemensart.com/:path*",
+        permanent: true,
+      },
+
+      // ═══════════════════════════════════════════════════════
+      // 0b. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
       // ═══════════════════════════════════════════════════════
       { source: "/haberler", destination: "/bulten/arsiv", permanent: true },
       { source: "/haberler/:slug", destination: "/bulten/arsiv", permanent: true },
@@ -186,31 +196,31 @@ const nextConfig: NextConfig = {
       { source: "/ornek-sayfa", destination: "/", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 3. İZLEME PANELLERİ → Loca
+      // 3. İZLEME PANELLERİ → ilgili atölye sayfasına
       // ═══════════════════════════════════════════════════════
-      { source: "/caravaggio-izleme-paneli", destination: "/club/giris", permanent: true },
-      { source: "/modern-sanat-atolyesi-izleme-paneli", destination: "/club/giris", permanent: true },
-      { source: "/kapsamli-sanat-tarihi-atolyesi-izleme-paneli", destination: "/club/giris", permanent: true },
-      { source: "/ronesans-atolyesi-izleme-paneli", destination: "/club/giris", permanent: true },
-      { source: "/sanat-tarihinde-duygular-izleme-paneli", destination: "/club/giris", permanent: true },
-      { source: "/ronesans-izleme-odasi", destination: "/club/giris", permanent: true },
+      { source: "/caravaggio-izleme-paneli", destination: "/atolyeler", permanent: true },
+      { source: "/modern-sanat-atolyesi-izleme-paneli", destination: "/atolyeler/modern-sanat-atolyesi", permanent: true },
+      { source: "/kapsamli-sanat-tarihi-atolyesi-izleme-paneli", destination: "/atolyeler", permanent: true },
+      { source: "/ronesans-atolyesi-izleme-paneli", destination: "/atolyeler", permanent: true },
+      { source: "/sanat-tarihinde-duygular-izleme-paneli", destination: "/atolyeler/sanat-tarihinde-duygular", permanent: true },
+      { source: "/ronesans-izleme-odasi", destination: "/atolyeler", permanent: true },
       { source: "/ozbekistan-masterclass", destination: "/atolyeler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
       // 4. ÜYELİK / GİRİŞ / HESAP
       // ═══════════════════════════════════════════════════════
-      { source: "/klemense-katil", destination: "/club/giris", permanent: true },
-      { source: "/membership-thankyou", destination: "/club/profil", permanent: true },
+      { source: "/klemense-katil", destination: "/atolyeler", permanent: true },
+      { source: "/membership-thankyou", destination: "/", permanent: true },
       { source: "/membership-pricing", destination: "/atolyeler", permanent: true },
-      { source: "/my-account/:path*", destination: "/club/giris", permanent: true },
-      { source: "/lost-password", destination: "/club/giris", permanent: true },
-      { source: "/registration", destination: "/club/giris", permanent: true },
-      { source: "/login", destination: "/club/giris", permanent: true },
-      { source: "/hesabim", destination: "/club/giris", permanent: true },
-      { source: "/sepet", destination: "/club/giris", permanent: true },
-      { source: "/cart", destination: "/club/giris", permanent: true },
-      { source: "/checkout", destination: "/club/giris", permanent: true },
-      { source: "/odeme", destination: "/club/giris", permanent: true },
+      { source: "/my-account/:path*", destination: "/", permanent: true },
+      { source: "/lost-password", destination: "/", permanent: true },
+      { source: "/registration", destination: "/atolyeler", permanent: true },
+      { source: "/login", destination: "/", permanent: true },
+      { source: "/hesabim", destination: "/", permanent: true },
+      { source: "/sepet", destination: "/atolyeler", permanent: true },
+      { source: "/cart", destination: "/atolyeler", permanent: true },
+      { source: "/checkout", destination: "/atolyeler", permanent: true },
+      { source: "/odeme", destination: "/atolyeler", permanent: true },
       { source: "/odeme-sayfasi", destination: "/atolyeler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
@@ -259,7 +269,7 @@ const nextConfig: NextConfig = {
       { source: "/saskin-oyunbazin-okuma-macerasi", destination: "/icerikler", permanent: true },
       { source: "/sanatin-tekel-yonetimi-2", destination: "/icerikler/yazi/sanatin-tekel-yonetimi", permanent: true },
       { source: "/dijital-nostalji-tehlikesi-yapay-zeka-tarihi-fotograflarin-yerini-alabilir-mi-3", destination: "/icerikler/yazi/dijital-nostalji-tehlikesi-yapay-zeka-tarihi-fotograflarin-yerini-alabilir-mi", permanent: true },
-      { source: "/klemens-club", destination: "/club/giris", permanent: true },
+      { source: "/klemens-club", destination: "/atolyeler", permanent: true },
       { source: "/wp-content/:path*", destination: "/", permanent: true },
       { source: "/download", destination: "/", permanent: true },
       { source: "/etn_category/:path*", destination: "/etkinlikler", permanent: true },
@@ -282,9 +292,7 @@ const nextConfig: NextConfig = {
       { source: "/video-category/:path*", destination: "/", permanent: true },
       { source: "/search-videos", destination: "/", permanent: true },
 
-      // WordPress eski home / ajanda
-      { source: "/home", destination: "/", permanent: true },
-      { source: "/ajanda", destination: "/etkinlikler", permanent: true },
+      // WordPress eski ajanda (alt path'ler)
       { source: "/ajanda/:path*", destination: "/etkinlikler", permanent: true },
 
       // ═══════════════════════════════════════════════════════
