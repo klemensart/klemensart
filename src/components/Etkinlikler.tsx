@@ -8,6 +8,7 @@ type EventRow = {
   venue: string | null;
   event_date: string | null;
   is_klemens_event: boolean;
+  source_url: string | null;
 };
 
 const TYPE_DOT: Record<string, string> = {
@@ -41,7 +42,7 @@ export default async function Etkinlikler() {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("events")
-      .select("id,title,description,event_type,venue,event_date,is_klemens_event")
+      .select("id,title,description,event_type,venue,event_date,is_klemens_event,source_url")
       .eq("status", "approved")
       .gte("event_date", new Date().toISOString())
       .order("event_date", { ascending: true })
@@ -90,10 +91,16 @@ export default async function Etkinlikler() {
               const label = TYPE_LABEL[type] ?? type;
               const date = fmtDate(e.event_date);
 
+              const Tag = e.source_url ? "a" : "div";
+              const linkProps = e.source_url
+                ? { href: e.source_url, target: "_blank" as const, rel: "noopener noreferrer" }
+                : {};
+
               return (
-                <div
+                <Tag
                   key={e.id}
-                  className="group flex flex-col sm:flex-row items-start gap-6 p-7 rounded-3xl bg-warm-50 border border-warm-100 hover:border-warm-300/60 hover:bg-warm-100/60 transition-all duration-200"
+                  {...linkProps}
+                  className="group flex flex-col sm:flex-row items-start gap-6 p-7 rounded-3xl bg-warm-50 border border-warm-100 hover:border-warm-300/60 hover:bg-warm-100/60 transition-all duration-200 no-underline cursor-pointer"
                 >
                   {/* Date badge */}
                   <div className="flex sm:flex-col items-center sm:items-center gap-3 sm:gap-1 flex-shrink-0 sm:w-16 sm:text-center">
@@ -127,15 +134,14 @@ export default async function Etkinlikler() {
                   {/* CTA */}
                   {e.is_klemens_event && (
                     <div className="flex-shrink-0 sm:flex sm:items-center">
-                      <a
-                        href="/atolyeler"
+                      <span
                         className="px-6 py-2.5 bg-white border border-warm-200 text-warm-900 text-sm font-semibold rounded-full group-hover:bg-coral group-hover:border-coral group-hover:text-white transition-all duration-200 whitespace-nowrap"
                       >
                         Kayıt Ol
-                      </a>
+                      </span>
                     </div>
                   )}
-                </div>
+                </Tag>
               );
             })}
           </div>
