@@ -58,8 +58,10 @@ export async function PATCH(req: NextRequest) {
 
   // 3. Build update payload
   const updates: Record<string, unknown> = {};
-  if (action === "approve") updates.status = "approved";
-  else if (action === "reject") updates.status = "rejected";
+  if (action === "approve") {
+    updates.status = "approved";
+    updates.verification_note = null;
+  } else if (action === "reject") updates.status = "rejected";
   else if (action === "pending") updates.status = "pending";
   if (ai_comment !== undefined) updates.ai_comment = ai_comment;
 

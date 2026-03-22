@@ -20,6 +20,8 @@ type EventRow = {
   status: string;
   is_klemens_event: boolean;
   created_at: string;
+  verified_at: string | null;
+  verification_note: string | null;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -199,6 +201,19 @@ export default function AdminEtkinliklerPage() {
                     {e.is_klemens_event && (
                       <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">
                         Klemens Etkinliği
+                      </span>
+                    )}
+                    {e.verification_note && (
+                      <span
+                        className="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full cursor-help"
+                        title={e.verification_note}
+                      >
+                        ⚠ Kaynak doğrulanamadı
+                      </span>
+                    )}
+                    {e.verified_at && !e.verification_note && (
+                      <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">
+                        Doğrulandı
                       </span>
                     )}
                     <span className="ml-auto text-xs text-warm-900/40 font-mono">

@@ -1875,6 +1875,132 @@ export async function GET(req: NextRequest) {
   });
 }
 
+// ── Source URL Doğrulama ─────────────────────────────────────────────────────
+// Onaylı gelecek etkinliklerin kaynak URL'lerini kontrol eder.
+// Otomatik silme yok — sadece verification_note ile işaretler, admin karar verir.
+
+// SSL sertifika sorunlu domainler — HEAD/GET'te rejectUnauthorized: false
+const SSL_TOLERANT_DOMAINS = new Set(["csoadaankara.gov.tr"]);
+
+async function verifySourceUrls(admin: ReturnType<typeof createAdminClient>) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Sadece approved + gelecek tarihli + source_url dolu
+  const { data: events, error } = await admin
+    .from("events")
+    .select("id, source_url, source_name")
+    .eq("status", "approved")
+    .gte("event_date", today.toISOString())
+    .not("source_url", "is", null);
+
+  if (error || !events) {
+    return { checked: 0, valid: 0, invalid: 0, errors: [] as string[] };
+  }
+
+  // Domain bazlı gruplama
+  const byDomain = new Map<string, typeof events>();
+  for (const ev of events) {
+    if (!ev.source_url) continue;
+    try {
+      const domain = new URL(ev.source_url).hostname;
+      if (!byDomain.has(domain)) byDomain.set(domain, []);
+      byDomain.get(domain)!.push(ev);
+    } catch {
+      // Geçersiz URL
+    }
+  }
+
+  let valid = 0;
+  let invalid = 0;
+  const errors: string[] = [];
+  const now = new Date().toISOString();
+
+  // Max 5 domain paralel
+  const domainEntries = Array.from(byDomain.entries());
+  for (let i = 0; i < domainEntries.length; i += 5) {
+    const batch = domainEntries.slice(i, i + 5);
+    await Promise.all(
+      batch.map(async ([domain, domainEvents]) => {
+        const needsInsecure = SSL_TOLERANT_DOMAINS.has(domain);
+
+        for (let j = 0; j < domainEvents.length; j++) {
+          const ev = domainEvents[j];
+          // Rate limit: 500ms arasıyla (ilk hariç)
+          if (j > 0) await new Promise((r) => setTimeout(r, 500));
+
+          let ok = false;
+          let reason = "";
+
+          try {
+            // HEAD dene
+            const fetchFn = needsInsecure ? undiciFetch : fetch;
+            const fetchOpts: Record<string, unknown> = {
+              method: "HEAD",
+              headers: { "User-Agent": "Mozilla/5.0 (compatible; KlemensBot/1.0)" },
+              signal: AbortSignal.timeout(10000),
+              redirect: "follow" as const,
+            };
+            if (needsInsecure) fetchOpts.dispatcher = insecureAgent;
+
+            let res = await (fetchFn as typeof fetch)(ev.source_url, fetchOpts as RequestInit);
+
+            // Bazı sunucular HEAD'i 405 ile reddeder — GET ile tekrar dene
+            if (res.status === 405 || res.status === 501) {
+              fetchOpts.method = "GET";
+              res = await (fetchFn as typeof fetch)(ev.source_url, fetchOpts as RequestInit);
+              // Body'yi boşalt
+              if (res.body) {
+                try { await res.text(); } catch { /* */ }
+              }
+            }
+
+            if (res.ok || res.status === 301 || res.status === 302 || res.status === 308) {
+              ok = true;
+            } else {
+              reason = `HTTP ${res.status}`;
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            if (msg.includes("timeout") || msg.includes("abort")) {
+              reason = "Timeout (10s)";
+            } else if (msg.includes("ENOTFOUND") || msg.includes("getaddrinfo")) {
+              reason = "DNS bulunamadı";
+            } else if (msg.includes("certificate") || msg.includes("SSL") || msg.includes("TLS")) {
+              // SSL hatası ama tolerant domain'se geçerli say
+              if (needsInsecure) {
+                ok = true;
+              } else {
+                reason = "SSL hatası";
+              }
+            } else {
+              reason = msg.slice(0, 100);
+            }
+          }
+
+          if (ok) {
+            valid++;
+            await admin
+              .from("events")
+              .update({ verified_at: now, verification_note: null })
+              .eq("id", ev.id);
+          } else {
+            invalid++;
+            const note = `${reason} — ${new Date().toLocaleDateString("tr-TR")}`;
+            errors.push(`${ev.source_name}: ${ev.source_url} → ${reason}`);
+            await admin
+              .from("events")
+              .update({ verification_note: note })
+              .eq("id", ev.id);
+          }
+        }
+      })
+    );
+  }
+
+  return { checked: events.length, valid, invalid, errors };
+}
+
 // ── POST: Mevcut etkinlikleri temizle (Title Case + Fuzzy Dedup) ──────────────
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -2005,11 +2131,15 @@ export async function POST(req: NextRequest) {
     pastRemoved = pastIds.length;
   }
 
+  // 5. Kaynak URL doğrulama
+  const verification = await verifySourceUrls(admin);
+
   return NextResponse.json({
     success: true,
     titleCaseUpdated,
     duplicatesRemoved: { exact: exactDuplicates, fuzzy: fuzzyDuplicates, total: toDelete.length },
     pastEventsRemoved: pastRemoved,
+    verification,
     totalProcessed: allEvents.length,
     remaining: allEvents.length - toDelete.length - pastRemoved,
   });
