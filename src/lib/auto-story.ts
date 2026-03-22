@@ -176,3 +176,177 @@ export function generateStoryDesignRow(
     ...(userId && userId !== "system" ? { created_by: userId } : {}),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/*  Leonardo — Dark Story Variant                                      */
+/*  Koyu arka plan, altın aksanlar, oyunun atmosferine uygun           */
+/* ------------------------------------------------------------------ */
+
+const LEONARDO_COLORS = {
+  bg: "#141414",
+  gold: "#C9A84C",
+  goldMuted: "#C9A84C66", // %40 opacity
+  white: "#FFFFFF",
+  whiteSoft: "#FFFFFF80", // %50 opacity
+  coral: "#FF6D60",
+};
+
+type LeonardoStoryOptions = {
+  /** Portre görseli URL'i (varsayılan: fallback-portrait.webp) */
+  portraitUrl?: string;
+  /** Üst etiket (varsayılan: "LEONARDO'NUN ATÖLYESİ") */
+  tag?: string;
+  /** Ana başlık */
+  title?: string;
+  /** Alt açıklama */
+  subtitle?: string;
+  /** İmza (varsayılan: "KLEMENS") */
+  signature?: string;
+};
+
+export function generateLeonardoStoryCanvasData(
+  opts: LeonardoStoryOptions = {}
+): StoryCanvasData {
+  const {
+    portraitUrl = "https://klemensart.com/images/leonardo/fallback-portrait.webp",
+    tag = "LEONARDO'NUN ATÖLYESİ",
+    title = "Leonardo'nun Atölyesine\nDavetlisiniz",
+    subtitle = "5 gizemli oda · 25 zorlu soru\nSeni atölyede bekliyor.",
+    signature = "KLEMENS",
+  } = opts;
+
+  // IG Story safe zone: üst ~200px, alt ~280px UI ile kapanır
+  // İçerik y=200 – y=1640 arasında kalmalı
+  const PAD = 100;
+  const CONTENT_W = 1080 - PAD * 2; // 880px
+  const PORTRAIT_W = 600;
+  const PORTRAIT_H = 900; // 2:3 oran
+  const PORTRAIT_X = (1080 - PORTRAIT_W) / 2; // 240
+
+  const objects: StoryObject[] = [
+    // Koyu arka plan
+    {
+      type: "shape",
+      x: 0,
+      y: 0,
+      width: 1080,
+      height: 1920,
+      fill: LEONARDO_COLORS.bg,
+      shapeType: "rect",
+      opacity: 1,
+      rotation: 0,
+    },
+    // Üst etiket — altın, letter-spaced (safe zone: y≥200)
+    {
+      type: "text",
+      x: PAD,
+      y: 200,
+      width: CONTENT_W,
+      text: tag,
+      fontSize: 28,
+      fontFamily: "Montserrat",
+      fontStyle: "bold",
+      fill: LEONARDO_COLORS.gold,
+      align: "left",
+      letterSpacing: 10,
+      lineHeight: 1.2,
+      opacity: 1,
+      rotation: 0,
+    },
+    // Leonardo portresi — merkez, yuvarlatılmış köşe
+    {
+      type: "image",
+      x: PORTRAIT_X,
+      y: 270,
+      width: PORTRAIT_W,
+      height: PORTRAIT_H,
+      src: portraitUrl,
+      cornerRadius: 20,
+      opacity: 1,
+      rotation: 0,
+    },
+    // Altın ayraç çizgi
+    {
+      type: "shape",
+      x: PAD,
+      y: 1200,
+      width: CONTENT_W,
+      height: 1,
+      fill: LEONARDO_COLORS.gold,
+      shapeType: "rect",
+      opacity: 0.3,
+      rotation: 0,
+    },
+    // Ana başlık — beyaz, büyük
+    {
+      type: "text",
+      x: PAD,
+      y: 1240,
+      width: CONTENT_W,
+      text: title,
+      fontSize: 50,
+      fontFamily: "Montserrat",
+      fontStyle: "bold",
+      fill: LEONARDO_COLORS.white,
+      align: "left",
+      letterSpacing: 0,
+      lineHeight: 1.3,
+      opacity: 1,
+      rotation: 0,
+    },
+    // Alt açıklama — beyaz, yarı saydam
+    {
+      type: "text",
+      x: PAD,
+      y: 1410,
+      width: CONTENT_W,
+      text: subtitle,
+      fontSize: 34,
+      fontFamily: "Montserrat",
+      fontStyle: "normal",
+      fill: LEONARDO_COLORS.whiteSoft,
+      align: "left",
+      letterSpacing: 0,
+      lineHeight: 1.6,
+      opacity: 1,
+      rotation: 0,
+    },
+    // İmza — altın, italik (safe zone: y≤1640)
+    {
+      type: "text",
+      x: PAD,
+      y: 1590,
+      width: CONTENT_W,
+      text: `— ${signature}`,
+      fontSize: 34,
+      fontFamily: "Montserrat",
+      fontStyle: "italic",
+      fill: LEONARDO_COLORS.gold,
+      align: "left",
+      letterSpacing: 0,
+      lineHeight: 1.2,
+      opacity: 1,
+      rotation: 0,
+    },
+  ];
+
+  return { backgroundColor: LEONARDO_COLORS.bg, objects };
+}
+
+export function generateLeonardoStoryDesignRow(
+  opts: LeonardoStoryOptions = {},
+  userId?: string | null
+) {
+  const canvasData = generateLeonardoStoryCanvasData(opts);
+
+  return {
+    name: "Story — Leonardo'nun Atölyesi",
+    platform: "instagram-story",
+    width: 1080,
+    height: 1920,
+    canvas_data: canvasData,
+    thumbnail_url: null,
+    is_template: false,
+    ...(userId && userId !== "system" ? { created_by: userId } : {}),
+  };
+}
