@@ -11,6 +11,7 @@ import Etkinlikler from "@/components/Etkinlikler";
 import Footer from "@/components/Footer";
 
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
+const LeonardoBanner = dynamic(() => import("@/components/LeonardoBanner"));
 const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
 const Bulten = dynamic(() => import("@/components/Bulten"));
 const MuzeRehberBanner = dynamic(() => import("@/components/MuzeRehberBanner"));
@@ -55,6 +56,9 @@ export default function Home() {
         <HaritaBanner />
       </Suspense>
       <Hizmetler />
+      <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
+        <LeonardoBanner />
+      </Suspense>
       <Suspense fallback={<div className="h-96 bg-warm-50 animate-pulse" />}>
         <DunyamiziBolum />
       </Suspense>
