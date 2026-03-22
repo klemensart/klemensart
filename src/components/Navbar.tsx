@@ -130,7 +130,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           )}
 
           <a
-            href="#bulten"
+            href="/#bulten"
             className="inline-flex items-center px-5 py-2 bg-coral text-white text-sm font-semibold rounded-full hover:opacity-90 active:scale-95 transition-all duration-150"
           >
             Bültene Katıl
@@ -199,7 +199,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           )}
 
           <a
-            href="#bulten"
+            href="/#bulten"
             className="mt-2 px-5 py-3 bg-coral text-white text-sm font-semibold rounded-full text-center"
             onClick={() => setMenuOpen(false)}
           >
