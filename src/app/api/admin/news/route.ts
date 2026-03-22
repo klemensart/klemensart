@@ -107,6 +107,16 @@ export async function POST(req: NextRequest) {
     } catch { /* görselsiz devam et */ }
   }
 
+  // Manuel eklenen haberler için otomatik newsletter_order ata
+  const { data: maxRow } = await admin
+    .from("news_items")
+    .select("newsletter_order")
+    .eq("status", "published")
+    .order("newsletter_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const nextOrder = ((maxRow?.newsletter_order as number) ?? 0) + 1;
+
   const { data, error } = await admin
     .from("news_items")
     .insert({
@@ -116,10 +126,11 @@ export async function POST(req: NextRequest) {
       url: url ?? null,
       image_url: finalImage,
       source_name: source_name ?? "Klemens",
-      status: "new",
+      status: "published",
       is_manual: true,
       published_at: publishedAt,
       slug,
+      newsletter_order: nextOrder,
     })
     .select("id")
     .single();
