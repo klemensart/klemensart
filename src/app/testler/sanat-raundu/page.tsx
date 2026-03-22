@@ -542,6 +542,7 @@ export default function SanatRaundu() {
           mode: "timed",
           time_seconds: totalTimeRef.current || null,
           quiz_slug: "sanat-raundu",
+          quiz_title: "Sanat Raundu",
           results: results.map((r) => ({
             question: r.question.question,
             correctAnswer: r.question.correct_answer,

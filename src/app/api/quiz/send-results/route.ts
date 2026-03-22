@@ -16,7 +16,7 @@ type ResultItem = {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { email, score, badge, results, mode, time_seconds, quiz_slug = "ronesans-quiz", quiz_title = "Rönesans Sanat Quizi" } = body as {
+  const { email, score, badge, results, mode, time_seconds, quiz_slug = "ronesans-quiz", quiz_title = "Rönesans Sanat Quizi", max_score } = body as {
     email: string;
     score: number;
     badge: string;
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     time_seconds: number | null;
     quiz_slug?: string;
     quiz_title?: string;
+    max_score?: number;
   };
 
   if (!email || typeof score !== "number" || !badge || !results) {
@@ -144,11 +145,14 @@ export async function POST(req: NextRequest) {
   const wrongResults = results.filter((r) => !r.correct);
   const correctCount = results.filter((r) => r.correct).length;
 
-  const html = buildResultsEmail({ score, badge, mode, time_seconds, results, wrongResults, correctCount, quiz_title });
+  const totalQuestions = results.length;
+  const scoreLabel = max_score ? `${score}/${max_score}` : `${score} puan`;
+
+  const html = buildResultsEmail({ score, badge, mode, time_seconds, results, wrongResults, correctCount, quiz_title, max_score, totalQuestions });
 
   await sendThankYouEmail({
     to: trimmedEmail,
-    subject: `${quiz_title} — Sonuçlarınız: ${score}/10`,
+    subject: `${quiz_title} — Sonuçlarınız: ${scoreLabel}`,
     html,
   });
 
@@ -164,8 +168,10 @@ function buildResultsEmail(params: {
   wrongResults: ResultItem[];
   correctCount: number;
   quiz_title: string;
+  max_score?: number;
+  totalQuestions: number;
 }): string {
-  const { score, badge, mode, time_seconds, results, wrongResults, correctCount, quiz_title } = params;
+  const { score, badge, mode, time_seconds, results, wrongResults, correctCount, quiz_title, max_score, totalQuestions } = params;
 
   const timeStr = time_seconds
     ? `${Math.floor(time_seconds / 60) > 0 ? Math.floor(time_seconds / 60) + "dk " : ""}${time_seconds % 60}sn`
@@ -227,7 +233,7 @@ function buildResultsEmail(params: {
     <!-- Score -->
     <div style="text-align:center;background:#252220;border:1px solid #3a302a;border-radius:16px;padding:28px 20px;margin-bottom:24px;">
       <div style="font-size:48px;font-weight:800;color:#C9A84C;line-height:1;">
-        ${score}<span style="font-size:20px;color:#9B918A;">/10</span>
+        ${score}${max_score ? `<span style="font-size:20px;color:#9B918A;">/${max_score}</span>` : `<span style="font-size:20px;color:#9B918A;"> puan</span>`}
       </div>
       ${timeStr ? `<div style="font-size:13px;color:#9B918A;margin-top:6px;">${timeStr}${mode === "timed" ? " — Hızlı Mod" : ""}</div>` : ""}
       <div style="margin-top:16px;display:inline-block;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:99px;padding:10px 28px;">
@@ -235,7 +241,7 @@ function buildResultsEmail(params: {
         <div style="font-size:18px;font-weight:800;color:#C9A84C;margin-top:2px;">${badge}</div>
       </div>
       <div style="margin-top:12px;color:#9B918A;font-size:13px;">
-        ${correctCount} doğru &middot; ${10 - correctCount} yanlış
+        ${correctCount} doğru &middot; ${totalQuestions - correctCount} yanlış
       </div>
     </div>
 

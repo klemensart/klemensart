@@ -438,7 +438,7 @@ export default function LeonardoAtolyesi() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim().toLowerCase(), score: totalScore, badge: b.name,
-          time_seconds: totalTimeRef.current, quiz_slug: "leonardo-atolyesi",
+          time_seconds: totalTimeRef.current, quiz_slug: "leonardo-atolyesi", quiz_title: "Leonardo'nun Atölyesi",
           results: results.map(r => {
             const q = questions[r.questionIndex];
             return { question: q?.question ?? "", correctAnswer: q?.correct_answer ?? "", userAnswer: r.userAnswer, correct: r.correct, points: r.points, funFact: q?.fun_fact ?? null };

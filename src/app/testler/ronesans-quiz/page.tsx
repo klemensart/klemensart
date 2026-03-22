@@ -419,6 +419,7 @@ export default function RonesansQuiz() {
           badge: badge.name,
           mode,
           time_seconds: totalTimeRef.current || null,
+          max_score: 10,
           results: results.map((r) => ({
             title: r.item.title,
             artist: r.item.artist,

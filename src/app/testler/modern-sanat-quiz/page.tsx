@@ -526,6 +526,7 @@ export default function ModernSanatQuiz() {
           time_seconds: totalTimeRef.current || null,
           quiz_slug: QUIZ_SLUG,
           quiz_title: QUIZ_TITLE,
+          max_score: 10,
           results: results.map((r) => ({
             title: r.item.title,
             artist: r.item.artist,
