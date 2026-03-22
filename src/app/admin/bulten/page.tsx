@@ -625,10 +625,18 @@ export default function BultenGonderPage() {
         if (data.items) {
           // Tüm yayınlanmış haberleri yükle (sent_in_newsletter filtresi kaldırıldı —
           // kullanıcı admin panelden istediğini seçebilsin)
+          // RSS boilerplate temizle ("Read more", "The post..." vb.)
+          const cleanRss = (s: string) => s
+            .replace(/\.{2,}\s*Read more.*$/i, "…")
+            .replace(/\s*Read more.*$/i, "")
+            .replace(/\s*The post\s+.+?\s+(appeared|was published)\s+(first\s+)?on\s+.+\.?$/i, "")
+            .replace(/\s*Continue reading.*$/i, "")
+            .replace(/\s*Devamını oku.*$/i, "")
+            .trim();
           const newsItems = data.items.map(
             (item: { title: string; summary: string; url: string; image_url?: string; source_name?: string }) => ({
               title: item.title || "",
-              summary: item.summary || "",
+              summary: cleanRss(item.summary || ""),
               url: item.url || "",
               image_url: item.image_url || "",
               source_name: item.source_name || "",
