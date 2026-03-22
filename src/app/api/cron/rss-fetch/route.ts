@@ -53,6 +53,23 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
 
+// ── RSS boilerplate temizleme (WordPress "Read more", "The post..." vb.) ────
+function cleanSummary(text: string | null): string | null {
+  if (!text) return null;
+  return text
+    // "... Read more" veya "Read more" ile biten kısımları temizle
+    .replace(/\.{2,}\s*Read more.*$/i, "…")
+    .replace(/\s*Read more.*$/i, "")
+    // "The post [title] appeared first on [site]" WordPress kalıplarını temizle
+    .replace(/\s*The post\s+.+?\s+(appeared|was published)\s+(first\s+)?on\s+.+\.?$/i, "")
+    // "Continue reading" kalıpları
+    .replace(/\s*Continue reading.*$/i, "")
+    // "Devamını oku" Türkçe kalıpları
+    .replace(/\s*Devamını oku.*$/i, "")
+    // Sondaki boşluklar
+    .trim() || null;
+}
+
 // ── Konu filtreleme (futbol vb. istenmeyen içerikler) ────────────────────────
 const BLOCKED_KEYWORDS = [
   "futbol", "süper lig", "şampiyonlar ligi", "europa league",
@@ -98,11 +115,12 @@ export async function GET(req: NextRequest) {
 
         const rows = items.map((item) => {
           const raw = item as unknown as Record<string, unknown>;
-          const summary = item.contentSnippet
+          const rawSummary = item.contentSnippet
             ? stripHtml(item.contentSnippet).slice(0, 500)
             : item.summary
               ? stripHtml(item.summary).slice(0, 500)
               : null;
+          const summary = cleanSummary(rawSummary);
 
           return {
             feed_id: feed.id,

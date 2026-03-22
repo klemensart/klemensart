@@ -634,16 +634,31 @@ export default function BultenGonderPage() {
               source_name: item.source_name || "",
             })
           );
-          // Auto week label + slug (Pazartesi–Pazar, bugünü içeren hafta)
+          // Auto week label + slug — bu hafta zaten gönderildiyse sonraki haftayı göster
           const now = new Date();
           const day = now.getDay(); // 0=Pazar
           const mondayOffset = day === 0 ? -6 : 1 - day;
           const weekStart = new Date(now);
           weekStart.setDate(now.getDate() + mondayOffset);
+
+          // Son HaberlerBulteni kampanyasını kontrol et
+          try {
+            const campRes = await fetch("/api/admin/newsletter/last-campaign?template=HaberlerBulteni");
+            const campData = await campRes.json();
+            if (campData.created_at) {
+              const lastSent = new Date(campData.created_at);
+              // Son kampanya bu haftanın Pazartesi'sinden sonra mı gönderilmiş?
+              if (lastSent >= weekStart) {
+                // Bu hafta zaten gönderilmiş → sonraki haftaya ilerle
+                weekStart.setDate(weekStart.getDate() + 7);
+              }
+            }
+          } catch { /* kampanya kontrol hatası — mevcut haftayı kullan */ }
+
           const weekEnd = new Date(weekStart);
           weekEnd.setDate(weekStart.getDate() + 6);
           const fmt = (d: Date) => `${d.getDate()} ${d.toLocaleDateString("tr-TR", { month: "long" })}`;
-          const weekLabel = `${fmt(weekStart)}–${fmt(weekEnd)} ${now.getFullYear()}`;
+          const weekLabel = `${fmt(weekStart)}–${fmt(weekEnd)} ${weekStart.getFullYear()}`;
 
           // weekSlug: "16-mart-2026" formatında — e-postadaki buton linki için
           const monthNames = ["ocak","subat","mart","nisan","mayis","haziran","temmuz","agustos","eylul","ekim","kasim","aralik"];
