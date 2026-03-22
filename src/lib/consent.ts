@@ -12,4 +12,5 @@ export function hasConsent(): boolean | null {
 
 export function setConsent(value: boolean): void {
   localStorage.setItem(KEY, String(value));
+  window.dispatchEvent(new Event("consent-changed"));
 }

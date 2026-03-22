@@ -10,15 +10,15 @@ export default function GoogleAnalytics() {
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    // Check on mount and whenever consent changes (storage event)
     const check = () => setAllowed(hasConsent() === true);
     check();
+    // Cross-tab consent changes
     window.addEventListener("storage", check);
-    // Also listen for same-tab consent changes
-    const interval = setInterval(check, 1000);
+    // Same-tab consent changes (custom event fired by consent UI)
+    window.addEventListener("consent-changed", check);
     return () => {
       window.removeEventListener("storage", check);
-      clearInterval(interval);
+      window.removeEventListener("consent-changed", check);
     };
   }, []);
 
