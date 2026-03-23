@@ -73,8 +73,13 @@ const TYPE_LABELS: Record<string, string> = {
   konser: "Konser",
   tiyatro: "Tiyatro",
   soylesi: "Söyleşi",
+  panel: "Panel",
   festival: "Festival",
   "film-festivali": "Film Festivali",
+  performans: "Performans",
+  opera: "Opera",
+  bale: "Bale",
+  atolye: "Atölye",
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -82,8 +87,13 @@ const TYPE_COLORS: Record<string, string> = {
   konser:           "bg-amber-100 text-amber-700",
   tiyatro:          "bg-violet-100 text-violet-700",
   soylesi:          "bg-emerald-100 text-emerald-700",
+  panel:            "bg-cyan-100 text-cyan-700",
   festival:         "bg-sky-100 text-sky-700",
   "film-festivali": "bg-rose-100 text-rose-700",
+  performans:       "bg-fuchsia-100 text-fuchsia-700",
+  opera:            "bg-red-100 text-red-700",
+  bale:             "bg-pink-100 text-pink-700",
+  atolye:           "bg-teal-100 text-teal-700",
 };
 
 function fmtFullDate(iso: string | null) {

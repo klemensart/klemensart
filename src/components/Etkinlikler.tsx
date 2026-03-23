@@ -16,13 +16,20 @@ const TYPE_DOT: Record<string, string> = {
   konser:           "bg-amber-500",
   tiyatro:          "bg-violet-500",
   soylesi:          "bg-emerald-500",
+  panel:            "bg-cyan-500",
   festival:         "bg-sky-500",
   "film-festivali": "bg-rose-500",
+  performans:       "bg-fuchsia-500",
+  opera:            "bg-red-500",
+  bale:             "bg-pink-400",
+  atolye:           "bg-teal-500",
 };
 
 const TYPE_LABEL: Record<string, string> = {
   sergi: "Sergi", konser: "Konser", tiyatro: "Tiyatro",
-  soylesi: "Söyleşi", festival: "Festival", "film-festivali": "Film Festivali",
+  soylesi: "Söyleşi", panel: "Panel", festival: "Festival",
+  "film-festivali": "Film Festivali", performans: "Performans",
+  opera: "Opera", bale: "Bale", atolye: "Atölye",
 };
 
 function fmtDate(iso: string | null) {
@@ -87,7 +94,7 @@ export default async function Etkinlikler() {
           <div className="space-y-4">
             {events.map((e) => {
               const type = e.event_type ?? "";
-              const dot = TYPE_DOT[type] ?? "bg-warm-400";
+              const dot = TYPE_DOT[type] ?? "bg-stone-400";
               const label = TYPE_LABEL[type] ?? type;
               const date = fmtDate(e.event_date);
 
