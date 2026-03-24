@@ -50,6 +50,7 @@ type SeriesWorkshop = {
   price: string;
   imgSquare: string | null;
   imgPosition?: string;
+  startLabel?: string;
 };
 
 const SERILER: SeriesWorkshop[] = [
@@ -72,6 +73,7 @@ const SERILER: SeriesWorkshop[] = [
     price: "6.000 TL",
     imgSquare: "/images/workshops/modern-sanat-atolyesi-square.webp",
     imgPosition: "center center",
+    startLabel: "8 Nisan'da başlıyor",
   },
   {
     slug: "ronesans-okuryazarligi",
@@ -92,6 +94,17 @@ const SERILER: SeriesWorkshop[] = [
     price: "6.000 TL",
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
     imgPosition: "center center",
+  },
+  {
+    slug: "leonardo-da-vinci-semineri",
+    workshopId: SLUG_TO_ATOLYE["leonardo-da-vinci-semineri"].id,
+    title: "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
+    description: "Mona Lisa'nın gizemi, Son Akşam Yemeği'nin ötesi — tek oturumda Leonardo'nun evrenini keşfedin.",
+    duration: "Tek Oturum",
+    price: "600 TL",
+    imgSquare: "/images/workshops/leonardo-da-vinci-square.webp",
+    imgPosition: "center center",
+    startLabel: "1 Nisan",
   },
 ];
 
@@ -264,6 +277,22 @@ function SeriesKart({ w, status, badgeText }: { w: SeriesWorkshop; status: Statu
                 }}
               >
                 <VideoIcon /> Zoom
+              </span>
+            )}
+            {w.startLabel && status === "open" && (
+              <span
+                style={{
+                  background: "rgba(255,255,255,0.22)",
+                  backdropFilter: "blur(6px)",
+                  color: "#fff",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {w.startLabel}
               </span>
             )}
             {badgeText && (

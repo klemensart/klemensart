@@ -25,7 +25,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     forSale: true,
     imgCover: "/images/workshops/modern-sanat-atolyesi-cover.webp",
     imgSquare: "/images/workshops/modern-sanat-atolyesi-square.webp",
-    targetDate: "2026-03-25T20:30:00+03:00",
+    targetDate: "2026-04-08T20:30:00+03:00",
   },
   "ronesans-okuryazarligi": {
     id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -42,6 +42,15 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     imgCover: "/images/workshops/kapsamli-sanat-tarihi-cover.webp",
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
     targetDate: "2026-01-28T20:30:00+03:00",
+  },
+
+  "leonardo-da-vinci-semineri": {
+    id: "d5e6f7a8-b9c0-1234-defa-567890123456",
+    price: 60000,
+    forSale: true,
+    imgCover: "/images/workshops/leonardo-da-vinci-cover.webp",
+    imgSquare: "/images/workshops/leonardo-da-vinci-square.webp",
+    targetDate: "2026-04-01T20:30:00+03:00",
   },
 
   /* ─── Sinema Kulübü ──────────────────────────── */

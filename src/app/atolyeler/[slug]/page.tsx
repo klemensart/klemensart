@@ -61,6 +61,10 @@ export async function generateMetadata({ params }: Props) {
       title: "Kapsamlı Sanat Tarihi Atölyesi",
       description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık program.",
     },
+    "leonardo-da-vinci-semineri": {
+      title: "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
+      description: "Mona Lisa'dan Vitruvius Adamı'na, Son Akşam Yemeği'nden uçma makinelerine — Rönesans'ın en büyük dehası Leonardo da Vinci'nin evrenine tek oturumluk yolculuk.",
+    },
   };
   const m = meta[slug] ?? { title: "Atölye", description: "" };
   const cfg = SLUG_TO_ATOLYE[slug];
@@ -96,6 +100,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "modern-sanat-atolyesi": "Modern Sanatı Okumak",
     "ronesans-okuryazarligi": "Rönesans Okur-Yazarlığı",
     "kapsamli-sanat-tarihi": "Kapsamlı Sanat Tarihi Atölyesi",
+    "leonardo-da-vinci-semineri": "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
   };
 
   const courseDescriptions: Record<string, string> = {
@@ -103,6 +108,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
     "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
     "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze, 10 haftalık kapsamlı sanat tarihi programı.",
+    "leonardo-da-vinci-semineri": "Rönesans'ın en büyük dehası Leonardo da Vinci'nin sanat, bilim ve mühendislik evrenine tek oturumluk yolculuk.",
   };
 
   const courseJsonLd = {
@@ -127,6 +133,8 @@ export default async function AtolyeDetayPage({ params }: Props) {
     page = <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "kapsamli-sanat-tarihi")
     page = <KapsamliSanatTarihiPage config={config} status={status} slug={slug} />;
+  else if (slug === "leonardo-da-vinci-semineri")
+    page = <LeonardoDaVinciPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else return <YakindaPage baslik="Bilinmeyen Atölye" />;
 
   return (
@@ -348,7 +356,7 @@ function EgitmenKart() {
           Kerem Hun
         </h3>
         <p style={{ color: B.coral, fontSize: 13, fontWeight: 600, margin: "0 0 10px" }}>
-          Sanat Tarihçisi & Küratör
+          Sanat Tarihçisi
         </p>
         <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.7, margin: 0 }}>
           Sanat tarihini sezgisel ve erişilebilir bir dille aktaran Kerem Hun, 10 yılı aşkın süredir atölye
@@ -698,7 +706,7 @@ function ModernSanatPage({
 
         <HeroBanner
           config={config}
-          altBaslik="KLEMENS LOCA — 10 Hafta"
+          altBaslik="KLEMENS LOCA — 10 Hafta · 8 Nisan'da Başlıyor"
           baslik="Modern Sanatı Okumak"
           fiyat="6.000₺"
           workshopTitle="Modern Sanat Atolyesi"
@@ -761,8 +769,13 @@ function ModernSanatPage({
 
           {/* Bilgi */}
           <BilgiBanner>
-            10 haftalık atölye Zoom üzerinden canlı. Kayıt sonrası 6 aylık tekrar izleme erişim
-            anahtarı iletilecektir.
+            <p style={{ margin: "0 0 4px" }}>
+              <strong>Başlangıç: 8 Nisan 2026, Çarşamba — 20:30</strong> · Her hafta aynı gün ve saatte.
+            </p>
+            <p style={{ margin: 0 }}>
+              10 haftalık atölye Zoom üzerinden canlı. Kayıt sonrası 6 aylık tekrar izleme erişim
+              anahtarı iletilecektir.
+            </p>
           </BilgiBanner>
 
           {/* Müfredat */}
@@ -843,7 +856,7 @@ function ModernSanatPage({
             config={config}
             workshopSlug={slug}
             workshopTitle="Modern Sanat Atolyesi"
-            aciklama="10 hafta · Zoom · 6 aylık tekrar izleme"
+            aciklama="8 Nisan'da başlıyor · 10 hafta · Zoom · 6 aylık tekrar izleme"
             fiyatLabel="6.000₺"
             status={status}
           />
@@ -1222,7 +1235,217 @@ function KapsamliSanatTarihiPage({
   );
 }
 
-/* ─── SAYFA 5: Yakında (fallback) ───────────────────── */
+/* ─── SAYFA 5: Leonardo da Vinci Semineri ──────────── */
+
+function LeonardoDaVinciPage({
+  config,
+  status,
+  nextSessionDate,
+  slug,
+}: {
+  config: AtolyeConfig;
+  status: Status;
+  nextSessionDate: string | null;
+  slug: string;
+}) {
+  const bolumler = [
+    {
+      no: 1,
+      baslik: "FLORANSA'DAN DÜNYAYA",
+      aciklama: "Vinci kasabasından Verrocchio'nun atölyesine — bir dehaya giden yol. Floransa'nın altın çağında sanatçı olmak ne demekti?",
+    },
+    {
+      no: 2,
+      baslik: "RESSAMLIĞIN ZİRVESİ",
+      aciklama: "Mona Lisa'nın sfumato'su, Son Akşam Yemeği'nin perspektif devrimi, Kayalıklar Bakiresi'nin gizemli ışığı — her eserin ardındaki hikaye.",
+    },
+    {
+      no: 3,
+      baslik: "BİLİM İNSANI LEONARDO",
+      aciklama: "Anatomi çizimleri, uçma makineleri, su mühendisliği, optik deneyleri — sanatçının defterlerindeki keşifler çağının yüzyıllar ötesindeydi.",
+    },
+    {
+      no: 4,
+      baslik: "MİRAS VE GÜNÜMÜZ",
+      aciklama: "Leonardo'nun düşünce yöntemi bugün bize ne öğretir? Disiplinlerarası yaratıcılık ve 'merak' kavramının anatomisi.",
+    },
+  ];
+
+  return (
+    <>
+      <Navbar />
+      <main style={{ background: B.cream, minHeight: "100vh" }}>
+
+        {/* Geri sayım */}
+        {status === "open" && nextSessionDate && (
+          <div style={{ background: B.dark, padding: "20px 24px", textAlign: "center" }}>
+            <p style={{ color: "#a09890", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 14px" }}>
+              Seminere Kalan Süre
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CountdownTimer targetDate={nextSessionDate} />
+            </div>
+          </div>
+        )}
+
+        <HeroBanner
+          config={config}
+          altBaslik="Seminer · 1 Nisan Çarşamba"
+          baslik={"Leonardo da Vinci:\nSanatın ve Bilimin Kesiştiği Deha"}
+          fiyat="600₺"
+          workshopTitle="Leonardo da Vinci Semineri"
+          workshopSlug={slug}
+          imgPosition="center 35%"
+          status={status}
+        />
+
+        {/* Tagline */}
+        <div style={{ background: B.light, borderLeft: `4px solid ${B.coral}`, padding: "14px 24px", margin: 0 }}>
+          <p style={{ maxWidth: 800, margin: "0 auto", color: B.dark, fontSize: 16, fontStyle: "italic", lineHeight: 1.6 }}>
+            &ldquo;Öğrenme arzusunun tükendiği yerde yaşam da tükenir.&rdquo; — Leonardo da Vinci
+          </p>
+        </div>
+
+        <div id="detaylar" style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
+
+          {/* Açıklama */}
+          <section style={{ paddingTop: 56, paddingBottom: 0 }}>
+            <p style={{ color: B.dark, fontSize: 17, lineHeight: 1.85, margin: "0 0 20px" }}>
+              1452'de Toskana'nın küçük bir kasabasında doğan Leonardo, yalnızca bir ressam değildi.
+              O bir anatomist, mühendis, mucit, botanikçi, müzisyen ve filozoftu. Tarih onu &ldquo;Rönesans İnsanı&rdquo;nın
+              en saf hali olarak hatırlar.
+            </p>
+            <p style={{ color: B.dark, fontSize: 17, lineHeight: 1.85, margin: "0 0 16px" }}>
+              Bu seminerde Leonardo'nun dünyasına dört farklı pencereden bakacağız:
+            </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 48px", display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                "Mona Lisa'nın binlerce katmanlı sfumato tekniği",
+                "Son Akşam Yemeği'ndeki matematik ve duygu dengesi",
+                "Anatomik çizimlerinin modern tıbbı nasıl öncülediği",
+                "Uçma makinelerinden savaş araçlarına — mühendis Leonardo",
+                "Defterlerindeki ayna yazısının sırrı",
+              ].map((item) => (
+                <li key={item} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ color: B.coral, fontWeight: 700, flexShrink: 0, marginTop: 3 }}>—</span>
+                  <span style={{ color: B.dark, fontSize: 16, lineHeight: 1.65 }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* Bilgi */}
+          <BilgiBanner>
+            <p style={{ margin: "0 0 4px" }}>
+              <strong>1 Nisan 2026, Çarşamba — 20:30</strong> · Zoom üzerinden canlı.
+              Kayıt sonrası katılım linki e-posta ile iletilecektir.
+            </p>
+            <p style={{ margin: 0, fontStyle: "italic", color: B.warm }}>
+              Kontenjan sınırlıdır — yerinizi ayırın.
+            </p>
+          </BilgiBanner>
+
+          {/* Seminer Bölümleri */}
+          <section style={{ paddingBottom: 56 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: B.dark, marginBottom: 24 }}>
+              Seminer İçeriği
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+              {bolumler.map((b) => (
+                <div
+                  key={b.no}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 14,
+                    padding: "24px 20px",
+                    boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span
+                      style={{
+                        width: 28, height: 28, borderRadius: "50%",
+                        background: B.light, color: B.coral,
+                        fontSize: 12, fontWeight: 700,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {b.no}
+                    </span>
+                    <span style={{ color: B.coral, fontSize: 12, fontWeight: 800, letterSpacing: "0.1em" }}>
+                      {b.baslik}
+                    </span>
+                  </div>
+                  <p style={{ color: B.dark, fontSize: 14, lineHeight: 1.7, margin: 0 }}>
+                    {b.aciklama}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Konu Öne Çıkanlar */}
+          <section style={{ paddingBottom: 48 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: B.dark, marginBottom: 24 }}>
+              Neden Leonardo?
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+              {[
+                { icon: "🎨", baslik: "Sanat", alt: "Ressamlığı yeniden tanımladı. Sfumato, chiaroscuro ve perspektif tekniklerini mükemmelleştirdi." },
+                { icon: "🔬", baslik: "Bilim", alt: "Anatomi, optik, jeoloji ve botanik alanlarında çağının ötesinde çalışmalar yaptı." },
+                { icon: "⚙️", baslik: "Mühendislik", alt: "Uçma makineleri, tank tasarımları, köprüler — hayal gücünün sınırlarını zorladı." },
+                { icon: "📖", baslik: "Felsefe", alt: "Gözlem, merak ve disiplinlerarası düşünce — Leonardo'nun yaratıcılık formülü." },
+              ].map((k) => (
+                <div
+                  key={k.baslik}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 14,
+                    padding: "24px 20px",
+                    boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
+                    textAlign: "center",
+                  }}
+                >
+                  <span style={{ fontSize: 32, display: "block", marginBottom: 12 }}>{k.icon}</span>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: B.dark, margin: "0 0 8px" }}>{k.baslik}</h3>
+                  <p style={{ color: B.warm, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{k.alt}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Alıntı */}
+          <blockquote style={{ borderLeft: `3px solid ${B.coral}`, paddingLeft: 24, margin: "0 0 48px" }}>
+            <p style={{ color: B.warm, fontSize: 18, lineHeight: 1.8, fontStyle: "italic", margin: 0 }}>
+              &ldquo;Basitlik, inceliğin doruk noktasıdır.&rdquo;
+            </p>
+            <p style={{ color: B.warm, fontSize: 14, margin: "8px 0 0", fontWeight: 600 }}>
+              — Leonardo da Vinci
+            </p>
+          </blockquote>
+
+          <EgitmenKart />
+
+          <AltCTA
+            config={config}
+            workshopSlug={slug}
+            workshopTitle="Leonardo da Vinci Semineri"
+            aciklama="Tek oturum · 1 Nisan · Zoom · 20:30"
+            fiyatLabel="600₺"
+            status={status}
+          />
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+/* ─── SAYFA 6: Yakında (fallback) ───────────────────── */
 
 function YakindaPage({ baslik }: { baslik: string }) {
   return (
