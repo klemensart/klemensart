@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Editor, EditorContent, useEditor, NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
@@ -10,6 +10,9 @@ import TiptapLink from "@tiptap/extension-link";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Markdown } from "tiptap-markdown";
+import { SuggestionExtension, findTextInDoc } from "@/lib/tiptap-suggestions";
+import type { Suggestion } from "@/lib/tiptap-suggestions";
+import SuggestionPopover from "./SuggestionPopover";
 
 /* ── Types ── */
 type Props = {
@@ -18,6 +21,13 @@ type Props = {
   onUploadImage: (file: File) => Promise<string | null>;
   uploading?: boolean;
   placeholder?: string;
+  /* Suggestion system */
+  articleId?: string;
+  suggestions?: Suggestion[];
+  onSuggestionsChange?: (suggestions: Suggestion[]) => void;
+  currentUserId?: string;
+  currentUserRole?: string;
+  currentUserName?: string;
 };
 
 /* ── Custom Image extension with data-size attribute ── */
@@ -628,6 +638,18 @@ const EDITOR_CSS = `
     color: inherit;
     font-size: 0.85em;
   }
+
+  /* Suggestion highlights */
+  .ProseMirror .suggestion-highlight {
+    background: rgba(251, 191, 36, 0.25);
+    border-bottom: 2px solid #f59e0b;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 2px;
+  }
+  .ProseMirror .suggestion-highlight:hover {
+    background: rgba(251, 191, 36, 0.4);
+  }
 `;
 
 /* ── Main editor component ── */
@@ -637,6 +659,12 @@ export default function TiptapEditor({
   onUploadImage,
   uploading,
   placeholder,
+  articleId,
+  suggestions = [],
+  onSuggestionsChange,
+  currentUserId,
+  currentUserRole,
+  currentUserName,
 }: Props) {
   const lastMdRef = useRef(content);
   const onUploadRef = useRef(onUploadImage);
@@ -644,6 +672,137 @@ export default function TiptapEditor({
   const editorRef = useRef<Editor | null>(null);
 
   const [optimizing, setOptimizing] = useState(false);
+  const [suggestionMode, setSuggestionMode] = useState(false);
+  // Mini = small "Öneri Bırak" button near selection; create/review = full popover
+  const [popover, setPopover] = useState<{
+    mode: "mini";
+    selectedText: string;
+    rect: DOMRect;
+  } | {
+    mode: "create";
+    selectedText: string;
+    rect: DOMRect;
+  } | {
+    mode: "review";
+    suggestion: Suggestion;
+    rect: DOMRect;
+  } | null>(null);
+
+  const pendingCount = suggestions.filter((s) => s.status === "pending").length;
+
+  // Sync suggestions to extension storage
+  useEffect(() => {
+    const ed = editorRef.current;
+    if (!ed || ed.isDestroyed) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (ed.storage as any).suggestion.suggestions = suggestions;
+    // Force decoration recalculation
+    ed.view.dispatch(ed.state.tr.setMeta("suggestion-update", true));
+  }, [suggestions]);
+
+  // Handle suggestion create
+  const handleSuggestionCreate = useCallback(async (data: {
+    original_text: string;
+    suggested_text: string;
+    context_before: string;
+    context_after: string;
+    note: string;
+  }) => {
+    if (!articleId) return;
+
+    // Get context from editor
+    const ed = editorRef.current;
+    if (ed && !ed.isDestroyed) {
+      const match = findTextInDoc(ed.state.doc, data.original_text, "", "");
+      if (match) {
+        // Extract context_before and context_after from surrounding text
+        const textBefore: string[] = [];
+        ed.state.doc.nodesBetween(0, match.from, (node) => {
+          if (node.isText && node.text) textBefore.push(node.text);
+        });
+        const textAfter: string[] = [];
+        ed.state.doc.nodesBetween(match.to, ed.state.doc.content.size, (node) => {
+          if (node.isText && node.text) textAfter.push(node.text);
+        });
+        data.context_before = textBefore.join("").slice(-80);
+        data.context_after = textAfter.join("").slice(0, 80);
+      }
+    }
+
+    const res = await fetch(`/api/admin/articles/${articleId}/suggestions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      const { suggestion } = await res.json();
+      onSuggestionsChange?.([...suggestions, suggestion]);
+    }
+  }, [articleId, suggestions, onSuggestionsChange]);
+
+  // Handle accept
+  const handleSuggestionAccept = useCallback(async (suggestion: Suggestion) => {
+    if (!articleId) return;
+
+    // Replace text in editor
+    const ed = editorRef.current;
+    if (ed && !ed.isDestroyed) {
+      const match = findTextInDoc(
+        ed.state.doc,
+        suggestion.original_text,
+        suggestion.context_before,
+        suggestion.context_after
+      );
+      if (match) {
+        ed.chain()
+          .focus()
+          .setTextSelection({ from: match.from, to: match.to })
+          .insertContent(suggestion.suggested_text)
+          .run();
+      }
+    }
+
+    // Update API
+    const res = await fetch(
+      `/api/admin/articles/${articleId}/suggestions/${suggestion.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "accepted" }),
+      }
+    );
+
+    if (res.ok) {
+      onSuggestionsChange?.(
+        suggestions.map((s) =>
+          s.id === suggestion.id ? { ...s, status: "accepted" as const } : s
+        )
+      );
+    }
+  }, [articleId, suggestions, onSuggestionsChange]);
+
+  // Handle reject
+  const handleSuggestionReject = useCallback(async (suggestion: Suggestion) => {
+    if (!articleId) return;
+
+    const res = await fetch(
+      `/api/admin/articles/${articleId}/suggestions/${suggestion.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "rejected" }),
+      }
+    );
+
+    if (res.ok) {
+      onSuggestionsChange?.(
+        suggestions.map((s) =>
+          s.id === suggestion.id ? { ...s, status: "rejected" as const } : s
+        )
+      );
+    }
+  }, [articleId, suggestions, onSuggestionsChange]);
 
   const handleImageUpload = async (file: File) => {
     const ed = editorRef.current;
@@ -743,6 +902,7 @@ export default function TiptapEditor({
         transformPastedText: true,
         transformCopiedText: true,
       }),
+      SuggestionExtension,
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -752,6 +912,20 @@ export default function TiptapEditor({
       onChange(md);
     },
     editorProps: {
+      handleClick(view, _pos, event) {
+        const target = event.target as HTMLElement;
+        const suggEl = target.closest("[data-suggestion-id]") as HTMLElement | null;
+        if (suggEl) {
+          const sid = suggEl.getAttribute("data-suggestion-id");
+          const s = suggestions.find((sg) => sg.id === sid);
+          if (s && s.status === "pending") {
+            const rect = suggEl.getBoundingClientRect();
+            setPopover({ mode: "review", suggestion: s, rect: DOMRect.fromRect(rect) });
+            return true;
+          }
+        }
+        return false;
+      },
       handleDrop(_view, event, _slice, moved) {
         if (!moved && event.dataTransfer?.files?.length) {
           const file = event.dataTransfer.files[0];
@@ -794,6 +968,51 @@ export default function TiptapEditor({
     }
   }, [content, editor]);
 
+  // Handle text selection in suggestion mode — show mini button
+  useEffect(() => {
+    if (!editor || editor.isDestroyed || !suggestionMode) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const handler = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        // Don't overwrite an open create/review popover
+        if (popover?.mode === "create" || popover?.mode === "review") return;
+
+        const { from, to } = editor.state.selection;
+        if (from === to) { setPopover(null); return; }
+        const selectedText = editor.state.doc.textBetween(from, to, "");
+        if (!selectedText.trim()) { setPopover(null); return; }
+
+        const domSelection = window.getSelection();
+        if (!domSelection || domSelection.rangeCount === 0) return;
+        const rect = domSelection.getRangeAt(0).getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) return;
+
+        setPopover({
+          mode: "mini",
+          selectedText,
+          rect: DOMRect.fromRect(rect),
+        });
+      }, 80);
+    };
+
+    const editorEl = editor.view.dom;
+    editorEl.addEventListener("mouseup", handler);
+    // Also clear mini when selection changes to empty
+    const selHandler = () => {
+      if (popover?.mode === "mini") {
+        const { from, to } = editor.state.selection;
+        if (from === to) setPopover(null);
+      }
+    };
+    editorEl.addEventListener("mousedown", selHandler);
+    return () => {
+      clearTimeout(timer);
+      editorEl.removeEventListener("mouseup", handler);
+      editorEl.removeEventListener("mousedown", selHandler);
+    };
+  }, [editor, suggestionMode, popover?.mode]);
+
   const fileRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;
@@ -835,6 +1054,15 @@ export default function TiptapEditor({
           active={editor.isActive("heading", { level: 3 })}
         >
           <span className="text-xs font-bold leading-none">H3</span>
+        </TBtn>
+        <TBtn
+          title="Normal Metin"
+          onClick={() => editor.chain().focus().setParagraph().run()}
+          active={editor.isActive("paragraph") && !editor.isActive("heading")}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 4v16" /><path d="M17 4v16" /><path d="M19 4H9.5a4.5 4.5 0 1 0 0 9H13" />
+          </svg>
         </TBtn>
         <TSep />
         <TBtn
@@ -902,6 +1130,36 @@ export default function TiptapEditor({
             </span>
           </>
         )}
+        {articleId && (
+          <>
+            <TSep />
+            <button
+              type="button"
+              title="Öneri Modu"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setSuggestionMode((p) => !p);
+                setPopover(null);
+              }}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition ${
+                suggestionMode
+                  ? "bg-amber-100 text-amber-700"
+                  : "text-warm-900/40 hover:bg-warm-200/60 hover:text-warm-900/70"
+              }`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              Öneri
+              {pendingCount > 0 && (
+                <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold rounded-full bg-amber-500 text-white">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Floating BubbleMenu — appears on text selection */}
@@ -927,6 +1185,15 @@ export default function TiptapEditor({
             active={editor.isActive("heading", { level: 3 })}
           >
             <span className="text-xs font-bold leading-none">H3</span>
+          </TBtn>
+          <TBtn
+            title="Normal Metin"
+            onClick={() => editor.chain().focus().setParagraph().run()}
+            active={editor.isActive("paragraph") && !editor.isActive("heading")}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 4v16" /><path d="M17 4v16" /><path d="M19 4H9.5a4.5 4.5 0 1 0 0 9H13" />
+            </svg>
           </TBtn>
           <TSep />
           <TBtn
@@ -1002,6 +1269,60 @@ export default function TiptapEditor({
         }}
       />
       <EditorContent editor={editor} />
+
+      {/* Mini "Öneri Bırak" button — appears near selection */}
+      {popover?.mode === "mini" && (
+        <button
+          type="button"
+          className="fixed z-50 flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white text-xs font-medium rounded-lg shadow-lg hover:bg-amber-600 transition"
+          style={{
+            top: popover.rect.bottom + 6,
+            left: popover.rect.left + popover.rect.width / 2 - 60,
+          }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            // Upgrade mini → full create popover, re-snapshot the selection rect
+            const domSelection = window.getSelection();
+            let rect = popover.rect;
+            if (domSelection && domSelection.rangeCount > 0) {
+              const r = domSelection.getRangeAt(0).getBoundingClientRect();
+              if (r.width > 0) rect = DOMRect.fromRect(r);
+            }
+            setPopover({
+              mode: "create",
+              selectedText: popover.selectedText,
+              rect,
+            });
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+          </svg>
+          Öneri Bırak
+        </button>
+      )}
+
+      {/* Suggestion Popover */}
+      {popover?.mode === "create" && (
+        <SuggestionPopover
+          mode="create"
+          selectedText={popover.selectedText}
+          anchorRect={popover.rect}
+          onSubmit={handleSuggestionCreate}
+          onClose={() => setPopover(null)}
+        />
+      )}
+      {popover?.mode === "review" && (
+        <SuggestionPopover
+          mode="review"
+          suggestion={popover.suggestion}
+          anchorRect={popover.rect}
+          onAccept={handleSuggestionAccept}
+          onReject={handleSuggestionReject}
+          onClose={() => setPopover(null)}
+        />
+      )}
     </div>
   );
 }

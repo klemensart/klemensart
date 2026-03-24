@@ -25,5 +25,5 @@ export default async function AdminLayout({
   const role = await getAdminRole(user.id);
   if (!role) redirect("/");
 
-  return <AdminShell role={role}>{children}</AdminShell>;
+  return <AdminShell role={role} userId={user.id}>{children}</AdminShell>;
 }

@@ -172,9 +172,11 @@ const NAV_ITEMS: NavItem[] = [
 export default function AdminShell({
   children,
   role,
+  userId,
 }: {
   children: React.ReactNode;
   role: string;
+  userId: string;
 }) {
   const pathname = usePathname();
 
@@ -253,7 +255,7 @@ export default function AdminShell({
 
       {/* Main content */}
       <main className="flex-1 ml-64">
-        <AdminRoleProvider value={role}>{children}</AdminRoleProvider>
+        <AdminRoleProvider value={{ role, userId }}>{children}</AdminRoleProvider>
       </main>
     </div>
   );

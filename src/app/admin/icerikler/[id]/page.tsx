@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import TiptapEditor from "@/components/admin/TiptapEditor";
-import { useAdminRole } from "@/components/admin/AdminRoleContext";
+import { useAdminRole, useAdminUser } from "@/components/admin/AdminRoleContext";
+import type { Suggestion } from "@/lib/tiptap-suggestions";
 
 const CATEGORIES = [
   { slug: "Odak", label: "Odak" },
@@ -110,7 +111,10 @@ export default function AdminArticleEditPage() {
   const [deleting, setDeleting] = useState(false);
   const coverFileRef = useRef<HTMLInputElement>(null);
   const role = useAdminRole();
+  const { userId } = useAdminUser();
   const isAdminRole = role === "admin";
+  const [adminName, setAdminName] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   // Source mode toggle for custom markdown blocks
   const [sourceMode, setSourceMode] = useState(false);
@@ -145,6 +149,21 @@ export default function AdminArticleEditPage() {
         setLoading(false);
       }
     })();
+  }, [id, isNew]);
+
+  // Fetch suggestions + admin name for existing articles
+  useEffect(() => {
+    if (isNew) return;
+    // Fetch suggestions
+    fetch(`/api/admin/articles/${id}/suggestions`)
+      .then((r) => r.json())
+      .then((d) => { if (d.suggestions) setSuggestions(d.suggestions); })
+      .catch(() => {});
+    // Fetch admin name
+    fetch("/api/admin/me")
+      .then((r) => r.json())
+      .then((d) => { if (d.name) setAdminName(d.name); })
+      .catch(() => {});
   }, [id, isNew]);
 
   const set = (key: keyof Form, val: string) => {
@@ -544,6 +563,12 @@ export default function AdminArticleEditPage() {
               onUploadImage={handleEditorImageUpload}
               uploading={uploading}
               placeholder="Yazı içeriğini yazın... Görsel yapıştırabilir veya sürükleyebilirsiniz."
+              articleId={isNew ? undefined : id}
+              suggestions={suggestions}
+              onSuggestionsChange={setSuggestions}
+              currentUserId={userId}
+              currentUserRole={role}
+              currentUserName={adminName}
             />
           )}
         </div>
