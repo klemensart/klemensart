@@ -781,9 +781,16 @@ export default function AtolyelerClient() {
               gap: 22,
             }}
           >
-            {SERILER.map((w) => (
-              <SeriesKart key={w.slug} w={w} status={statusMap[w.workshopId] ?? "soon"} badgeText={announcementBadges[w.slug]} />
-            ))}
+            {[...SERILER]
+              .sort((a, b) => {
+                const order: Record<Status, number> = { open: 0, soon: 1, closed: 2 };
+                const sa = statusMap[a.workshopId] ?? "soon";
+                const sb = statusMap[b.workshopId] ?? "soon";
+                return order[sa] - order[sb];
+              })
+              .map((w) => (
+                <SeriesKart key={w.slug} w={w} status={statusMap[w.workshopId] ?? "soon"} badgeText={announcementBadges[w.slug]} />
+              ))}
           </div>
         </section>
 
