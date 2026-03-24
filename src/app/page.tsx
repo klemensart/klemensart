@@ -6,13 +6,13 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import Hero from "@/components/Hero";
 import Hizmetler from "@/components/Hizmetler";
 import IceriklerSection from "@/components/IceriklerSection";
-import Manifesto from "@/components/Manifesto";
-import Etkinlikler from "@/components/Etkinlikler";
 import Footer from "@/components/Footer";
 
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
 const LeonardoBanner = dynamic(() => import("@/components/LeonardoBanner"));
 const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
+const Manifesto = dynamic(() => import("@/components/Manifesto"));
+const Etkinlikler = dynamic(() => import("@/components/Etkinlikler"));
 const Bulten = dynamic(() => import("@/components/Bulten"));
 const MuzeRehberBanner = dynamic(() => import("@/components/MuzeRehberBanner"));
 
@@ -63,8 +63,12 @@ export default function Home() {
         <DunyamiziBolum />
       </Suspense>
       <IceriklerSection />
-      <Manifesto />
-      <Etkinlikler />
+      <Suspense fallback={<div className="h-96 bg-warm-50 animate-pulse" />}>
+        <Manifesto />
+      </Suspense>
+      <Suspense fallback={<div className="h-96 bg-warm-50 animate-pulse" />}>
+        <Etkinlikler />
+      </Suspense>
       <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
         <Bulten />
       </Suspense>
