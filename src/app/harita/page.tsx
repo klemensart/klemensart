@@ -2319,11 +2319,11 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
                         style={{
                           padding: "6px 12px", borderRadius: 7,
-                          background: "transparent", border: "1px solid rgba(48,43,39,0.25)",
-                          color: "#302B27", fontSize: 10, fontWeight: 600,
+                          background: "transparent", border: "1px solid rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 600,
                           cursor: "pointer", transition: "all 0.2s",
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.background = "rgba(48,43,39,0.06)"; }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
                         onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
                       >
                         Ön İzleme
@@ -2433,8 +2433,8 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
                         style={{
                           padding: "5px 10px", borderRadius: 6,
-                          background: "transparent", border: "1px solid rgba(48,43,39,0.25)",
-                          color: "#302B27", fontSize: 9, fontWeight: 600,
+                          background: "transparent", border: "1px solid rgba(255,255,255,0.2)",
+                          color: "rgba(255,255,255,0.55)", fontSize: 9, fontWeight: 600,
                           cursor: "pointer",
                         }}
                       >
