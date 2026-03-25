@@ -1,10 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, lazy, Suspense } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
-import { PLACES, ROUTES, TYPE_LABELS, ERA_LABELS, ERA_ORDER, type PlaceType, type EraType, type CulturePlace, type Route } from "@/lib/harita-data";
+import { PLACES, ROUTES, TYPE_LABELS, TYPE_COLORS, ERA_LABELS, ERA_ORDER, type PlaceType, type EraType, type CulturePlace, type Route } from "@/lib/harita-data";
 import { placeSlug, haversineDistance, getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
+import { useMapSearch } from "@/lib/hooks/useMapSearch";
+import { useDiscovery } from "@/lib/hooks/useDiscovery";
+import { usePlaceOfTheDay } from "@/lib/hooks/usePlaceOfTheDay";
+import { useScrollytelling } from "@/lib/hooks/useScrollytelling";
+import MapSearchBar from "./components/MapSearchBar";
+import SimilarPlaces from "./components/SimilarPlaces";
+import DiscoveryProgress from "./components/DiscoveryProgress";
+import PlaceOfDayToast from "./components/PlaceOfDayToast";
+import SurpriseButton from "./components/SurpriseButton";
+
+const ScrollytellingOverlay = lazy(() => import("./components/ScrollytellingOverlay"));
 
 /* ───────── Types ───────── */
 
@@ -36,19 +47,6 @@ type CheckInResult = {
 };
 
 /* ───────── Constants ───────── */
-
-const TYPE_COLORS: Record<PlaceType, string> = {
-  müze: "#4A9EFF",
-  galeri: "#FF6D60",
-  konser: "#9B6BB0",
-  tiyatro: "#4CAF50",
-  tarihi: "#FFB300",
-  edebiyat: "#8B5CF6",
-  miras: "#795548",
-  doğa: "#43A047",
-  gastronomi: "#E65100",
-  mimari: "#5D4037",
-};
 
 const ERA_COLORS: Record<EraType, string> = {
   paleolitik: "#795548",
@@ -200,6 +198,12 @@ export default function HaritaPage() {
   const [reviewText, setReviewText] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  // ─── New feature hooks ───
+  const search = useMapSearch(userPos);
+  const discovery = useDiscovery(gamUser, visitedSlugs);
+  const potd = usePlaceOfTheDay();
+  const scrolly = useScrollytelling();
+
   // Fetch events for selected place
   const fetchEvents = useCallback(async (place: CulturePlace) => {
     setEventsLoading(true);
@@ -321,7 +325,8 @@ export default function HaritaPage() {
     setShowReviewForm(false);
     setReviewRating(0);
     setReviewText("");
-  }, [fetchEvents, fetchReviews]);
+    discovery.discoverPlace(placeSlug(place.name));
+  }, [fetchEvents, fetchReviews, discovery]);
 
   // Locate user on map
   const locateUser = useCallback(() => {
@@ -695,19 +700,21 @@ export default function HaritaPage() {
       const labelShadow = isDark ? "0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6)" : "0 1px 3px rgba(255,255,255,0.8),0 0 6px rgba(255,255,255,0.4)";
       const markerBorder = isDark ? "none" : "2px solid #fff";
       const isVis = visitedSlugs.has(placeSlug(place.name));
+      const isDisc = discovery.isDiscovered(placeSlug(place.name));
       const visitCheckHtml = isVis
         ? `<div style="position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#4CAF50;display:flex;align-items:center;justify-content:center;border:2px solid ${isDark ? '#1a1a1a' : '#fff'};z-index:2;">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>`
         : "";
-      const labelHtml = showLabel
+      const labelHtml = (showLabel && isDisc)
         ? `<div style="position:absolute;left:44px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:${labelColor};text-shadow:${labelShadow};pointer-events:none;">${place.name}</div>`
         : "";
+      const fogStyle = isDisc ? "" : "opacity:0.3;filter:blur(0.5px);";
       const icon = Leaf.divIcon({
         className: "culture-marker",
         iconSize: [36, 36],
         iconAnchor: [18, 18],
-        html: `<div style="position:relative;">
+        html: `<div style="position:relative;${fogStyle}transition:opacity 0.4s,filter 0.4s;">
           <div class="marker-circle" style="
             width:36px;height:36px;border-radius:50%;
             background:${color};border:${markerBorder};box-sizing:border-box;
@@ -739,7 +746,7 @@ export default function HaritaPage() {
       marker.addTo(map);
       markersRef.current.push(marker);
     });
-  }, [activeFilter, activeEra, currentZoom, mapReady, selectPlace, mode, isDark, visitedSlugs]);
+  }, [activeFilter, activeEra, currentZoom, mapReady, selectPlace, mode, isDark, visitedSlugs, discovery]);
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
@@ -1307,9 +1314,34 @@ export default function HaritaPage() {
           {activeStop.name}
         </h2>
 
-        <p style={{ color: "#bbb", fontSize: compact ? 13 : 14, lineHeight: 1.8, margin: "0 0 16px 0" }}>
-          {activeStop.story}
-        </p>
+        <div style={{ color: "#bbb", fontSize: compact ? 13 : 14, lineHeight: 1.8, margin: "0 0 16px 0" }}>
+          {activeStop.story.split("\n\n").map((para, i) => (
+            <p key={i} style={{ margin: i > 0 ? "10px 0 0 0" : 0 }}>{para}</p>
+          ))}
+        </div>
+
+        {/* Fun facts from matching place */}
+        {(() => {
+          const stopSlug = placeSlug(activeStop.name);
+          const matchedPlace = PLACES.find((p) => placeSlug(p.name) === stopSlug);
+          if (!matchedPlace?.funFacts?.length) return null;
+          return (
+            <div style={{
+              background: "rgba(255,179,0,0.08)", border: "1px solid rgba(255,179,0,0.2)",
+              borderRadius: compact ? 10 : 12, padding: compact ? "10px 12px" : "12px 14px", marginBottom: compact ? 12 : 16,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                <span style={{ fontSize: compact ? 12 : 13 }}>💡</span>
+                <span style={{ color: "#FFB300", fontSize: compact ? 10 : 11, fontWeight: 700 }}>Biliyor Musun?</span>
+              </div>
+              {matchedPlace.funFacts.slice(0, 2).map((fact, i) => (
+                <p key={i} style={{ color: "rgba(255,179,0,0.8)", fontSize: compact ? 10 : 11, lineHeight: 1.5, margin: i === 0 ? 0 : "4px 0 0 0" }}>
+                  <span style={{ color: "#FFB300", fontWeight: 700 }}>{i + 1}.</span> {fact}
+                </p>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Route stop check-in */}
         {gamUser && !stopVisitedToday && !routeCheckInResult && (
@@ -1481,7 +1513,7 @@ export default function HaritaPage() {
       `}</style>
 
       {/* Map */}
-      <div ref={mapContainerRef} style={{ width: "100%", height: "100%", zIndex: 1 }} />
+      <div ref={mapContainerRef} style={{ width: "100%", height: "100%", zIndex: 1, display: scrolly.scrollyActive ? "none" : "block" }} />
 
       {/* Header */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: "none" }}>
@@ -1548,6 +1580,24 @@ export default function HaritaPage() {
               </button>
             </div>
           </div>
+
+          {/* Search bar */}
+          <MapSearchBar
+            query={search.query}
+            setQuery={search.setQuery}
+            results={search.results}
+            onSelectPlace={(place) => {
+              if (mode !== "explore") switchMode("explore");
+              selectPlace(place);
+              const map = mapRef.current;
+              if (map) map.flyTo([place.lat, place.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
+            }}
+            onSelectRoute={(route) => {
+              if (mode !== "routes") switchMode("routes");
+              selectRoute(route);
+            }}
+            isDark={isDark}
+          />
 
           {/* Filters (explore only) */}
           {mode === "explore" && (
@@ -1662,6 +1712,45 @@ export default function HaritaPage() {
         </svg>
       </button>
 
+      {/* Surprise button — above locate */}
+      {mode === "explore" && (
+        <SurpriseButton
+          getRandomPlace={potd.getRandomPlace}
+          onSelect={(place) => {
+            selectPlace(place);
+            const map = mapRef.current;
+            if (map) map.flyTo([place.lat, place.lng], 16, { duration: 0.8 });
+          }}
+          isDark={isDark}
+        />
+      )}
+
+      {/* Discovery progress widget */}
+      {mode === "explore" && (
+        <DiscoveryProgress
+          discovered={discovery.totalProgress.discovered}
+          total={discovery.totalProgress.total}
+          percent={discovery.totalProgress.percent}
+          districts={discovery.districtProgress}
+          isDark={isDark}
+        />
+      )}
+
+      {/* Place of the Day toast */}
+      {mode === "explore" && !potd.dismissed && (
+        <PlaceOfDayToast
+          place={potd.dailyPlace}
+          visible={potd.showToast}
+          onExplore={() => {
+            selectPlace(potd.dailyPlace);
+            const map = mapRef.current;
+            if (map) map.flyTo([potd.dailyPlace.lat, potd.dailyPlace.lng], 16, { duration: 0.8 });
+            potd.dismiss();
+          }}
+          onDismiss={potd.dismiss}
+        />
+      )}
+
       {/* Legend — bottom right (explore only) */}
       {mode === "explore" && (
         <div style={{
@@ -1732,9 +1821,25 @@ export default function HaritaPage() {
                 }}>
                   {TYPE_LABELS[selectedPlace.type]}
                 </div>
-                <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: "0 0 12px 0", lineHeight: 1.3 }}>
+                <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 600, margin: "0 0 8px 0", lineHeight: 1.3 }}>
                   {selectedPlace.name}
                 </h2>
+                {(selectedPlace.hours || selectedPlace.admission) && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 12, color: "#777", fontSize: 11 }}>
+                    {selectedPlace.hours && (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                        {selectedPlace.hours}
+                      </span>
+                    )}
+                    {selectedPlace.admission && (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                        {selectedPlace.admission}
+                      </span>
+                    )}
+                  </div>
+                )}
                 {selectedPlace.longDesc ? (
                   <div style={{ margin: "0 0 20px 0" }}>
                     {selectedPlace.longDesc.split("\n\n").slice(0, 2).map((para, i) => (
@@ -1773,6 +1878,14 @@ export default function HaritaPage() {
                 {renderCheckInButton(selectedPlace)}
                 {renderDirectionsButton(selectedPlace)}
                 {renderEventsSection()}
+                <SimilarPlaces
+                  places={search.getSimilarPlaces(selectedPlace)}
+                  onSelect={(p) => {
+                    selectPlace(p);
+                    const map = mapRef.current;
+                    if (map) map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
+                  }}
+                />
                 {renderReviewsSection(selectedPlace)}
               </div>
             </div>
@@ -1819,6 +1932,22 @@ export default function HaritaPage() {
           <h3 style={{ color: "#fff", fontSize: 18, fontWeight: 600, margin: "0 0 8px 0", lineHeight: 1.3 }}>
             {selectedPlace.name}
           </h3>
+          {(selectedPlace.hours || selectedPlace.admission) && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10, color: "#777", fontSize: 10 }}>
+              {selectedPlace.hours && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                  {selectedPlace.hours}
+                </span>
+              )}
+              {selectedPlace.admission && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                  {selectedPlace.admission}
+                </span>
+              )}
+            </div>
+          )}
           {selectedPlace.longDesc ? (
             <div style={{ margin: "0 0 14px 0" }}>
               <p style={{ color: "#999", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
@@ -1855,6 +1984,22 @@ export default function HaritaPage() {
           {renderCheckInButton(selectedPlace, true)}
           {renderDirectionsButton(selectedPlace, true)}
           {renderEventsSection(true)}
+          <SimilarPlaces
+            places={search.getSimilarPlaces(selectedPlace)}
+            onSelect={(p) => {
+              selectPlace(p);
+              const map = mapRef.current;
+              if (map) {
+                const panelH = window.innerHeight * 0.45;
+                const zoom = Math.max(map.getZoom(), 15);
+                const targetPoint = map.project([p.lat, p.lng], zoom);
+                targetPoint.y += panelH / 3;
+                const offsetLatLng = map.unproject(targetPoint, zoom);
+                map.flyTo(offsetLatLng, zoom, { duration: 0.6 });
+              }
+            }}
+            compact
+          />
           {renderReviewsSection(selectedPlace, true)}
         </div>
       )}
@@ -1902,11 +2047,38 @@ export default function HaritaPage() {
                   <div style={{ color: isNightLocked ? "#FF9800" : "#888", fontSize: 11, marginBottom: 6, lineHeight: 1.4 }}>
                     {isNightLocked ? "Gece Kuşları İçin — 23:00'te Açılır" : route.desc}
                   </div>
-                  <div style={{ display: "flex", gap: 8, color: "#666", fontSize: 10 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, color: "#666", fontSize: 10, alignItems: "center" }}>
                     <span>{route.stops.length} durak</span>
                     <span>&middot;</span>
                     <span>{route.duration}</span>
+                    {route.difficulty && (
+                      <>
+                        <span>&middot;</span>
+                        <span style={{
+                          padding: "1px 6px", borderRadius: 8, fontSize: 9, fontWeight: 600,
+                          background: route.difficulty === "kolay" ? "rgba(34,197,94,0.15)" : route.difficulty === "orta" ? "rgba(245,158,11,0.15)" : "rgba(239,68,68,0.15)",
+                          color: route.difficulty === "kolay" ? "#22c55e" : route.difficulty === "orta" ? "#f59e0b" : "#ef4444",
+                        }}>
+                          {route.difficulty === "kolay" ? "Kolay" : route.difficulty === "orta" ? "Orta" : "Zor"}
+                        </span>
+                      </>
+                    )}
                   </div>
+                  {!isNightLocked && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
+                      style={{
+                        marginTop: 8, padding: "5px 10px", borderRadius: 6,
+                        background: `${route.color}15`, border: `1px solid ${route.color}30`,
+                        color: route.color, fontSize: 10, fontWeight: 600,
+                        cursor: "pointer", transition: "background 0.2s",
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.background = `${route.color}30`; }}
+                      onMouseOut={(e) => { e.currentTarget.style.background = `${route.color}15`; }}
+                    >
+                      Hikayeyi Kesfet
+                    </button>
+                  )}
                 </div>
               </button>
               );
@@ -1975,11 +2147,36 @@ export default function HaritaPage() {
                   {isNightLocked ? (
                     <div style={{ color: "#FF9800", fontSize: 10, marginBottom: 3 }}>23:00&apos;te Açılır</div>
                   ) : (
-                    <div style={{ display: "flex", gap: 6, color: "#666", fontSize: 10 }}>
+                    <>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, color: "#666", fontSize: 10, alignItems: "center" }}>
                       <span>{route.stops.length} durak</span>
                       <span>&middot;</span>
                       <span>{route.duration}</span>
+                      {route.difficulty && (
+                        <>
+                          <span>&middot;</span>
+                          <span style={{
+                            padding: "1px 5px", borderRadius: 6, fontSize: 9, fontWeight: 600,
+                            background: route.difficulty === "kolay" ? "rgba(34,197,94,0.15)" : route.difficulty === "orta" ? "rgba(245,158,11,0.15)" : "rgba(239,68,68,0.15)",
+                            color: route.difficulty === "kolay" ? "#22c55e" : route.difficulty === "orta" ? "#f59e0b" : "#ef4444",
+                          }}>
+                            {route.difficulty === "kolay" ? "Kolay" : route.difficulty === "orta" ? "Orta" : "Zor"}
+                          </span>
+                        </>
+                      )}
                     </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
+                      style={{
+                        marginTop: 6, padding: "4px 8px", borderRadius: 6,
+                        background: `${route.color}15`, border: `1px solid ${route.color}30`,
+                        color: route.color, fontSize: 9, fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Hikayeyi Kesfet
+                    </button>
+                    </>
                   )}
                 </div>
               </button>
@@ -2033,6 +2230,23 @@ export default function HaritaPage() {
             {renderStoryContent(true)}
           </div>
         </div>
+      )}
+
+      {/* Scrollytelling Overlay */}
+      {scrolly.scrollyActive && scrolly.scrollyRoute && (
+        <Suspense fallback={null}>
+          <ScrollytellingOverlay
+            route={scrolly.scrollyRoute}
+            currentChapter={scrolly.currentChapter}
+            setCurrentChapter={scrolly.setCurrentChapter}
+            scrollProgress={scrolly.scrollProgress}
+            setScrollProgress={scrolly.setScrollProgress}
+            onExit={scrolly.exitScrollytelling}
+            onSelectRoute={selectRoute}
+            mapboxMapRef={scrolly.mapboxMapRef}
+            mapboxContainerRef={scrolly.mapboxContainerRef}
+          />
+        </Suspense>
       )}
 
       {/* Responsive */}

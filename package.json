@@ -35,6 +35,7 @@
     "gray-matter": "^4.0.3",
     "konva": "^10.2.0",
     "leaflet": "^1.9.4",
+    "mapbox-gl": "^3.20.0",
     "next": "16.1.6",
     "papaparse": "^5.5.3",
     "pptxgenjs": "^4.0.1",
