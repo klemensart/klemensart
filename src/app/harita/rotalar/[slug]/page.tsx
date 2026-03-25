@@ -143,18 +143,58 @@ export default async function RotaDetayPage({ params }: Props) {
             {route.title}
           </h1>
 
-          {/* Duration + stops count */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-warm-900/55 mb-8">
+          {/* Duration + stops count + difficulty + bestTime */}
+          <div className="flex flex-wrap items-center gap-3 text-sm text-warm-900/55 mb-8">
             <span>{route.duration}</span>
             <span>{route.stops.length} durak</span>
+            {route.difficulty && (
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                route.difficulty === "kolay" ? "bg-green-100 text-green-700" :
+                route.difficulty === "orta" ? "bg-amber-100 text-amber-700" :
+                "bg-red-100 text-red-700"
+              }`}>
+                {route.difficulty === "kolay" ? "Kolay" : route.difficulty === "orta" ? "Orta" : "Zor"}
+              </span>
+            )}
+            {route.bestTime && (
+              <span className="text-warm-900/40">🕐 {route.bestTime}</span>
+            )}
           </div>
 
           {/* Description */}
           <div className="bg-white rounded-2xl border border-warm-100 p-8 mb-8">
-            <p className="text-warm-900 text-base leading-relaxed">
-              {route.desc}
-            </p>
+            {route.longDesc ? (
+              <div className="space-y-4">
+                {route.longDesc.split("\n\n").map((para, i) => (
+                  <p key={i} className="text-warm-900 text-base leading-relaxed">
+                    {para}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p className="text-warm-900 text-base leading-relaxed">
+                {route.desc}
+              </p>
+            )}
           </div>
+
+          {/* Tips */}
+          {route.tips && route.tips.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">📌</span>
+                <h2 className="text-base font-bold text-blue-900">İpuçları</h2>
+              </div>
+              <ul className="space-y-1.5">
+                {route.tips.map((tip, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-blue-900/80 leading-relaxed">
+                    <span className="text-blue-400 flex-shrink-0">•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Stops */}
           <h2 className="text-lg font-bold text-warm-900 mb-4">Rota Durakları</h2>
@@ -178,9 +218,11 @@ export default async function RotaDetayPage({ params }: Props) {
                       ) : (
                         <h3 className="text-base font-bold text-warm-900">{stop.name}</h3>
                       )}
-                      <p className="text-sm text-warm-900/60 leading-relaxed mt-1">
-                        {stop.story}
-                      </p>
+                      <div className="text-sm text-warm-900/60 leading-relaxed mt-1 space-y-2">
+                        {stop.story.split("\n\n").map((para, j) => (
+                          <p key={j}>{para}</p>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

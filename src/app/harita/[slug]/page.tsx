@@ -237,13 +237,33 @@ export default async function MekanDetayPage({ params }: Props) {
             {place.name}
           </h1>
 
-          {/* Location */}
-          <div className="flex items-center gap-1.5 text-sm text-warm-900/55 mb-8">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            Ankara
+          {/* Location + Practical Info */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-warm-900/55 mb-8">
+            <span className="inline-flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Ankara
+            </span>
+            {place.hours && (
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                {place.hours}
+              </span>
+            )}
+            {place.admission && (
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                {place.admission}
+              </span>
+            )}
           </div>
 
           {/* Image */}
@@ -290,6 +310,24 @@ export default async function MekanDetayPage({ params }: Props) {
                   </li>
                 ))}
               </ol>
+            </div>
+          )}
+
+          {/* Tips */}
+          {place.tips && place.tips.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">📌</span>
+                <h2 className="text-base font-bold text-blue-900">Ziyaretçi İpuçları</h2>
+              </div>
+              <ul className="space-y-1.5">
+                {place.tips.map((tip, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-blue-900/80 leading-relaxed">
+                    <span className="text-blue-400 flex-shrink-0">•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
