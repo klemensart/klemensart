@@ -1482,14 +1482,18 @@ export default function HaritaPage() {
         <button
           onClick={() => { deselectRoute(); setRouteCheckInResult(null); setRouteCompleted(false); }}
           style={{
-            marginTop: 20, width: "100%", padding: compact ? "8px 0" : "10px 0",
-            background: "transparent",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 8, color: "#888", fontSize: compact ? 11 : 12,
+            marginTop: 20, width: "100%", padding: compact ? "12px 0" : "14px 0",
+            background: "linear-gradient(135deg, #FF6D60, #FF8A80)",
+            border: "none",
+            borderRadius: 12, color: "#fff", fontSize: compact ? 13 : 14,
+            fontWeight: 700, letterSpacing: 0.5,
             cursor: "pointer", transition: "all 0.2s",
+            boxShadow: "0 4px 12px rgba(255,109,96,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           }}
         >
-          &larr; Rotalara D&ouml;n
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Rotalara D&ouml;n
         </button>
       </>
     );
@@ -1703,37 +1707,36 @@ export default function HaritaPage() {
       <div className="mobile-header" style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: "none" }}>
         {/* Compact single-line bar */}
         <div style={{
-          height: 48, display: "flex", alignItems: "center", gap: 8,
-          padding: "0 10px",
+          height: 48, display: "flex", alignItems: "center", gap: 6,
+          padding: "0 8px",
           background: isDark ? "rgba(26,26,26,0.92)" : "rgba(255,255,255,0.92)",
           backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
           borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
           pointerEvents: "auto",
         }}>
           {/* Back button */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, color: isDark ? "rgba(255,255,255,0.6)" : "#374151", textDecoration: "none", flexShrink: 0 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <Link href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, color: isDark ? "rgba(255,255,255,0.6)" : "#374151", textDecoration: "none", flexShrink: 0 }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </Link>
 
           {/* Title */}
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2, color: uiText, whiteSpace: "nowrap", flexShrink: 0 }}>
-            KÜLTÜR HARİTASI
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: uiText, whiteSpace: "nowrap", flexShrink: 0 }}>
+            HARİTA
           </span>
 
           {/* Mode pill segment */}
-          <div style={{ display: "flex", background: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)", borderRadius: 18, padding: 3, flexShrink: 0 }}>
+          <div style={{ display: "flex", background: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)", borderRadius: 16, padding: 2, flexShrink: 0 }}>
             {(["explore", "routes"] as MapMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
                 style={{
-                  padding: "5px 14px", borderRadius: 15, border: "none",
+                  padding: "5px 12px", borderRadius: 14, border: "none",
                   background: mode === m ? "#FF6D60" : "transparent",
                   color: mode === m ? "#fff" : (isDark ? "#aaa" : "#555"),
-                  fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontSize: 11, fontWeight: 700, cursor: "pointer",
                   transition: "all 0.2s", whiteSpace: "nowrap",
                   boxShadow: mode === m ? "0 2px 8px rgba(255,109,96,0.35)" : "none",
-                  letterSpacing: 0.3,
                 }}
               >
                 {m === "explore" ? "Keşfet" : "Rotalar"}
@@ -1748,14 +1751,14 @@ export default function HaritaPage() {
           <button
             onClick={() => { setMobileSearchOpen(!mobileSearchOpen); setMobileFiltersOpen(false); }}
             style={{
-              width: 28, height: 28, borderRadius: 8, border: "none",
-              background: mobileSearchOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
+              width: 30, height: 30, borderRadius: 8, border: "none",
+              background: mobileSearchOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"),
               color: mobileSearchOpen ? "#FF6D60" : (isDark ? "#bbb" : "#444"),
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s", flexShrink: 0,
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
 
           {/* Filter toggle (explore mode only) */}
@@ -1763,14 +1766,14 @@ export default function HaritaPage() {
             <button
               onClick={() => { setMobileFiltersOpen(!mobileFiltersOpen); setMobileSearchOpen(false); }}
               style={{
-                width: 28, height: 28, borderRadius: 8, border: "none", position: "relative",
-                background: mobileFiltersOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
+                width: 30, height: 30, borderRadius: 8, border: "none", position: "relative",
+                background: mobileFiltersOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"),
                 color: mobileFiltersOpen ? "#FF6D60" : (isDark ? "#bbb" : "#444"),
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "all 0.2s", flexShrink: 0,
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
               {(activeFilter !== "all" || activeEra !== "all") && (
                 <span style={{
                   position: "absolute", top: 2, right: 2, width: 7, height: 7,
@@ -1785,17 +1788,17 @@ export default function HaritaPage() {
           <button
             onClick={() => setTileStyle(isDark ? "voyager" : "dark")}
             style={{
-              width: 28, height: 28, borderRadius: 8, border: "none",
-              background: "transparent",
+              width: 30, height: 30, borderRadius: 8, border: "none",
+              background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
               color: isDark ? "#bbb" : "#444",
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s", flexShrink: 0,
             }}
           >
             {isDark ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             )}
           </button>
         </div>
