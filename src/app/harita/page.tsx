@@ -1721,18 +1721,19 @@ export default function HaritaPage() {
           </span>
 
           {/* Mode pill segment */}
-          <div style={{ display: "flex", background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", borderRadius: 14, padding: 2, flexShrink: 0 }}>
+          <div style={{ display: "flex", background: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)", borderRadius: 18, padding: 3, flexShrink: 0 }}>
             {(["explore", "routes"] as MapMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
                 style={{
-                  padding: "4px 10px", borderRadius: 12, border: "none",
-                  background: mode === m ? (isDark ? "rgba(255,109,96,0.3)" : "#fff") : "transparent",
-                  color: mode === m ? "#FF6D60" : (isDark ? "#888" : "#666"),
-                  fontSize: 11, fontWeight: 600, cursor: "pointer",
+                  padding: "5px 14px", borderRadius: 15, border: "none",
+                  background: mode === m ? "#FF6D60" : "transparent",
+                  color: mode === m ? "#fff" : (isDark ? "#999" : "#888"),
+                  fontSize: 12, fontWeight: 700, cursor: "pointer",
                   transition: "all 0.2s", whiteSpace: "nowrap",
-                  boxShadow: mode === m ? (isDark ? "none" : "0 1px 3px rgba(0,0,0,0.1)") : "none",
+                  boxShadow: mode === m ? "0 2px 8px rgba(255,109,96,0.35)" : "none",
+                  letterSpacing: 0.3,
                 }}
               >
                 {m === "explore" ? "Keşfet" : "Rotalar"}

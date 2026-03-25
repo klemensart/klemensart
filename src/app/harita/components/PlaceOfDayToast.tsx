@@ -36,23 +36,27 @@ export default function PlaceOfDayToast({ place, visible, onExplore, onDismiss }
   const color = TYPE_COLORS[place.type as PlaceType];
 
   return (
-    <div style={{
+    <div className="potd-toast" style={{
       position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)",
       zIndex: 100, pointerEvents: "auto",
+      maxWidth: "calc(100vw - 24px)", width: "fit-content",
       animation: hiding ? "toast-hide 0.4s ease forwards" : "toast-show 0.5s ease forwards",
     }}>
       <style>{`
         @keyframes toast-show {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         @keyframes toast-hide {
-          from { opacity: 1; transform: translateY(0); }
-          to { opacity: 0; transform: translateY(-20px); }
+          from { opacity: 1; transform: translateX(-50%) translateY(0); }
+          to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
         @keyframes shimmer-border {
           0% { background-position: 0% 50%; }
           100% { background-position: 200% 50%; }
+        }
+        @media (max-width: 640px) {
+          .potd-toast { top: 56px !important; }
         }
       `}</style>
       <div style={{
@@ -69,7 +73,7 @@ export default function PlaceOfDayToast({ place, visible, onExplore, onDismiss }
           borderRadius: 12,
           padding: "12px 16px",
           display: "flex", alignItems: "center", gap: 12,
-          minWidth: 260, maxWidth: 360,
+          minWidth: 220, maxWidth: 360,
         }}>
           {/* Color dot */}
           <div style={{
