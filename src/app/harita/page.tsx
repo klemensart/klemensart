@@ -197,6 +197,8 @@ export default function HaritaPage() {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // ─── New feature hooks ───
   const search = useMapSearch(userPos);
@@ -1510,13 +1512,23 @@ export default function HaritaPage() {
           filter: ${tileStyle === "dark" ? "brightness(1.3)" : "none"};
         }
         .culture-marker .marker-circle:hover { transform: scale(1.17); }
+        @media (max-width: 640px) {
+          .desktop-header { display: none !important; }
+        }
+        @media (min-width: 641px) {
+          .mobile-header { display: none !important; }
+        }
+        @keyframes mobileSlideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
       {/* Map */}
       <div ref={mapContainerRef} style={{ width: "100%", height: "100%", zIndex: 1, display: scrolly.scrollyActive ? "none" : "block" }} />
 
-      {/* Header */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: "none" }}>
+      {/* Header (desktop) */}
+      <div className="desktop-header" style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: "none" }}>
         <div style={{ padding: "16px 20px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <Link
@@ -1685,6 +1697,225 @@ export default function HaritaPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Header (mobile) */}
+      <div className="mobile-header" style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, pointerEvents: "none" }}>
+        {/* Compact single-line bar */}
+        <div style={{
+          height: 48, display: "flex", alignItems: "center", gap: 8,
+          padding: "0 10px",
+          background: isDark ? "rgba(26,26,26,0.85)" : "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+          borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+          pointerEvents: "auto",
+        }}>
+          {/* Back button */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, color: uiMuted, textDecoration: "none", flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </Link>
+
+          {/* Title */}
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2, color: uiText, whiteSpace: "nowrap", flexShrink: 0 }}>
+            KÜLTÜR HARİTASI
+          </span>
+
+          {/* Mode pill segment */}
+          <div style={{ display: "flex", background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", borderRadius: 14, padding: 2, flexShrink: 0 }}>
+            {(["explore", "routes"] as MapMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => switchMode(m)}
+                style={{
+                  padding: "4px 10px", borderRadius: 12, border: "none",
+                  background: mode === m ? (isDark ? "rgba(255,109,96,0.3)" : "#fff") : "transparent",
+                  color: mode === m ? "#FF6D60" : (isDark ? "#888" : "#666"),
+                  fontSize: 11, fontWeight: 600, cursor: "pointer",
+                  transition: "all 0.2s", whiteSpace: "nowrap",
+                  boxShadow: mode === m ? (isDark ? "none" : "0 1px 3px rgba(0,0,0,0.1)") : "none",
+                }}
+              >
+                {m === "explore" ? "Keşfet" : "Rotalar"}
+              </button>
+            ))}
+          </div>
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+
+          {/* Search toggle */}
+          <button
+            onClick={() => { setMobileSearchOpen(!mobileSearchOpen); setMobileFiltersOpen(false); }}
+            style={{
+              width: 28, height: 28, borderRadius: 8, border: "none",
+              background: mobileSearchOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
+              color: mobileSearchOpen ? "#FF6D60" : (isDark ? "#aaa" : "#666"),
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 0.2s", flexShrink: 0,
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+
+          {/* Filter toggle (explore mode only) */}
+          {mode === "explore" && (
+            <button
+              onClick={() => { setMobileFiltersOpen(!mobileFiltersOpen); setMobileSearchOpen(false); }}
+              style={{
+                width: 28, height: 28, borderRadius: 8, border: "none", position: "relative",
+                background: mobileFiltersOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
+                color: mobileFiltersOpen ? "#FF6D60" : (isDark ? "#aaa" : "#666"),
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s", flexShrink: 0,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              {(activeFilter !== "all" || activeEra !== "all") && (
+                <span style={{
+                  position: "absolute", top: 2, right: 2, width: 7, height: 7,
+                  borderRadius: "50%", background: "#FF6D60",
+                  border: `1.5px solid ${isDark ? "#1a1a1a" : "#fff"}`,
+                }} />
+              )}
+            </button>
+          )}
+
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTileStyle(isDark ? "voyager" : "dark")}
+            style={{
+              width: 28, height: 28, borderRadius: 8, border: "none",
+              background: "transparent",
+              color: isDark ? "#aaa" : "#666",
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 0.2s", flexShrink: 0,
+            }}
+          >
+            {isDark ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            )}
+          </button>
+        </div>
+
+        {/* Search panel (slide down) */}
+        {mobileSearchOpen && (
+          <div style={{
+            padding: "8px 12px 12px", pointerEvents: "auto",
+            background: isDark ? "rgba(26,26,26,0.92)" : "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+            borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+            animation: "mobileSlideDown 0.2s ease-out",
+          }}>
+            <MapSearchBar
+              query={search.query}
+              setQuery={search.setQuery}
+              results={search.results}
+              onSelectPlace={(place) => {
+                if (mode !== "explore") switchMode("explore");
+                selectPlace(place);
+                setMobileSearchOpen(false);
+                const map = mapRef.current;
+                if (map) map.flyTo([place.lat, place.lng], Math.max(map.getZoom(), 15), { duration: 0.6 });
+              }}
+              onSelectRoute={(route) => {
+                if (mode !== "routes") switchMode("routes");
+                selectRoute(route);
+                setMobileSearchOpen(false);
+              }}
+              isDark={isDark}
+            />
+          </div>
+        )}
+
+        {/* Filters panel (slide down, explore only) */}
+        {mobileFiltersOpen && mode === "explore" && (
+          <div
+            onClick={(e) => { if (e.target === e.currentTarget) setMobileFiltersOpen(false); }}
+            style={{
+              position: "fixed", top: 48, left: 0, right: 0, bottom: 0, zIndex: 9,
+            }}
+          >
+            <div style={{
+              padding: "10px 12px 12px",
+              background: isDark ? "rgba(26,26,26,0.95)" : "rgba(255,255,255,0.95)",
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+              borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+              animation: "mobileSlideDown 0.2s ease-out",
+              pointerEvents: "auto",
+            }}>
+              {/* Type filters */}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                {FILTER_OPTIONS.map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setActiveFilter(f.key)}
+                    style={{
+                      padding: "4px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600,
+                      border: isDark
+                        ? `1px solid ${activeFilter === f.key
+                            ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                            : "rgba(255,255,255,0.12)"}`
+                        : `1px solid ${activeFilter === f.key
+                            ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                            : "#e0e0e0"}`,
+                      background: isDark
+                        ? (activeFilter === f.key
+                            ? (f.key === "all" ? "rgba(255,109,96,0.2)" : `${TYPE_COLORS[f.key as PlaceType]}20`)
+                            : "rgba(0,0,0,0.6)")
+                        : (activeFilter === f.key
+                            ? (f.key === "all" ? "#FFF0EE" : `${TYPE_COLORS[f.key as PlaceType]}15`)
+                            : "#f9f9f9"),
+                      color: isDark
+                        ? (activeFilter === f.key
+                            ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                            : "#999")
+                        : (activeFilter === f.key
+                            ? (f.key === "all" ? "#FF6D60" : TYPE_COLORS[f.key as PlaceType])
+                            : "#374151"),
+                      cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap",
+                    }}
+                  >
+                    {f.key !== "all" && (
+                      <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: TYPE_COLORS[f.key as PlaceType], marginRight: 5, verticalAlign: "middle" }} />
+                    )}
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              {/* Era filters */}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setActiveEra("all")}
+                  style={{
+                    padding: "3px 9px", borderRadius: 14, fontSize: 10, fontWeight: 600,
+                    border: isDark ? `1px solid ${activeEra === "all" ? "#FF6D60" : "rgba(255,255,255,0.08)"}` : `1px solid ${activeEra === "all" ? "#FF6D60" : "#e0e0e0"}`,
+                    background: isDark ? (activeEra === "all" ? "rgba(255,109,96,0.15)" : "rgba(0,0,0,0.4)") : (activeEra === "all" ? "#FFF0EE" : "#f9f9f9"),
+                    color: isDark ? (activeEra === "all" ? "#FF6D60" : "#777") : (activeEra === "all" ? "#FF6D60" : "#666"),
+                    cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+                  }}
+                >Tüm Dönemler</button>
+                {ERA_ORDER.map((era) => (
+                  <button
+                    key={era}
+                    onClick={() => setActiveEra(era)}
+                    style={{
+                      padding: "3px 9px", borderRadius: 14, fontSize: 10, fontWeight: 600,
+                      border: isDark ? `1px solid ${activeEra === era ? ERA_COLORS[era] : "rgba(255,255,255,0.08)"}` : `1px solid ${activeEra === era ? ERA_COLORS[era] : "#e0e0e0"}`,
+                      background: isDark ? (activeEra === era ? `${ERA_COLORS[era]}20` : "rgba(0,0,0,0.4)") : (activeEra === era ? `${ERA_COLORS[era]}15` : "#f9f9f9"),
+                      color: isDark ? (activeEra === era ? ERA_COLORS[era] : "#777") : (activeEra === era ? ERA_COLORS[era] : "#666"),
+                      cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+                    }}
+                  >
+                    <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: ERA_COLORS[era], marginRight: 4, verticalAlign: "middle" }} />
+                    {ERA_LABELS[era]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Locate me button — above zoom controls */}
