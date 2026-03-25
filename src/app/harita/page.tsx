@@ -2305,10 +2305,10 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); selectRoute(route); }}
                         style={{
                           padding: "6px 14px", borderRadius: 7,
-                          background: route.color, border: "none",
+                          background: "#FF6D60", border: "none",
                           color: "#fff", fontSize: 11, fontWeight: 700,
                           cursor: "pointer", transition: "all 0.2s",
-                          boxShadow: `0 2px 8px ${route.color}40`,
+                          boxShadow: "0 2px 8px rgba(255,109,96,0.35)",
                         }}
                         onMouseOver={(e) => { e.currentTarget.style.opacity = "0.85"; }}
                         onMouseOut={(e) => { e.currentTarget.style.opacity = "1"; }}
@@ -2319,11 +2319,11 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
                         style={{
                           padding: "6px 12px", borderRadius: 7,
-                          background: "transparent", border: `1px solid ${route.color}40`,
-                          color: route.color, fontSize: 10, fontWeight: 600,
+                          background: "transparent", border: "1px solid rgba(48,43,39,0.25)",
+                          color: "#302B27", fontSize: 10, fontWeight: 600,
                           cursor: "pointer", transition: "all 0.2s",
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.background = `${route.color}12`; }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = "rgba(48,43,39,0.06)"; }}
                         onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
                       >
                         Ön İzleme
@@ -2421,10 +2421,10 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); selectRoute(route); }}
                         style={{
                           padding: "5px 12px", borderRadius: 6,
-                          background: route.color, border: "none",
+                          background: "#FF6D60", border: "none",
                           color: "#fff", fontSize: 10, fontWeight: 700,
                           cursor: "pointer", transition: "all 0.2s",
-                          boxShadow: `0 2px 6px ${route.color}40`,
+                          boxShadow: "0 2px 6px rgba(255,109,96,0.35)",
                         }}
                       >
                         Rotayı Yürü
@@ -2433,8 +2433,8 @@ export default function HaritaPage() {
                         onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
                         style={{
                           padding: "5px 10px", borderRadius: 6,
-                          background: "transparent", border: `1px solid ${route.color}40`,
-                          color: route.color, fontSize: 9, fontWeight: 600,
+                          background: "transparent", border: "1px solid rgba(48,43,39,0.25)",
+                          color: "#302B27", fontSize: 9, fontWeight: 600,
                           cursor: "pointer",
                         }}
                       >
