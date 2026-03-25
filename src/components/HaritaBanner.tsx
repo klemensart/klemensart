@@ -178,7 +178,7 @@ export default function HaritaBanner() {
             Ankara&apos;n&#305;n<br />K&uuml;lt&uuml;r Haritas&#305;
           </h2>
           <p className="text-white/40 text-sm md:text-base leading-relaxed mb-8 max-w-md">
-            63 k&uuml;lt&uuml;rel mekan, 13 tematik rota, gizli hikayeler.
+            210+ k&uuml;lt&uuml;rel mekan, 18 tematik rota, gizli hikayeler.
             Ba&#351;kentin g&ouml;r&uuml;nmez katmanlar&#305;n&#305; ke&#351;fedin.
           </p>
           <a
