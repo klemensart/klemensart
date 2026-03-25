@@ -1705,14 +1705,14 @@ export default function HaritaPage() {
         <div style={{
           height: 48, display: "flex", alignItems: "center", gap: 8,
           padding: "0 10px",
-          background: isDark ? "rgba(26,26,26,0.85)" : "rgba(255,255,255,0.85)",
+          background: isDark ? "rgba(26,26,26,0.92)" : "rgba(255,255,255,0.92)",
           backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
           borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
           pointerEvents: "auto",
         }}>
           {/* Back button */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, color: uiMuted, textDecoration: "none", flexShrink: 0 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <Link href="/" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, color: isDark ? "rgba(255,255,255,0.6)" : "#374151", textDecoration: "none", flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </Link>
 
           {/* Title */}
@@ -1729,7 +1729,7 @@ export default function HaritaPage() {
                 style={{
                   padding: "5px 14px", borderRadius: 15, border: "none",
                   background: mode === m ? "#FF6D60" : "transparent",
-                  color: mode === m ? "#fff" : (isDark ? "#999" : "#888"),
+                  color: mode === m ? "#fff" : (isDark ? "#aaa" : "#555"),
                   fontSize: 12, fontWeight: 700, cursor: "pointer",
                   transition: "all 0.2s", whiteSpace: "nowrap",
                   boxShadow: mode === m ? "0 2px 8px rgba(255,109,96,0.35)" : "none",
@@ -1750,7 +1750,7 @@ export default function HaritaPage() {
             style={{
               width: 28, height: 28, borderRadius: 8, border: "none",
               background: mobileSearchOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
-              color: mobileSearchOpen ? "#FF6D60" : (isDark ? "#aaa" : "#666"),
+              color: mobileSearchOpen ? "#FF6D60" : (isDark ? "#bbb" : "#444"),
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s", flexShrink: 0,
             }}
@@ -1765,7 +1765,7 @@ export default function HaritaPage() {
               style={{
                 width: 28, height: 28, borderRadius: 8, border: "none", position: "relative",
                 background: mobileFiltersOpen ? (isDark ? "rgba(255,109,96,0.2)" : "#FFF0EE") : "transparent",
-                color: mobileFiltersOpen ? "#FF6D60" : (isDark ? "#aaa" : "#666"),
+                color: mobileFiltersOpen ? "#FF6D60" : (isDark ? "#bbb" : "#444"),
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "all 0.2s", flexShrink: 0,
               }}
@@ -1787,7 +1787,7 @@ export default function HaritaPage() {
             style={{
               width: 28, height: 28, borderRadius: 8, border: "none",
               background: "transparent",
-              color: isDark ? "#aaa" : "#666",
+              color: isDark ? "#bbb" : "#444",
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s", flexShrink: 0,
             }}
