@@ -2296,19 +2296,35 @@ export default function HaritaPage() {
                     )}
                   </div>
                   {!isNightLocked && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
-                      style={{
-                        marginTop: 8, padding: "5px 10px", borderRadius: 6,
-                        background: `${route.color}15`, border: `1px solid ${route.color}30`,
-                        color: route.color, fontSize: 10, fontWeight: 600,
-                        cursor: "pointer", transition: "background 0.2s",
-                      }}
-                      onMouseOver={(e) => { e.currentTarget.style.background = `${route.color}30`; }}
-                      onMouseOut={(e) => { e.currentTarget.style.background = `${route.color}15`; }}
-                    >
-                      Hikayeyi Kesfet
-                    </button>
+                    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); selectRoute(route); }}
+                        style={{
+                          padding: "6px 14px", borderRadius: 7,
+                          background: route.color, border: "none",
+                          color: "#fff", fontSize: 11, fontWeight: 700,
+                          cursor: "pointer", transition: "all 0.2s",
+                          boxShadow: `0 2px 8px ${route.color}40`,
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+                        onMouseOut={(e) => { e.currentTarget.style.opacity = "1"; }}
+                      >
+                        Rotayı Yürü
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
+                        style={{
+                          padding: "6px 12px", borderRadius: 7,
+                          background: "transparent", border: `1px solid ${route.color}40`,
+                          color: route.color, fontSize: 10, fontWeight: 600,
+                          cursor: "pointer", transition: "all 0.2s",
+                        }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = `${route.color}12`; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        Ön İzleme
+                      </button>
+                    </div>
                   )}
                 </div>
               </button>
@@ -2396,17 +2412,31 @@ export default function HaritaPage() {
                         </>
                       )}
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
-                      style={{
-                        marginTop: 6, padding: "4px 8px", borderRadius: 6,
-                        background: `${route.color}15`, border: `1px solid ${route.color}30`,
-                        color: route.color, fontSize: 9, fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Hikayeyi Kesfet
-                    </button>
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); selectRoute(route); }}
+                        style={{
+                          padding: "5px 12px", borderRadius: 6,
+                          background: route.color, border: "none",
+                          color: "#fff", fontSize: 10, fontWeight: 700,
+                          cursor: "pointer", transition: "all 0.2s",
+                          boxShadow: `0 2px 6px ${route.color}40`,
+                        }}
+                      >
+                        Rotayı Yürü
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); scrolly.enterScrollytelling(route); }}
+                        style={{
+                          padding: "5px 10px", borderRadius: 6,
+                          background: "transparent", border: `1px solid ${route.color}40`,
+                          color: route.color, fontSize: 9, fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Ön İzleme
+                      </button>
+                    </div>
                     </>
                   )}
                 </div>
