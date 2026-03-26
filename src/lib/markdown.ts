@@ -32,6 +32,34 @@ function extractYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
+/** Optimize inline images: Next.js image optimization + responsive srcset + lazy load */
+function optimizeImages(rawHtml: string): string {
+  return rawHtml.replace(
+    /<img(\s[^>]*?)src="([^"]*?)"([^>]*?)>/g,
+    (_match, before: string, src: string, after: string) => {
+      // Already optimized? Skip
+      if (before.includes("loading=") || after.includes("loading=")) return _match;
+
+      const isLocal = src.startsWith("/");
+      const isSupabase = src.includes("sgabkrzzzszfqrtgkord.supabase.co");
+
+      // Non-optimizable external images: just add lazy loading
+      if (!isLocal && !isSupabase) {
+        return `<img${before}src="${src}"${after} loading="lazy" decoding="async">`;
+      }
+
+      const encoded = encodeURIComponent(src);
+      const srcset = [
+        `/_next/image?url=${encoded}&w=640&q=75 640w`,
+        `/_next/image?url=${encoded}&w=828&q=75 828w`,
+        `/_next/image?url=${encoded}&w=1080&q=75 1080w`,
+      ].join(", ");
+
+      return `<img${before}src="/_next/image?url=${encoded}&w=828&q=75"${after} srcset="${srcset}" sizes="(max-width: 768px) 100vw, 680px" loading="lazy" decoding="async">`;
+    },
+  );
+}
+
 /** Image → <figure> + optional <figcaption> from title attr or italic caption */
 function processImageCaptions(rawHtml: string): string {
   // 1. NEW FORMAT: <p><img title="caption"></p> → <figure><figcaption>
@@ -265,6 +293,7 @@ export async function markdownToHtml(content: string): Promise<string> {
 
   // 4. Post-process pipeline
   contentHtml = processImageCaptions(contentHtml);
+  contentHtml = optimizeImages(contentHtml);
   contentHtml = processWarningBoxes(contentHtml);
   contentHtml = processYouTubeEmbeds(processBlockquotes(contentHtml));
   contentHtml = processKaynakca(contentHtml);
