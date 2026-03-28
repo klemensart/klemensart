@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import type { ArticleMeta } from "@/lib/markdown";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -17,10 +18,22 @@ type TeamMember = {
   quote: string;
   ig?: string;
   mail?: string;
+  photo?: string;
   svgX: number;
   svgY: number;
   floatDur: number;
   floatDelay: number;
+};
+
+type WriterMember = {
+  id: string;
+  name: string;
+  initials: string;
+  role: string;
+  quote?: string;
+  ig?: string;
+  mail?: string;
+  photo?: string;
 };
 
 // ── SVG canvas constants ───────────────────────────────────────────────────────
@@ -29,7 +42,7 @@ const VH = 540;
 const CX = 500;
 const CY = 270;
 
-// ── Team data ──────────────────────────────────────────────────────────────────
+// ── Core team (SVG network — 4 kişi) ────────────────────────────────────────
 const TEAM: TeamMember[] = [
   {
     id: "kerem",
@@ -40,68 +53,171 @@ const TEAM: TeamMember[] = [
     quote: "Sanat tarihi bir amaç değil, kendinizi keşfetmek için bir araç.",
     ig: "@keremhun",
     mail: "kerem@klemensart.com",
-    svgX: 212, svgY: 108,
+    photo: "/images/ekip/kerem-hun.jpg",
+    svgX: 240, svgY: 115,
     floatDur: 12, floatDelay: 0,
+  },
+  {
+    id: "volkan",
+    name: "Volkan Muyan",
+    initials: "VM",
+    role: "Yayın Koordinatörü",
+    size: "medium",
+    quote: "İyi bir yayın, okura yeni bir pencere açar.",
+    svgX: 760, svgY: 115,
+    floatDur: 14, floatDelay: 1.5,
+  },
+  {
+    id: "hulya",
+    name: "Hülya Utkuluer",
+    initials: "HU",
+    role: "Editör",
+    size: "medium",
+    quote: "Sanat hayatın ilhamıysa, müzeler ilhamın hafızasıdır.",
+    ig: "@hutkuluer",
+    mail: "hulyautkuluer@gmail.com",
+    photo: "/images/ekip/hulya-utkuluer.jpg",
+    svgX: 240, svgY: 420,
+    floatDur: 11, floatDelay: 2.8,
+  },
+  {
+    id: "sevim",
+    name: "Sevim Aydın",
+    initials: "SA",
+    role: "Tasarımcı",
+    size: "medium",
+    quote: "Her film, izleyicisine kendini anlatan bir mektuptur.",
+    ig: "@sevim_aydin",
+    mail: "aydinsevimm@gmail.com",
+    photo: "/images/ekip/sevim-aydin.jpg",
+    svgX: 760, svgY: 420,
+    floatDur: 13, floatDelay: 0.8,
+  },
+];
+
+// ── Writers grid (tüm yazarlar — soyadı sırasına göre) ─────────────────────
+const WRITERS: WriterMember[] = [
+  {
+    id: "berra",
+    name: "Ebru Berra Alkan",
+    initials: "BA",
+    role: "Yazar",
+  },
+  {
+    id: "ezel",
+    name: "Ezel Evin Altındağ",
+    initials: "EA",
+    role: "Yazar",
+  },
+  {
+    id: "baris",
+    name: "Barış Arslan",
+    initials: "BA",
+    role: "Yazar — Sinema & Kültür",
+    quote: "İnsani olan hiçbir şey bana yabancı değildir.",
+    ig: "@barars2023",
+    mail: "bararslan2009@gmail.com",
+    photo: "/images/ekip/baris-arslan.jpg",
+  },
+  {
+    id: "ugur",
+    name: "Uğur Atay",
+    initials: "UA",
+    role: "Yazar",
+  },
+  {
+    id: "zeynep",
+    name: "Zeynep Aydın",
+    initials: "ZA",
+    role: "Yazar",
+  },
+  {
+    id: "ecem",
+    name: "Ecem Civaş",
+    initials: "EC",
+    role: "Yazar",
   },
   {
     id: "gizem",
     name: "Gizem Dinç",
     initials: "GD",
     role: "Yazar — Psikoloji & Sosyoloji",
-    size: "medium",
     quote: "Yapay zeka çağında bile en güçlü bağ, insanın kendisiyle kurduğu bağdır.",
     ig: "@gizemdinc.h",
     mail: "gizemdinc@gmail.com",
-    svgX: 748, svgY: 90,
-    floatDur: 14, floatDelay: 1.5,
+    photo: "/images/ekip/gizem-dinc.jpg",
   },
   {
     id: "defne",
     name: "Defne Ege Durucu",
     initials: "DD",
     role: "Yazar — Felsefe & Varoluş",
-    size: "medium",
     quote: "Yalnızlık kimsenin olmadığı bir yer değildir. Aksine, baktıkça kalabalıklaşır.",
     ig: "@aging_as_a_tree",
     mail: "defneeged@gmail.com",
-    svgX: 870, svgY: 265,
-    floatDur: 10, floatDelay: 2.8,
   },
   {
-    id: "sevim",
-    name: "Sevim Aydın",
-    initials: "SA",
-    role: "Yazar — Sinema & Dijital Kültür",
-    size: "medium",
-    quote: "Her film, izleyicisine kendini anlatan bir mektuptur.",
-    ig: "@sevim_aydin",
-    mail: "aydinsevimm@gmail.com",
-    svgX: 750, svgY: 445,
-    floatDur: 13, floatDelay: 0.8,
+    id: "cansu",
+    name: "Cansu Kul",
+    initials: "CK",
+    role: "Yazar",
   },
   {
-    id: "melis",
-    name: "Melis Terzi",
-    initials: "MT",
-    role: "Yazar — Kültür & Sanat Rehberleri",
-    size: "medium",
-    quote: "Sanat ekseninde yalnızlığı konuşarak birlikte olalım.",
-    ig: "@melisterzi",
-    mail: "terzi_melis@hotmail.com",
-    svgX: 242, svgY: 442,
-    floatDur: 11, floatDelay: 3.5,
+    id: "mehtap",
+    name: "Mehtap Kurt",
+    initials: "MK",
+    role: "Yazar — Sanat Tarihi & Mitoloji",
+    quote: "Sanat insanın dünyadaki izini çözer, kültür ise onun sessiz hafızasını ortaya çıkarır.",
+    ig: "@mehtapconatus",
+    mail: "mehtapkurt7140@gmail.com",
+    photo: "/images/ekip/mehtap-kurt.jpg",
+  },
+  {
+    id: "dolunay",
+    name: "Dolunay May",
+    initials: "DM",
+    role: "Yazar — Kültür & Sanat Felsefesi",
+    quote: "Sanat, insanın kendini ve dünyayı sorguladığı en dürüst alandır.",
+  },
+  {
+    id: "gozde",
+    name: "Gözde Şensoy Murt",
+    initials: "GM",
+    role: "Yazar — Kültür Sanat & Psikoloji",
+    quote: "Anlaşılmak, ruhun karmaşasını bir sanat eserine dönüştüren büyülü bir akışa kapılmaktır.",
+    ig: "@gozdsnsy",
+    mail: "gozdesnsy@gmail.com",
+    photo: "/images/ekip/gozde-murt.png",
   },
   {
     id: "didem",
     name: "Didem Kazan Sol",
     initials: "DS",
     role: "Yazar — Sanat Tarihi & Feminizm",
-    size: "medium",
     quote: "Fırça, kadının sessiz direnişinin en güçlü silahıdır.",
     ig: "@didosol",
     mail: "soldidem@gmail.com",
-    svgX: 118, svgY: 260,
-    floatDur: 15, floatDelay: 2.0,
+  },
+  {
+    id: "iklim",
+    name: "İklim Demir Tantoğlu",
+    initials: "İT",
+    role: "Yazar",
+  },
+  {
+    id: "melis",
+    name: "Melis Terzi",
+    initials: "MT",
+    role: "Yazar — Kültür & Sanat Rehberleri",
+    quote: "Sanat ekseninde yalnızlığı konuşarak birlikte olalım.",
+    ig: "@melisterzi",
+    mail: "terzi_melis@hotmail.com",
+  },
+  {
+    id: "doga",
+    name: "Doğa Uğurel",
+    initials: "DU",
+    role: "Yazar",
   },
 ];
 
@@ -116,23 +232,19 @@ type Connection = {
 };
 
 const CONNECTIONS: Connection[] = [
-  // Center → members
-  { from: "center", to: "kerem",  bend:  0.15, dur: 8,  delay: 0   },
-  { from: "center", to: "gizem",  bend: -0.10, dur: 10, delay: 1.2 },
-  { from: "center", to: "defne",  bend:  0.08, dur: 9,  delay: 0.5 },
-  { from: "center", to: "sevim",  bend: -0.12, dur: 11, delay: 2.0 },
-  { from: "center", to: "melis",  bend:  0.12, dur: 7,  delay: 1.8 },
-  { from: "center", to: "didem",  bend: -0.10, dur: 12, delay: 0.9 },
-  // Outer ring
-  { from: "kerem",  to: "gizem",  bend: -0.20, dur: 14, delay: 2.5, secondary: true },
-  { from: "gizem",  to: "defne",  bend:  0.22, dur: 12, delay: 1.0, secondary: true },
-  { from: "defne",  to: "sevim",  bend: -0.18, dur: 10, delay: 3.0, secondary: true },
-  { from: "sevim",  to: "melis",  bend:  0.15, dur: 13, delay: 0.3, secondary: true },
-  { from: "melis",  to: "didem",  bend: -0.22, dur: 11, delay: 2.2, secondary: true },
-  { from: "didem",  to: "kerem",  bend:  0.20, dur: 15, delay: 1.5, secondary: true },
-  // Cross connections
-  { from: "kerem",  to: "defne",  bend:  0.28, dur: 16, delay: 3.5, secondary: true },
-  { from: "gizem",  to: "melis",  bend: -0.28, dur: 14, delay: 2.8, secondary: true },
+  // Center → 4 core members
+  { from: "center", to: "kerem",  bend:  0.12, dur: 8,  delay: 0   },
+  { from: "center", to: "volkan", bend: -0.12, dur: 10, delay: 1.2 },
+  { from: "center", to: "hulya",  bend: -0.10, dur: 9,  delay: 0.5 },
+  { from: "center", to: "sevim",  bend:  0.10, dur: 11, delay: 2.0 },
+  // Outer ring (rectangle)
+  { from: "kerem",  to: "volkan", bend: -0.15, dur: 14, delay: 2.5, secondary: true },
+  { from: "volkan", to: "sevim",  bend:  0.18, dur: 12, delay: 1.0, secondary: true },
+  { from: "sevim",  to: "hulya",  bend: -0.15, dur: 13, delay: 0.3, secondary: true },
+  { from: "hulya",  to: "kerem",  bend:  0.18, dur: 11, delay: 2.2, secondary: true },
+  // Cross connections (diagonals)
+  { from: "kerem",  to: "sevim",  bend:  0.22, dur: 16, delay: 3.5, secondary: true },
+  { from: "volkan", to: "hulya",  bend: -0.22, dur: 15, delay: 2.8, secondary: true },
 ];
 
 function nodePos(id: string) {
@@ -218,9 +330,22 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const selectedMember = selectedId ? TEAM.find((m) => m.id === selectedId) ?? null : null;
+  const allMembers = [...TEAM, ...WRITERS];
+  const selectedMember = selectedId === "center"
+    ? { id: "center", name: "KLEMENS", initials: "K", role: "Kolektif Yayınlar", quote: "Klemens, tek bir zihin değil — birbirine bağlı düşüncelerin, merakların ve tutkuların ağıdır.", photo: undefined }
+    : selectedId ? allMembers.find((m) => m.id === selectedId) ?? null : null;
+  // Author name aliases (DB name may differ from display name)
+  const authorAliases: Record<string, string[]> = {
+    "Gözde Şensoy Murt": ["Gözde Murt", "Gözde Şensoy Murt"],
+    "Ebru Berra Alkan": ["Ebru Berra Alkan", "Berra Alkan"],
+    "Ezel Evin Altındağ": ["Ezel Evin Altındağ", "Ezel Evin"],
+    "KLEMENS": ["KLEMENS"],
+  };
   const memberArticles = selectedMember
-    ? articles.filter((a) => a.author === selectedMember.name)
+    ? articles.filter((a) => {
+        const names = authorAliases[selectedMember.name] ?? [selectedMember.name];
+        return names.includes(a.author);
+      })
     : [];
 
   return (
@@ -296,8 +421,10 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
 
             {/* ── Center node: Klemens ── */}
             <motion.g
+              style={{ cursor: "pointer" }}
               animate={{ y: FY, x: FX }}
               transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", times: FT }}
+              onClick={() => setSelectedId("center")}
             >
               {/* Pulse ring */}
               <motion.circle
@@ -341,6 +468,13 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
               </text>
             </motion.g>
 
+            {/* ── Photo clip paths ── */}
+            {TEAM.filter((m) => m.photo).map((m) => (
+              <clipPath key={`clip-${m.id}`} id={`clip-${m.id}`}>
+                <circle cx={m.svgX} cy={m.svgY} r={nodeRadius(m.size)} />
+              </clipPath>
+            ))}
+
             {/* ── Member nodes ── */}
             {TEAM.map((member) => {
               const r = nodeRadius(member.size);
@@ -372,30 +506,59 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
                   onHoverEnd={() => setHoveredId(null)}
                   onClick={() => setSelectedId(member.id)}
                 >
-                  {/* Node circle */}
-                  <circle
-                    cx={member.svgX}
-                    cy={member.svgY}
-                    r={r}
-                    style={{ fill, transition: "fill 0.2s ease" }}
-                  />
-                  {/* Initials */}
-                  <text
-                    x={member.svgX}
-                    y={member.svgY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    style={{
-                      fontFamily: "var(--font-jakarta)",
-                      fontWeight: 700,
-                      fontSize: member.size === "large" ? 12 : 10,
-                      fill: "white",
-                      letterSpacing: "0.04em",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    {member.initials}
-                  </text>
+                  {member.photo ? (
+                    <>
+                      {/* Hit area (invisible but clickable) */}
+                      <circle cx={member.svgX} cy={member.svgY} r={r + 4} fill="transparent" />
+                      {/* Photo node */}
+                      <image
+                        href={member.photo}
+                        x={member.svgX - r}
+                        y={member.svgY - r}
+                        width={r * 2}
+                        height={r * 2}
+                        clipPath={`url(#clip-${member.id})`}
+                        preserveAspectRatio="xMidYMid slice"
+                        style={{ pointerEvents: "none" }}
+                      />
+                      {/* Ring */}
+                      <circle
+                        cx={member.svgX}
+                        cy={member.svgY}
+                        r={r + 2}
+                        fill="none"
+                        stroke={active ? "#FF6D60" : "rgba(44,35,25,0.15)"}
+                        strokeWidth={active ? 2.5 : 1}
+                        style={{ transition: "stroke 0.2s ease, stroke-width 0.2s ease", pointerEvents: "none" }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/* Initials node */}
+                      <circle
+                        cx={member.svgX}
+                        cy={member.svgY}
+                        r={r}
+                        style={{ fill, transition: "fill 0.2s ease" }}
+                      />
+                      <text
+                        x={member.svgX}
+                        y={member.svgY}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        style={{
+                          fontFamily: "var(--font-jakarta)",
+                          fontWeight: 700,
+                          fontSize: member.size === "large" ? 12 : 10,
+                          fill: "white",
+                          letterSpacing: "0.04em",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {member.initials}
+                      </text>
+                    </>
+                  )}
                   {/* Name label */}
                   <text
                     x={member.svgX}
@@ -424,41 +587,54 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
         </div>
       </section>
 
-      {/* ── Mobile card grid ──────────────────────────────────────────────── */}
+      {/* ── Mobile core team ──────────────────────────────────────────────── */}
       <section className="lg:hidden py-16 px-6 bg-white">
         <div className="max-w-lg mx-auto">
-          <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-8">
-            Ekibimiz
+          <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-2">
+            Çekirdek Ekip
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {TEAM.map((member) => (
-              <button
-                key={member.id}
-                onClick={() => setSelectedId(member.id)}
-                className="text-left rounded-2xl bg-warm-50 border border-warm-100 p-5 hover:border-warm-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98]"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className="rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
-                    style={{
-                      width:      member.size === "large" ? 48 : 42,
-                      height:     member.size === "large" ? 48 : 42,
-                      fontSize:   member.size === "large" ? 14 : 12,
-                      background: "#2C2319",
-                    }}
-                  >
-                    {member.initials}
-                  </div>
-                  <div>
-                    <p className="font-bold text-warm-900 text-sm leading-tight">{member.name}</p>
-                    <p className="text-xs text-warm-900/50 mt-0.5">{member.role}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-warm-900/50 italic leading-relaxed line-clamp-2">
-                  {member.quote}
-                </p>
-              </button>
-            ))}
+          <p className="text-warm-900/40 text-xs mb-6">Bir üyeye dokunarak tanıyın</p>
+
+          {/* Klemens center + core team */}
+          <div className="flex flex-col items-center gap-5 mb-4">
+            {/* Klemens hub */}
+            <button
+              onClick={() => setSelectedId("center")}
+              className="w-16 h-16 rounded-full bg-coral flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+            >
+              <span className="text-white font-extrabold text-lg tracking-wide">K</span>
+            </button>
+
+            {/* 2x2 grid of core */}
+            <div className="grid grid-cols-2 gap-3 w-full">
+              {TEAM.map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() => setSelectedId(member.id)}
+                  className="flex flex-col items-center text-center rounded-2xl bg-warm-50 border border-warm-100 p-4 hover:border-coral/30 hover:shadow-md active:scale-[0.97] transition-all duration-200"
+                >
+                  {member.photo ? (
+                    <Image
+                      src={member.photo}
+                      alt={member.name}
+                      width={56}
+                      height={56}
+                      className="rounded-full object-cover mb-2.5"
+                      style={{ width: 56, height: 56 }}
+                    />
+                  ) : (
+                    <div
+                      className="rounded-full flex items-center justify-center text-white font-bold mb-2.5"
+                      style={{ width: 56, height: 56, fontSize: 14, background: "#2C2319" }}
+                    >
+                      {member.initials}
+                    </div>
+                  )}
+                  <p className="font-bold text-warm-900 text-sm leading-tight">{member.name}</p>
+                  <p className="text-[11px] text-warm-900/45 mt-0.5">{member.role}</p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -509,12 +685,22 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
                 </button>
 
                 {/* Avatar */}
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg mb-5"
-                  style={{ background: "#FF6D60" }}
-                >
-                  {selectedMember.initials}
-                </div>
+                {selectedMember.photo ? (
+                  <Image
+                    src={selectedMember.photo}
+                    alt={selectedMember.name}
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 rounded-full object-cover mb-5"
+                  />
+                ) : (
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg mb-5"
+                    style={{ background: "#FF6D60" }}
+                  >
+                    {selectedMember.initials}
+                  </div>
+                )}
 
                 {/* Name + role */}
                 <h2 className="text-2xl font-bold text-warm-900 leading-tight mb-1">
@@ -582,6 +768,58 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
           </>
         )}
       </AnimatePresence>
+
+      {/* ── Writers grid ──────────────────────────────────────────────────── */}
+      {WRITERS.length > 0 && (
+        <section className="py-16 px-6 bg-[#FFFBF7]">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-2">
+              Yazarlarımız
+            </p>
+            <p className="text-warm-900/45 text-sm mb-10 max-w-lg">
+              Farklı disiplinlerden gelen yazarlarımız, Klemens&apos;in kolektif sesini oluşturur.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {WRITERS.map((writer) => (
+                <button
+                  key={writer.id}
+                  onClick={() => setSelectedId(writer.id)}
+                  className="text-left rounded-2xl bg-white border border-warm-100 p-4 hover:border-warm-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98]"
+                >
+                  <div className="flex flex-col items-center text-center gap-3">
+                    {writer.photo ? (
+                      <Image
+                        src={writer.photo}
+                        alt={writer.name}
+                        width={56}
+                        height={56}
+                        className="rounded-full object-cover"
+                        style={{ width: 56, height: 56 }}
+                      />
+                    ) : (
+                      <div
+                        className="rounded-full flex items-center justify-center text-white font-bold"
+                        style={{ width: 56, height: 56, fontSize: 14, background: "#2C2319" }}
+                      >
+                        {writer.initials}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-bold text-warm-900 text-sm leading-tight">{writer.name}</p>
+                      <p className="text-[11px] text-warm-900/45 mt-1">{writer.role}</p>
+                    </div>
+                    {writer.quote && (
+                      <p className="text-[11px] text-warm-900/40 italic leading-relaxed line-clamp-2">
+                        &ldquo;{writer.quote}&rdquo;
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Manifesto + stats ─────────────────────────────────────────────── */}
       <section className="py-24 px-6 bg-warm-100">
