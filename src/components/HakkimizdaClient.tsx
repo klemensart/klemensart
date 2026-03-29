@@ -180,6 +180,7 @@ const WRITERS: WriterMember[] = [
     initials: "DM",
     role: "Yazar",
     quote: "Sanat, insanın kendini ve dünyayı sorguladığı en dürüst alandır.",
+    photo: "/images/ekip/dolunay-may.jpg",
   },
   {
     id: "gozde",
