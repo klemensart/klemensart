@@ -25,7 +25,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     forSale: true,
     imgCover: "/images/workshops/modern-sanat-atolyesi-cover.webp",
     imgSquare: "/images/workshops/modern-sanat-atolyesi-square.webp",
-    targetDate: "2026-04-08T20:30:00+03:00",
+    targetDate: "2026-04-15T20:30:00+03:00",
   },
   "ronesans-okuryazarligi": {
     id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
