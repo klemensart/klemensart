@@ -89,19 +89,29 @@ export async function POST(req: NextRequest) {
 
   // ── All mode ──
   if (mode === "all") {
-    const { data: subs, error: dbError } = await admin
-      .from("subscribers")
-      .select("email")
-      .eq("is_active", true);
-
-    if (dbError) {
-      return NextResponse.json(
-        { error: `Veritabanı hatası: ${dbError.message}` },
-        { status: 500 }
-      );
+    // Supabase max_rows=1000 limiti — sayfalama ile tüm aboneleri çek
+    const subs: { email: string }[] = [];
+    let page = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data: batch, error: dbError } = await admin
+        .from("subscribers")
+        .select("email")
+        .eq("is_active", true)
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+      if (dbError) {
+        return NextResponse.json(
+          { error: `Veritabanı hatası: ${dbError.message}` },
+          { status: 500 }
+        );
+      }
+      if (!batch || batch.length === 0) break;
+      subs.push(...batch);
+      if (batch.length < pageSize) break;
+      page++;
     }
 
-    if (!subs || subs.length === 0) {
+    if (subs.length === 0) {
       return NextResponse.json(
         { error: "Aktif abone bulunamadı." },
         { status: 400 }
