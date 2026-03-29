@@ -381,6 +381,11 @@ export default function ProfilPage() {
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
   const [quizLoading, setQuizLoading] = useState(false);
 
+  // Favori Yazılar data
+  type FavArticle = { slug: string; title: string; category: string; description: string; readTime: string; date: string; liked_at: string };
+  const [favArticles, setFavArticles] = useState<FavArticle[]>([]);
+  const [favLoading, setFavLoading] = useState(false);
+
   /* ─── Auth ─── */
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -509,6 +514,53 @@ export default function ProfilPage() {
   useEffect(() => {
     if (user && activeTab === "tests") fetchQuizResults();
   }, [user, activeTab, fetchQuizResults]);
+
+  /* ─── Fetch Favorites ─── */
+  const fetchFavorites = useCallback(async () => {
+    if (!user) return;
+    setFavLoading(true);
+    try {
+      const sb = createClient();
+      const { data: likes } = await sb
+        .from("article_likes")
+        .select("article_slug, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (likes && likes.length > 0) {
+        const slugs = likes.map((l) => l.article_slug);
+        const { data: articles } = await sb
+          .from("articles")
+          .select("slug, title, category, description, read_time, published_at")
+          .in("slug", slugs);
+
+        const articleMap = new Map((articles ?? []).map((a) => [a.slug, a]));
+        const merged: FavArticle[] = likes
+          .map((l) => {
+            const a = articleMap.get(l.article_slug);
+            if (!a) return null;
+            return {
+              slug: a.slug,
+              title: a.title,
+              category: a.category ?? "",
+              description: a.description ?? "",
+              readTime: a.read_time ?? "",
+              date: a.published_at ?? "",
+              liked_at: l.created_at,
+            };
+          })
+          .filter((x): x is FavArticle => x !== null);
+        setFavArticles(merged);
+      } else {
+        setFavArticles([]);
+      }
+    } catch { /* ignore */ }
+    setFavLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    if (user && activeTab === "favorites") fetchFavorites();
+  }, [user, activeTab, fetchFavorites]);
 
   /* ─── Sign out ─── */
   const handleSignOut = async () => {
@@ -934,11 +986,52 @@ export default function ProfilPage() {
 
           {/* ══ FAVORİ YAZILAR ══ */}
           {activeTab === "favorites" && (
-            <div className="text-center py-[60px] text-brand-warm">
-              <HeartIcon size={48} className="text-brand-light mx-auto" />
-              <p className="text-[15px] font-semibold text-brand-dark mt-4">Favori Yazılar</p>
-              <p className="text-[13px]">Beğendiğin ve kaydettiğin içerikler burada listelenecek.</p>
-              <p className="text-xs italic mt-2">Yakında</p>
+            <div>
+              {favLoading ? (
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto" />
+                </div>
+              ) : favArticles.length === 0 ? (
+                <div className="text-center py-[60px] text-brand-warm">
+                  <HeartIcon size={48} className="text-brand-light mx-auto" />
+                  <p className="text-[15px] font-semibold text-brand-dark mt-4">Henüz favori yazın yok</p>
+                  <p className="text-[13px]">Yazıların altındaki kalp ikonuna tıklayarak favorilerine ekleyebilirsin.</p>
+                  <Link
+                    href="/icerikler"
+                    className="inline-flex items-center gap-2 mt-5 px-6 py-2.5 rounded-full border border-coral text-coral text-sm font-semibold hover:bg-coral hover:text-white transition-all"
+                  >
+                    Yazıları Keşfet <ArrowRightIcon size={14} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {favArticles.map((a) => (
+                    <Link
+                      key={a.slug}
+                      href={`/icerikler/yazi/${a.slug}`}
+                      className="group flex items-start gap-4 p-4 rounded-xl border border-brand-light hover:border-coral/30 hover:shadow-sm transition-all"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-coral/10 text-coral mb-1.5">
+                          {a.category}
+                        </span>
+                        <h3 className="text-[14px] font-semibold text-brand-dark group-hover:text-coral transition-colors leading-snug">
+                          {a.title}
+                        </h3>
+                        {a.description && (
+                          <p className="text-[12px] text-brand-warm mt-1 line-clamp-2 leading-relaxed">{a.description}</p>
+                        )}
+                        <p className="text-[11px] text-brand-warm/60 mt-1.5">
+                          {a.readTime && `${a.readTime} okuma`}
+                          {a.readTime && a.date && " · "}
+                          {a.date && new Date(a.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}
+                        </p>
+                      </div>
+                      <HeartIcon size={16} className="text-coral flex-shrink-0 mt-1" />
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
