@@ -24,8 +24,8 @@ export type TemplateName =
   | "HaberlerBulteni"
   | "DogumGunuTebrik";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TemplateEntry = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: (props: any) => React.ReactElement;
   defaultSubject: string;
 };

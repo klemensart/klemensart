@@ -1,4 +1,4 @@
-import { Section, Text, Img, Link } from "@react-email/components";
+import { Section, Text, Img } from "@react-email/components";
 import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 

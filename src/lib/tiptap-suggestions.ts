@@ -21,7 +21,8 @@ export type Suggestion = {
   created_at: string;
 };
 
-/* ── Text extraction ── */
+/* ── Text extraction (used by scoreContextMatch) ── */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function extractPlainText(doc: ProseMirrorNode): string {
   const parts: string[] = [];
   doc.descendants((node) => {
@@ -78,8 +79,6 @@ function findAllOccurrences(doc: ProseMirrorNode, searchText: string): TextMatch
 
 /* ── Context-based disambiguation ── */
 function scoreContextMatch(doc: ProseMirrorNode, match: TextMatch, contextBefore: string, contextAfter: string): number {
-  const plainText = extractPlainText(doc);
-
   // We need to map match.from/to to plaintext indices
   // Approximate: extract text around the match directly from the doc
   let score = 0;

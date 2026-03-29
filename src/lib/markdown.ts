@@ -142,8 +142,6 @@ function youtubeIframe(id: string): string {
   return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
 }
 
-const YT_URL_RE = /https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?[^\s<"]*|youtu\.be\/[\w-]+[^\s<"]*|youtube\.com\/embed\/[\w-]+[^\s<"]*|m\.youtube\.com\/watch\?[^\s<"]*)/g;
-
 function processYouTubeEmbeds(rawHtml: string): string {
   // 1. <youtube>URL</youtube> custom tag
   let result = rawHtml.replace(/<youtube>([\s\S]*?)<\/youtube>/g, (_, url) => {

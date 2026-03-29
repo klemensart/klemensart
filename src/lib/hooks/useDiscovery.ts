@@ -29,18 +29,21 @@ function getDistrict(lat: number, lng: number): string {
 
 export type DistrictProgress = { name: string; discovered: number; total: number; percent: number };
 
-export function useDiscovery(gamUser: { id: string } | null, visitedSlugs: Set<string>) {
-  const [discoveredSlugs, setDiscoveredSlugs] = useState<Set<string>>(new Set());
-
-  // Init from localStorage + merge with gamification visitedSlugs
-  useEffect(() => {
+export function useDiscovery(_gamUser: { id: string } | null, visitedSlugs: Set<string>) {
+  // Lazy init from localStorage
+  const [localSlugs, setLocalSlugs] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
     const stored = localStorage.getItem(LS_KEY);
-    const fromStorage: string[] = stored ? JSON.parse(stored) : [];
-    const merged = new Set([...fromStorage, ...visitedSlugs]);
-    setDiscoveredSlugs(merged);
-  }, [visitedSlugs]);
+    return stored ? new Set<string>(JSON.parse(stored)) : new Set();
+  });
 
-  // Persist to localStorage when set changes
+  // Merge localStorage slugs + gamification visitedSlugs during render
+  const discoveredSlugs = useMemo(
+    () => new Set([...localSlugs, ...visitedSlugs]),
+    [localSlugs, visitedSlugs],
+  );
+
+  // Persist merged set to localStorage
   useEffect(() => {
     if (discoveredSlugs.size > 0) {
       localStorage.setItem(LS_KEY, JSON.stringify([...discoveredSlugs]));
@@ -48,7 +51,7 @@ export function useDiscovery(gamUser: { id: string } | null, visitedSlugs: Set<s
   }, [discoveredSlugs]);
 
   const discoverPlace = useCallback((slug: string) => {
-    setDiscoveredSlugs((prev) => {
+    setLocalSlugs((prev) => {
       if (prev.has(slug)) return prev;
       const next = new Set(prev);
       next.add(slug);
