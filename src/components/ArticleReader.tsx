@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ArticleLikeButton from "@/components/ArticleLikeButton";
+import ArticleNewsletterCTA from "@/components/ArticleNewsletterCTA";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
 
 function formatDate(dateStr: string) {
@@ -216,14 +218,17 @@ export default function ArticleReader({ article, relatedArticles = [] }: { artic
           </div>
         </div>
 
-        {/* Share */}
+        {/* Like & Share */}
         <div
           className="mx-auto px-6 mb-16"
           style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
         >
-          <p className={`text-xs font-semibold tracking-widest uppercase mb-4 ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
-            Paylaş
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <p className={`text-xs font-semibold tracking-widest uppercase ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
+              Paylaş
+            </p>
+            <ArticleLikeButton slug={meta.slug} darkMode={darkMode} />
+          </div>
           <div className="flex items-center gap-3">
             {/* WhatsApp */}
             <a
@@ -294,6 +299,9 @@ export default function ArticleReader({ article, relatedArticles = [] }: { artic
             </button>
           </div>
         </div>
+
+        {/* Newsletter CTA */}
+        {!readingMode && <ArticleNewsletterCTA darkMode={darkMode} />}
 
         {/* Related articles */}
         {!readingMode && relatedArticles.length > 0 && (
