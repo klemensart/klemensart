@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props) {
       description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. Sanatın grameri Rönesans'tır.",
     },
     "ronesans-okuryazarligi-2": {
-      title: "Rönesans Okur-Yazarlığı — 2. Dönem",
+      title: "Rönesans Okur-Yazarlığı",
       description: "7 Mayıs'ta başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
     },
     "kapsamli-sanat-tarihi": {
@@ -103,7 +103,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "sanat-tarihinde-duygular": "Sanat Tarihinde Duygular",
     "modern-sanat-atolyesi": "Modern Sanatı Okumak",
     "ronesans-okuryazarligi": "Rönesans Okur-Yazarlığı",
-    "ronesans-okuryazarligi-2": "Rönesans Okur-Yazarlığı — 2. Dönem",
+    "ronesans-okuryazarligi-2": "Rönesans Okur-Yazarlığı",
     "kapsamli-sanat-tarihi": "Kapsamlı Sanat Tarihi Atölyesi",
     "leonardo-da-vinci-semineri": "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
   };
@@ -1053,7 +1053,7 @@ function RonesansPage({
   );
 }
 
-/* ─── SAYFA 3b: Rönesans Okur-Yazarlığı — 2. Dönem ───── */
+/* ─── SAYFA 3b: Rönesans Okur-Yazarlığı ───── */
 
 function Ronesans2Page({
   config,
@@ -1109,7 +1109,7 @@ function Ronesans2Page({
           altBaslik="Online — 8 Hafta"
           baslik="Rönesans Okur-Yazarlığı"
           fiyat="4.500₺"
-          workshopTitle="Rönesans Okur-Yazarlığı — 2. Dönem"
+          workshopTitle="Rönesans Okur-Yazarlığı"
           imgPosition="center 20%"
           workshopSlug={slug}
           status={status}
@@ -1250,7 +1250,7 @@ function Ronesans2Page({
           <AltCTA
             config={config}
             workshopSlug={slug}
-            workshopTitle="Rönesans Okur-Yazarlığı — 2. Dönem"
+            workshopTitle="Rönesans Okur-Yazarlığı"
             aciklama="8 hafta · Zoom · 6 aylık kayıt erişimi · PDF dokümanlar dahil"
             fiyatLabel="4.500₺"
             status={status}

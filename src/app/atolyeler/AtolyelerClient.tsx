@@ -88,7 +88,7 @@ const SERILER: SeriesWorkshop[] = [
   {
     slug: "ronesans-okuryazarligi-2",
     workshopId: SLUG_TO_ATOLYE["ronesans-okuryazarligi-2"].id,
-    title: "Rönesans Okur-Yazarlığı — 2. Dönem",
+    title: "Rönesans Okur-Yazarlığı",
     description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğren. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
     duration: "8 Hafta",
     price: "4.500 TL",
