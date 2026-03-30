@@ -86,6 +86,17 @@ const SERILER: SeriesWorkshop[] = [
     imgPosition: "center 20%",
   },
   {
+    slug: "ronesans-okuryazarligi-2",
+    workshopId: SLUG_TO_ATOLYE["ronesans-okuryazarligi-2"].id,
+    title: "Rönesans Okur-Yazarlığı — 2. Dönem",
+    description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğren. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
+    duration: "8 Hafta",
+    price: "4.500 TL",
+    imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
+    imgPosition: "center 20%",
+    startLabel: "7 Mayıs'ta başlıyor",
+  },
+  {
     slug: "kapsamli-sanat-tarihi",
     workshopId: SLUG_TO_ATOLYE["kapsamli-sanat-tarihi"].id,
     title: "Kapsamlı Sanat Tarihi Atölyesi",

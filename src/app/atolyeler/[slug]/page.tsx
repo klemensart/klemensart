@@ -57,6 +57,10 @@ export async function generateMetadata({ params }: Props) {
       title: "Rönesans Okur-Yazarlığı",
       description: "8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. Sanatın grameri Rönesans'tır.",
     },
+    "ronesans-okuryazarligi-2": {
+      title: "Rönesans Okur-Yazarlığı — 2. Dönem",
+      description: "7 Mayıs'ta başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
+    },
     "kapsamli-sanat-tarihi": {
       title: "Kapsamlı Sanat Tarihi Atölyesi",
       description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık program.",
@@ -99,6 +103,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "sanat-tarihinde-duygular": "Sanat Tarihinde Duygular",
     "modern-sanat-atolyesi": "Modern Sanatı Okumak",
     "ronesans-okuryazarligi": "Rönesans Okur-Yazarlığı",
+    "ronesans-okuryazarligi-2": "Rönesans Okur-Yazarlığı — 2. Dönem",
     "kapsamli-sanat-tarihi": "Kapsamlı Sanat Tarihi Atölyesi",
     "leonardo-da-vinci-semineri": "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
   };
@@ -107,6 +112,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "sanat-tarihinde-duygular": "Korku, haz ve öfkenin sanat tarihindeki izleri — 3 haftalık canlı Zoom atölyesi.",
     "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
     "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
+    "ronesans-okuryazarligi-2": "7 Mayıs'ta başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
     "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze, 10 haftalık kapsamlı sanat tarihi programı.",
     "leonardo-da-vinci-semineri": "Rönesans'ın en büyük dehası Leonardo da Vinci'nin sanat, bilim ve mühendislik evrenine tek oturumluk yolculuk.",
   };
@@ -131,6 +137,8 @@ export default async function AtolyeDetayPage({ params }: Props) {
     page = <ModernSanatPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "ronesans-okuryazarligi")
     page = <RonesansPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
+  else if (slug === "ronesans-okuryazarligi-2")
+    page = <Ronesans2Page config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "kapsamli-sanat-tarihi")
     page = <KapsamliSanatTarihiPage config={config} status={status} slug={slug} />;
   else if (slug === "leonardo-da-vinci-semineri")
@@ -1036,6 +1044,215 @@ function RonesansPage({
             workshopTitle="Rönesans Okur-Yazarlığı"
             aciklama="8 hafta · Zoom · 6 aylık kayıt erişimi"
             fiyatLabel="—"
+            status={status}
+          />
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+/* ─── SAYFA 3b: Rönesans Okur-Yazarlığı — 2. Dönem ───── */
+
+function Ronesans2Page({
+  config,
+  status,
+  nextSessionDate,
+  slug,
+}: {
+  config: AtolyeConfig;
+  status: Status;
+  nextSessionDate: string | null;
+  slug: string;
+}) {
+  const program = [
+    { tarih: "7 Mayıs 2026 Per",  konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
+    { tarih: "14 Mayıs 2026 Per", konu: "Floransa II — Botticelli, Michelangelo ve Medici Çevresi" },
+    { tarih: "21 Mayıs 2026 Per", konu: "Roma I — Vatikan, Sistine Şapeli ve Yüksek Rönesans" },
+    { tarih: "4 Haziran 2026 Per", konu: "Roma II — Raphael ve Rönesans Mimarisinin Grameri" },
+    { tarih: "11 Haziran 2026 Per", konu: "Venedik I — Titian, Tintoretto ve Renk Felsefesi" },
+    { tarih: "18 Haziran 2026 Per", konu: "Venedik II — Mimari, Su ve Osmanlı Bağlantısı" },
+    { tarih: "25 Haziran 2026 Per", konu: "Milano & Leonardo — Sfumato, Bilim ve Sanatın Birleşimi" },
+    { tarih: "2 Temmuz 2026 Per",  konu: "Büyük Final — 3 Adımda Eser Okuma ve Müze Stratejisi" },
+  ];
+
+  const aciklamaParagraflari = [
+    "Yalnızca 8 online derste Rönesans'ın ustalarını ve Floransa–Roma–Venedik–Milano'nun yapısını net bir çerçevede öğrenecek, her şehir için özgün rota önerileriyle mutlaka görmen gereken eserleri bileceksin.",
+    "Sanatçı–şehir etkileşimini net görecek, bir eserin neden o şehirde ortaya çıktığını kısa ve anlaşılır biçimde öğreneceksin.",
+    "Floransa Katedrali'nin (Duomo) kendi kendini taşıyan çift kabuklu kubbesi gibi örneklerle Rönesans mimarisini jargonsuz, basit mantığıyla anlayacaksın.",
+    "İtalya'nın farklı şehirlerinde ortaya çıkan büyük sanat akımlarını karşılaştıracak; hepsini birleştiren insanı merkeze alan hümanist felsefeyi kısa, anlaşılır hikayelerle kavrayacaksın.",
+    "Dünyanın önde gelen müzelerini gezerken hangi eserlerin öncelikli olduğunu bilecek, hedef odaklı gezi planı yapmayı öğreneceksin. Zamanını doğru eserlere ayıracak, müzede kaybolmayacaksın.",
+    "3 Adımda Eser Okuma yöntemiyle, sanat eserlerini hızlı ve isabetli şekilde okuyabileceksin.",
+    "Sanat özgün bir dilse, grameri Rönesans'tır. Bu grameri öğrenmeden diğer sanat akımları tam olarak kavranamaz. Bu atölye ile sanatın dilini kolayca öğreneceksin.",
+  ];
+
+  return (
+    <>
+      <Navbar />
+      <main style={{ background: B.cream, minHeight: "100vh" }}>
+
+        {/* Geri sayım — sadece kayıt açıkken */}
+        {status === "open" && nextSessionDate && (
+          <div style={{ background: B.dark, padding: "20px 24px", textAlign: "center" }}>
+            <p style={{ color: "#a09890", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 14px" }}>
+              İlk Oturuma Kalan Süre
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CountdownTimer targetDate={nextSessionDate} />
+            </div>
+          </div>
+        )}
+
+        <HeroBanner
+          config={config}
+          altBaslik="Online — 8 Hafta"
+          baslik="Rönesans Okur-Yazarlığı"
+          fiyat="4.500₺"
+          workshopTitle="Rönesans Okur-Yazarlığı — 2. Dönem"
+          imgPosition="center 20%"
+          workshopSlug={slug}
+          status={status}
+        />
+
+        {/* Alt bilgi şeridi */}
+        <div
+          style={{
+            background: B.light,
+            borderLeft: `4px solid ${B.coral}`,
+            padding: "14px 24px",
+          }}
+        >
+          <p
+            style={{
+              maxWidth: 800,
+              margin: "0 auto",
+              color: B.warm,
+              fontSize: 13,
+              lineHeight: 1.6,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "6px 20px",
+            }}
+          >
+            <span>8 Hafta</span>
+            <span style={{ color: B.light }}>|</span>
+            <span>7 Mayıs – 2 Temmuz 2026</span>
+            <span style={{ color: B.light }}>|</span>
+            <span>20:30 – 22:00</span>
+            <span style={{ color: B.light }}>|</span>
+            <span>Online (Zoom)</span>
+            <span style={{ color: B.light }}>|</span>
+            <span>6 ay kayıt erişimi</span>
+          </p>
+        </div>
+
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
+
+          {/* Açıklama */}
+          <section style={{ paddingTop: 56, paddingBottom: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 48 }}>
+              {aciklamaParagraflari.map((p, i) => (
+                <p key={i} style={{ color: B.dark, fontSize: 16, lineHeight: 1.85, margin: 0 }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+          </section>
+
+          {/* Neler Dahil */}
+          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 28px", marginBottom: 36, boxShadow: "0 1px 8px rgba(0,0,0,0.05)" }}>
+            <p style={{ color: B.coral, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 14px" }}>
+              Neler Dahil?
+            </p>
+            {[
+              "8 haftalık canlı Zoom atölyesi",
+              "6 ay boyunca tüm ders kayıtlarına erişim",
+              "PDF çalışma dokümanları ve ek okuma materyalleri",
+              "Soru-cevap ve interaktif tartışma imkanı",
+              "E-arşiv fatura",
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                <span style={{ color: B.coral, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>✓</span>
+                <p style={{ color: B.dark, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <BilgiBanner>
+            <p style={{ margin: "0 0 4px" }}>
+              Tüm buluşmalar kayda alınır; 6 ay boyunca erişebilirsiniz.
+            </p>
+            <p style={{ margin: "0 0 4px" }}>
+              Perşembe 20:30–22:00 · 7 Mayıs – 2 Temmuz 2026 (28 Mayıs Kurban Bayramı haftası ders yoktur.)
+            </p>
+            <p style={{ margin: 0, color: B.warm }}>
+              Kontenjan sınırlı. E-arşiv fatura kesilir.
+            </p>
+          </BilgiBanner>
+
+          {/* Program */}
+          <section style={{ paddingBottom: 56 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: B.dark, marginBottom: 8 }}>
+              Program
+            </h2>
+            <p style={{ color: B.warm, fontSize: 13, margin: "0 0 24px" }}>
+              Her Perşembe 20:30 · Zoom · 28 Mayıs&apos;ta (Kurban Bayramı) ders yoktur
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {program.map((s, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 12,
+                    padding: "16px 20px",
+                    display: "flex",
+                    gap: 16,
+                    alignItems: "flex-start",
+                    boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <span
+                    style={{
+                      minWidth: 22,
+                      height: 22,
+                      borderRadius: "50%",
+                      background: i === 7 ? B.coral : B.light,
+                      color: i === 7 ? "#fff" : B.coral,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      marginTop: 1,
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: B.warm, fontSize: 11, fontWeight: 600, margin: "0 0 3px", letterSpacing: "0.04em" }}>
+                      {s.tarih}
+                    </p>
+                    <p style={{ color: B.dark, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
+                      {s.konu}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <EgitmenKart />
+
+          <AltCTA
+            config={config}
+            workshopSlug={slug}
+            workshopTitle="Rönesans Okur-Yazarlığı — 2. Dönem"
+            aciklama="8 hafta · Zoom · 6 aylık kayıt erişimi · PDF dokümanlar dahil"
+            fiyatLabel="4.500₺"
             status={status}
           />
         </div>

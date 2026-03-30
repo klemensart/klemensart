@@ -35,6 +35,14 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
     targetDate: "2025-12-11T20:30:00+03:00",
   },
+  "ronesans-okuryazarligi-2": {
+    id: "019ef1b5-08a1-4fb0-a794-34d52fa4060b",
+    price: 450000,
+    forSale: true,
+    imgCover: "/images/workshops/ronesans-atolyesi-cover.webp",
+    imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
+    targetDate: "2026-05-07T20:30:00+03:00",
+  },
   "kapsamli-sanat-tarihi": {
     id: "75468e8b-5de7-4f69-95f2-c8132778cf6a",
     price: 600000,
