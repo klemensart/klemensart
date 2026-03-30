@@ -382,7 +382,7 @@ export default function ProfilPage() {
   const [quizLoading, setQuizLoading] = useState(false);
 
   // Favori Yazılar data
-  type FavArticle = { slug: string; title: string; category: string; description: string; readTime: string; date: string; liked_at: string };
+  type FavArticle = { slug: string; title: string; category: string; description: string; date: string; liked_at: string };
   const [favArticles, setFavArticles] = useState<FavArticle[]>([]);
   const [favLoading, setFavLoading] = useState(false);
 
@@ -531,7 +531,7 @@ export default function ProfilPage() {
         const slugs = likes.map((l) => l.article_slug);
         const { data: articles } = await sb
           .from("articles")
-          .select("slug, title, category, description, read_time, published_at")
+          .select("slug, title, category, description, date")
           .in("slug", slugs);
 
         const articleMap = new Map((articles ?? []).map((a) => [a.slug, a]));
@@ -544,8 +544,7 @@ export default function ProfilPage() {
               title: a.title,
               category: a.category ?? "",
               description: a.description ?? "",
-              readTime: a.read_time ?? "",
-              date: a.published_at ?? "",
+              date: a.date ?? "",
               liked_at: l.created_at,
             };
           })
@@ -1022,9 +1021,7 @@ export default function ProfilPage() {
                           <p className="text-[12px] text-brand-warm mt-1 line-clamp-2 leading-relaxed">{a.description}</p>
                         )}
                         <p className="text-[11px] text-brand-warm/60 mt-1.5">
-                          {a.readTime && `${a.readTime} okuma`}
-                          {a.readTime && a.date && " · "}
-                          {a.date && new Date(a.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}
+                          {a.date && new Date(a.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       </div>
                       <HeartIcon size={16} className="text-coral flex-shrink-0 mt-1" />
