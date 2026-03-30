@@ -594,7 +594,7 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
       <section className="lg:hidden py-16 px-6 bg-white">
         <div className="max-w-lg mx-auto">
           <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-2">
-            Çekirdek Ekip
+            Hazırlayanlar
           </p>
           <p className="text-warm-900/40 text-xs mb-6">Bir üyeye dokunarak tanıyın</p>
 
