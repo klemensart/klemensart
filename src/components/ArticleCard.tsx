@@ -25,7 +25,7 @@ function isExternal(src: string) {
   return src.startsWith("http://") || src.startsWith("https://");
 }
 
-export default function ArticleCard({ article, priority = false }: { article: ArticleMeta; priority?: boolean }) {
+export default function ArticleCard({ article, priority = false, likeCount }: { article: ArticleMeta; priority?: boolean; likeCount?: number }) {
   const gradient = categoryGradient[article.category] ?? defaultGradient;
   const hasImage = article.image && article.image.trim() !== "";
 
@@ -77,8 +77,17 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
             <span className="text-warm-900/70 font-semibold">{article.author}</span>
             <span className="text-warm-900/25">·</span>
             <span className="text-warm-900/35">{article.date}</span>
-            <span className="text-warm-900/25">·</span>
-            <span className="text-warm-900/35">{article.readTime}</span>
+            {typeof likeCount === "number" && likeCount > 0 && (
+              <>
+                <span className="text-warm-900/25">·</span>
+                <span className="text-coral/70 flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                  {likeCount}
+                </span>
+              </>
+            )}
           </div>
           <Link
             href={`/icerikler/yazi/${article.slug}`}
