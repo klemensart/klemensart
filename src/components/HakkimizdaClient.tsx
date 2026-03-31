@@ -54,7 +54,7 @@ const TEAM: TeamMember[] = [
     ig: "@keremhun",
     mail: "kerem@klemensart.com",
     photo: "/images/ekip/kerem-hun.jpg",
-    svgX: 240, svgY: 115,
+    svgX: 500, svgY: 100,
     floatDur: 12, floatDelay: 0,
   },
   {
@@ -64,7 +64,7 @@ const TEAM: TeamMember[] = [
     role: "Yayın Koordinatörü",
     size: "medium",
     quote: "İyi bir yayın, okura yeni bir pencere açar.",
-    svgX: 760, svgY: 115,
+    svgX: 760, svgY: 420,
     floatDur: 14, floatDelay: 1.5,
   },
   {
@@ -79,19 +79,6 @@ const TEAM: TeamMember[] = [
     photo: "/images/ekip/hulya-utkuluer.jpg",
     svgX: 240, svgY: 420,
     floatDur: 11, floatDelay: 2.8,
-  },
-  {
-    id: "sevim",
-    name: "Sevim Aydın",
-    initials: "SA",
-    role: "Tasarımcı",
-    size: "medium",
-    quote: "Her film, izleyicisine kendini anlatan bir mektuptur.",
-    ig: "@sevim_aydin",
-    mail: "aydinsevimm@gmail.com",
-    photo: "/images/ekip/sevim-aydin.jpg",
-    svgX: 760, svgY: 420,
-    floatDur: 13, floatDelay: 0.8,
   },
 ];
 
@@ -235,19 +222,14 @@ type Connection = {
 };
 
 const CONNECTIONS: Connection[] = [
-  // Center → 4 core members
+  // Center → 3 core members
   { from: "center", to: "kerem",  bend:  0.12, dur: 8,  delay: 0   },
   { from: "center", to: "volkan", bend: -0.12, dur: 10, delay: 1.2 },
   { from: "center", to: "hulya",  bend: -0.10, dur: 9,  delay: 0.5 },
-  { from: "center", to: "sevim",  bend:  0.10, dur: 11, delay: 2.0 },
-  // Outer ring (rectangle)
+  // Outer ring (triangle)
   { from: "kerem",  to: "volkan", bend: -0.15, dur: 14, delay: 2.5, secondary: true },
-  { from: "volkan", to: "sevim",  bend:  0.18, dur: 12, delay: 1.0, secondary: true },
-  { from: "sevim",  to: "hulya",  bend: -0.15, dur: 13, delay: 0.3, secondary: true },
+  { from: "volkan", to: "hulya",  bend:  0.18, dur: 12, delay: 1.0, secondary: true },
   { from: "hulya",  to: "kerem",  bend:  0.18, dur: 11, delay: 2.2, secondary: true },
-  // Cross connections (diagonals)
-  { from: "kerem",  to: "sevim",  bend:  0.22, dur: 16, delay: 3.5, secondary: true },
-  { from: "volkan", to: "hulya",  bend: -0.22, dur: 15, delay: 2.8, secondary: true },
 ];
 
 function nodePos(id: string) {
