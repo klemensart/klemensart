@@ -1019,6 +1019,25 @@ export default function TiptapEditor({
 
   if (!editor) return null;
 
+  // Toggle heading + strip leftover markdown # prefixes from text
+  const toggleH = (level: 2 | 3) => {
+    editor.chain().focus().toggleHeading({ level }).run();
+    // After toggling, strip any literal "## " / "### " left in the heading text
+    const { $from } = editor.state.selection;
+    const parent = $from.parent;
+    if (parent.type.name === "heading" && parent.firstChild?.isText) {
+      const text = parent.firstChild.text ?? "";
+      const match = text.match(/^#{1,6}\s+/);
+      if (match) {
+        const start = $from.start();
+        editor.chain()
+          .setTextSelection({ from: start, to: start + match[0].length })
+          .deleteSelection()
+          .run();
+      }
+    }
+  };
+
   const addLink = () => {
     const choice = prompt(
       "Link türü seçin:\n1 = Dış link (URL girin)\n2 = Site içi yazı linki (/icerikler/yazi/slug)\n\nURL veya numara girin:"
@@ -1045,14 +1064,14 @@ export default function TiptapEditor({
       <div className="flex items-center gap-0.5 flex-wrap bg-white border-b border-warm-200 px-2 py-1.5 sticky top-0 z-10">
         <TBtn
           title="Başlık 2"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          onClick={() => toggleH(2)}
           active={editor.isActive("heading", { level: 2 })}
         >
           <span className="text-xs font-bold leading-none">H2</span>
         </TBtn>
         <TBtn
           title="Başlık 3"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          onClick={() => toggleH(3)}
           active={editor.isActive("heading", { level: 3 })}
         >
           <span className="text-xs font-bold leading-none">H3</span>
@@ -1176,14 +1195,14 @@ export default function TiptapEditor({
         <div className="flex items-center gap-0.5 bg-white rounded-xl shadow-lg border border-warm-100 p-1">
           <TBtn
             title="Başlık 2"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            onClick={() => toggleH(2)}
             active={editor.isActive("heading", { level: 2 })}
           >
             <span className="text-xs font-bold leading-none">H2</span>
           </TBtn>
           <TBtn
             title="Başlık 3"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            onClick={() => toggleH(3)}
             active={editor.isActive("heading", { level: 3 })}
           >
             <span className="text-xs font-bold leading-none">H3</span>
