@@ -670,6 +670,8 @@ export default function TiptapEditor({
   const onUploadRef = useRef(onUploadImage);
   onUploadRef.current = onUploadImage;
   const editorRef = useRef<Editor | null>(null);
+  const suggestionsRef = useRef(suggestions);
+  suggestionsRef.current = suggestions;
 
   const [optimizing, setOptimizing] = useState(false);
   const [suggestionMode, setSuggestionMode] = useState(false);
@@ -917,7 +919,7 @@ export default function TiptapEditor({
         const suggEl = target.closest("[data-suggestion-id]") as HTMLElement | null;
         if (suggEl) {
           const sid = suggEl.getAttribute("data-suggestion-id");
-          const s = suggestions.find((sg) => sg.id === sid);
+          const s = suggestionsRef.current.find((sg) => sg.id === sid);
           if (s && s.status === "pending") {
             const rect = suggEl.getBoundingClientRect();
             setPopover({ mode: "review", suggestion: s, rect: DOMRect.fromRect(rect) });

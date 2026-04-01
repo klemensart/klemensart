@@ -139,31 +139,77 @@ async function fetchAllFeeds(): Promise<FeedItem[]> {
   return items;
 }
 
+// ── Türkçe / İngilizce stop-word listesi ────────────────────────────────────
+const STOP_WORDS = new Set([
+  // Türkçe
+  "bir", "ve", "ile", "için", "bu", "da", "de", "den", "dan", "nin", "nın",
+  "nun", "nün", "ama", "veya", "gibi", "kadar", "daha", "çok", "her", "olan",
+  "olarak", "sonra", "önce", "üzerinde", "arasında", "nasıl", "neden", "yeni",
+  // İngilizce
+  "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of",
+  "with", "by", "from", "is", "are", "was", "were", "be", "been", "has", "have",
+  "had", "not", "this", "that", "it", "its", "as", "how", "why", "new", "about",
+]);
+
+function extractKeywords(title: string): Set<string> {
+  return new Set(
+    title
+      .toLowerCase()
+      .replace(/[^a-zçğıöşüâîû0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && !STOP_WORDS.has(w))
+  );
+}
+
 // ── Duplikasyon Kontrolü ────────────────────────────────────────────────────
 async function filterExistingSlugs(
   items: FeedItem[],
   admin: ReturnType<typeof createAdminClient>
-): Promise<FeedItem[]> {
-  // Son 7 günde eklenen yazıların başlıklarını al
-  const weekAgo = new Date(Date.now() - 7 * 86400_000).toISOString();
+): Promise<{ filtered: FeedItem[]; recentTitles: string[] }> {
+  // Son 30 günde eklenen yazıların başlıklarını al
+  const monthAgo = new Date(Date.now() - 30 * 86400_000).toISOString();
   const { data: existing } = await admin
     .from("articles")
     .select("title")
-    .gte("date", weekAgo);
+    .gte("date", monthAgo);
 
-  const existingTitles = new Set(
-    (existing ?? []).map((a) => a.title.toLowerCase().trim())
-  );
+  const existingTitles = (existing ?? []).map((a) => a.title.trim());
+  const existingLower = new Set(existingTitles.map((t) => t.toLowerCase()));
 
-  return items.filter(
-    (item) => !existingTitles.has(item.title.toLowerCase().trim())
-  );
+  // Mevcut yazıların anahtar kelimelerini çıkar
+  const existingKeywordSets = existingTitles.map((t) => extractKeywords(t));
+
+  const filtered = items.filter((item) => {
+    const itemLower = item.title.toLowerCase().trim();
+
+    // 1. Tam başlık eşleşmesi
+    if (existingLower.has(itemLower)) return false;
+
+    // 2. Anahtar kelime örtüşmesi kontrolü
+    const itemKeywords = extractKeywords(item.title);
+    if (itemKeywords.size === 0) return true; // anahtar kelime yoksa geçir
+
+    for (const existingKw of existingKeywordSets) {
+      if (existingKw.size === 0) continue;
+      let overlap = 0;
+      for (const kw of itemKeywords) {
+        if (existingKw.has(kw)) overlap++;
+      }
+      // Haberin anahtar kelimelerinin %50+'sı mevcut bir yazıyla örtüşüyorsa → reddet
+      if (overlap / itemKeywords.size >= 0.5) return false;
+    }
+
+    return true;
+  });
+
+  return { filtered, recentTitles: existingTitles };
 }
 
 // ── AI Filtreleme + SEO Puanlaması (Haiku — toplu) ─────────────────────────
 async function scoreAndFilter(
   items: FeedItem[],
-  anthropic: Anthropic
+  anthropic: Anthropic,
+  recentTitles: string[] = []
 ): Promise<ScoredItem[]> {
   // 30'ar haber batch'i ile işle (token limiti aşmamak için)
   const BATCH = 30;
@@ -179,6 +225,13 @@ async function scoreAndFilter(
       )
       .join("\n\n");
 
+    // Son 30 günde yazılan konuları prompt'a ekle (tekrar önleme)
+    const recentContext =
+      recentTitles.length > 0
+        ? `\n\nSON 30 GÜNDE YAZILAN KONULAR (bu konularla aynı/çok benzer haberlere score=0 ver, ELENMELI):
+${recentTitles.map((t) => `- ${t}`).join("\n")}\n`
+        : "";
+
     const resp = await anthropic.messages.create({
       model: HAIKU,
       max_tokens: 2000,
@@ -190,7 +243,7 @@ async function scoreAndFilter(
 Klemens Art multidisipliner bir platformdur: sanat tarihi, felsefe, mimarlık, sinema, edebiyat, müzik, arkeoloji, sosyoloji konularını kapsar. Sıradan sergi duyuruları, piyasa haberleri, açık artırma fiyatları veya dedikodu içerikleri ELENMELI.
 
 İlginç, düşündürücü, kültürel derinliği olan haberleri SEÇ. Türk okuyucuyu meraklandıracak evrensel konular öncelikli.
-
+${recentContext}
 Her haber için JSON döndür:
 - "i": haber indeksi
 - "score": 0-100 arası SEO/CTR potansiyeli (Türk kültür-sanat okuyucusu için)
@@ -426,16 +479,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Haber bulunamadı", duration: Date.now() - start });
     }
 
-    // 2. Duplikasyon kontrolü
-    const freshItems = await filterExistingSlugs(allItems, admin);
-    console.log(`[curate] ${freshItems.length} yeni haber (duplikasyonlar elendi).`);
+    // 2. Duplikasyon kontrolü (anahtar kelime örtüşmesi dahil)
+    const { filtered: freshItems, recentTitles } = await filterExistingSlugs(allItems, admin);
+    console.log(`[curate] ${freshItems.length} yeni haber (duplikasyonlar elendi, ${recentTitles.length} mevcut konu kontrol edildi).`);
 
     if (freshItems.length === 0) {
       return NextResponse.json({ message: "Yeni haber yok", duration: Date.now() - start });
     }
 
-    // 3. AI filtrele ve en iyi 2'yi seç
-    const top2 = await scoreAndFilter(freshItems, anthropic);
+    // 3. AI filtrele ve en iyi 2'yi seç (geçmiş konular AI'a da bildiriliyor)
+    const top2 = await scoreAndFilter(freshItems, anthropic, recentTitles);
     console.log(`[curate] En iyi 2 seçildi:`, top2.map((t) => t.title));
 
     if (top2.length === 0) {
