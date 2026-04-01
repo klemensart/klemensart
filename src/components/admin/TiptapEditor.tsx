@@ -47,6 +47,28 @@ const ResizableImage = TiptapImage.extend({
   addNodeView() {
     return ReactNodeViewRenderer(ImageNodeView);
   },
+  addStorage() {
+    return {
+      // Fix: prosemirror-markdown's image serializer doesn't call closeBlock(),
+      // so the next block gets concatenated on the same line. This breaks
+      // markdown-it parsing on reload (## heading becomes literal text).
+      markdown: {
+        serialize(
+          state: { write: (s: string) => void; esc: (s: string) => string; closeBlock: (n: unknown) => void },
+          node: { attrs: { alt?: string; src?: string; title?: string } },
+        ) {
+          state.write(
+            "![" + state.esc(node.attrs.alt || "") + "](" +
+            (node.attrs.src || "").replace(/[()]/g, "\\$&") +
+            (node.attrs.title ? ' "' + node.attrs.title.replace(/"/g, '\\"') + '"' : "") +
+            ")"
+          );
+          state.closeBlock(node);
+        },
+        parse: {},
+      },
+    };
+  },
 });
 
 /* ── Image Node View (caption + size controls) ── */
@@ -1234,7 +1256,10 @@ export default function TiptapEditor({
                       </button>
                     </div>
                   </div>
-                  {pendingSuggestions.map((s) => (
+                  {pendingSuggestions.map((s) => {
+                    // Check if suggestion text can be found in document
+                    const match = editor ? findTextInDoc(editor.state.doc, s.original_text, s.context_before, s.context_after) : null;
+                    return (
                     <div key={s.id} className="px-3 py-3 border-b border-warm-100 last:border-b-0">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-5 h-5 rounded-full bg-coral/10 text-coral flex items-center justify-center text-[10px] font-bold">
@@ -1245,6 +1270,12 @@ export default function TiptapEditor({
                           {new Date(s.created_at).toLocaleDateString("tr-TR")}
                         </span>
                       </div>
+                      {/* Context hint when text can't be found */}
+                      {!match && s.context_before && (
+                        <div className="text-[10px] text-warm-900/40 mb-1 truncate">
+                          ...{s.context_before.slice(-40)}
+                        </div>
+                      )}
                       <div className="text-sm mb-1">
                         <span className="line-through text-red-500/70 bg-red-50 px-0.5 rounded text-xs">
                           {s.original_text.length > 80 ? s.original_text.slice(0, 80) + "..." : s.original_text}
@@ -1260,24 +1291,52 @@ export default function TiptapEditor({
                           {s.note}
                         </div>
                       )}
-                      <div className="flex justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={async () => { await handleSuggestionReject(s); }}
-                          className="px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 rounded transition"
-                        >
-                          Reddet
-                        </button>
-                        <button
-                          type="button"
-                          onClick={async () => { await handleSuggestionAccept(s); }}
-                          className="px-2 py-1 text-[11px] font-medium bg-green-600 text-white rounded hover:bg-green-700 transition"
-                        >
-                          Kabul Et
-                        </button>
+                      <div className="flex items-center gap-1.5">
+                        {match ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Scroll to and select the suggestion text
+                              editor.chain().focus().setTextSelection({ from: match.from, to: match.to }).run();
+                              const domEl = editor.view.domAtPos(match.from).node as HTMLElement;
+                              domEl?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+                              setShowSuggestionList(false);
+                              // Open review popover at the highlighted text
+                              const sel = window.getSelection();
+                              if (sel && sel.rangeCount > 0) {
+                                const rect = sel.getRangeAt(0).getBoundingClientRect();
+                                setPopover({ mode: "review", suggestion: s, rect: DOMRect.fromRect(rect) });
+                              }
+                            }}
+                            className="px-2 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-50 rounded transition"
+                          >
+                            Yazıda Göster
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-warm-900/30 italic">
+                            Metin düzenlenmiş
+                          </span>
+                        )}
+                        <div className="flex gap-1.5 ml-auto">
+                          <button
+                            type="button"
+                            onClick={async () => { await handleSuggestionReject(s); }}
+                            className="px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 rounded transition"
+                          >
+                            Reddet
+                          </button>
+                          <button
+                            type="button"
+                            onClick={async () => { await handleSuggestionAccept(s); }}
+                            className="px-2 py-1 text-[11px] font-medium bg-green-600 text-white rounded hover:bg-green-700 transition"
+                          >
+                            Kabul Et
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
