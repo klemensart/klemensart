@@ -9,6 +9,7 @@ import IceriklerSection from "@/components/IceriklerSection";
 import Footer from "@/components/Footer";
 
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
+const SonYazilarSection = dynamic(() => import("@/components/SonYazilarSection"));
 const LeonardoBanner = dynamic(() => import("@/components/LeonardoBanner"));
 const DunyamiziBolum = dynamic(() => import("@/components/DunyamiziBolum"));
 const Manifesto = dynamic(() => import("@/components/Manifesto"));
@@ -52,6 +53,9 @@ export default function Home() {
       <AnnouncementBar page="homepage" />
       <Navbar />
       <Hero />
+      <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
+        <SonYazilarSection />
+      </Suspense>
       <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
         <HaritaBanner />
       </Suspense>
