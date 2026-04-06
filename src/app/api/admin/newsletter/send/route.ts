@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { render } from "@react-email/render";
 import KlemensNewsletter from "@/emails/KlemensNewsletter";
 import { templateRegistry, TemplateName } from "@/lib/email-templates";
+import { sendBatchWithRetry } from "@/lib/resend-batch";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = "Klemens Art <info@klemensart.com>";
@@ -176,26 +177,7 @@ export async function POST(req: NextRequest) {
       html: emailHtml,
     }));
 
-    let totalSent = 0;
-    const batchSize = 100;
-    const errors: string[] = [];
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      const { data, error } = await resend.batch.send(batch);
-      if (error) {
-        errors.push(error.message);
-      } else {
-        totalSent += batch.length;
-        const ids = data?.data ?? [];
-        const batchLogs = batch.map((email, j) => ({
-          resend_email_id: ids[j]?.id || null,
-          subscriber_email: email.to as string,
-          subject: emailSubject,
-        }));
-        await admin.from("email_logs").insert(batchLogs);
-      }
-    }
+    const { totalSent, totalFailed, errors } = await sendBatchWithRetry(resend, emails, emailSubject);
 
     if (errors.length > 0 && totalSent === 0) {
       return NextResponse.json(
@@ -225,9 +207,11 @@ export async function POST(req: NextRequest) {
     }
 
     const skippedMsg = skippedCount > 0 ? ` (${skippedCount} kişi daha önce almıştı, atlandı)` : "";
+    const failedMsg = totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : "";
     return NextResponse.json({
-      message: `${totalSent} aboneye e-bülten gönderildi.${skippedMsg}`,
+      message: `${totalSent} aboneye e-bülten gönderildi.${skippedMsg}${failedMsg}`,
       sent: totalSent,
+      failed: totalFailed,
       total: subs.length,
     });
   }
@@ -295,26 +279,7 @@ export async function POST(req: NextRequest) {
       html: emailHtml,
     }));
 
-    let totalSent = 0;
-    const batchSize = 100;
-    const errors: string[] = [];
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      const { data, error } = await resend.batch.send(batch);
-      if (error) {
-        errors.push(error.message);
-      } else {
-        totalSent += batch.length;
-        const ids = data?.data ?? [];
-        const batchLogs = batch.map((email, j) => ({
-          resend_email_id: ids[j]?.id || null,
-          subscriber_email: email.to as string,
-          subject: emailSubject,
-        }));
-        await admin.from("email_logs").insert(batchLogs);
-      }
-    }
+    const { totalSent, totalFailed, errors } = await sendBatchWithRetry(resend, emails, emailSubject);
 
     if (errors.length > 0 && totalSent === 0) {
       return NextResponse.json(
@@ -334,9 +299,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const failedMsg = totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : "";
     return NextResponse.json({
-      message: `${totalSent} atölye katılımcısına e-posta gönderildi.`,
+      message: `${totalSent} atölye katılımcısına e-posta gönderildi.${failedMsg}`,
       sent: totalSent,
+      failed: totalFailed,
       total: participantEmails.length,
     });
   }
@@ -405,26 +372,7 @@ export async function POST(req: NextRequest) {
       html: emailHtml,
     }));
 
-    let totalSent = 0;
-    const batchSize = 100;
-    const errors: string[] = [];
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      const { data, error } = await resend.batch.send(batch);
-      if (error) {
-        errors.push(error.message);
-      } else {
-        totalSent += batch.length;
-        const ids = data?.data ?? [];
-        const batchLogs = batch.map((email, j) => ({
-          resend_email_id: ids[j]?.id || null,
-          subscriber_email: email.to as string,
-          subject: emailSubject,
-        }));
-        await admin.from("email_logs").insert(batchLogs);
-      }
-    }
+    const { totalSent, totalFailed, errors } = await sendBatchWithRetry(resend, emails, emailSubject);
 
     if (errors.length > 0 && totalSent === 0) {
       return NextResponse.json(
@@ -443,9 +391,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const failedMsg = totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : "";
     return NextResponse.json({
-      message: `${totalSent} sinema kulübü üyesine e-posta gönderildi.`,
+      message: `${totalSent} sinema kulübü üyesine e-posta gönderildi.${failedMsg}`,
       sent: totalSent,
+      failed: totalFailed,
       total: memberEmails.length,
     });
   }
@@ -532,26 +482,7 @@ export async function POST(req: NextRequest) {
       html: emailHtml,
     }));
 
-    let totalSent = 0;
-    const batchSize = 100;
-    const errors: string[] = [];
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      const { data, error } = await resend.batch.send(batch);
-      if (error) {
-        errors.push(error.message);
-      } else {
-        totalSent += batch.length;
-        const ids = data?.data ?? [];
-        const batchLogs = batch.map((email, j) => ({
-          resend_email_id: ids[j]?.id || null,
-          subscriber_email: email.to as string,
-          subject: emailSubject,
-        }));
-        await admin.from("email_logs").insert(batchLogs);
-      }
-    }
+    const { totalSent, totalFailed, errors } = await sendBatchWithRetry(resend, emails, emailSubject);
 
     if (errors.length > 0 && totalSent === 0) {
       return NextResponse.json(
@@ -571,9 +502,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const failedMsg = totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : "";
     return NextResponse.json({
-      message: `${totalSent} kişiye yarım kalan kayıt hatırlatması gönderildi.`,
+      message: `${totalSent} kişiye yarım kalan kayıt hatırlatması gönderildi.${failedMsg}`,
       sent: totalSent,
+      failed: totalFailed,
       total: abandonedEmails.length,
     });
   }
@@ -610,26 +543,7 @@ export async function POST(req: NextRequest) {
       html: emailHtml,
     }));
 
-    let totalSent = 0;
-    const batchSize = 100;
-    const errors: string[] = [];
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      const { data, error } = await resend.batch.send(batch);
-      if (error) {
-        errors.push(error.message);
-      } else {
-        totalSent += batch.length;
-        const ids = data?.data ?? [];
-        const batchLogs = batch.map((email, j) => ({
-          resend_email_id: ids[j]?.id || null,
-          subscriber_email: email.to as string,
-          subject: emailSubject,
-        }));
-        await admin.from("email_logs").insert(batchLogs);
-      }
-    }
+    const { totalSent, totalFailed, errors } = await sendBatchWithRetry(resend, emails, emailSubject);
 
     if (errors.length > 0 && totalSent === 0) {
       return NextResponse.json(
@@ -649,9 +563,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const failedMsg = totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : "";
     return NextResponse.json({
-      message: `${totalSent} kişiye e-posta gönderildi.`,
+      message: `${totalSent} kişiye e-posta gönderildi.${failedMsg}`,
       sent: totalSent,
+      failed: totalFailed,
       total: segmentEmails.length,
     });
   }

@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import { render } from "@react-email/render";
 import { templateRegistry } from "@/lib/email-templates";
 import { campaignWeekSlug } from "@/lib/bulten-helpers";
+import { sendBatchWithRetry } from "@/lib/resend-batch";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 function isAuthorized(req: NextRequest) {
@@ -112,22 +113,17 @@ export async function GET(req: NextRequest) {
     html: emailHtml,
   }));
 
-  let totalSent = 0;
-  const batchSize = 100;
+  const { totalSent, totalFailed, errors: batchErrors } = await sendBatchWithRetry(
+    resend,
+    emails,
+    emailSubject,
+  );
 
-  for (let i = 0; i < emails.length; i += batchSize) {
-    const batch = emails.slice(i, i + batchSize);
-    const { data, error } = await resend.batch.send(batch);
-    if (!error) {
-      totalSent += batch.length;
-      const ids = data?.data ?? [];
-      const batchLogs = batch.map((email, j) => ({
-        resend_email_id: ids[j]?.id || null,
-        subscriber_email: email.to as string,
-        subject: emailSubject,
-      }));
-      await admin.from("email_logs").insert(batchLogs);
-    }
+  if (totalFailed > 0) {
+    console.error(
+      `[Weekly Newsletter] ${totalFailed} kişiye mail gönderilemedi:`,
+      batchErrors,
+    );
   }
 
   // 5. Kampanya kaydı (otomatik herkese açık)
@@ -151,8 +147,9 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    message: `Haftalık bülten ${totalSent} aboneye gönderildi (${newsItems.length} haber).`,
+    message: `Haftalık bülten ${totalSent} aboneye gönderildi (${newsItems.length} haber).${totalFailed > 0 ? ` ${totalFailed} kişiye gönderilemedi.` : ""}`,
     totalSent,
+    totalFailed,
     newsCount: newsItems.length,
     weekLabel,
   });
