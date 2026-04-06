@@ -104,41 +104,39 @@ export async function POST(req: NextRequest) {
       metadata: { merchant_oid, amount: Number(total_amount) },
     });
 
-    // 6b) Telefon bilgisini kullanıcı meta verisine kaydet + Teşekkür e-postası (fire-and-forget)
-    (async () => {
-      try {
-        if (intent.phone) {
-          await supabase.auth.admin.updateUserById(intent.user_id, {
-            user_metadata: { phone: intent.phone },
-          });
-        }
-
-        const { data: userData } = await supabase.auth.admin.getUserById(intent.user_id);
-        const userName = userData?.user?.user_metadata?.full_name || userData?.user?.email || "Sanat Sever";
-
-        const { data: workshop } = await supabase
-          .from("workshops")
-          .select("title")
-          .eq("id", intent.workshop_id)
-          .single();
-
-        const workshopTitle = workshop?.title || "Atolye";
-
-        const isSinemaKlubu = SINEMA_KLUBU_IDS.includes(intent.workshop_id);
-        const whatsappLink = isSinemaKlubu
-          ? process.env.SINEMA_KLUBU_WHATSAPP_LINK
-          : undefined;
-
-        const html = await render(AtolyeTesekkur({ name: userName, workshopTitle, whatsappLink }));
-        await sendThankYouEmail({
-          to: userData?.user?.email || "",
-          subject: "Atölye Satın Alma Onayı — Klemens Art",
-          html,
+    // 6b) Telefon bilgisini kullanıcı meta verisine kaydet + Teşekkür e-postası
+    try {
+      if (intent.phone) {
+        await supabase.auth.admin.updateUserById(intent.user_id, {
+          user_metadata: { phone: intent.phone },
         });
-      } catch (err) {
-        console.error("[PayTR Callback] Tesekkur maili gonderilemedi:", err);
       }
-    })();
+
+      const { data: userData } = await supabase.auth.admin.getUserById(intent.user_id);
+      const userName = userData?.user?.user_metadata?.full_name || userData?.user?.email || "Sanat Sever";
+
+      const { data: workshop } = await supabase
+        .from("workshops")
+        .select("title")
+        .eq("id", intent.workshop_id)
+        .single();
+
+      const workshopTitle = workshop?.title || "Atolye";
+
+      const isSinemaKlubu = SINEMA_KLUBU_IDS.includes(intent.workshop_id);
+      const whatsappLink = isSinemaKlubu
+        ? process.env.SINEMA_KLUBU_WHATSAPP_LINK
+        : undefined;
+
+      const html = await render(AtolyeTesekkur({ name: userName, workshopTitle, whatsappLink }));
+      await sendThankYouEmail({
+        to: userData?.user?.email || "",
+        subject: "Atölye Satın Alma Onayı — Klemens Art",
+        html,
+      });
+    } catch (err) {
+      console.error("[PayTR Callback] Tesekkur maili gonderilemedi:", err);
+    }
 
     // 7) intent temizle
     await supabase
