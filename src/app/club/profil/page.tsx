@@ -12,6 +12,7 @@ import {
   MapPinIcon,
 } from "@/lib/icons";
 import { getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
+import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 
 const BUNNY_LIB = "596471";
 
@@ -381,6 +382,10 @@ export default function ProfilPage() {
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
   const [quizLoading, setQuizLoading] = useState(false);
 
+  // Kupon data
+  type UserCoupon = { code: string; discount_percent: number; workshop_slug: string; workshop_title: string; workshop_id: string; price: number; expires_at: string };
+  const [coupons, setCoupons] = useState<UserCoupon[]>([]);
+
   // Favori Yazılar data
   type FavArticle = { slug: string; title: string; category: string; description: string; date: string; liked_at: string };
   const [favArticles, setFavArticles] = useState<FavArticle[]>([]);
@@ -469,6 +474,43 @@ export default function ProfilPage() {
 
     setWorkshops(wsItems);
     setVideos(vidItems);
+
+    // 4. Active coupons for this user
+    try {
+      const { data: { user: authUser } } = await sb.auth.getUser();
+      if (authUser?.email) {
+        const { data: couponRows } = await sb
+          .from("quiz_coupons")
+          .select("code, discount_percent, workshop_slug, expires_at")
+          .eq("user_email", authUser.email)
+          .eq("used", false)
+          .gt("expires_at", now);
+
+        if (couponRows && couponRows.length > 0) {
+          // Get workshop titles from DB
+          const slugs = couponRows.map((c: { workshop_slug: string }) => c.workshop_slug);
+          const wsIds = slugs.map((s: string) => SLUG_TO_ATOLYE[s]?.id).filter(Boolean);
+          const { data: wsRows } = wsIds.length > 0
+            ? await sb.from("workshops").select("id, title").in("id", wsIds)
+            : { data: [] };
+          const titleMap = new Map((wsRows ?? []).map((w: { id: string; title: string }) => [w.id, w.title]));
+
+          const mapped: UserCoupon[] = couponRows.map((c: { code: string; discount_percent: number; workshop_slug: string; expires_at: string }) => {
+            const cfg = SLUG_TO_ATOLYE[c.workshop_slug];
+            return {
+              ...c,
+              workshop_title: titleMap.get(cfg?.id ?? "") || c.workshop_slug,
+              workshop_id: cfg?.id ?? "",
+              price: cfg?.price ?? 0,
+            };
+          }).filter((c: UserCoupon) => c.workshop_id);
+          setCoupons(mapped);
+        } else {
+          setCoupons([]);
+        }
+      }
+    } catch { /* ignore coupon fetch errors */ }
+
     setLocaLoading(false);
   }, []);
 
@@ -642,7 +684,7 @@ export default function ProfilPage() {
             <div>
               {locaLoading ? (
                 <LocaSkeleton />
-              ) : workshops.length === 0 && videos.length === 0 ? (
+              ) : workshops.length === 0 && videos.length === 0 && coupons.length === 0 ? (
                 /* Empty state */
                 <div className="text-center py-[60px] text-brand-warm">
                   <FilmIcon size={48} className="text-brand-light mx-auto" />
@@ -671,6 +713,66 @@ export default function ProfilPage() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Coupon cards */}
+                  {coupons.length > 0 && (
+                    <div className="mb-9">
+                      {coupons.map((cpn) => (
+                        <div
+                          key={cpn.code}
+                          className="relative overflow-hidden rounded-[16px] mb-3"
+                          style={{
+                            background: "linear-gradient(135deg, #FFF8F5 0%, #FFF0EC 100%)",
+                            border: "1.5px solid rgba(255,109,96,0.2)",
+                          }}
+                        >
+                          <div className="px-5 py-5">
+                            <div className="flex items-start gap-3">
+                              {/* Gift icon */}
+                              <div className="w-10 h-10 min-w-[40px] rounded-xl flex items-center justify-center" style={{ background: "rgba(255,109,96,0.1)" }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="3" y="8" width="18" height="13" rx="2" />
+                                  <path d="M12 8v13M3 12h18M8 8c0-2 1-4 4-4s4 2 4 4" />
+                                </svg>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-semibold tracking-wider text-coral mb-1">SANA ÖZEL İNDİRİM</p>
+                                <p className="text-[15px] font-semibold text-brand-dark font-serif mb-1">{cpn.workshop_title}</p>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[13px] font-bold text-coral" style={{ background: "rgba(255,109,96,0.1)" }}>
+                                    %{cpn.discount_percent} indirim
+                                  </span>
+                                  {cpn.price > 0 && (
+                                    <>
+                                      <span className="text-[12px] text-brand-warm line-through">
+                                        {(cpn.price / 100).toLocaleString("tr-TR")} TL
+                                      </span>
+                                      <span className="text-[13px] font-bold text-brand-dark">
+                                        {(Math.round(cpn.price * (1 - cpn.discount_percent / 100)) / 100).toLocaleString("tr-TR")} TL
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 text-[11px] text-brand-warm">
+                                  <span className="font-mono tracking-wide bg-white/70 px-2 py-0.5 rounded border border-brand-light select-all">{cpn.code}</span>
+                                  <span>·</span>
+                                  <span>Son: {new Date(cpn.expires_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <Link
+                              href={`/club/odeme/${cpn.workshop_id}?amount=${cpn.price}&title=${encodeURIComponent(cpn.workshop_title)}&slug=${cpn.workshop_slug}&coupon=${cpn.code}`}
+                              className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-coral text-white text-[14px] font-semibold no-underline"
+                              style={{ boxShadow: "0 4px 16px rgba(255,109,96,0.25)" }}
+                            >
+                              Hemen Kullan
+                              <ArrowRightIcon size={14} className="text-white" />
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Workshops */}
                   {workshops.length > 0 && (

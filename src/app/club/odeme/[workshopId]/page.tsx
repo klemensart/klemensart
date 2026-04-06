@@ -77,8 +77,14 @@ export default function OdemePage() {
       // Show coupon step
       setStatus("coupon");
       trackEvent("checkout_start", { workshopId, workshopSlug });
+
+      // Auto-fill coupon from URL ?coupon=CODE
+      const urlCoupon = searchParams.get("coupon");
+      if (urlCoupon) {
+        setCouponInput(urlCoupon.toUpperCase());
+      }
     });
-  }, [workshopId, amount, workshopTitle, workshopSlug, router]);
+  }, [workshopId, amount, workshopTitle, workshopSlug, router, searchParams]);
 
   // Validate coupon
   const validateCoupon = useCallback(async () => {
@@ -102,6 +108,15 @@ export default function OdemePage() {
       setCouponError("Doğrulama yapılamadı");
     }
   }, [couponInput, workshopSlug]);
+
+  // Auto-validate coupon from URL param
+  const autoValidatedRef = useRef(false);
+  useEffect(() => {
+    if (status === "coupon" && couponInput && couponStatus === "idle" && !autoValidatedRef.current) {
+      autoValidatedRef.current = true;
+      validateCoupon();
+    }
+  }, [status, couponInput, couponStatus, validateCoupon]);
 
   // Format phone: "5321234567" → "532 123 45 67"
   const formatPhone = (val: string) => {
