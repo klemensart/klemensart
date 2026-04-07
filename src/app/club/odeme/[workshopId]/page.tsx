@@ -77,6 +77,14 @@ export default function OdemePage() {
       // Show coupon step
       setStatus("coupon");
       trackEvent("checkout_start", { workshopId, workshopSlug });
+      if (typeof window !== "undefined" && typeof window.fbq === "function") {
+        window.fbq("track", "InitiateCheckout", {
+          content_ids: [workshopId],
+          content_type: "product",
+          value: amount / 100,
+          currency: "TRY",
+        });
+      }
 
       // Auto-fill coupon from URL ?coupon=CODE
       const urlCoupon = searchParams.get("coupon");

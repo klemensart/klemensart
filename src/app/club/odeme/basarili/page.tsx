@@ -1,11 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const B = { coral: "#FF6D60", cream: "#FFFBF7", dark: "#2D2926", warm: "#8C857E" };
 
 export default function OdemeBasarili() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof window.fbq === "function") {
+      window.fbq("track", "Purchase", { currency: "TRY", value: 0 });
+    }
+  }, []);
 
   return (
     <div

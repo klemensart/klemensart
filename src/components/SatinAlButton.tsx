@@ -27,6 +27,15 @@ export default function SatinAlButton({
 
   async function handleClick() {
     trackEvent("add_to_cart", { workshopId, workshopSlug });
+    if (typeof window !== "undefined" && typeof window.fbq === "function") {
+      window.fbq("track", "AddToCart", {
+        content_name: workshopTitle,
+        content_ids: [workshopId],
+        content_type: "product",
+        value: amount / 100,
+        currency: "TRY",
+      });
+    }
 
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
