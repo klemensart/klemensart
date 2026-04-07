@@ -149,7 +149,7 @@ export default function OdemePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           workshopId,
-          amount: finalAmount,
+          amount,
           workshopTitle,
           coupon_code: validatedCoupon || undefined,
           phone: `0${digits}`,
