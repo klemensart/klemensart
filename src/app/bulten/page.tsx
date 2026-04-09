@@ -39,15 +39,6 @@ export default async function BultenPage() {
     .select("id", { count: "exact", head: true })
     .eq("is_active", true);
 
-  // Son public kampanya
-  const { data: lastCampaign } = await supabase
-    .from("campaigns")
-    .select("id, subject, html_content, created_at")
-    .eq("is_public", true)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
   const webPageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -91,19 +82,7 @@ export default async function BultenPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <BultenClient
-        subscriberCount={subscriberCount ?? 0}
-        lastCampaign={
-          lastCampaign
-            ? {
-                id: lastCampaign.id,
-                subject: lastCampaign.subject,
-                htmlContent: lastCampaign.html_content,
-                createdAt: lastCampaign.created_at,
-              }
-            : null
-        }
-      />
+      <BultenClient subscriberCount={subscriberCount ?? 0} />
     </>
   );
 }

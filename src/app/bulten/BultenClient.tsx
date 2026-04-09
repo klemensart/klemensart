@@ -1,16 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 type Props = {
   subscriberCount: number;
-  lastCampaign: {
-    id: string;
-    subject: string;
-    htmlContent: string;
-    createdAt: string;
-  } | null;
 };
 
 function SignupForm() {
@@ -148,7 +141,7 @@ const benefits = [
   },
 ];
 
-export default function BultenClient({ subscriberCount, lastCampaign }: Props) {
+export default function BultenClient({ subscriberCount }: Props) {
   return (
     <main>
       {/* ── Hero Section ── */}
@@ -198,42 +191,6 @@ export default function BultenClient({ subscriberCount, lastCampaign }: Props) {
           </div>
         </div>
       </section>
-
-      {/* ── Son Bülten Önizleme ── */}
-      {lastCampaign && (
-        <section className="py-20 px-6 bg-white">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-warm-900 text-center mb-3">
-              Son Bültenimiz
-            </h2>
-            <p className="text-warm-500 text-center mb-8">
-              {lastCampaign.subject} &middot;{" "}
-              {new Date(lastCampaign.createdAt).toLocaleDateString("tr-TR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-            <div className="border border-warm-200 rounded-2xl overflow-hidden bg-[#f7f5f2]">
-              <iframe
-                srcDoc={lastCampaign.htmlContent}
-                title={lastCampaign.subject}
-                className="w-full border-0"
-                style={{ minHeight: 500 }}
-                sandbox="allow-same-origin"
-              />
-            </div>
-            <div className="text-center mt-6">
-              <Link
-                href="/bulten/arsiv"
-                className="text-coral font-semibold text-sm hover:underline"
-              >
-                Tüm bültenleri görüntüle &rarr;
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── Alt CTA ── */}
       <section className="py-24 px-6 bg-warm-900">
