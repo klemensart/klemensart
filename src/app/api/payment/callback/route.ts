@@ -104,7 +104,40 @@ export async function POST(req: NextRequest) {
       metadata: { merchant_oid, amount: Number(total_amount) },
     });
 
-    // 6b) Telefon bilgisini kullanıcı meta verisine kaydet + Teşekkür e-postası
+    // 6b) Kupon kullanıldıysa işaretle (ödenen tutar < tam fiyat → kupon uygulanmış)
+    try {
+      const { data: ws } = await supabase
+        .from("workshops")
+        .select("price_cents")
+        .eq("id", intent.workshop_id)
+        .single();
+
+      const paidAmount = Number(total_amount);
+
+      if (ws && paidAmount < ws.price_cents) {
+        const { data: userData } = await supabase.auth.admin.getUserById(intent.user_id);
+        const userEmail = userData?.user?.email;
+
+        if (userEmail) {
+          // workshop_id → slug (atolyeler-config'deki reverse map)
+          const { ID_TO_SLUG } = await import("@/lib/atolyeler-config");
+          const workshopSlug = ID_TO_SLUG[intent.workshop_id];
+
+          if (workshopSlug) {
+            await supabase
+              .from("quiz_coupons")
+              .update({ used: true, used_at: new Date().toISOString() })
+              .eq("user_email", userEmail)
+              .eq("workshop_slug", workshopSlug)
+              .eq("used", false);
+          }
+        }
+      }
+    } catch (couponErr) {
+      console.error("[PayTR Callback] Kupon işaretleme hatası:", couponErr);
+    }
+
+    // 6c) Telefon bilgisini kullanıcı meta verisine kaydet + Teşekkür e-postası
     try {
       if (intent.phone) {
         await supabase.auth.admin.updateUserById(intent.user_id, {

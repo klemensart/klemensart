@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
 
   // Validate and apply coupon if provided
   let finalAmount = parseInt(String(amount), 10);
-  let appliedCouponId: string | null = null;
 
   if (coupon_code) {
     const admin = createAdminClient();
@@ -44,7 +43,6 @@ export async function POST(req: NextRequest) {
 
     // Apply discount
     finalAmount = Math.round(finalAmount * (1 - coupon.discount_percent / 100));
-    appliedCouponId = coupon.id;
   }
 
   const merchant_id = process.env.PAYTR_MERCHANT_ID!;
@@ -152,13 +150,8 @@ export async function POST(req: NextRequest) {
     phone: phone || null,
   });
 
-  // Mark coupon as used
-  if (appliedCouponId) {
-    await adminForIntent.from("quiz_coupons").update({
-      used: true,
-      used_at: new Date().toISOString(),
-    }).eq("id", appliedCouponId);
-  }
+  // Kupon, ödeme başarılı olduğunda callback'te işaretlenecek
+  // (create-token aşamasında işaretlersek, ödeme başarısız olursa kupon kaybolur)
 
   return NextResponse.json({ token: data.token, merchant_oid });
 }
