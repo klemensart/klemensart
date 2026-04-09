@@ -17,6 +17,10 @@ const DRAFT_META: Record<string, Omit<DraftMeta, "slug">> = {
     title: "Yalnızlık Bülteni #1",
     subject: "Klemens Bülten — Yalnızlık",
   },
+  "bulten-tuz-content": {
+    title: "Tuz Bülteni #2",
+    subject: "Klemens Bülten — Tuz",
+  },
 };
 
 export async function GET(req: Request) {
