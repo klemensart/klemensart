@@ -45,13 +45,28 @@ export async function GET() {
     }
   }
 
-  // Get active subscribers
-  const { data: subs } = await admin
-    .from("subscribers")
-    .select("email")
-    .eq("is_active", true);
+  // Get active subscribers (paginate to avoid Supabase 1000-row default limit)
+  const allSubs: { email: string }[] = [];
+  let subFrom = 0;
+  let subHasMore = true;
 
-  const activeEmails = new Set((subs ?? []).map((s) => s.email));
+  while (subHasMore) {
+    const { data: subPage } = await admin
+      .from("subscribers")
+      .select("email")
+      .eq("is_active", true)
+      .range(subFrom, subFrom + pageSize - 1);
+
+    if (subPage && subPage.length > 0) {
+      allSubs.push(...subPage);
+      subFrom += pageSize;
+      subHasMore = subPage.length === pageSize;
+    } else {
+      subHasMore = false;
+    }
+  }
+
+  const activeEmails = new Set(allSubs.map((s) => s.email));
 
   // Per-campaign stats (group by subject)
   const campaignMap = new Map<string, {
