@@ -40,7 +40,7 @@ export default function KlemensNewsletter({
           {/* Header */}
           <Section style={header}>
             <Img
-              src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon.PNG"
+              src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon-optimized.png"
               alt="Klemens Art"
               width="160"
               style={logoImg}
