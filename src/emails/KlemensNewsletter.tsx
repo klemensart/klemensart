@@ -49,13 +49,6 @@ export default function KlemensNewsletter({
 
           <Hr style={divider} />
 
-          {/* Subject */}
-          {subject && (
-            <Section style={subjectSection}>
-              <Text style={subjectStyle}>{subject}</Text>
-            </Section>
-          )}
-
           {/* Dynamic Content */}
           <Section style={contentSection}>
             <div
