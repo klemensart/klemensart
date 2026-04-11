@@ -41,8 +41,8 @@ export async function GET(req: NextRequest) {
 
   // Paginated fetch helper (avoids Supabase 1000-row default limit)
   const PAGE = 1000;
-  async function fetchAll<T>(table: string, select: string, filters?: (q: any) => any): Promise<T[]> {
-    const all: T[] = [];
+  async function fetchAll(table: string, select: string, filters?: (q: any) => any): Promise<any[]> {
+    const all: any[] = [];
     let from = 0;
     while (true) {
       let q = admin.from(table).select(select).range(from, from + PAGE - 1);
@@ -72,12 +72,12 @@ export async function GET(req: NextRequest) {
 
   // Fetch all data we need (paginated)
   const [logs, subs, purchases, authUsers, mapVisits, funnelEvents] = await Promise.all([
-    fetchAll<any>("email_logs", "subscriber_email, subject, sent_at, opened_at, clicked_at"),
-    fetchAll<any>("subscribers", "email, subscribed_at, is_active", (q) => q.eq("is_active", true)),
-    fetchAll<any>("purchases", "user_id, workshop_id, expires_at"),
+    fetchAll("email_logs", "subscriber_email, subject, sent_at, opened_at, clicked_at"),
+    fetchAll("subscribers", "email, subscribed_at, is_active", (q) => q.eq("is_active", true)),
+    fetchAll("purchases", "user_id, workshop_id, expires_at"),
     fetchAllAuthUsers(),
-    fetchAll<any>("map_visits", "user_id, place_type"),
-    fetchAll<any>("user_events", "event_type, user_id, anonymous_id"),
+    fetchAll("map_visits", "user_id, place_type"),
+    fetchAll("user_events", "event_type, user_id, anonymous_id"),
   ]);
 
   // Funnel: user_id bazlı event setleri (sadece user_id olanlar — e-posta göndermek için)
