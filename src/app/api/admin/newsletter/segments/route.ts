@@ -39,25 +39,46 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Fetch all data we need
-  const [logsRes, subsRes, purchasesRes, usersRes, mapVisitsRes, funnelEventsRes] = await Promise.all([
-    admin
-      .from("email_logs")
-      .select("subscriber_email, subject, sent_at, opened_at, clicked_at")
-      .order("sent_at", { ascending: false }),
-    admin.from("subscribers").select("email, subscribed_at, is_active").eq("is_active", true),
-    admin.from("purchases").select("user_id, workshop_id, expires_at"),
-    admin.auth.admin.listUsers({ perPage: 1000 }),
-    admin.from("map_visits").select("user_id, place_type"),
-    admin.from("user_events").select("event_type, user_id, anonymous_id"),
-  ]);
+  // Paginated fetch helper (avoids Supabase 1000-row default limit)
+  const PAGE = 1000;
+  async function fetchAll<T>(table: string, select: string, filters?: (q: any) => any): Promise<T[]> {
+    const all: T[] = [];
+    let from = 0;
+    while (true) {
+      let q = admin.from(table).select(select).range(from, from + PAGE - 1);
+      if (filters) q = filters(q);
+      const { data } = await q;
+      if (!data || data.length === 0) break;
+      all.push(...data);
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+    return all;
+  }
 
-  const logs = logsRes.data ?? [];
-  const subs = subsRes.data ?? [];
-  const purchases = purchasesRes.data ?? [];
-  const authUsers = usersRes.data?.users ?? [];
-  const mapVisits = mapVisitsRes.data ?? [];
-  const funnelEvents = funnelEventsRes.data ?? [];
+  // Paginated auth users fetch
+  async function fetchAllAuthUsers() {
+    const all: any[] = [];
+    let page = 1;
+    while (true) {
+      const { data } = await admin.auth.admin.listUsers({ page, perPage: PAGE });
+      if (!data?.users || data.users.length === 0) break;
+      all.push(...data.users);
+      if (data.users.length < PAGE) break;
+      page++;
+    }
+    return all;
+  }
+
+  // Fetch all data we need (paginated)
+  const [logs, subs, purchases, authUsers, mapVisits, funnelEvents] = await Promise.all([
+    fetchAll<any>("email_logs", "subscriber_email, subject, sent_at, opened_at, clicked_at"),
+    fetchAll<any>("subscribers", "email, subscribed_at, is_active", (q) => q.eq("is_active", true)),
+    fetchAll<any>("purchases", "user_id, workshop_id, expires_at"),
+    fetchAllAuthUsers(),
+    fetchAll<any>("map_visits", "user_id, place_type"),
+    fetchAll<any>("user_events", "event_type, user_id, anonymous_id"),
+  ]);
 
   // Funnel: user_id bazlı event setleri (sadece user_id olanlar — e-posta göndermek için)
   const funnelUserEvents = new Map<string, Set<string>>();

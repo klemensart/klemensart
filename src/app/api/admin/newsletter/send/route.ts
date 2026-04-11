@@ -11,6 +11,21 @@ import { sendBatchWithRetry } from "@/lib/resend-batch";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = "Klemens Art <info@klemensart.com>";
 
+// Paginated auth users fetch (avoids Supabase 1000-row default limit)
+async function fetchAllAuthUsers(admin: ReturnType<typeof createAdminClient>) {
+  const all: any[] = [];
+  let page = 1;
+  const perPage = 1000;
+  while (true) {
+    const { data } = await admin.auth.admin.listUsers({ page, perPage });
+    if (!data?.users || data.users.length === 0) break;
+    all.push(...data.users);
+    if (data.users.length < perPage) break;
+    page++;
+  }
+  return all;
+}
+
 export async function POST(req: NextRequest) {
   const userClient = await createServerSupabaseClient();
   const {
@@ -248,17 +263,8 @@ export async function POST(req: NextRequest) {
     // Get unique user_ids
     const userIds = [...new Set(purchases.map((p) => p.user_id))];
 
-    // Resolve emails via Supabase Auth admin
-    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
-      perPage: 1000,
-    });
-
-    if (usersError) {
-      return NextResponse.json(
-        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
-        { status: 500 }
-      );
-    }
+    // Resolve emails via Supabase Auth admin (paginated)
+    const users = await fetchAllAuthUsers(admin);
 
     const userIdSet = new Set(userIds);
     const participantEmails = users
@@ -341,17 +347,8 @@ export async function POST(req: NextRequest) {
     // Deduplicate by user_id
     const userIds = [...new Set(purchases.map((p) => p.user_id))];
 
-    // Resolve emails via Supabase Auth admin
-    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
-      perPage: 1000,
-    });
-
-    if (usersError) {
-      return NextResponse.json(
-        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
-        { status: 500 }
-      );
-    }
+    // Resolve emails via Supabase Auth admin (paginated)
+    const users = await fetchAllAuthUsers(admin);
 
     const userIdSet = new Set(userIds);
     const memberEmails = users
@@ -451,17 +448,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Resolve emails
-    const { data: { users }, error: usersError } = await admin.auth.admin.listUsers({
-      perPage: 1000,
-    });
-
-    if (usersError) {
-      return NextResponse.json(
-        { error: `Kullanıcı listesi hatası: ${usersError.message}` },
-        { status: 500 }
-      );
-    }
+    // Resolve emails via Supabase Auth admin (paginated)
+    const users = await fetchAllAuthUsers(admin);
 
     const abandonedSet = new Set(abandonedUserIds);
     const abandonedEmails = users
