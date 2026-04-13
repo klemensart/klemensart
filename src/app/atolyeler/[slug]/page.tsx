@@ -62,8 +62,8 @@ export async function generateMetadata({ params }: Props) {
       description: "7 Mayıs'ta başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
     },
     "kapsamli-sanat-tarihi": {
-      title: "Kapsamlı Sanat Tarihi Atölyesi",
-      description: "Antik Yunan'dan günümüze sanatın dönüm noktaları, büyük ustaların hayatları ve başlıca akımlar. 10 haftalık program.",
+      title: "Kapsamlı Sanat Tarihi Atölyesi | Klemens Art",
+      description: "Antik Yunan'dan günümüze sanat tarihinin 10 haftalık yolculuğu. Online, interaktif, Zoom üzerinden.",
     },
     "leonardo-da-vinci-semineri": {
       title: "Leonardo da Vinci: Sanatın ve Bilimin Kesiştiği Deha",
@@ -113,7 +113,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
     "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
     "ronesans-okuryazarligi-2": "7 Mayıs'ta başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
-    "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze, 10 haftalık kapsamlı sanat tarihi programı.",
+    "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze sanat tarihinin 10 haftalık yolculuğu. 7 Mayıs'ta başlıyor.",
     "leonardo-da-vinci-semineri": "Rönesans'ın en büyük dehası Leonardo da Vinci'nin sanat, bilim ve mühendislik evrenine tek oturumluk yolculuk.",
   };
 
@@ -140,7 +140,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
   else if (slug === "ronesans-okuryazarligi-2")
     page = <Ronesans2Page config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "kapsamli-sanat-tarihi")
-    page = <KapsamliSanatTarihiPage config={config} status={status} slug={slug} />;
+    page = <KapsamliSanatTarihiPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else if (slug === "leonardo-da-vinci-semineri")
     page = <LeonardoDaVinciPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else return <YakindaPage baslik="Bilinmeyen Atölye" />;
@@ -1267,23 +1267,45 @@ function Ronesans2Page({
 function KapsamliSanatTarihiPage({
   config,
   status,
+  nextSessionDate,
   slug,
 }: {
   config: AtolyeConfig;
   status: Status;
+  nextSessionDate: string | null;
   slug: string;
 }) {
-  const program = [
-    { tarih: "19 Kasım 2025 Çar", konu: "Oturum 1" },
-    { tarih: "26 Kasım 2025 Çar", konu: "Oturum 2" },
-    { tarih: "3 Aralık 2025 Çar", konu: "Oturum 3" },
-    { tarih: "10 Aralık 2025 Çar", konu: "Oturum 4" },
-    { tarih: "17 Aralık 2025 Çar", konu: "Oturum 5" },
-    { tarih: "24 Aralık 2025 Çar", konu: "Oturum 6" },
-    { tarih: "7 Ocak 2026 Çar", konu: "Oturum 7" },
-    { tarih: "14 Ocak 2026 Çar", konu: "Oturum 8" },
-    { tarih: "21 Ocak 2026 Çar", konu: "Oturum 9" },
-    { tarih: "28 Ocak 2026 Çar", konu: "Oturum 10" },
+  const bloklar = [
+    {
+      no: 1,
+      baslik: "ANTİK DÜNYADAN RÖNESANS'A",
+      alt: "Hafta 1–3",
+      haftalar: [
+        "Hafta 1: Güzelliğin Kaynağı (Antik Yunan ve Roma)",
+        "Hafta 2: Tanrı'nın Işığı (Bizans, Roman, Gotik)",
+        "Hafta 3: İnsanın Zamanı (Rönesans)",
+      ],
+    },
+    {
+      no: 2,
+      baslik: "BAROK'TAN DEVRİME",
+      alt: "Hafta 4–6",
+      haftalar: [
+        "Hafta 4: Drama ve Zarafet (Barok & Rokoko)",
+        "Hafta 5: Akıl mı, Duygu mu? (Neoklasizm & Romantizm)",
+        "Hafta 6: Işığın ve Gerçeğin Peşinde (Realizm & Empresyonizm)",
+      ],
+    },
+    {
+      no: 3,
+      baslik: "MODERN ÇAĞ",
+      alt: "Hafta 7–9",
+      haftalar: [
+        "Hafta 7: Bireysel Vizyonlar (Post-Empresyonizm & Art Nouveau)",
+        "Hafta 8: Kuralları Yıkanlar (Kübizm, Ekspresyonizm, Dadaizm)",
+        "Hafta 9: Bilinçaltı ve Jestin Gücü (Sürrealizm & Soyut Ekspresyonizm)",
+      ],
+    },
   ];
 
   return (
@@ -1291,10 +1313,36 @@ function KapsamliSanatTarihiPage({
       <Navbar />
       <main style={{ background: B.cream, minHeight: "100vh" }}>
 
+        {/* Geri sayım — sadece kayıt açıkken */}
+        {status === "open" && nextSessionDate && (
+          <div
+            style={{
+              background: B.dark,
+              padding: "20px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p
+              style={{
+                color: "#a09890",
+                fontSize: 11,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                margin: "0 0 14px",
+              }}
+            >
+              İlk Oturuma Kalan Süre
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CountdownTimer targetDate={nextSessionDate} />
+            </div>
+          </div>
+        )}
+
         <HeroBanner
           config={config}
-          altBaslik="Online — 10 Hafta"
-          baslik="Kapsamlı Sanat Tarihi Atölyesi"
+          altBaslik="KLEMENS LOCA — 10 Hafta · 7 Mayıs'ta Başlıyor"
+          baslik="Kapsamlı Sanat Tarihi"
           fiyat="6.000₺"
           workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
           imgPosition="center center"
@@ -1302,35 +1350,10 @@ function KapsamliSanatTarihiPage({
           status={status}
         />
 
-        {/* Alt bilgi şeridi */}
-        <div
-          style={{
-            background: B.light,
-            borderLeft: `4px solid ${B.coral}`,
-            padding: "14px 24px",
-          }}
-        >
-          <p
-            style={{
-              maxWidth: 800,
-              margin: "0 auto",
-              color: B.warm,
-              fontSize: 13,
-              lineHeight: 1.6,
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "6px 20px",
-            }}
-          >
-            <span>10 Hafta</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>19 Kasım 2025 – 28 Ocak 2026</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>20:30 – 22:00</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>Online (Zoom)</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>Kayıtlar 6 ay erişilebilir</span>
+        {/* Tagline şeridi */}
+        <div style={{ background: B.light, borderLeft: `4px solid ${B.coral}`, padding: "14px 24px", margin: "0" }}>
+          <p style={{ maxWidth: 800, margin: "0 auto", color: B.dark, fontSize: 16, fontStyle: "italic", lineHeight: 1.6 }}>
+            "Sanat tarihini bilmeden sanatı anlamak, grameri bilmeden bir dili okumaya çalışmak gibidir."
           </p>
         </div>
 
@@ -1338,101 +1361,135 @@ function KapsamliSanatTarihiPage({
 
           {/* Açıklama */}
           <section style={{ paddingTop: 56, paddingBottom: 0 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: B.coral, letterSpacing: "0.04em", margin: "0 0 24px", textTransform: "uppercase" }}>
-              Antik Yunan'dan Günümüze Sanatın Dönüm Noktaları, Büyük Ustaların Hayatları ve Başlıca Akımlar
-            </h2>
+            <p style={{ color: B.dark, fontSize: 17, lineHeight: 1.85, margin: "0 0 20px" }}>
+              Antik Yunan tapınaklarından Rönesans'ın başyapıtlarına, Barok'un dramatik ışığından
+              Empresyonizm'in titreyen renklerine, Kübizm'in parçalanan formlarından günümüzün sınır
+              tanımaz çağdaş sanatına — 10 haftada sanat tarihinin tüm büyük dönüm noktalarını
+              keşfediyoruz.
+            </p>
+            <p style={{ color: B.dark, fontSize: 17, lineHeight: 1.85, margin: "0 0 32px" }}>
+              Bu atölye bir kronoloji dersi değil; her haftanın ardındaki felsefi kırılmayı, toplumsal
+              bağlamı ve sanatçının bireysel isyanını birlikte okuyacağız. Sonunda bir müzeye
+              girdiğinizde eserleri sadece izlemeyecek, onlarla diyalog kuracaksınız.
+            </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 48 }}>
-              {[
-                "Büyük virajları net biçimde ele alıyoruz.",
-                "Perspektif, ışık ve malzeme gibi tekniklerin nasıl ortaya çıktığını adım adım gösteriyoruz.",
-                "Üslup değişimlerini ve toplumsal kırılmaları, ana eserler ve ustalar üzerinden okuyoruz.",
-                "Amaç, müze/sergi deneyiminizde neyi, neden, nasıl okuyacağınızı kalıcı bir alışkanlığa dönüştürmek.",
-              ].map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: B.coral, fontWeight: 700, flexShrink: 0, marginTop: 3 }}>—</span>
-                  <p style={{ color: B.dark, fontSize: 16, lineHeight: 1.85, margin: 0 }}>{p}</p>
-                </div>
-              ))}
+            {/* Ne Kazanacaksınız */}
+            <div style={{ background: "#fff", borderRadius: 16, padding: "28px 28px", marginBottom: 36, boxShadow: "0 1px 8px rgba(0,0,0,0.05)" }}>
+              <p style={{ color: B.coral, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 14px" }}>
+                Ne Kazanacaksınız
+              </p>
+              <p style={{ color: B.dark, fontSize: 16, lineHeight: 1.85, margin: 0 }}>
+                Bir müzeye veya sergiye adım attığınızda hangi eserin hangi dönemden geldiğini, neden o
+                biçimde yapıldığını ve arkasındaki hikayeyi çözecek bir bakış açısı kazanacaksınız.
+                Sanatı sadece beğenmek değil, okuyabilmek — dönemin ruhunu, toplumsal kırılmaları ve
+                felsefi temelleri anlayabilmek elinizin altında olacak.
+              </p>
+            </div>
+
+            {/* Keşfedeceklerimiz */}
+            <div style={{ marginBottom: 48 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: B.dark, marginBottom: 18 }}>
+                Keşfedeceklerimiz
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {[
+                  "Antik Yunan'ın ideal güzellik arayışı ve Roma'nın mühendislik dehası",
+                  "Gotik katedrallerin ışığı nasıl bir ibadet aracına dönüştürdüğü",
+                  "Rönesans'ın perspektif devriminden Barok'un dramatik teatralliğine geçiş",
+                  "Empresyonistlerin atölyeyi terk edip ışığın peşine düşmesi",
+                  "Picasso'nun gerçekliği parçalaması, Duchamp'ın sanatın tanımını sorgulaması",
+                  "Pollock'un sıçrayan boyalarından Banksy'nin sokak isyanına",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span style={{ color: B.coral, fontWeight: 700, flexShrink: 0, marginTop: 3 }}>—</span>
+                    <span style={{ color: B.dark, fontSize: 16, lineHeight: 1.65 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
-
-          {/* Kimler için */}
-          <div style={{ background: "#fff", borderRadius: 16, padding: "28px 28px", marginBottom: 36, boxShadow: "0 1px 8px rgba(0,0,0,0.05)" }}>
-            <p style={{ color: B.coral, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 14px" }}>
-              Kimler İçin?
-            </p>
-            <p style={{ color: B.dark, fontSize: 16, lineHeight: 1.85, margin: 0 }}>
-              İyi bir izleyici/okur olmak isteyenler, yaratıcı sektör profesyonelleri, öğrenciler ve
-              kültür-sanat meraklıları. Önkoşul yok.
-            </p>
-          </div>
 
           {/* Bilgi */}
           <BilgiBanner>
             <p style={{ margin: "0 0 4px" }}>
-              Tüm buluşmalar kayda alınır; 6 ay boyunca erişebilirsiniz.
+              <strong>Başlangıç: 7 Mayıs 2026, Perşembe — 20:30</strong> · Her hafta aynı gün ve saatte.
             </p>
-            <p style={{ margin: "0 0 4px" }}>
-              Çarşamba 20:30–22:00 · 19 Kasım 2025 – 28 Ocak 2026 (31 Aralık 2025 haftası ders yok.)
-            </p>
-            <p style={{ margin: 0, color: B.warm }}>
-              Kontenjan sınırlı. E-arşiv fatura kesilir.
+            <p style={{ margin: 0 }}>
+              10 haftalık atölye Zoom üzerinden canlı. Kayıt sonrası 6 aylık tekrar izleme erişim
+              anahtarı iletilecektir.
             </p>
           </BilgiBanner>
 
-          {/* Program */}
+          {/* Müfredat */}
           <section style={{ paddingBottom: 56 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: B.dark, marginBottom: 8 }}>
-              Program
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: B.dark, marginBottom: 24 }}>
+              10 Haftalık Müfredat
             </h2>
-            <p style={{ color: B.warm, fontSize: 13, margin: "0 0 24px" }}>
-              Her Çarşamba 20:30 · Zoom · 31 Aralık'ta ders yoktur
-            </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {program.map((s, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "#fff",
-                    borderRadius: 12,
-                    padding: "16px 20px",
-                    display: "flex",
-                    gap: 16,
-                    alignItems: "flex-start",
-                    boxShadow: "0 1px 6px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <span
-                    style={{
-                      minWidth: 22,
-                      height: 22,
-                      borderRadius: "50%",
-                      background: i === 9 ? B.coral : B.light,
-                      color: i === 9 ? "#fff" : B.coral,
-                      fontSize: 10,
-                      fontWeight: 700,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      marginTop: 1,
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ color: B.warm, fontSize: 11, fontWeight: 600, margin: "0 0 3px", letterSpacing: "0.04em" }}>
-                      {s.tarih}
-                    </p>
-                    <p style={{ color: B.dark, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
-                      {s.konu}
-                    </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 16 }}>
+              {bloklar.map((blok) => (
+                <div key={blok.no} style={{ background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 8px rgba(0,0,0,0.05)" }}>
+                  <div style={{ background: B.dark, padding: "13px 22px", display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ background: B.coral, color: "#fff", fontSize: 10, fontWeight: 700, padding: "2px 10px", borderRadius: 20, letterSpacing: "0.06em" }}>
+                      BLOK {blok.no}
+                    </span>
+                    <span style={{ color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: "0.07em" }}>
+                      {blok.baslik}
+                    </span>
+                    <span style={{ color: "#a09890", fontSize: 12, marginLeft: "auto" }}>{blok.alt}</span>
+                  </div>
+                  <div style={{ padding: "16px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
+                    {blok.haftalar.map((h, j) => (
+                      <div key={j} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        <span
+                          style={{
+                            minWidth: 22, height: 22, borderRadius: "50%",
+                            background: B.light, color: B.coral,
+                            fontSize: 10, fontWeight: 700,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            flexShrink: 0, marginTop: 1,
+                          }}
+                        >
+                          {(blok.no - 1) * 3 + j + 1}
+                        </span>
+                        <span style={{ color: B.dark, fontSize: 14, lineHeight: 1.6 }}>{h}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Final */}
+            <div style={{ border: `1.5px solid ${B.coral}`, borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ background: B.coral, padding: "13px 22px", display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: "0.08em" }}>BÜYÜK FİNAL</span>
+                <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, marginLeft: "auto" }}>Hafta 10</span>
+              </div>
+              <div style={{ padding: "16px 22px" }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span
+                    style={{
+                      minWidth: 22, height: 22, borderRadius: "50%",
+                      background: B.coral, color: "#fff",
+                      fontSize: 10, fontWeight: 700,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, marginTop: 1,
+                    }}
+                  >
+                    10
+                  </span>
+                  <span style={{ color: B.dark, fontSize: 14, lineHeight: 1.65 }}>
+                    Hafta 10: Çağdaş Sanat Panoraması — Pop Art'tan kavramsal sanata, sokak sanatından
+                    dijital devrime. 10 haftanın tüm ipliklerini birleştiriyoruz.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <p style={{ color: B.warm, fontSize: 13, fontStyle: "italic", marginTop: 16, textAlign: "center" }}>
+              Erken Kayıt Ayrıcalığı — kontenjan sınırlıdır.
+            </p>
           </section>
 
           <EgitmenKart />
@@ -1441,7 +1498,7 @@ function KapsamliSanatTarihiPage({
             config={config}
             workshopSlug={slug}
             workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
-            aciklama="10 hafta · Zoom · 6 aylık kayıt erişimi"
+            aciklama="7 Mayıs'ta başlıyor · 10 hafta · Zoom · 6 aylık tekrar izleme"
             fiyatLabel="6.000₺"
             status={status}
           />

@@ -38,7 +38,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
   "ronesans-okuryazarligi-2": {
     id: "019ef1b5-08a1-4fb0-a794-34d52fa4060b",
     price: 450000,
-    forSale: true,
+    forSale: false,
     imgCover: "/images/workshops/ronesans-atolyesi-cover.webp",
     imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
     targetDate: "2026-05-07T20:30:00+03:00",
@@ -46,10 +46,10 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
   "kapsamli-sanat-tarihi": {
     id: "75468e8b-5de7-4f69-95f2-c8132778cf6a",
     price: 600000,
-    forSale: false,
+    forSale: true,
     imgCover: "/images/workshops/kapsamli-sanat-tarihi-cover.webp",
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
-    targetDate: "2026-01-28T20:30:00+03:00",
+    targetDate: "2026-05-07T20:30:00+03:00",
   },
 
   "leonardo-da-vinci-semineri": {
