@@ -1412,7 +1412,7 @@ function KapsamliSanatTarihiPage({
           {/* Bilgi */}
           <BilgiBanner>
             <p style={{ margin: "0 0 4px" }}>
-              <strong>Başlangıç: 7 Mayıs 2026, Perşembe — 20:30</strong> · Her hafta aynı gün ve saatte.
+              <strong>Her Perşembe 20:30 · 7 Mayıs – 16 Temmuz 2026</strong>
             </p>
             <p style={{ margin: 0 }}>
               10 haftalık atölye Zoom üzerinden canlı. Kayıt sonrası 6 aylık tekrar izleme erişim
