@@ -367,9 +367,11 @@ function EgitmenKart() {
           Sanat Tarihçisi
         </p>
         <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.7, margin: 0 }}>
-          Sanat tarihini sezgisel ve erişilebilir bir dille aktaran Kerem Hun, 10 yılı aşkın süredir atölye
-          ve seminerler yürütmektedir. Odak alanları: Rönesans'tan Modernizme Batı sanatı, duygu ve estetik
-          teorisi.
+          Kerem Hun, Ankara Üniversitesi Sanat Tarihi ve Radyo Televizyon Sinema bölümlerinden
+          mezundur. Belgesel sinema alanında çeşitli filmlere imza atmış; sanat tarihini sezgisel ve
+          erişilebilir bir dille aktarma motivasyonuyla 2023 yılında Klemens&apos;i kurmuştur. O günden
+          bu yana çevrim içi ve yüz yüze seminerlerle geniş bir katılımcı kitlesine ulaşmıştır.
+          Odak alanları: Rönesans&apos;tan Modernizme Batı sanatı, duygu ve estetik teorisi.
         </p>
       </div>
     </div>
