@@ -48,6 +48,7 @@ migrate-users.mjs
 
 # kullanıcı verileri
 *.csv
+scripts/ab-test-map.json
 
 # claude code local settings
 .claude/

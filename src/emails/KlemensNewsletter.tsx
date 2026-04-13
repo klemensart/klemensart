@@ -37,18 +37,6 @@ export default function KlemensNewsletter({
       {previewText && <Preview>{previewText}</Preview>}
       <Body style={body}>
         <Container style={container}>
-          {/* Header */}
-          <Section style={header}>
-            <Img
-              src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/logo-yazi-somon-optimized.png"
-              alt="Klemens Art"
-              width="160"
-              style={logoImg}
-            />
-          </Section>
-
-          <Hr style={divider} />
-
           {/* Dynamic Content */}
           <Section style={contentSection}>
             <div
