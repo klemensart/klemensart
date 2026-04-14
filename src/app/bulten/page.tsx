@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase-admin";
 import BultenClient from "./BultenClient";
@@ -82,7 +83,9 @@ export default async function BultenPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <BultenClient subscriberCount={subscriberCount ?? 0} />
+      <Suspense>
+        <BultenClient subscriberCount={subscriberCount ?? 0} />
+      </Suspense>
     </>
   );
 }

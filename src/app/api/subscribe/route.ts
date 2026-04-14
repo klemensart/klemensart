@@ -10,6 +10,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PDF_URL =
   "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/muzede-1-saat-istanbul-arkeoloji.pdf";
 
+const TUZ_BULTEN_CAMPAIGN_ID = "09a4a679-6086-46c2-871f-70350442b02d";
+
 export async function POST(req: NextRequest) {
   const { email, name, source } = await req.json();
 
@@ -23,6 +25,7 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const trimmedEmail = email.trim().toLowerCase();
   const isMuzede1Saat = source === "muzede1saat";
+  const isTuzBulten = source === "tuz-bulten";
 
   // Check if already subscribed
   const { data: existing } = await admin
@@ -48,6 +51,15 @@ export async function POST(req: NextRequest) {
           ? "PDF rehberiniz e-postanıza gönderildi!"
           : "Tekrar hoş geldiniz! PDF rehberiniz e-postanıza gönderildi.",
         pdfUrl: PDF_URL,
+      });
+    }
+
+    if (isTuzBulten) {
+      sendTuzBultenEmail(admin, trimmedEmail);
+      return NextResponse.json({
+        message: existing.is_active
+          ? "Tuz Bülteni e-postanıza gönderildi!"
+          : "Tekrar hoş geldiniz! Tuz Bülteni e-postanıza gönderildi.",
       });
     }
 
@@ -79,6 +91,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: PDF_URL });
   }
 
+  if (isTuzBulten) {
+    sendTuzBultenEmail(admin, trimmedEmail);
+    return NextResponse.json({ message: "Abone oldunuz! Tuz Bülteni e-postanıza gönderildi." });
+  }
+
   sendBultenTesekkurEmail(trimmedEmail, name?.trim());
   return NextResponse.json({ message: "Abone oldunuz!" });
 }
@@ -94,6 +111,31 @@ function sendBultenTesekkurEmail(email: string, name?: string | null) {
       });
     } catch (err) {
       console.error("[Subscribe] Tesekkur maili gonderilemedi:", err);
+    }
+  })();
+}
+
+function sendTuzBultenEmail(admin: ReturnType<typeof createAdminClient>, email: string) {
+  (async () => {
+    try {
+      const { data } = await admin
+        .from("campaigns")
+        .select("html_content, subject")
+        .eq("id", TUZ_BULTEN_CAMPAIGN_ID)
+        .single();
+
+      if (!data?.html_content) {
+        console.error("[Subscribe] Tuz Bulteni kampanya HTML bulunamadi");
+        return;
+      }
+
+      await sendThankYouEmail({
+        to: email,
+        subject: data.subject,
+        html: data.html_content,
+      });
+    } catch (err) {
+      console.error("[Subscribe] Tuz Bulteni gonderilemedi:", err);
     }
   })();
 }

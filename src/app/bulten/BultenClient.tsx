@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   subscriberCount: number;
 };
 
 function SignupForm() {
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
   const [email, setEmail] = useState("");
   const [kvkkChecked, setKvkkChecked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,7 +27,7 @@ function SignupForm() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, ...(ref && { source: ref }) }),
       });
 
       const data = await res.json();

@@ -8,6 +8,7 @@ import Hizmetler from "@/components/Hizmetler";
 import IceriklerSection from "@/components/IceriklerSection";
 import Footer from "@/components/Footer";
 
+const TuzBultenVitrin = dynamic(() => import("@/components/TuzBultenVitrin"));
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
 const SonYazilarSection = dynamic(() => import("@/components/SonYazilarSection"));
 const LeonardoBanner = dynamic(() => import("@/components/LeonardoBanner"));
@@ -53,6 +54,7 @@ export default function Home() {
       <AnnouncementBar page="homepage" />
       <Navbar />
       <Hero />
+      <TuzBultenVitrin />
       <Suspense fallback={<div className="h-64 bg-warm-50 animate-pulse" />}>
         <SonYazilarSection />
       </Suspense>
