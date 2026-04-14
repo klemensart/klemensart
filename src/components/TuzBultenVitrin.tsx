@@ -15,7 +15,12 @@ export default function TuzBultenVitrin() {
         <div className="flex justify-center order-1">
           <div>
             <div className="md:rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-              <div className="rounded-2xl overflow-hidden border border-warm-200 shadow-lg">
+              <a
+                href="https://www.instagram.com/delikli.iliskiler/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-2xl overflow-hidden border border-warm-200 shadow-lg"
+              >
                 <Image
                   src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/tuz-bulten-vitrin.jpg"
                   alt="Tuz Bülteni illüstrasyon — Delikli İlişkiler"
@@ -23,10 +28,18 @@ export default function TuzBultenVitrin() {
                   height={510}
                   className="block"
                 />
-              </div>
+              </a>
             </div>
             <p className="text-xs text-warm-900/30 mt-3 text-center italic">
-              Çizim: Delikli İlişkiler
+              Çizim:{" "}
+              <a
+                href="https://www.instagram.com/delikli.iliskiler/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-coral/60 hover:text-coral transition-colors"
+              >
+                @delikli.iliskiler
+              </a>
             </p>
           </div>
         </div>
