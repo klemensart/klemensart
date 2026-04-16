@@ -94,7 +94,7 @@ const SERILER: SeriesWorkshop[] = [
     price: "4.500 TL",
     imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
     imgPosition: "center 20%",
-    startLabel: "7 Mayıs'ta başlıyor",
+    startLabel: "11 Mayıs'ta başlıyor",
   },
   {
     slug: "kapsamli-sanat-tarihi",
@@ -105,6 +105,7 @@ const SERILER: SeriesWorkshop[] = [
     price: "6.000 TL",
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
     imgPosition: "center center",
+    startLabel: "7 Mayıs'ta başlıyor",
   },
   {
     slug: "leonardo-da-vinci-semineri",
@@ -337,9 +338,30 @@ function SeriesKart({ w, status, badgeText }: { w: SeriesWorkshop; status: Statu
           <h2 style={{ fontSize: 20, fontWeight: 800, color: B.dark, margin: "0 0 8px", lineHeight: 1.25 }}>
             {w.title}
           </h2>
-          <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.7, margin: "0 0 18px" }}>
+          <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>
             {w.description}
           </p>
+
+          {/* Belirgin tarih satırı */}
+          {w.startLabel && status === "open" && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 16,
+                padding: "8px 12px",
+                background: B.light,
+                borderRadius: 8,
+                borderLeft: `3px solid ${B.coral}`,
+              }}
+            >
+              <span style={{ color: B.dark, fontSize: 14, fontWeight: 700 }}>
+                {w.startLabel}
+              </span>
+              <span style={{ color: B.warm, fontSize: 12 }}>· {w.duration} · Zoom</span>
+            </div>
+          )}
 
           <div
             style={{
