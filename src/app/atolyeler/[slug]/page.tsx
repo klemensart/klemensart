@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props) {
     },
     "ronesans-okuryazarligi-2": {
       title: "Rönesans Okur-Yazarlığı",
-      description: "7 Mayıs'ta başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
+      description: "11 Mayıs Pazartesi başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
     },
     "kapsamli-sanat-tarihi": {
       title: "Kapsamlı Sanat Tarihi Atölyesi | Klemens Art",
@@ -112,8 +112,8 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "sanat-tarihinde-duygular": "Korku, haz ve öfkenin sanat tarihindeki izleri — 3 haftalık canlı Zoom atölyesi.",
     "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
     "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
-    "ronesans-okuryazarligi-2": "7 Mayıs'ta başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
-    "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze sanat tarihinin 10 haftalık yolculuğu. 7 Mayıs'ta başlıyor.",
+    "ronesans-okuryazarligi-2": "11 Mayıs Pazartesi başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
+    "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze sanat tarihinin 10 haftalık yolculuğu. 7 Mayıs Perşembe başlıyor.",
     "leonardo-da-vinci-semineri": "Rönesans'ın en büyük dehası Leonardo da Vinci'nin sanat, bilim ve mühendislik evrenine tek oturumluk yolculuk.",
   };
 
@@ -466,6 +466,73 @@ function BilgiBanner({ children }: { children: React.ReactNode }) {
       </span>
       <div style={{ color: B.dark, fontSize: 14, lineHeight: 1.7 }}>{children}</div>
     </div>
+  );
+}
+
+/* ─── Standart Tarih Blok ─────────────────────────────
+ * Hero'nun hemen altında, vurgulu ve büyük tarih gösterimi.
+ * Tüm çok haftalı atölyelerde aynı biçimde kullanılır.
+ */
+function ProminentDateBlock({
+  tarih,
+  gun,
+  saat,
+  ekstra,
+}: {
+  tarih: string;
+  gun: string;
+  saat: string;
+  ekstra?: string;
+}) {
+  return (
+    <section
+      style={{
+        background: "#fff",
+        borderTop: `3px solid ${B.coral}`,
+        borderBottom: `1px solid ${B.light}`,
+        padding: "44px 24px",
+        textAlign: "center",
+      }}
+    >
+      <p
+        style={{
+          color: B.coral,
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          margin: "0 0 14px",
+        }}
+      >
+        Başlangıç Tarihi
+      </p>
+      <h2
+        style={{
+          color: B.dark,
+          fontSize: "clamp(30px, 5vw, 46px)",
+          fontWeight: 800,
+          margin: "0 0 10px",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.1,
+        }}
+      >
+        {tarih}
+      </h2>
+      <p
+        style={{
+          color: B.dark,
+          fontSize: 18,
+          fontWeight: 600,
+          margin: "0 0 12px",
+          letterSpacing: "0.01em",
+        }}
+      >
+        {gun} · {saat}
+      </p>
+      {ekstra && (
+        <p style={{ color: B.warm, fontSize: 14, margin: 0 }}>{ekstra}</p>
+      )}
+    </section>
   );
 }
 
@@ -1069,14 +1136,14 @@ function Ronesans2Page({
   slug: string;
 }) {
   const program = [
-    { tarih: "7 Mayıs 2026 Per",  konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
-    { tarih: "14 Mayıs 2026 Per", konu: "Floransa II — Botticelli, Michelangelo ve Medici Çevresi" },
-    { tarih: "21 Mayıs 2026 Per", konu: "Roma I — Vatikan, Sistine Şapeli ve Yüksek Rönesans" },
-    { tarih: "4 Haziran 2026 Per", konu: "Roma II — Raphael ve Rönesans Mimarisinin Grameri" },
-    { tarih: "11 Haziran 2026 Per", konu: "Venedik I — Titian, Tintoretto ve Renk Felsefesi" },
-    { tarih: "18 Haziran 2026 Per", konu: "Venedik II — Mimari, Su ve Osmanlı Bağlantısı" },
-    { tarih: "25 Haziran 2026 Per", konu: "Milano & Leonardo — Sfumato, Bilim ve Sanatın Birleşimi" },
-    { tarih: "2 Temmuz 2026 Per",  konu: "Büyük Final — 3 Adımda Eser Okuma ve Müze Stratejisi" },
+    { tarih: "11 Mayıs 2026 Pzt",   konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
+    { tarih: "18 Mayıs 2026 Pzt",   konu: "Floransa II — Botticelli, Michelangelo ve Medici Çevresi" },
+    { tarih: "1 Haziran 2026 Pzt",  konu: "Roma I — Vatikan, Sistine Şapeli ve Yüksek Rönesans" },
+    { tarih: "8 Haziran 2026 Pzt",  konu: "Roma II — Raphael ve Rönesans Mimarisinin Grameri" },
+    { tarih: "15 Haziran 2026 Pzt", konu: "Venedik I — Titian, Tintoretto ve Renk Felsefesi" },
+    { tarih: "22 Haziran 2026 Pzt", konu: "Venedik II — Mimari, Su ve Osmanlı Bağlantısı" },
+    { tarih: "29 Haziran 2026 Pzt", konu: "Milano & Leonardo — Sfumato, Bilim ve Sanatın Birleşimi" },
+    { tarih: "6 Temmuz 2026 Pzt",   konu: "Büyük Final — 3 Adımda Eser Okuma ve Müze Stratejisi" },
   ];
 
   const aciklamaParagraflari = [
@@ -1117,37 +1184,13 @@ function Ronesans2Page({
           status={status}
         />
 
-        {/* Alt bilgi şeridi */}
-        <div
-          style={{
-            background: B.light,
-            borderLeft: `4px solid ${B.coral}`,
-            padding: "14px 24px",
-          }}
-        >
-          <p
-            style={{
-              maxWidth: 800,
-              margin: "0 auto",
-              color: B.warm,
-              fontSize: 13,
-              lineHeight: 1.6,
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "6px 20px",
-            }}
-          >
-            <span>8 Hafta</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>7 Mayıs – 2 Temmuz 2026</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>20:30 – 22:00</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>Online (Zoom)</span>
-            <span style={{ color: B.light }}>|</span>
-            <span>6 ay kayıt erişimi</span>
-          </p>
-        </div>
+        {/* Vurgulu tarih bloğu */}
+        <ProminentDateBlock
+          tarih="11 Mayıs 2026"
+          gun="Pazartesi"
+          saat="20:30 – 22:00"
+          ekstra="8 Hafta · Online (Zoom) · 11 Mayıs – 6 Temmuz 2026"
+        />
 
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
 
@@ -1155,7 +1198,7 @@ function Ronesans2Page({
           <section style={{ paddingTop: 56, paddingBottom: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 48 }}>
               {aciklamaParagraflari.map((p, i) => (
-                <p key={i} style={{ color: B.dark, fontSize: 16, lineHeight: 1.85, margin: 0 }}>
+                <p key={i} style={{ color: B.dark, fontSize: 17, lineHeight: 1.85, margin: 0 }}>
                   {p}
                 </p>
               ))}
@@ -1186,7 +1229,7 @@ function Ronesans2Page({
               Tüm buluşmalar kayda alınır; 6 ay boyunca erişebilirsiniz.
             </p>
             <p style={{ margin: "0 0 4px" }}>
-              Perşembe 20:30–22:00 · 7 Mayıs – 2 Temmuz 2026 (28 Mayıs Kurban Bayramı haftası ders yoktur.)
+              Pazartesi 20:30–22:00 · 11 Mayıs – 6 Temmuz 2026 (25 Mayıs Kurban Bayramı arifesi haftası ders yoktur.)
             </p>
             <p style={{ margin: 0, color: B.warm }}>
               Kontenjan sınırlı. E-arşiv fatura kesilir.
@@ -1199,7 +1242,7 @@ function Ronesans2Page({
               Program
             </h2>
             <p style={{ color: B.warm, fontSize: 13, margin: "0 0 24px" }}>
-              Her Perşembe 20:30 · Zoom · 28 Mayıs&apos;ta (Kurban Bayramı) ders yoktur
+              Her Pazartesi 20:30 · Zoom · 25 Mayıs&apos;ta (Kurban Bayramı arifesi) ders yoktur
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1209,7 +1252,7 @@ function Ronesans2Page({
                   style={{
                     background: "#fff",
                     borderRadius: 12,
-                    padding: "16px 20px",
+                    padding: "18px 20px",
                     display: "flex",
                     gap: 16,
                     alignItems: "flex-start",
@@ -1218,27 +1261,27 @@ function Ronesans2Page({
                 >
                   <span
                     style={{
-                      minWidth: 22,
-                      height: 22,
+                      minWidth: 28,
+                      height: 28,
                       borderRadius: "50%",
                       background: i === 7 ? B.coral : B.light,
                       color: i === 7 ? "#fff" : B.coral,
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: 700,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
-                      marginTop: 1,
+                      marginTop: 2,
                     }}
                   >
                     {i + 1}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ color: B.warm, fontSize: 11, fontWeight: 600, margin: "0 0 3px", letterSpacing: "0.04em" }}>
+                    <p style={{ color: B.dark, fontSize: 15, fontWeight: 700, margin: "0 0 4px", letterSpacing: "0.01em" }}>
                       {s.tarih}
                     </p>
-                    <p style={{ color: B.dark, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ color: B.warm, fontSize: 14, lineHeight: 1.55, margin: 0 }}>
                       {s.konu}
                     </p>
                   </div>
@@ -1350,6 +1393,14 @@ function KapsamliSanatTarihiPage({
           imgPosition="center center"
           workshopSlug={slug}
           status={status}
+        />
+
+        {/* Vurgulu tarih bloğu */}
+        <ProminentDateBlock
+          tarih="7 Mayıs 2026"
+          gun="Perşembe"
+          saat="20:30 – 22:00"
+          ekstra="10 Hafta · Online (Zoom) · 7 Mayıs – 16 Temmuz 2026"
         />
 
         {/* Tagline şeridi */}

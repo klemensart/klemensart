@@ -41,7 +41,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     forSale: false,
     imgCover: "/images/workshops/ronesans-atolyesi-cover.webp",
     imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
-    targetDate: "2026-05-07T20:30:00+03:00",
+    targetDate: "2026-05-11T20:30:00+03:00",
   },
   "kapsamli-sanat-tarihi": {
     id: "75468e8b-5de7-4f69-95f2-c8132778cf6a",
