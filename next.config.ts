@@ -68,7 +68,12 @@ const nextConfig: NextConfig = {
       },
 
       // ═══════════════════════════════════════════════════════
-      // 0b. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
+      // 0b. SERGİ v2 → v1
+      // ═══════════════════════════════════════════════════════
+      { source: "/sergi/en-sessiz-zaman-v2", destination: "/sergi/en-sessiz-zaman", permanent: true },
+
+      // ═══════════════════════════════════════════════════════
+      // 0c. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
       // ═══════════════════════════════════════════════════════
       { source: "/haberler", destination: "/bulten/arsiv", permanent: true },
       { source: "/haberler/:slug", destination: "/bulten/arsiv", permanent: true },
