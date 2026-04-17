@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/testler/modern-sanat-quiz`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/atolyeler/sinema-klubu`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/rehber`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE_URL}/rehber/bodrum`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/bulten`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/bulten/arsiv`, lastModified: lastCampaignDate, changeFrequency: "weekly", priority: 0.6 },
   ];

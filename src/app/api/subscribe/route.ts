@@ -3,12 +3,16 @@ import { createAdminClient } from "@/lib/supabase-admin";
 import { render } from "@react-email/render";
 import BultenTesekkur from "@/emails/BultenTesekkur";
 import Muzede1SaatTesekkur from "@/emails/Muzede1SaatTesekkur";
+import BodrumMuzeTesekkur from "@/emails/BodrumMuzeTesekkur";
 import { sendThankYouEmail } from "@/lib/send-thank-you";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const PDF_URL =
   "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/muzede-1-saat-istanbul-arkeoloji.pdf";
+
+const BODRUM_PDF_URL =
+  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/bodrum-sualti-arkeoloji-muzesi.pdf";
 
 const TUZ_BULTEN_CAMPAIGN_ID = "09a4a679-6086-46c2-871f-70350442b02d";
 
@@ -25,6 +29,7 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const trimmedEmail = email.trim().toLowerCase();
   const isMuzede1Saat = source === "muzede1saat";
+  const isBodrumRehber = source === "bodrum-muze-rehberi";
   const isTuzBulten = source === "tuz-bulten";
 
   // Check if already subscribed
@@ -39,7 +44,11 @@ export async function POST(req: NextRequest) {
       // Reactivate
       await admin
         .from("subscribers")
-        .update({ is_active: true, ...(isMuzede1Saat && { source: "muzede1saat" }) })
+        .update({
+          is_active: true,
+          ...(isMuzede1Saat && { source: "muzede1saat" }),
+          ...(isBodrumRehber && { source: "bodrum-muze-rehberi" }),
+        })
         .eq("id", existing.id);
     }
 
@@ -51,6 +60,16 @@ export async function POST(req: NextRequest) {
           ? "PDF rehberiniz e-postanıza gönderildi!"
           : "Tekrar hoş geldiniz! PDF rehberiniz e-postanıza gönderildi.",
         pdfUrl: PDF_URL,
+      });
+    }
+
+    if (isBodrumRehber) {
+      sendBodrumMuzeEmail(trimmedEmail, name?.trim());
+      return NextResponse.json({
+        message: existing.is_active
+          ? "PDF rehberiniz e-postanıza gönderildi!"
+          : "Tekrar hoş geldiniz! PDF rehberiniz e-postanıza gönderildi.",
+        pdfUrl: BODRUM_PDF_URL,
       });
     }
 
@@ -77,6 +96,7 @@ export async function POST(req: NextRequest) {
       email: trimmedEmail,
       name: name?.trim() || null,
       ...(isMuzede1Saat && { source: "muzede1saat" }),
+      ...(isBodrumRehber && { source: "bodrum-muze-rehberi" }),
     });
 
   if (error) {
@@ -89,6 +109,11 @@ export async function POST(req: NextRequest) {
   if (isMuzede1Saat) {
     sendMuzede1SaatEmail(trimmedEmail, name?.trim());
     return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: PDF_URL });
+  }
+
+  if (isBodrumRehber) {
+    sendBodrumMuzeEmail(trimmedEmail, name?.trim());
+    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: BODRUM_PDF_URL });
   }
 
   if (isTuzBulten) {
@@ -151,6 +176,21 @@ function sendMuzede1SaatEmail(email: string, name?: string | null) {
       });
     } catch (err) {
       console.error("[Subscribe] Muzede1Saat maili gonderilemedi:", err);
+    }
+  })();
+}
+
+function sendBodrumMuzeEmail(email: string, name?: string | null) {
+  (async () => {
+    try {
+      const html = await render(BodrumMuzeTesekkur({ name: name || undefined }));
+      await sendThankYouEmail({
+        to: email,
+        subject: "Bodrum Müze Rehberiniz Hazır! — Klemens Art",
+        html,
+      });
+    } catch (err) {
+      console.error("[Subscribe] Bodrum muze maili gonderilemedi:", err);
     }
   })();
 }
