@@ -3,7 +3,7 @@ import * as React from "react";
 import { KlemensLayout, KlemensButton } from "./components/KlemensLayout";
 
 const PDF_URL =
-  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/bodrum-sualti-arkeoloji-muzesi.pdf";
+  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/bulten-hediye/muzede-1-saat-bodrum-sualti-arkeoloji-muzesi.pdf";
 
 type Props = {
   name?: string;

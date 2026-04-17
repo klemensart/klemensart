@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 
 const PDF_URL =
-  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/bodrum-sualti-arkeoloji-muzesi.pdf";
+  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/bulten-hediye/muzede-1-saat-bodrum-sualti-arkeoloji-muzesi.pdf";
 
 export default function BodrumRehberForm({ id }: { id?: string }) {
   const [email, setEmail] = useState("");

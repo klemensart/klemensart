@@ -12,7 +12,7 @@ const PDF_URL =
   "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/muzede-1-saat-istanbul-arkeoloji.pdf";
 
 const BODRUM_PDF_URL =
-  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/rehberler/bodrum-sualti-arkeoloji-muzesi.pdf";
+  "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/bulten-hediye/muzede-1-saat-bodrum-sualti-arkeoloji-muzesi.pdf";
 
 const TUZ_BULTEN_CAMPAIGN_ID = "09a4a679-6086-46c2-871f-70350442b02d";
 
