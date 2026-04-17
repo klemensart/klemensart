@@ -775,6 +775,9 @@ export default function EnSessizZamanSergiPage() {
     const animate = () => {
       frameIdRef.current = requestAnimationFrame(animate);
 
+      // Pause heavy 3D work while fullscreen overlay is open
+      if (overlayOpenRef.current) return;
+
       checkLazyLoad();
 
       const maxSpeed = 0.08;
