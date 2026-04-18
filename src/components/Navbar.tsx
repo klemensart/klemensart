@@ -20,14 +20,15 @@ function getInitials(email: string) {
 }
 
 export default function Navbar({ dark = false }: { dark?: boolean }) {
-  const [scrolled,  setScrolled]  = useState(false);
+  const [scrolled,  setScrolled]  = useState(true);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [user,      setUser]      = useState<User | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 0);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
