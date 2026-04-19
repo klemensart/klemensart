@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase";
@@ -292,11 +291,13 @@ function EventCard({ e }: { e: EventRow }) {
 }
 
 export default function EtkinliklerClient() {
-  const searchParams = useSearchParams();
   const [filter, setFilter] = useState<Filter>("Tümü");
-  const [viewMode, setViewMode] = useState<"grid" | "table">(
-    searchParams.get("view") === "table" ? "table" : "grid"
-  );
+  const [viewMode, setViewMode] = useState<"grid" | "table">(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("view") === "table" ? "table" : "grid";
+    }
+    return "grid";
+  });
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
 
