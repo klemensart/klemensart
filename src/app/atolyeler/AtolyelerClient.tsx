@@ -7,32 +7,7 @@ import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase";
 import PazaryeriCard from "./components/PazaryeriCard";
 import AjandaView from "./components/AjandaView";
-
-/* ─── Tipler ──────────────────────────────────────── */
-
-type MarketplaceEvent = {
-  id: string;
-  slug: string;
-  title: string;
-  category: string;
-  city: string;
-  district: string | null;
-  price: number;
-  image_url: string | null;
-  event_date: string | null;
-  is_featured: boolean;
-  is_klemens: boolean;
-  detail_slug: string | null;
-  duration_note: string | null;
-  organizer_name: string;
-  short_description: string | null;
-  venue_name: string | null;
-  venue_address: string | null;
-  organizer_phone: string | null;
-  organizer_email: string | null;
-  organizer_url: string | null;
-  organizer_logo_url: string | null;
-};
+import type { MarketplaceEventCard as MarketplaceEvent } from "@/types/marketplace";
 
 type SingleVideo = {
   id: string;
@@ -176,7 +151,7 @@ export default function AtolyelerClient() {
       const supabase = createClient();
       let query = supabase
         .from("marketplace_events")
-        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url")
+        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url, host_id, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
         .eq("status", "active");
 
       if (city) query = query.eq("city", city);

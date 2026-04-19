@@ -2,24 +2,8 @@ import { remark } from "remark";
 import html from "remark-html";
 import { createAdminClient } from "./supabase-admin";
 
-export type ArticleMeta = {
-  title: string;
-  description: string;
-  author: string;
-  authorIg?: string;
-  authorEmail?: string;
-  date: string;
-  category: string;
-  tags: string[];
-  image: string;
-  readTime: string;
-  slug: string;
-};
-
-export type ParsedArticle = {
-  meta: ArticleMeta;
-  contentHtml: string;
-};
+export type { ArticleMeta, ParsedArticle } from "@/types/article";
+import type { ArticleMeta, ParsedArticle } from "@/types/article";
 
 /* ──────────────── markdown processing helpers ──────────────── */
 
@@ -309,7 +293,7 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
   const [articleRes, otherArticlesRes] = await Promise.all([
     supabase
       .from("articles")
-      .select("*")
+      .select("*, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
       .eq("slug", slug)
       .eq("status", "published")
       .maybeSingle(),
@@ -353,6 +337,8 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
     image: data.image ?? "",
     readTime,
     slug: data.slug,
+    author_id: data.author_id ?? null,
+    author_person: (Array.isArray(data.author_person) ? data.author_person[0] : data.author_person) ?? null,
   };
 
   return { meta, contentHtml };
@@ -379,7 +365,7 @@ export async function getRelatedArticles(
   // Önce aynı kategoriden makaleleri dene
   const { data: sameCat } = await supabase
     .from("articles")
-    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
     .eq("status", "published")
     .eq("category", category)
     .neq("slug", currentSlug)
@@ -393,7 +379,7 @@ export async function getRelatedArticles(
     const existingSlugs = [currentSlug, ...rows.map((r) => r.slug)];
     const { data: others } = await supabase
       .from("articles")
-      .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+      .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
       .eq("status", "published")
       .not("slug", "in", `(${existingSlugs.join(",")})`)
       .order("date", { ascending: false })
@@ -416,6 +402,8 @@ export async function getRelatedArticles(
       image: row.image ?? "",
       readTime: `${minutes} dk`,
       slug: row.slug,
+      author_id: row.author_id ?? null,
+      author_person: (Array.isArray(row.author_person) ? row.author_person[0] : row.author_person) ?? null,
     };
   });
 }
@@ -424,7 +412,7 @@ export async function getAllArticlesMetadata(): Promise<ArticleMeta[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("articles")
-    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
     .eq("status", "published")
     .order("date", { ascending: false });
 
@@ -445,6 +433,8 @@ export async function getAllArticlesMetadata(): Promise<ArticleMeta[]> {
       image: row.image ?? "",
       readTime: `${minutes} dk`,
       slug: row.slug,
+      author_id: row.author_id ?? null,
+      author_person: (Array.isArray(row.author_person) ? row.author_person[0] : row.author_person) ?? null,
     };
   });
 }

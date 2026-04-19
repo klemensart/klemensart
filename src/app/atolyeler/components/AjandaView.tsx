@@ -1,31 +1,7 @@
 "use client";
 
 import { Fragment, useState, useRef, useEffect } from "react";
-
-/* ─── Tipler ──────────────────────────────────────── */
-
-type MarketplaceEvent = {
-  id: string;
-  slug: string;
-  title: string;
-  category: string;
-  city: string;
-  district: string | null;
-  price: number;
-  image_url: string | null;
-  event_date: string | null;
-  is_featured: boolean;
-  is_klemens: boolean;
-  detail_slug: string | null;
-  duration_note: string | null;
-  organizer_name: string;
-  short_description: string | null;
-  venue_name: string | null;
-  venue_address: string | null;
-  organizer_phone: string | null;
-  organizer_email: string | null;
-  organizer_url: string | null;
-};
+import type { MarketplaceEventCard as MarketplaceEvent } from "@/types/marketplace";
 
 type Props = { events: MarketplaceEvent[] };
 

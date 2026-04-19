@@ -10,6 +10,7 @@ import WorkshopViewTracker from "@/components/WorkshopViewTracker";
 import { createAdminClient } from "@/lib/supabase-admin";
 import MarketplaceDetailClient from "./MarketplaceDetailClient";
 import StickyWorkshopBar from "./StickyWorkshopBar";
+import type { MarketplaceEvent } from "@/types/marketplace";
 
 const B = {
   coral: "#FF6D60",
@@ -43,44 +44,11 @@ async function fetchNextSessionDate(workshopId: string): Promise<string | null> 
 
 /* ─── Marketplace fallback ──────────────────────── */
 
-type MarketplaceEvent = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  short_description: string | null;
-  category: string;
-  city: string;
-  district: string | null;
-  venue_name: string | null;
-  venue_address: string | null;
-  organizer_name: string;
-  organizer_url: string | null;
-  organizer_phone: string | null;
-  organizer_email: string | null;
-  organizer_logo_url: string | null;
-  price: number;
-  price_options: { label: string; price: number; note?: string }[] | null;
-  currency: string;
-  event_date: string | null;
-  end_date: string | null;
-  event_time_note: string | null;
-  duration_note: string | null;
-  recurring: boolean;
-  recurring_note: string | null;
-  image_url: string | null;
-  gallery_urls: string[] | null;
-  max_participants: number | null;
-  is_featured: boolean;
-  is_klemens: boolean;
-  detail_slug: string | null;
-};
-
 async function getMarketplaceEvent(slug: string): Promise<MarketplaceEvent | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("marketplace_events")
-    .select("*")
+    .select("*, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
     .eq("slug", slug)
     .eq("status", "active")
     .maybeSingle();
@@ -214,7 +182,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
         />
-        <Navbar />
+        <Navbar solid />
         <MarketplaceDetailClient event={event} />
         <Footer />
       </>
