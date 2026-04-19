@@ -151,7 +151,7 @@ export default function AtolyelerClient() {
       const supabase = createClient();
       let query = supabase
         .from("marketplace_events")
-        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url, host_id, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url, host_id, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
         .eq("status", "active");
 
       if (city) query = query.eq("city", city);
@@ -202,6 +202,22 @@ export default function AtolyelerClient() {
           Online ve yüz yüze atölyeleri keşfet, hemen kaydol.
         </p>
       </section>
+
+      {/* ═══ Platform bilgi şeridi ═══ */}
+      <div
+        style={{ background: B.cream }}
+        className="max-w-7xl mx-auto px-6 pb-4"
+      >
+        <div className="bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 flex gap-3 items-start">
+          <span className="text-warm-900/30 text-base flex-shrink-0 mt-0.5">&#9432;</span>
+          <p className="text-[11px] sm:text-xs text-warm-900/40 leading-relaxed">
+            Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
+            Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
+            tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
+            düzenleyicisinin sorumluluğundadır.
+          </p>
+        </div>
+      </div>
 
       {/* ═══ Dual-pane layout — iki bağımsız scroll paneli ═══ */}
       <div

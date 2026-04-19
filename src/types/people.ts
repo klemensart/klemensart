@@ -21,5 +21,5 @@ export type Person = {
 /** Supabase join sorgularında dönen minimal kişi bilgisi */
 export type PersonSummary = Pick<
   Person,
-  "id" | "slug" | "name" | "avatar_url" | "short_bio" | "instagram"
+  "id" | "slug" | "name" | "avatar_url" | "short_bio" | "instagram" | "expertise"
 >;

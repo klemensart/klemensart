@@ -48,7 +48,7 @@ async function getMarketplaceEvent(slug: string): Promise<MarketplaceEvent | nul
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("marketplace_events")
-    .select("*, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+    .select("*, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
     .eq("slug", slug)
     .eq("status", "active")
     .maybeSingle();

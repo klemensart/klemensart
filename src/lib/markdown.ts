@@ -293,7 +293,7 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
   const [articleRes, otherArticlesRes] = await Promise.all([
     supabase
       .from("articles")
-      .select("*, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+      .select("*, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
       .eq("slug", slug)
       .eq("status", "published")
       .maybeSingle(),
@@ -365,7 +365,7 @@ export async function getRelatedArticles(
   // Önce aynı kategoriden makaleleri dene
   const { data: sameCat } = await supabase
     .from("articles")
-    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
     .eq("status", "published")
     .eq("category", category)
     .neq("slug", currentSlug)
@@ -379,7 +379,7 @@ export async function getRelatedArticles(
     const existingSlugs = [currentSlug, ...rows.map((r) => r.slug)];
     const { data: others } = await supabase
       .from("articles")
-      .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+      .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
       .eq("status", "published")
       .not("slug", "in", `(${existingSlugs.join(",")})`)
       .order("date", { ascending: false })
@@ -412,7 +412,7 @@ export async function getAllArticlesMetadata(): Promise<ArticleMeta[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("articles")
-    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram)")
+    .select("slug, title, description, author, author_ig, author_email, date, category, tags, image, content, author_id, author_person:people!articles_author_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
     .eq("status", "published")
     .order("date", { ascending: false });
 

@@ -1,19 +1,23 @@
 import { InstagramIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from "@/lib/icons";
 
 const kesfetLinks = [
-  { label: "Atölyeler",        href: "/atolyeler" },
-  { label: "Testler ve Oyunlar", href: "#"        },
-  { label: "Kültür Haritası",  href: "/harita"    },
-  { label: "E-bülten",         href: "/bulten"    },
-  { label: "İçerikler",        href: "#"          },
-  { label: "Etkinlikler",      href: "/etkinlikler" },
+  { label: "Atölyeler",          href: "/atolyeler" },
+  { label: "Eğitmenler",         href: "/egitmenler" },
+  { label: "Yazarlar",           href: "/yazarlar" },
+  { label: "Testler ve Oyunlar", href: "#" },
+  { label: "Kültür Haritası",    href: "/harita" },
+  { label: "E-bülten",           href: "/bulten" },
+  { label: "İçerikler",          href: "#" },
+  { label: "Etkinlikler",        href: "/etkinlikler" },
 ];
 const kurumLinks = [
-  { label: "Hakkımızda", href: "/hakkimizda" },
-  { label: "SSS", href: "/sss" },
-  { label: "İletişim", href: "mailto:info@klemensart.com" },
-  { label: "Gizlilik Politikası", href: "/kvkk" },
-  { label: "İade ve İptal", href: "/iade-ve-iptal" },
+  { label: "Hakkımızda",              href: "/hakkimizda" },
+  { label: "SSS",                     href: "/sss" },
+  { label: "İletişim",                href: "mailto:info@klemensart.com" },
+  { label: "Gizlilik Politikası",     href: "/kvkk" },
+  { label: "İade ve İptal",           href: "/iade-ve-iptal" },
+  { label: "Düzenleyici Koşulları",   href: "/duzenleyici-kosullari" },
+  { label: "KVKK (Düzenleyici)",      href: "/kvkk-duzenleyici" },
 ];
 
 const socials = [
@@ -74,6 +78,28 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        {/* Company info block */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 border-t border-white/10 mb-8">
+          <div>
+            <p className="text-white/30 text-xs leading-relaxed">
+              Klemens Art Prodüksiyon Limited Şirketi
+              <br />
+              Tınaztepe Mah. Başçavuş Sk. No: 55 İç Kapı No: 6
+              <br />
+              Çankaya / Ankara
+              <br />
+              MERSİS: 0564137179400001 · Vergi No: 5641371794
+            </p>
+          </div>
+          <div>
+            <p className="text-white/20 text-xs leading-relaxed">
+              Klemens, kültür ve sanat alanındaki atölyeleri ve etkinlikleri
+              listeleyen bir platformdur. Bağımsız düzenleyiciler tarafından
+              sunulan içerikler için sorumluluk ilgili düzenleyiciye aittir.
+            </p>
           </div>
         </div>
 

@@ -32,6 +32,7 @@ export type MarketplaceEvent = {
   is_featured: boolean;
   is_klemens: boolean;
   detail_slug: string | null;
+  tier?: "klemens" | "kulup" | "network";
   /* FK — people tablosuna */
   host_id?: string | null;
   host?: PersonSummary | null;
