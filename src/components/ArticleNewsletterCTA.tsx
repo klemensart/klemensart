@@ -40,7 +40,7 @@ export default function ArticleNewsletterCTA({ darkMode }: { darkMode: boolean }
     return (
       <div
         className={`mx-auto px-6 mb-16 ${darkMode ? "" : ""}`}
-        style={{ maxWidth: "680px" }}
+        style={{ maxWidth: "640px" }}
       >
         <div
           className={`rounded-2xl p-8 text-center border ${
@@ -61,7 +61,7 @@ export default function ArticleNewsletterCTA({ darkMode }: { darkMode: boolean }
   }
 
   return (
-    <div className="mx-auto px-6 mb-16" style={{ maxWidth: "680px" }}>
+    <div className="mx-auto px-6 mb-16" style={{ maxWidth: "640px" }}>
       <div
         className={`rounded-2xl p-8 border ${
           darkMode

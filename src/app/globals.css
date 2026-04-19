@@ -81,12 +81,32 @@ html {
 
 /* ── Article prose styles ── */
 .prose-klemens {
-  font-size: 18px;
-  line-height: 1.82;
+  font-size: 19px;
+  line-height: 1.75;
   color: inherit;
 }
+@media (max-width: 768px) {
+  .prose-klemens {
+    font-size: 18px;
+  }
+}
 .prose-klemens p {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.1em;
+}
+/* ── Drop cap: ilk paragrafın ilk harfi ── */
+.prose-klemens > p:first-child::first-letter {
+  float: left;
+  font-size: 4.5em;
+  line-height: 0.9;
+  font-weight: 700;
+  margin-right: 0.1em;
+  margin-top: 0.05em;
+  color: var(--brand-dark, #2C2319);
+}
+@media (max-width: 768px) {
+  .prose-klemens > p:first-child::first-letter {
+    font-size: 3.5em;
+  }
 }
 .prose-klemens h2 {
   font-size: 1.75rem;
@@ -334,6 +354,37 @@ html {
 }
 .prose-klemens figcaption strong {
   font-weight: 400;
+}
+
+/* ── GFM Footnotes ── */
+.prose-klemens .footnotes {
+  border-top: 1px solid #e8e0d8;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #78716c;
+  line-height: 1.65;
+}
+.prose-klemens .footnotes ol {
+  padding-left: 1.25rem;
+}
+.prose-klemens .footnotes li {
+  margin-bottom: 0.5rem;
+}
+.prose-klemens .footnotes li p {
+  margin-bottom: 0.25rem;
+  display: inline;
+}
+.prose-klemens sup a[href^="#fn"] {
+  color: #FF6D60;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.75em;
+}
+.prose-klemens a[href^="#fnref"] {
+  text-decoration: none;
+  color: #FF6D60;
+  margin-left: 0.25em;
 }
 
 /* YouTube embed */

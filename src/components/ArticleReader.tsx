@@ -59,7 +59,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Article header */}
         <header
           className="mx-auto px-6 mb-12"
-          style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           {/* Category badge */}
           <div className="mb-6">
@@ -143,7 +143,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Article body */}
         <article
           className="mx-auto px-6 mb-16"
-          style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           {/* Spot / Lead paragraph */}
           {meta.description && (
@@ -182,7 +182,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Tags */}
         <div
           className="mx-auto px-6 mb-10"
-          style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           <div className={`h-px mb-8 ${darkMode ? "bg-[#f5f0eb]/10" : "bg-warm-200"}`} />
           <div className="flex flex-wrap gap-2">
@@ -204,7 +204,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Like & Share */}
         <div
           className="mx-auto px-6 mb-16"
-          style={{ maxWidth: readingMode ? "600px" : "680px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           <div className="flex items-center justify-between mb-4">
             <p className={`text-xs font-semibold tracking-widest uppercase ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
