@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
     image,
     content: body.content ?? "",
     status: body.status ?? "draft",
+    hero_overlay_enabled: body.hero_overlay_enabled ?? false,
   };
 
   const { data, error } = await admin

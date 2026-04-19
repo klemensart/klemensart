@@ -47,6 +47,7 @@ type Form = {
   content: string;
   status: string;
   date: string;
+  hero_overlay_enabled: boolean;
 };
 
 const EMPTY: Form = {
@@ -62,6 +63,7 @@ const EMPTY: Form = {
   content: "",
   status: "draft",
   date: new Date().toISOString().slice(0, 10),
+  hero_overlay_enabled: false,
 };
 
 /* ── Upload helper ── */
@@ -143,6 +145,7 @@ export default function AdminArticleEditPage() {
           content: article.content ?? "",
           status: article.status ?? "draft",
           date: article.date ? article.date.slice(0, 10) : "",
+          hero_overlay_enabled: article.hero_overlay_enabled ?? false,
         });
         setSlugManual(true);
       } finally {
@@ -260,6 +263,7 @@ export default function AdminArticleEditPage() {
         content: form.content,
         status: status ?? form.status,
         date: form.date,
+        hero_overlay_enabled: form.hero_overlay_enabled,
       };
 
       let res: Response;
@@ -591,6 +595,31 @@ export default function AdminArticleEditPage() {
           >
             {form.status === "published" ? "Yayında" : "Taslak"}
           </button>
+        </div>
+
+        {/* Hero overlay toggle */}
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-warm-900/50">Cover image overlay başlık (Aeon stili):</span>
+            <button
+              onClick={() =>
+                setForm((prev) => ({
+                  ...prev,
+                  hero_overlay_enabled: !prev.hero_overlay_enabled,
+                }))
+              }
+              className={`text-xs font-medium px-3 py-1.5 rounded-full transition ${
+                form.hero_overlay_enabled
+                  ? "bg-coral/10 text-coral"
+                  : "bg-warm-100 text-warm-900/40"
+              }`}
+            >
+              {form.hero_overlay_enabled ? "Açık" : "Kapalı"}
+            </button>
+          </div>
+          <p className="text-[11px] text-warm-900/30 mt-1 max-w-lg leading-relaxed">
+            Açıkken: başlık ve açıklama görselin üzerinde, sinematik görünüm. Tabloları rahatsız edebilir, sadece atmosferik görsellerde önerilir. Kapalıyken: başlık görselin altında, sade akış.
+          </p>
         </div>
 
         {/* Actions */}

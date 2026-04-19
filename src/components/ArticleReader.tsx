@@ -56,7 +56,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
 
       <main className={readingMode ? "pt-16" : "pt-28"} style={{ transition: "padding-top 0.35s ease" }}>
 
-        {/* Cover image — full-bleed */}
+        {/* Cover image — full-bleed (overlay veya hibrit) */}
         {meta.image && !readingMode && (
           <>
             <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
@@ -72,6 +72,32 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
                   : { unoptimized: true }
                 )}
               />
+
+              {/* Aeon stili overlay — sadece toggle açıkken */}
+              {meta.hero_overlay_enabled && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 px-6 pb-8 md:pb-16">
+                    <div className="max-w-[1100px] mx-auto">
+                      {meta.category && (
+                        <div className="mb-4">
+                          <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] md:text-xs font-medium">
+                            {meta.category}
+                          </span>
+                        </div>
+                      )}
+                      <h1 className="text-white font-bold text-3xl md:text-5xl lg:text-6xl leading-tight mb-4 max-w-4xl">
+                        {meta.title}
+                      </h1>
+                      {meta.description && (
+                        <p className="text-white/90 text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl">
+                          {meta.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             {meta.cover_caption && (
               <div
@@ -106,23 +132,27 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
           className="mx-auto px-6 mb-12"
           style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
-          {/* Category badge */}
-          <div className="mb-6">
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-coral/10 text-coral">
-              {meta.category}
-            </span>
-          </div>
+          {/* Category badge — overlay açıkken zaten görselde gösteriliyor */}
+          {!meta.hero_overlay_enabled && (
+            <div className="mb-6">
+              <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-coral/10 text-coral">
+                {meta.category}
+              </span>
+            </div>
+          )}
 
-          {/* Title */}
-          <h1
-            className={`font-bold leading-tight mb-8 ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}
-            style={{
-              fontSize: "clamp(1.9rem, 4vw, 2.75rem)",
-              lineHeight: 1.2,
-            }}
-          >
-            {meta.title}
-          </h1>
+          {/* Title — overlay açıkken zaten görselde gösteriliyor */}
+          {!meta.hero_overlay_enabled && (
+            <h1
+              className={`font-bold leading-tight mb-8 ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}
+              style={{
+                fontSize: "clamp(1.9rem, 4vw, 2.75rem)",
+                lineHeight: 1.2,
+              }}
+            >
+              {meta.title}
+            </h1>
+          )}
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -191,8 +221,8 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
           className="mx-auto px-6 mb-16"
           style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
-          {/* Spot / Lead paragraph */}
-          {meta.description && (
+          {/* Spot / Lead paragraph — overlay açıkken description zaten görselde gösteriliyor */}
+          {meta.description && !meta.hero_overlay_enabled && (
             <p
               className={`spot-quote mb-8 ${darkMode ? "text-[#f5f0eb]/90" : "text-warm-900/90"}`}
               style={{

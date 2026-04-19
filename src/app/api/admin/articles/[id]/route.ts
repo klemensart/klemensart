@@ -62,6 +62,7 @@ export async function PUT(
     image: body.image ?? "",
     content: body.content ?? "",
     status: body.status ?? "draft",
+    hero_overlay_enabled: body.hero_overlay_enabled ?? false,
   };
 
   const { error } = await admin

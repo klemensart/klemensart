@@ -12,6 +12,7 @@ export type ArticleMeta = {
   tags: string[];
   image: string;
   cover_caption?: string | null;
+  hero_overlay_enabled?: boolean;
   readTime: string;
   slug: string;
   /* FK — people tablosuna */
