@@ -9,6 +9,7 @@ import { SLUG_TO_ATOLYE, type AtolyeConfig } from "@/lib/atolyeler-config";
 import WorkshopViewTracker from "@/components/WorkshopViewTracker";
 import { createAdminClient } from "@/lib/supabase-admin";
 import MarketplaceDetailClient from "./MarketplaceDetailClient";
+import StickyWorkshopBar from "./StickyWorkshopBar";
 
 const B = {
   coral: "#FF6D60",
@@ -271,6 +272,10 @@ export default async function AtolyeDetayPage({ params }: Props) {
     page = <LeonardoDaVinciPage config={config} status={status} nextSessionDate={nextSessionDate} slug={slug} />;
   else return <YakindaPage baslik="Bilinmeyen Atölye" />;
 
+  const priceLabel = config.price > 0
+    ? (config.price / 100).toLocaleString("tr-TR", { minimumFractionDigits: 0 }) + " TL"
+    : "Ücretsiz";
+
   return (
     <>
       <script
@@ -279,6 +284,11 @@ export default async function AtolyeDetayPage({ params }: Props) {
       />
       <WorkshopViewTracker workshopId={config.id} workshopSlug={slug} />
       {page}
+      <StickyWorkshopBar
+        title={courseTitles[slug] ?? slug}
+        priceLabel={priceLabel}
+        forSale={config.forSale}
+      />
     </>
   );
 }
