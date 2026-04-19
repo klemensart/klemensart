@@ -1,5 +1,6 @@
 import { remark } from "remark";
 import html from "remark-html";
+import remarkGfm from "remark-gfm";
 import { createAdminClient } from "./supabase-admin";
 
 export type { ArticleMeta, ParsedArticle } from "@/types/article";
@@ -263,12 +264,12 @@ export async function markdownToHtml(content: string): Promise<string> {
   const mdWithDurak = extractDurakBlocks(withOneriTokens);
 
   // 2. Run remark on pre-processed content
-  const processed = await remark().use(html, { sanitize: false }).process(mdWithDurak);
+  const processed = await remark().use(remarkGfm).use(html, { sanitize: false }).process(mdWithDurak);
   let contentHtml = processed.toString();
 
   // 3. Inject oneri blocks (process their inner markdown separately)
   for (const [token, innerMd] of oneriBlocks) {
-    const innerProcessed = await remark().use(html, { sanitize: false }).process(innerMd);
+    const innerProcessed = await remark().use(remarkGfm).use(html, { sanitize: false }).process(innerMd);
     const innerHtml = innerProcessed
       .toString()
       .replace(/<a href=/g, '<a target="_blank" rel="noopener noreferrer" href=');
