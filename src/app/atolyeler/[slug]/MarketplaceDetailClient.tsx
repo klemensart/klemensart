@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { MarketplaceEvent } from "@/types/marketplace";
 import HostCard from "./components/HostCard";
 import DisclaimerNote from "./components/DisclaimerNote";
@@ -37,6 +38,12 @@ function fmtFullDate(iso: string) {
 
 function fmtPrice(price: number) {
   return new Intl.NumberFormat("tr-TR").format(price);
+}
+
+function getInitials(name: string) {
+  const words = name.split(/\s+/);
+  if (words.length === 1) return words[0][0].toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
 }
 
 /* ─── Icons ──────────────────────────────────────── */
@@ -373,6 +380,37 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
                   )}
                 </div>
 
+                {/* Düzenleyen satırı */}
+                {isKlemens ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-warm-100 flex items-center justify-center shrink-0">
+                      <span className="text-brand-warm font-bold text-xs">K</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-brand-warm">Düzenleyen</div>
+                      <div className="text-sm font-medium text-warm-900">Klemens</div>
+                    </div>
+                  </div>
+                ) : host && (
+                  <Link
+                    href={`/egitmenler/${host.slug}`}
+                    className="flex items-center gap-3 -mx-2 px-2 py-2 rounded-lg hover:bg-warm-100 transition group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-warm-100 flex items-center justify-center shrink-0 overflow-hidden">
+                      {host.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={host.avatar_url} alt={host.name} className="w-full h-full object-cover rounded-lg" />
+                      ) : (
+                        <span className="text-brand-warm font-bold text-xs">{getInitials(host.name)}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-brand-warm">Düzenleyen</div>
+                      <div className="text-sm font-medium text-warm-900 truncate group-hover:text-coral transition">{host.name}</div>
+                    </div>
+                  </Link>
+                )}
+
                 {/* Ayraç */}
                 <div className="border-t border-warm-200" />
 
@@ -415,7 +453,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
         {/* ═══ İÇERİK — 2 kolon ═══ */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
 
             {/* Sol — açıklama + galeri */}
             <div className="lg:col-span-2">
