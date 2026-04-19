@@ -10,19 +10,19 @@ function getFaqItems(hostName: string, isKlemens: boolean) {
       q: "Ödeme nasıl yapılır?",
       a: isKlemens
         ? "Ödeme Klemens üzerinden güvenli olarak alınır."
-        : "Ödeme doğrudan düzenleyiciye yapılır. Klemens ödeme sürecine taraf değildir.",
+        : "Ödeme doğrudan düzenleyiciye yapılır. Klemens ödeme sürecine taraf değildir. Ödeme yöntemleri için düzenleyiciyle iletişime geçin.",
     },
     {
       q: "İptal ve iade koşulları nelerdir?",
       a: isKlemens
         ? "Atölye başlamadan 48 saat öncesine kadar tam iade alabilirsiniz."
-        : "İptal ve iade koşulları her düzenleyici tarafından ayrı belirlenir. Lütfen kayıt olmadan önce düzenleyiciyle iletişime geçin.",
+        : "İptal ve iade koşulları her düzenleyici tarafından ayrı ayrı belirlenir. Kayıt olmadan önce düzenleyicinin iade politikasını öğrenin.",
     },
     {
       q: "Atölye iptal edilirse ne olur?",
       a: isKlemens
         ? "Klemens tarafından iptal edilen atölyeler için tam iade yapılır veya başka bir tarihe transfer edilir."
-        : "Atölyenin gerçekleşmemesi durumunda iade ve mağduriyet giderme yükümlülüğü düzenleyiciye aittir.",
+        : "Atölyenin gerçekleşmemesi durumunda iade ve mağduriyet giderme yükümlülüğü düzenleyiciye aittir. Klemens, bu durumda iletişimi kolaylaştırmaya çalışır.",
     },
     {
       q: "Bir sorun yaşarsam ne yapabilirim?",
@@ -49,8 +49,8 @@ export default function AtolyeFAQ({
       </h3>
       <div className="space-y-0">
         {items.map((item, i) => (
-          <details key={i} className="group">
-            <summary className="cursor-pointer font-medium text-sm text-warm-900 py-3 flex justify-between items-center gap-2 border-t border-warm-200 first:border-t-0 group-first:border-t-0">
+          <details key={i} className="group border-b border-warm-200 last:border-0">
+            <summary className="list-none cursor-pointer font-medium text-sm text-warm-900 py-3 flex justify-between items-center gap-2">
               <span>{item.q}</span>
               <span className="text-brand-warm text-xs flex-shrink-0 group-open:rotate-180 transition-transform">
                 ▾

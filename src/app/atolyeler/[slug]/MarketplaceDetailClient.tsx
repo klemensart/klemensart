@@ -5,6 +5,7 @@ import type { MarketplaceEvent } from "@/types/marketplace";
 import HostCard from "./components/HostCard";
 import DisclaimerNote from "./components/DisclaimerNote";
 import AtolyeFAQ from "./components/AtolyeFAQ";
+import MobileStickyBar from "./components/MobileStickyBar";
 
 /* ─── Constants ──────────────────────────────────── */
 
@@ -259,7 +260,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
     <>
       <main className="bg-cream min-h-screen">
         {/* ═══ Breadcrumb — desktop only ═══ */}
-        <div className="hidden lg:block max-w-6xl mx-auto px-6 pt-20 pb-2">
+        <div className="hidden md:block max-w-7xl mx-auto px-6 pt-20 pb-2">
           <nav className="flex items-center gap-1.5 text-xs text-brand-warm">
             <a href="/atolyeler" className="hover:text-coral transition-colors">Atölyeler</a>
             <span>/</span>
@@ -270,7 +271,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         </div>
 
         {/* Mobile back button */}
-        <div className="lg:hidden pt-20 px-6 pb-2">
+        <div className="md:hidden pt-20 px-6 pb-2">
           <a href="/atolyeler" className="inline-flex items-center gap-1.5 text-sm text-brand-warm hover:text-coral transition-colors">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -280,7 +281,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         </div>
 
         {/* ═══ HERO — 2 kolon ═══ */}
-        <section className="max-w-6xl mx-auto px-6 pt-4 pb-8">
+        <section className="max-w-7xl mx-auto px-6 pt-4 pb-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
 
             {/* Sol — görsel */}
@@ -413,7 +414,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         </section>
 
         {/* ═══ İÇERİK — 2 kolon ═══ */}
-        <section className="max-w-6xl mx-auto px-6 pb-20">
+        <section className="max-w-7xl mx-auto px-6 pb-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
             {/* Sol — açıklama + galeri */}
@@ -421,11 +422,10 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
               {event.description && (
                 <>
                   <h2 className="text-xl font-bold text-warm-900 mb-4">Atölye Hakkında</h2>
-                  <div className="prose prose-sm max-w-none mb-8">
-                    <p className="text-base leading-relaxed text-warm-900/70 whitespace-pre-line">
-                      {event.description}
-                    </p>
-                  </div>
+                  <div
+                    className="prose prose-sm max-w-none mb-8 text-warm-900/70 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: event.description }}
+                  />
                 </>
               )}
 
@@ -457,21 +457,8 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         </section>
       </main>
 
-      {/* ═══ Mobile Sticky CTA Bar — md:hidden ═══ */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-        <div className="bg-white border-t border-warm-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <span className="text-lg font-bold text-warm-900">{priceLabel}</span>
-            </div>
-            <div className="flex-shrink-0">
-              <CTAButton event={event} />
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Mobile bar spacer */}
-      <div className="lg:hidden h-16" />
+      {/* ═══ Mobile Sticky CTA Bar ═══ */}
+      <MobileStickyBar event={event} priceLabel={priceLabel} />
 
       {/* ═══ Contact Modal ═══ */}
       <ContactModal
