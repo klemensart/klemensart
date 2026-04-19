@@ -341,7 +341,7 @@ export default function AtolyelerClient() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[3/4]" />
+                <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[16/9]" />
               ))}
             </div>
           ) : sorted.length === 0 ? (
@@ -472,7 +472,7 @@ export default function AtolyelerClient() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[3/4]" />
+                <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[16/9]" />
               ))}
             </div>
           ) : sorted.length === 0 ? (
