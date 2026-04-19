@@ -17,6 +17,7 @@ type Props = {
   organizer_name?: string;
   organizer_logo_url?: string | null;
   instructor_name?: string | null;
+  host_slug?: string | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -40,7 +41,7 @@ function formatPrice(price: number): string {
 }
 
 export default function PazaryeriCard({
-  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url, instructor_name,
+  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url, instructor_name, host_slug,
 }: Props) {
   const linkHref = href ?? `/atolyeler/${slug}`;
   const isOnline = city === "Online";
@@ -110,12 +111,22 @@ export default function PazaryeriCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0">
               {(instructor_name || organizer_name) && (
-                <span className="text-xs font-medium text-white/80 truncate">
-                  {instructor_name ? `${instructor_name}` : organizer_name}
-                  {instructor_name && organizer_name && (
-                    <span className="text-white/50 font-normal"> · {organizer_name}</span>
-                  )}
-                </span>
+                host_slug && host_slug !== "klemens" ? (
+                  <a
+                    href={`/egitmenler/${host_slug}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-medium text-white/80 truncate hover:text-coral transition-colors"
+                  >
+                    {organizer_name}
+                  </a>
+                ) : (
+                  <span className="text-xs font-medium text-white/80 truncate">
+                    {instructor_name ? `${instructor_name}` : organizer_name}
+                    {instructor_name && organizer_name && (
+                      <span className="text-white/50 font-normal"> · {organizer_name}</span>
+                    )}
+                  </span>
+                )
               )}
               {(instructor_name || organizer_name) && (
                 <span className="text-white/30 text-xs">·</span>

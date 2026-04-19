@@ -62,4 +62,6 @@ export type MarketplaceEventCard = Pick<
   | "organizer_phone"
   | "organizer_email"
   | "organizer_url"
+  | "host_id"
+  | "host"
 >;

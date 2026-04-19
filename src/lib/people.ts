@@ -100,12 +100,15 @@ export async function getAllAuthorsWithStats() {
     .sort((a, b) => b.articleCount - a.articleCount || a.name.localeCompare(b.name, "tr"));
 }
 
+const EVENT_CARD_FIELDS =
+  "id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url";
+
 /** Bir kişinin gelecek atölyelerini getir */
 export async function getHostUpcomingEvents(personId: string) {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("marketplace_events")
-    .select("id, slug, title, category, city, event_date, image_url, price, detail_slug")
+    .select(EVENT_CARD_FIELDS)
     .eq("host_id", personId)
     .eq("status", "active")
     .gte("event_date", new Date().toISOString())
@@ -118,7 +121,7 @@ export async function getHostPastEvents(personId: string) {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("marketplace_events")
-    .select("id, slug, title, category, city, event_date, image_url, price, detail_slug")
+    .select(EVENT_CARD_FIELDS)
     .eq("host_id", personId)
     .eq("status", "active")
     .lt("event_date", new Date().toISOString())

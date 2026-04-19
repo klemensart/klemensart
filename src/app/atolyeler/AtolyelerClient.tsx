@@ -158,7 +158,12 @@ export default function AtolyelerClient() {
       if (category) query = query.eq("category", category);
 
       const { data } = await query;
-      setAllEvents((data as MarketplaceEvent[]) ?? []);
+      // Supabase FK join returns host as array — normalize to single object
+      const normalized = (data ?? []).map((row: Record<string, unknown>) => ({
+        ...row,
+        host: Array.isArray(row.host) ? row.host[0] ?? null : row.host ?? null,
+      }));
+      setAllEvents(normalized as MarketplaceEvent[]);
       setLoading(false);
     };
     fetchAll();
@@ -208,8 +213,8 @@ export default function AtolyelerClient() {
         style={{ background: B.cream }}
         className="max-w-7xl mx-auto px-6 pb-4"
       >
-        <div className="bg-warm-50 border border-warm-200 rounded-xl px-4 py-3 flex gap-3 items-start">
-          <span className="text-warm-900/30 text-base flex-shrink-0 mt-0.5">&#9432;</span>
+        <div className="bg-coral/5 border border-coral/10 rounded-xl px-4 py-3 flex gap-3 items-start">
+          <span className="text-coral/40 text-base flex-shrink-0 mt-0.5">&#9432;</span>
           <p className="text-[11px] sm:text-xs text-warm-900/40 leading-relaxed">
             Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
             Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
@@ -348,6 +353,7 @@ export default function AtolyelerClient() {
                     organizer_name={e.organizer_name}
                     organizer_logo_url={e.organizer_logo_url}
                     instructor_name={e.is_klemens ? "Kerem Hun" : null}
+                    host_slug={e.host?.slug ?? null}
                   />
                 </div>
               ))}
@@ -483,6 +489,7 @@ export default function AtolyelerClient() {
                     organizer_name={e.organizer_name}
                     organizer_logo_url={e.organizer_logo_url}
                     instructor_name={e.is_klemens ? "Kerem Hun" : null}
+                    host_slug={e.host?.slug ?? null}
                   />
                 </div>
               ))}
