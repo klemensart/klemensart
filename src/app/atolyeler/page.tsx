@@ -3,9 +3,9 @@ import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 import AtolyelerClient from "./AtolyelerClient";
 
 export const metadata: Metadata = {
-  title: "Atölyeler",
+  title: "Atölyeler — Sanat Tarihi, Workshop & Kurslar",
   description:
-    "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış. Sanat Tarihinde Duygular, Modern Sanat, Rönesans ve daha fazlası.",
+    "Online Zoom atölyeleri, şehirdeki sanat workshop'ları ve tekli oturumlar. Sanat tarihi, seramik, resim, fotoğraf ve daha fazlası — Ankara ve İstanbul.",
   keywords: [
     "sanat tarihi atölyesi",
     "online sanat eğitimi",
@@ -14,21 +14,26 @@ export const metadata: Metadata = {
     "modern sanat eğitimi",
     "sanat tarihi kursu",
     "sanat semineri",
-    "Caravaggio",
+    "sanat atölyesi",
+    "workshop İstanbul",
+    "workshop Ankara",
+    "seramik atölyesi",
+    "resim kursu",
+    "fotoğraf workshop",
   ],
   alternates: { canonical: "/atolyeler" },
   openGraph: {
-    title: "Sanat Tarihi Atölyeleri — Klemens",
+    title: "Sanat Atölyeleri & Workshop'lar — Klemens",
     description:
-      "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
+      "Online Zoom atölyeleri, şehirdeki sanat workshop'ları ve tekli oturumlar. Sanat tarihi, seramik, resim ve daha fazlası.",
     url: "https://klemensart.com/atolyeler",
     images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sanat Tarihi Atölyeleri — Klemens",
+    title: "Sanat Atölyeleri & Workshop'lar — Klemens",
     description:
-      "Canlı Zoom atölyeleri ve tekli oturumlar ile sanat tarihine derinlemesine dalış.",
+      "Online Zoom atölyeleri, şehirdeki sanat workshop'ları ve tekli oturumlar.",
     images: ["/logos/logo-wide-dark.PNG"],
   },
 };

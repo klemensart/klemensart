@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/icerikler`, lastModified: lastArticleDate, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/atolyeler`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/etkinlikler`, lastModified: lastEventDate, changeFrequency: "weekly", priority: 0.8 },
+    // /pazaryeri kaldırıldı — /atolyeler ile birleştirildi
     { url: `${BASE_URL}/harita`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/testler`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/hakkimizda`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
@@ -108,6 +109,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  // Marketplace event pages (artık /atolyeler/ altında)
+  const { data: marketplaceEvents } = await supabase
+    .from("marketplace_events")
+    .select("slug, updated_at, is_klemens")
+    .eq("status", "active")
+    .order("event_date", { ascending: false });
+
+  const workshopSlugs = new Set(Object.keys(SLUG_TO_ATOLYE));
+  const marketplacePages: MetadataRoute.Sitemap = (marketplaceEvents ?? [])
+    .filter((m) => !m.is_klemens && !workshopSlugs.has(m.slug))
+    .map((m) => ({
+      url: `${BASE_URL}/atolyeler/${m.slug}`,
+      lastModified: m.updated_at ? new Date(m.updated_at) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+
   // Kültür Haritası mekan sayfaları
   const seenSlugs = new Set<string>();
   const placePages: MetadataRoute.Sitemap = PLACES
@@ -146,6 +164,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...workshopPages,
     ...articlePages,
     ...eventPages,
+    ...marketplacePages,
     ...campaignPages,
     ...placePages,
     ...routePages,

@@ -73,7 +73,13 @@ const nextConfig: NextConfig = {
       { source: "/sergi/en-sessiz-zaman-v2", destination: "/sergi/en-sessiz-zaman", permanent: true },
 
       // ═══════════════════════════════════════════════════════
-      // 0c. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
+      // 0c. PAZARYERİ → ATÖLYELER BİRLEŞTİRİLDİ
+      // ═══════════════════════════════════════════════════════
+      { source: "/pazaryeri", destination: "/atolyeler", permanent: true },
+      { source: "/pazaryeri/:slug", destination: "/atolyeler/:slug", permanent: true },
+
+      // ═══════════════════════════════════════════════════════
+      // 0d. HABERLER SAYFASI KALDIRILDI — bülten arşivine yönlendir
       // ═══════════════════════════════════════════════════════
       { source: "/haberler", destination: "/bulten/arsiv", permanent: true },
       { source: "/haberler/:slug", destination: "/bulten/arsiv", permanent: true },

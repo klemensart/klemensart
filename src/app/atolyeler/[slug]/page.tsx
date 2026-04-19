@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,6 +8,7 @@ import CountdownTimer from "@/components/CountdownTimer";
 import { SLUG_TO_ATOLYE, type AtolyeConfig } from "@/lib/atolyeler-config";
 import WorkshopViewTracker from "@/components/WorkshopViewTracker";
 import { createAdminClient } from "@/lib/supabase-admin";
+import MarketplaceDetailClient from "./MarketplaceDetailClient";
 
 const B = {
   coral: "#FF6D60",
@@ -36,6 +38,53 @@ async function fetchNextSessionDate(workshopId: string): Promise<string | null> 
   } catch {
     return null;
   }
+}
+
+/* ─── Marketplace fallback ──────────────────────── */
+
+type MarketplaceEvent = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  short_description: string | null;
+  category: string;
+  city: string;
+  district: string | null;
+  venue_name: string | null;
+  venue_address: string | null;
+  organizer_name: string;
+  organizer_url: string | null;
+  organizer_phone: string | null;
+  organizer_email: string | null;
+  organizer_logo_url: string | null;
+  price: number;
+  price_options: { label: string; price: number; note?: string }[] | null;
+  currency: string;
+  event_date: string | null;
+  end_date: string | null;
+  event_time_note: string | null;
+  duration_note: string | null;
+  recurring: boolean;
+  recurring_note: string | null;
+  image_url: string | null;
+  gallery_urls: string[] | null;
+  max_participants: number | null;
+  is_featured: boolean;
+  is_klemens: boolean;
+  detail_slug: string | null;
+};
+
+async function getMarketplaceEvent(slug: string): Promise<MarketplaceEvent | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("marketplace_events")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "active")
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as MarketplaceEvent;
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -70,19 +119,44 @@ export async function generateMetadata({ params }: Props) {
       description: "Mona Lisa'dan Vitruvius Adamı'na, Son Akşam Yemeği'nden uçma makinelerine — Rönesans'ın en büyük dehası Leonardo da Vinci'nin evrenine tek oturumluk yolculuk.",
     },
   };
-  const m = meta[slug] ?? { title: "Atölye", description: "" };
+  const m = meta[slug];
   const cfg = SLUG_TO_ATOLYE[slug];
 
-  return {
-    title: m.title,
-    description: m.description,
-    alternates: { canonical: `/atolyeler/${slug}` },
-    openGraph: {
+  if (m) {
+    return {
       title: m.title,
       description: m.description,
-      ...(cfg?.imgCover && { images: [{ url: cfg.imgCover, width: 1200, height: 630 }] }),
+      alternates: { canonical: `/atolyeler/${slug}` },
+      openGraph: {
+        title: m.title,
+        description: m.description,
+        ...(cfg?.imgCover && { images: [{ url: cfg.imgCover, width: 1200, height: 630 }] }),
+      },
+    };
+  }
+
+  // Marketplace fallback metadata
+  const event = await getMarketplaceEvent(slug);
+  if (!event) return { title: "Atölye Bulunamadı" };
+
+  const desc = event.short_description ?? event.description?.slice(0, 160) ?? event.title;
+  return {
+    title: `${event.title} — Klemens Atölyeler`,
+    description: desc,
+    alternates: { canonical: `/atolyeler/${slug}` },
+    openGraph: {
+      title: event.title,
+      description: desc,
+      url: `https://klemensart.com/atolyeler/${slug}`,
+      ...(event.image_url && { images: [{ url: event.image_url, width: 1200, height: 630 }] }),
     },
-  };
+    twitter: {
+      card: "summary_large_image" as const,
+      title: event.title,
+      description: desc,
+      ...(event.image_url && { images: [event.image_url] }),
+    },
+  } satisfies Metadata;
 }
 
 export default async function AtolyeDetayPage({ params }: Props) {
@@ -92,7 +166,59 @@ export default async function AtolyeDetayPage({ params }: Props) {
   if (slug.startsWith("sinema-klubu")) redirect("/atolyeler/sinema-klubu");
 
   const config = SLUG_TO_ATOLYE[slug];
-  if (!config) notFound();
+
+  // Config'de yoksa → marketplace fallback
+  if (!config) {
+    const event = await getMarketplaceEvent(slug);
+    if (!event) notFound();
+    // Klemens event'i detail_slug ile eklenmiş olabilir — yönlendir
+    if (event.is_klemens && event.detail_slug && event.detail_slug !== slug) {
+      redirect(`/atolyeler/${event.detail_slug}`);
+    }
+    const eventJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: event.title,
+      description: event.description ?? event.short_description ?? event.title,
+      eventStatus: "https://schema.org/EventScheduled",
+      startDate: event.event_date ?? undefined,
+      endDate: event.end_date ?? event.event_date ?? undefined,
+      image: event.image_url || "https://klemensart.com/logos/logo-wide-dark.PNG",
+      location: {
+        "@type": "Place",
+        name: event.venue_name ?? event.city,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: event.venue_address ?? "",
+          addressLocality: event.city,
+          addressCountry: "TR",
+        },
+      },
+      organizer: {
+        "@type": "Organization",
+        name: event.organizer_name,
+        url: event.organizer_url ?? "https://klemensart.com",
+      },
+      offers: {
+        "@type": "Offer",
+        price: event.price,
+        priceCurrency: event.currency,
+        availability: "https://schema.org/InStock",
+        url: `https://klemensart.com/atolyeler/${event.slug}`,
+      },
+    };
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+        />
+        <Navbar />
+        <MarketplaceDetailClient event={event} />
+        <Footer />
+      </>
+    );
+  }
 
   // DB'den çek, yoksa config.targetDate'i kullan
   const nextSessionDate =
@@ -1814,3 +1940,4 @@ function YakindaPage({ baslik }: { baslik: string }) {
     </>
   );
 }
+
