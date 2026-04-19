@@ -12,6 +12,7 @@
   --color-brand-warm: #8C857E;
   --color-brand-light: #F5F0EB;
   --font-sans: var(--font-jakarta);
+  --font-newsreader: var(--font-newsreader);
 }
 
 html {

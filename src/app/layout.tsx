@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Playfair_Display, Newsreader } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import CookieConsent from "@/components/CookieConsent";
@@ -20,6 +20,14 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   style: ["italic"],
   weight: ["400"],
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-newsreader",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -131,7 +139,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://sgabkrzzzszfqrtgkord.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://sgabkrzzzszfqrtgkord.supabase.co" />
       </head>
-      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-white text-warm-900`}>
+      <body className={`${jakarta.variable} ${playfair.variable} ${newsreader.variable} font-sans antialiased bg-white text-warm-900`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
