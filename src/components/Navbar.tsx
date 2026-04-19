@@ -19,7 +19,7 @@ function getInitials(email: string) {
   return email.slice(0, 2).toUpperCase();
 }
 
-export default function Navbar({ dark = false }: { dark?: boolean }) {
+export default function Navbar({ dark = false, solid = false }: { dark?: boolean; solid?: boolean }) {
   const [scrolled,  setScrolled]  = useState(true);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -52,14 +52,15 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
   }, []);
 
   // When dark=true and not scrolled, use light text for dark hero backgrounds
-  const useDark = dark && !scrolled;
+  const isOpaque = solid || scrolled;
+  const useDark = dark && !isOpaque;
 
   return (
     <nav
       aria-label="Ana navigasyon"
       style={{ top: "var(--announcement-bar-h, 0px)" }}
       className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        isOpaque
           ? "bg-white/95 backdrop-blur-md shadow-sm shadow-warm-900/5"
           : "bg-transparent"
       }`}
