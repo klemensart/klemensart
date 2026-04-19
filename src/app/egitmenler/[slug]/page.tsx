@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PazaryeriCard from "@/app/atolyeler/components/PazaryeriCard";
 import { InstagramIcon } from "@/lib/icons";
 import {
   getPersonBySlug,
@@ -13,10 +13,38 @@ import {
 
 type Props = { params: Promise<{ slug: string }> };
 
+const CATEGORY_LABELS: Record<string, string> = {
+  resim: "Resim",
+  seramik: "Seramik",
+  fotograf: "Fotoğraf",
+  muzik: "Müzik",
+  heykel: "Heykel",
+  dijital: "Dijital Sanat",
+  yazarlik: "Yazarlık",
+  dans: "Dans",
+  tiyatro: "Tiyatro",
+  diger: "Diğer",
+  "sanat-tarihi": "Sanat Tarihi",
+  sinema: "Sinema",
+};
+
 function getInitials(name: string) {
   const words = name.split(/\s+/);
   if (words.length === 1) return words[0][0].toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatPrice(p: number) {
+  if (p === 0) return "Ücretsiz";
+  return p.toLocaleString("tr-TR") + " TL";
 }
 
 export async function generateStaticParams() {
@@ -55,160 +83,205 @@ export default async function EgitmenDetayPage({ params }: Props) {
     getHostPastEvents(person.id),
   ]);
 
+  const allEvents = [...upcoming, ...past];
+
   return (
     <>
       <Navbar solid />
 
       <main className="bg-cream min-h-screen">
-        {/* ── Compact hero ── */}
-        <section className="max-w-4xl mx-auto px-6 pt-28 pb-8">
-          <div className="flex items-center gap-5">
-            {/* 96px avatar */}
+        {/* ── Minimal hero ── */}
+        <section className="max-w-2xl mx-auto px-6 pt-28 pb-6">
+          <div className="flex items-center gap-4">
+            {/* 64px avatar — rounded-xl kare */}
             {person.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={person.avatar_url}
                 alt={person.name}
-                className="w-24 h-24 rounded-full object-cover flex-shrink-0"
+                className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-coral flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-3xl">
+              <div className="w-16 h-16 rounded-xl bg-warm-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-warm font-bold text-xl">
                   {getInitials(person.name)}
                 </span>
               </div>
             )}
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-warm-900 truncate">
-                  {person.name}
-                </h1>
-                {person.is_verified && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold bg-coral/10 text-coral rounded-full flex-shrink-0">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                    </svg>
-                    Onaylı
-                  </span>
-                )}
-              </div>
-
+              <h1 className="text-xl font-bold text-warm-900 truncate">
+                {person.name}
+              </h1>
               {person.short_bio && (
-                <p className="text-brand-warm text-sm leading-relaxed line-clamp-2">
+                <p className="text-sm text-warm-900/50 leading-relaxed line-clamp-2">
                   {person.short_bio}
                 </p>
               )}
-
-              {/* Social — sadece Instagram (compact) */}
               {person.instagram && (
                 <a
                   href={`https://instagram.com/${person.instagram.replace(/^@/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-2 text-xs text-warm-900/40 hover:text-coral transition-colors"
+                  className="inline-flex items-center gap-1 mt-1 text-xs text-warm-900/30 hover:text-coral transition-colors"
                 >
-                  <InstagramIcon size={13} />
+                  <InstagramIcon size={12} />
                   @{person.instagram.replace(/^@/, "")}
                 </a>
               )}
             </div>
           </div>
-
-          {/* Expertise chips — sadece dolu ise */}
-          {person.expertise && person.expertise.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-5">
-              {person.expertise.map((e) => (
-                <span
-                  key={e}
-                  className="px-2.5 py-0.5 text-[11px] font-medium bg-warm-100 text-warm-900/50 rounded-full"
-                >
-                  {e}
-                </span>
-              ))}
-            </div>
-          )}
         </section>
 
-        {/* ── Atölye kartları ── */}
-        <div className="max-w-4xl mx-auto px-6 pb-20 space-y-12">
-          {/* Yaklaşan */}
-          {upcoming.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold text-warm-900 mb-4">
-                Yaklaşan Atölyeler
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {upcoming.map((ev) => (
-                  <PazaryeriCard
-                    key={ev.id}
-                    slug={ev.slug}
-                    title={ev.title}
-                    category={ev.category}
-                    city={ev.city}
-                    district={ev.district}
-                    price={ev.price}
-                    image_url={ev.image_url}
-                    event_date={ev.event_date}
-                    is_featured={ev.is_featured}
-                    href={ev.detail_slug ? `/atolyeler/${ev.detail_slug}` : `/atolyeler/${ev.slug}`}
-                    badge={ev.is_klemens ? "Klemens" : undefined}
-                    duration_note={ev.duration_note}
-                    organizer_name={ev.organizer_name}
-                    organizer_logo_url={ev.organizer_logo_url}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+        {/* ── Ayraç ── */}
+        <div className="max-w-2xl mx-auto px-6">
+          <div className="border-t border-warm-200" />
+        </div>
 
-          {/* Geçmiş */}
-          {past.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold text-warm-900 mb-4">
-                Geçmiş Atölyeler
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {past.map((ev) => (
-                  <div key={ev.id} className="opacity-50 grayscale-[30%]">
-                    <PazaryeriCard
-                      slug={ev.slug}
-                      title={ev.title}
-                      category={ev.category}
-                      city={ev.city}
-                      district={ev.district}
-                      price={ev.price}
-                      image_url={ev.image_url}
-                      event_date={ev.event_date}
-                      is_featured={ev.is_featured}
-                      href={ev.detail_slug ? `/atolyeler/${ev.detail_slug}` : `/atolyeler/${ev.slug}`}
-                      duration_note={ev.duration_note}
-                      organizer_name={ev.organizer_name}
-                      organizer_logo_url={ev.organizer_logo_url}
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+        {/* ── Atölye arşivi ── */}
+        <section className="max-w-2xl mx-auto px-6 pt-8 pb-20">
+          <p className="text-xs text-warm-900/30 mb-6">
+            {allEvents.length} atölye
+          </p>
 
-          {/* Atölye yoksa */}
-          {upcoming.length === 0 && past.length === 0 && (
+          {allEvents.length === 0 ? (
             <p className="text-sm text-warm-900/40 text-center py-12">
               Henüz atölyesi yok.
             </p>
+          ) : (
+            <div className="space-y-0">
+              {/* Yaklaşan atölyeler */}
+              {upcoming.map((ev, i) => (
+                <Link
+                  key={ev.id}
+                  href={ev.detail_slug ? `/atolyeler/${ev.detail_slug}` : `/atolyeler/${ev.slug}`}
+                  className="group flex gap-4 py-5 hover:bg-warm-50/50 -mx-3 px-3 rounded-lg transition-colors"
+                  style={i > 0 ? { borderTop: "1px solid rgba(44,35,25,0.06)" } : undefined}
+                >
+                  {/* Atölye görseli */}
+                  {ev.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={ev.image_url}
+                      alt={ev.title}
+                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                      loading="lazy"
+                    />
+                  )}
+
+                  <div className="min-w-0 flex-1 flex flex-col justify-center">
+                    {/* Kategori + tarih */}
+                    <div className="flex items-center gap-2 mb-1">
+                      {ev.category && (
+                        <span className="text-[10px] font-semibold text-coral uppercase tracking-wide">
+                          {CATEGORY_LABELS[ev.category] ?? ev.category}
+                        </span>
+                      )}
+                      {ev.event_date && (
+                        <span className="text-[10px] text-warm-900/25">
+                          {formatDate(ev.event_date)}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Başlık */}
+                    <h3 className="text-sm font-semibold text-warm-900 line-clamp-2 group-hover:text-coral transition-colors leading-snug">
+                      {ev.title}
+                    </h3>
+
+                    {/* Konum + fiyat */}
+                    <p className="text-xs text-warm-900/35 mt-1">
+                      {ev.district ? `${ev.district}, ${ev.city}` : ev.city}
+                      {" · "}
+                      {formatPrice(ev.price)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+
+              {/* Geçmiş atölyeler */}
+              {past.length > 0 && (
+                <>
+                  {upcoming.length > 0 && (
+                    <div className="pt-6 pb-2">
+                      <div className="border-t border-warm-200" />
+                    </div>
+                  )}
+                  <h2 className="text-lg text-brand-warm font-medium mb-2">
+                    Geçmiş Atölyeler
+                  </h2>
+                  {past.map((ev, i) => (
+                    <Link
+                      key={ev.id}
+                      href={ev.detail_slug ? `/atolyeler/${ev.detail_slug}` : `/atolyeler/${ev.slug}`}
+                      className="group flex gap-4 py-5 opacity-60 hover:bg-warm-50/50 -mx-3 px-3 rounded-lg transition-colors"
+                      style={i > 0 ? { borderTop: "1px solid rgba(44,35,25,0.06)" } : undefined}
+                    >
+                      {ev.image_url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={ev.image_url}
+                          alt={ev.title}
+                          className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                          loading="lazy"
+                        />
+                      )}
+
+                      <div className="min-w-0 flex-1 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-1">
+                          {ev.category && (
+                            <span className="text-[10px] font-semibold text-coral uppercase tracking-wide">
+                              {CATEGORY_LABELS[ev.category] ?? ev.category}
+                            </span>
+                          )}
+                          {ev.event_date && (
+                            <span className="text-[10px] text-warm-900/25">
+                              {formatDate(ev.event_date)}
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="text-sm font-semibold text-warm-900 line-clamp-2 group-hover:text-coral transition-colors leading-snug">
+                          {ev.title}
+                        </h3>
+
+                        <p className="text-xs text-warm-900/35 mt-1">
+                          {ev.district ? `${ev.district}, ${ev.city}` : ev.city}
+                          {" · "}
+                          {formatPrice(ev.price)}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </>
+              )}
+            </div>
           )}
 
-          {/* Disclaimer */}
-          <section className="bg-coral/5 border border-coral/10 rounded-xl p-5">
-            <p className="text-xs text-warm-900/50 leading-relaxed">
-              {person.name}, Klemens platformunda bağımsız bir düzenleyicidir.
-              Atölyelerinin yürütülmesi, ödeme süreci ve iade koşulları
-              doğrudan düzenleyicinin sorumluluğundadır. Klemens, atölyeyi
-              listeleyen ve duyuran platformdur.
-            </p>
-          </section>
-        </div>
+          {/* Sorumluluk notu */}
+          <div className="mt-10">
+            <div className="max-w-2xl bg-coral/5 border border-coral/10 rounded-xl p-5">
+              <p className="text-xs text-warm-900/50 leading-relaxed">
+                {person.name}, Klemens platformunda bağımsız bir düzenleyicidir.
+                Atölyelerinin yürütülmesi, ödeme süreci ve iade koşulları
+                doğrudan düzenleyicinin sorumluluğundadır. Klemens, atölyeyi
+                listeleyen ve duyuran platformdur.
+              </p>
+            </div>
+          </div>
+
+          {/* Hakkında — en altta */}
+          {person.bio && (
+            <div className="mt-10 max-w-2xl">
+              <h2 className="text-lg text-brand-warm font-medium mb-3">
+                Hakkında
+              </h2>
+              <p className="text-sm text-warm-900/50 leading-relaxed whitespace-pre-line">
+                {person.bio}
+              </p>
+            </div>
+          )}
+        </section>
       </main>
 
       <Footer />
