@@ -153,6 +153,24 @@ export async function getPersonArticles(personId: string) {
   return data ?? [];
 }
 
+/** Bir yazarın belirli bir yazı dışındaki en yeni N yazısını getir */
+export async function getAuthorOtherArticles(
+  authorId: string,
+  excludeSlug: string,
+  limit: number = 3
+) {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("articles")
+    .select("slug, title, image, date, category")
+    .eq("author_id", authorId)
+    .eq("status", "published")
+    .neq("slug", excludeSlug)
+    .order("date", { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
 /** Bir kişinin düzenlediği atölyeleri getir */
 export async function getPersonHostings(personId: string) {
   const supabase = createAdminClient();

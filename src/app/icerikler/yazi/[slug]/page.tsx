@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles } from "@/lib/markdown";
+import { getAuthorOtherArticles } from "@/lib/people";
 import ArticleReader from "@/components/ArticleReader";
 
 export const revalidate = 60;
@@ -78,6 +79,10 @@ export default async function ArticlePage({
 
   const relatedArticles = await getRelatedArticles(slug, article.meta.category);
 
+  const authorOtherArticles = article.meta.author_id
+    ? await getAuthorOtherArticles(article.meta.author_id, slug, 3)
+    : [];
+
   const absImg = article.meta.image
     ? article.meta.image.startsWith("http") ? article.meta.image : `https://klemensart.com${article.meta.image}`
     : undefined;
@@ -121,7 +126,7 @@ export default async function ArticlePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <ArticleReader article={article} relatedArticles={relatedArticles} />
+      <ArticleReader article={article} relatedArticles={relatedArticles} authorOtherArticles={authorOtherArticles} />
     </>
   );
 }

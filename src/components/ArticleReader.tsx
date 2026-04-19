@@ -7,13 +7,16 @@ import Footer from "@/components/Footer";
 import ArticleLikeButton from "@/components/ArticleLikeButton";
 import ArticleNewsletterCTA from "@/components/ArticleNewsletterCTA";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
+import ArticleAuthorByline from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorByline";
+import ArticleAuthorCard from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorCard";
+import type { OtherArticle } from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorCard";
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function ArticleReader({ article, relatedArticles = [] }: { article: ParsedArticle; relatedArticles?: ArticleMeta[] }) {
+export default function ArticleReader({ article, relatedArticles = [], authorOtherArticles = [] }: { article: ParsedArticle; relatedArticles?: ArticleMeta[]; authorOtherArticles?: OtherArticle[] }) {
   const { meta, contentHtml } = article;
   const [darkMode, setDarkMode] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
@@ -78,45 +81,16 @@ export default function ArticleReader({ article, relatedArticles = [] }: { artic
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Author + date + time */}
-            <div className="flex items-center gap-4">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                style={{ background: "#FF6D60" }}
-              >
-                {meta.author.charAt(0)}
-              </div>
-              <div>
-                <p className={`text-sm font-semibold ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}>
-                  {meta.author}
-                </p>
-                {(meta.authorIg || meta.authorEmail) && (
-                  <p className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
-                    {meta.authorIg && (
-                      <a
-                        href={`https://instagram.com/${meta.authorIg.replace("@", "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
-                      >
-                        {meta.authorIg}
-                      </a>
-                    )}
-                    {meta.authorEmail && (
-                      <a
-                        href={`mailto:${meta.authorEmail}`}
-                        className={`text-xs font-normal transition-colors hover:text-coral ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/35"}`}
-                      >
-                        {meta.authorEmail}
-                      </a>
-                    )}
-                  </p>
-                )}
-                <p className={`text-xs mt-0.5 ${darkMode ? "text-[#f5f0eb]/40" : "text-warm-900/40"}`}>
-                  {formatDate(meta.date)} · {meta.readTime} okuma
-                </p>
-              </div>
-            </div>
+            {/* Author byline */}
+            <ArticleAuthorByline
+              authorPerson={meta.author_person}
+              authorName={meta.author}
+              authorIg={meta.authorIg}
+              authorEmail={meta.authorEmail}
+              date={meta.date}
+              readTime={meta.readTime}
+              darkMode={darkMode}
+            />
 
             {/* Mode buttons */}
             <div className="flex items-center gap-2">
@@ -195,6 +169,15 @@ export default function ArticleReader({ article, relatedArticles = [] }: { artic
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </article>
+
+        {/* Author Card */}
+        {meta.author_person && (
+          <ArticleAuthorCard
+            author={meta.author_person}
+            otherArticles={authorOtherArticles}
+            darkMode={darkMode}
+          />
+        )}
 
         {/* Tags */}
         <div
