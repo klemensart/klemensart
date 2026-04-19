@@ -144,6 +144,8 @@ export default async function AtolyeDetayPage({ params }: Props) {
     if (event.is_klemens && event.detail_slug && event.detail_slug !== slug) {
       redirect(`/atolyeler/${event.detail_slug}`);
     }
+    const host = Array.isArray(event.host) ? event.host[0] ?? null : event.host ?? null;
+    const isKlemens = host?.slug === "klemens" || event.is_klemens;
     const eventJsonLd = {
       "@context": "https://schema.org",
       "@type": "Event",
@@ -153,20 +155,26 @@ export default async function AtolyeDetayPage({ params }: Props) {
       startDate: event.event_date ?? undefined,
       endDate: event.end_date ?? event.event_date ?? undefined,
       image: event.image_url || "https://klemensart.com/logos/logo-wide-dark.PNG",
-      location: {
-        "@type": "Place",
-        name: event.venue_name ?? event.city,
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: event.venue_address ?? "",
-          addressLocality: event.city,
-          addressCountry: "TR",
-        },
-      },
+      location: event.city === "Online"
+        ? { "@type": "VirtualLocation", url: event.organizer_url ?? "https://klemensart.com" }
+        : {
+            "@type": "Place",
+            name: event.venue_name ?? event.city,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: event.venue_address ?? "",
+              addressLocality: event.city,
+              addressCountry: "TR",
+            },
+          },
       organizer: {
         "@type": "Organization",
-        name: event.organizer_name,
-        url: event.organizer_url ?? "https://klemensart.com",
+        name: host?.name ?? event.organizer_name,
+        url: isKlemens
+          ? "https://klemensart.com"
+          : host?.slug
+            ? `https://klemensart.com/egitmenler/${host.slug}`
+            : event.organizer_url ?? "https://klemensart.com",
       },
       offers: {
         "@type": "Offer",
