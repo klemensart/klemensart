@@ -59,7 +59,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Cover image — full-bleed (overlay veya hibrit) */}
         {meta.image && !readingMode && (
           <>
-            <div className="relative w-full h-[380px] sm:h-[60vh] md:h-[70vh] overflow-hidden">
+            <div className="relative w-full h-[260px] sm:h-[60vh] lg:h-[70vh] overflow-hidden">
               <Image
                 src={meta.image}
                 alt={meta.title}
@@ -112,9 +112,9 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
           </>
         )}
 
-        {/* Back link */}
+        {/* Back link — mobile'da gizli (navbar + browser back yeterli) */}
         {!readingMode && (
-          <div className={`max-w-2xl mx-auto px-6 ${meta.image ? "mt-8 mb-10" : "mb-10"}`}>
+          <div className={`hidden lg:block max-w-2xl mx-auto px-6 ${meta.image ? "mt-8 mb-10" : "mb-10"}`}>
             <Link
               href="/icerikler"
               className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${darkMode ? "text-[#f5f0eb]/40 hover:text-[#FF6D60]" : "text-warm-900/35 hover:text-coral"}`}
@@ -129,7 +129,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
 
         {/* Article header */}
         <header
-          className="mx-auto px-6 mb-12"
+          className={`mx-auto px-6 mb-12 ${meta.image ? "mt-6 lg:mt-0" : ""}`}
           style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           {/* Category badge — overlay açıkken lg:'de gizle (overlay içinde var) */}
