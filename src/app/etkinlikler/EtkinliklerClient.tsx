@@ -294,9 +294,9 @@ export default function EtkinliklerClient() {
   const [filter, setFilter] = useState<Filter>("Tümü");
   const [viewMode, setViewMode] = useState<"grid" | "table">(() => {
     if (typeof window !== "undefined") {
-      return new URLSearchParams(window.location.search).get("view") === "table" ? "table" : "grid";
+      return new URLSearchParams(window.location.search).get("view") === "grid" ? "grid" : "table";
     }
-    return "grid";
+    return "table";
   });
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
