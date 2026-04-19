@@ -230,7 +230,12 @@ export default function AjandaView({ events }: Props) {
                   <td
                     className={`hidden lg:table-cell py-3 px-3 border-b border-warm-100 transition-colors group-hover:bg-warm-50 ${past ? "opacity-50" : ""}`}
                   >
-                    <span className="text-warm-900/70">{e.organizer_name}</span>
+                    <div className="flex flex-col">
+                      <span className="text-warm-900/70">{e.organizer_name}</span>
+                      {e.is_klemens && (
+                        <span className="text-xs text-warm-900/40">Kerem Hun</span>
+                      )}
+                    </div>
                   </td>
 
                   <td

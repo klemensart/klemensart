@@ -136,7 +136,7 @@ function TekliKart({ v }: { v: SingleVideo }) {
 export default function AtolyelerClient() {
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "table">("table");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [gridCols, setGridCols] = useState<2 | 3>(2);
   const [allEvents, setAllEvents] = useState<MarketplaceEvent[]>([]);
   const [singles, setSingles] = useState<SingleVideo[]>([]);
@@ -384,6 +384,7 @@ export default function AtolyelerClient() {
                     duration_note={e.duration_note}
                     organizer_name={e.organizer_name}
                     organizer_logo_url={e.organizer_logo_url}
+                    instructor_name={e.is_klemens ? "Kerem Hun" : null}
                   />
                 </div>
               ))}
@@ -533,6 +534,7 @@ export default function AtolyelerClient() {
                     duration_note={e.duration_note}
                     organizer_name={e.organizer_name}
                     organizer_logo_url={e.organizer_logo_url}
+                    instructor_name={e.is_klemens ? "Kerem Hun" : null}
                   />
                 </div>
               ))}

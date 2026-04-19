@@ -16,6 +16,7 @@ type Props = {
   duration_note?: string | null;
   organizer_name?: string;
   organizer_logo_url?: string | null;
+  instructor_name?: string | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -39,7 +40,7 @@ function formatPrice(price: number): string {
 }
 
 export default function PazaryeriCard({
-  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url,
+  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url, instructor_name,
 }: Props) {
   const linkHref = href ?? `/atolyeler/${slug}`;
   const isOnline = city === "Online";
@@ -108,10 +109,15 @@ export default function PazaryeriCard({
           </h3>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0">
-              {organizer_name && (
-                <span className="text-xs font-medium text-white/80 truncate">{organizer_name}</span>
+              {(instructor_name || organizer_name) && (
+                <span className="text-xs font-medium text-white/80 truncate">
+                  {instructor_name ? `${instructor_name}` : organizer_name}
+                  {instructor_name && organizer_name && (
+                    <span className="text-white/50 font-normal"> · {organizer_name}</span>
+                  )}
+                </span>
               )}
-              {organizer_name && (
+              {(instructor_name || organizer_name) && (
                 <span className="text-white/30 text-xs">·</span>
               )}
               <p className="flex items-center gap-1 text-xs text-white/60 flex-shrink-0">
