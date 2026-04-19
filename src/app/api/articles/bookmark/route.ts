@@ -16,40 +16,27 @@ async function getAuthClient() {
   );
 }
 
-// GET: beğeni sayısı + kullanıcı beğenmiş mi
+// GET: kullanıcı bu yazıyı kaydetmiş mi
 export async function GET(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("slug");
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
 
+  const supabase = await getAuthClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ bookmarked: false });
+
   const admin = createAdminClient();
+  const { data } = await admin
+    .from("article_bookmarks")
+    .select("id")
+    .eq("article_slug", slug)
+    .eq("user_id", user.id)
+    .maybeSingle();
 
-  const { count } = await admin
-    .from("article_likes")
-    .select("*", { count: "exact", head: true })
-    .eq("article_slug", slug);
-
-  // Kullanıcı giriş yapmışsa kendi beğenisini kontrol et
-  let liked = false;
-  try {
-    const supabase = await getAuthClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await admin
-        .from("article_likes")
-        .select("id")
-        .eq("article_slug", slug)
-        .eq("user_id", user.id)
-        .maybeSingle();
-      liked = !!data;
-    }
-  } catch {
-    // Giriş yapmamış — sorun değil
-  }
-
-  return NextResponse.json({ count: count ?? 0, liked });
+  return NextResponse.json({ bookmarked: !!data });
 }
 
-// POST: toggle like
+// POST: toggle bookmark
 export async function POST(req: NextRequest) {
   const supabase = await getAuthClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -63,30 +50,21 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Mevcut beğeni var mı?
   const { data: existing } = await admin
-    .from("article_likes")
+    .from("article_bookmarks")
     .select("id")
     .eq("article_slug", slug)
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (existing) {
-    // Beğeniyi geri al
-    await admin.from("article_likes").delete().eq("id", existing.id);
+    await admin.from("article_bookmarks").delete().eq("id", existing.id);
   } else {
-    // Beğen
-    await admin.from("article_likes").insert({
+    await admin.from("article_bookmarks").insert({
       article_slug: slug,
       user_id: user.id,
     });
   }
 
-  // Güncel sayıyı döndür
-  const { count } = await admin
-    .from("article_likes")
-    .select("*", { count: "exact", head: true })
-    .eq("article_slug", slug);
-
-  return NextResponse.json({ liked: !existing, count: count ?? 0 });
+  return NextResponse.json({ bookmarked: !existing });
 }
