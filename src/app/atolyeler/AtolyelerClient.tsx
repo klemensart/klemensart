@@ -136,7 +136,7 @@ function TekliKart({ v }: { v: SingleVideo }) {
 export default function AtolyelerClient() {
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [gridCols, setGridCols] = useState<2 | 3>(2);
   const [allEvents, setAllEvents] = useState<MarketplaceEvent[]>([]);
   const [singles, setSingles] = useState<SingleVideo[]>([]);
