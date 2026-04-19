@@ -409,20 +409,7 @@ function DarkPriceSection({
 
 export default function MarketplaceDetailClient({ event }: { event: MarketplaceEvent }) {
   const [showContactModal, setShowContactModal] = useState(false);
-  const [stickyVisible, setStickyVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
-
-  // IntersectionObserver → hero'dan ayrılınca sticky bar görünür
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setStickyVisible(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const scrollToFiyatlar = useCallback(() => {
     document.getElementById("fiyatlar")?.scrollIntoView({ behavior: "smooth" });
@@ -433,9 +420,9 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
   return (
     <>
-      {/* ─── Hero ─────────────────────────────── */}
+      {/* ─── Hero (clean image — no overlay text) ─── */}
       <div ref={heroRef}>
-        <section className="relative w-full aspect-[16/9] max-h-[560px] overflow-hidden">
+        <section className="relative w-full aspect-[16/9] max-h-[520px] overflow-hidden" style={{ background: B.dark }}>
           {event.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -444,77 +431,90 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <div className="absolute inset-0" style={{ background: B.dark }} />
+            <div className="absolute inset-0 bg-gradient-to-br from-warm-200 to-warm-300" />
           )}
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           {/* Back link */}
           <a
             href="/atolyeler"
-            className="absolute top-20 left-6 z-10 inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+            className="absolute top-20 left-6 z-10 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm transition-colors bg-black/30 text-white/90 hover:bg-black/50 hover:text-white"
           >
             <ChevronLeftIcon className="w-4 h-4" />
             Tüm Atölyeler
           </a>
 
-          {/* Top-right badges */}
-          <div className="absolute top-20 right-6 z-10 flex items-center gap-2">
-            {event.event_date && <DateBadge date={event.event_date} size="lg" />}
+          {/* Top-right: category badge */}
+          <div className="absolute top-20 right-6 z-10">
             <span
               className="px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm"
-              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
+              style={{ background: "rgba(0,0,0,0.3)", color: "white" }}
             >
               {CATEGORY_LABELS[event.category] ?? event.category}
             </span>
           </div>
-
-          {/* Title overlay */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 p-6 md:p-10">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2">
-              {event.title}
-            </h1>
-            {event.short_description && (
-              <p className="text-base md:text-lg text-white/80 max-w-2xl">
-                {event.short_description}
-              </p>
-            )}
-          </div>
         </section>
       </div>
 
-      {/* ─── Info Strip ───────────────────────── */}
+      {/* ─── Info Section (below image) ─────── */}
       <section className="border-b" style={{ background: "white", borderColor: B.light }}>
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap gap-x-6 gap-y-3 text-sm" style={{ color: B.warm }}>
-          {event.event_date && (
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          {/* Title */}
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4" style={{ color: B.dark }}>
+            {event.title}
+          </h1>
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm" style={{ color: B.warm }}>
+            {/* Organizer with person icon */}
             <span className="flex items-center gap-2">
-              <CalendarIcon />
-              {fmtFullDate(event.event_date)}
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span className="font-medium" style={{ color: B.dark }}>{event.organizer_name}</span>
             </span>
-          )}
-          {event.duration_note && (
-            <span className="flex items-center gap-2">
-              <ClockIcon />
-              {event.duration_note}
-            </span>
-          )}
-          {event.venue_name ? (
-            <span className="flex items-center gap-2">
-              <MapPinIcon />
-              {event.venue_name}{event.district ? `, ${event.district}` : ""} · {event.city}
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <MapPinIcon />
-              Online · Zoom
-            </span>
-          )}
-          {event.max_participants && (
-            <span className="flex items-center gap-2">
-              <UsersIcon />
-              Maks. {event.max_participants} kişi
-            </span>
+
+            {event.event_date && (
+              <span className="flex items-center gap-2">
+                <CalendarIcon />
+                {fmtFullDate(event.event_date)}
+              </span>
+            )}
+
+            {event.duration_note && (
+              <span className="flex items-center gap-2">
+                <ClockIcon />
+                {event.duration_note}
+              </span>
+            )}
+
+            {event.venue_name ? (
+              <span className="flex items-center gap-2">
+                <MapPinIcon />
+                {event.venue_name}{event.district ? `, ${event.district}` : ""} · {event.city}
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <MapPinIcon />
+                Online · Zoom
+              </span>
+            )}
+
+            {event.max_participants && (
+              <span className="flex items-center gap-2">
+                <UsersIcon />
+                Maks. {event.max_participants} kişi
+              </span>
+            )}
+
+            {event.event_date && <DateBadge date={event.event_date} size="lg" />}
+          </div>
+
+          {/* Short description */}
+          {event.short_description && (
+            <p className="mt-4 text-base leading-relaxed max-w-3xl" style={{ color: B.warm }}>
+              {event.short_description}
+            </p>
           )}
         </div>
       </section>
@@ -569,7 +569,10 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
                   <img src={event.organizer_logo_url} alt={event.organizer_name} className="w-12 h-12 rounded-xl object-cover" />
                 ) : (
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${B.coral}15` }}>
-                    <span className="font-bold text-lg" style={{ color: B.coral }}>{event.organizer_name.charAt(0)}</span>
+                    <svg className="w-6 h-6" style={{ color: B.coral }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
                   </div>
                 )}
                 <div>

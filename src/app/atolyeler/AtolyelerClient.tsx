@@ -210,33 +210,21 @@ export default function AtolyelerClient() {
       <AnnouncementBar page="atolyeler" />
       <Navbar />
 
-      {/* ═══ Hero — normal sayfa akışında ═══ */}
-      <section style={{ background: B.cream }} className="max-w-7xl mx-auto px-6 pt-[72px] pb-10 text-center">
-        <p
-          style={{
-            color: B.coral,
-            fontWeight: 700,
-            fontSize: 11,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            marginBottom: 14,
-          }}
-        >
-          Klemens Atölyeler
-        </p>
+      {/* ═══ Hero ═══ */}
+      <section style={{ background: B.cream }} className="max-w-7xl mx-auto px-6 pt-[72px] pb-8 text-center">
         <h1
           style={{
-            fontSize: "clamp(28px, 5vw, 46px)",
+            fontSize: "clamp(32px, 5vw, 52px)",
             fontWeight: 800,
             color: B.dark,
-            margin: "0 0 16px",
-            lineHeight: 1.15,
+            margin: "0 0 12px",
+            lineHeight: 1.1,
           }}
         >
-          Sanatı Birlikte Keşfedelim
+          Atölyeler
         </h1>
-        <p style={{ color: B.warm, fontSize: 16, maxWidth: 560, margin: "0 auto", lineHeight: 1.75 }}>
-          Online Zoom atölyelerinden şehirdeki bağımsız workshop&apos;lara — sanat tarihi, seramik, resim ve daha fazlası.
+        <p style={{ color: B.warm, fontSize: 15, maxWidth: 480, margin: "0 auto", lineHeight: 1.7 }}>
+          Online ve yüz yüze atölyeleri keşfet, hemen kaydol.
         </p>
       </section>
 
