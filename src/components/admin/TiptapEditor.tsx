@@ -689,6 +689,7 @@ export default function TiptapEditor({
   currentUserName,
 }: Props) {
   const lastMdRef = useRef(content);
+  const suppressUpdateRef = useRef(false);
   const onUploadRef = useRef(onUploadImage);
   onUploadRef.current = onUploadImage;
   const editorRef = useRef<Editor | null>(null);
@@ -932,6 +933,11 @@ export default function TiptapEditor({
     ],
     content,
     onUpdate: ({ editor }) => {
+      // Skip the onUpdate triggered by external setContent (prevents round-trip data loss)
+      if (suppressUpdateRef.current) {
+        suppressUpdateRef.current = false;
+        return;
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const md = (editor.storage as any).markdown.getMarkdown() as string;
       lastMdRef.current = md;
@@ -989,6 +995,7 @@ export default function TiptapEditor({
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
     if (content !== lastMdRef.current) {
+      suppressUpdateRef.current = true;
       editor.commands.setContent(content);
       lastMdRef.current = content;
     }
