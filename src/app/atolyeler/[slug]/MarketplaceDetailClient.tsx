@@ -6,7 +6,7 @@ import type { MarketplaceEvent } from "@/types/marketplace";
 import HostCard from "./components/HostCard";
 import DisclaimerNote from "./components/DisclaimerNote";
 import AtolyeFAQ from "./components/AtolyeFAQ";
-import MobileStickyBar from "./components/MobileStickyBar";
+import StickyActionBar from "./components/StickyActionBar";
 
 /* ─── Constants ──────────────────────────────────── */
 
@@ -168,7 +168,7 @@ function ContactModal({
   const waPhone = organizerPhone?.replace(/\D/g, "");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 sm:p-8 z-10">
         <button onClick={onClose} className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 transition-colors">
@@ -265,7 +265,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
   return (
     <>
-      <main className="bg-cream min-h-screen">
+      <main className="bg-cream min-h-screen pb-24">
         {/* ═══ Breadcrumb — desktop only ═══ */}
         <div className="hidden md:block max-w-7xl mx-auto px-6 pt-20 pb-2">
           <nav className="flex items-center gap-1.5 text-xs text-brand-warm">
@@ -309,9 +309,9 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
               </div>
             </div>
 
-            {/* Sağ — bilgi paneli (sticky) */}
+            {/* Sağ — bilgi paneli */}
             <div className="lg:col-span-2">
-              <div className="lg:sticky lg:top-24 bg-warm-50 rounded-2xl p-6 lg:p-8 space-y-5">
+              <div className="bg-warm-50 rounded-2xl p-6 lg:p-8 space-y-5">
                 {/* Kategori + Klemens etiketi */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-semibold text-coral uppercase tracking-wide">
@@ -483,9 +483,9 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
               )}
             </div>
 
-            {/* Sağ — sidebar (sticky) */}
+            {/* Sağ — sidebar */}
             <div className="lg:col-span-1">
-              <div className="lg:sticky lg:top-24 space-y-5">
+              <div className="space-y-5">
                 <HostCard host={host} isKlemens={!!isKlemens} />
                 {!isKlemens && <DisclaimerNote hostName={hostName} />}
                 <AtolyeFAQ hostName={hostName} isKlemens={!!isKlemens} />
@@ -495,8 +495,13 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         </section>
       </main>
 
-      {/* ═══ Mobile Sticky CTA Bar ═══ */}
-      <MobileStickyBar event={event} priceLabel={priceLabel} />
+      {/* ═══ Sticky Action Bar — tüm cihazlarda ═══ */}
+      <StickyActionBar
+        event={event}
+        priceLabel={priceLabel}
+        isKlemens={!!isKlemens}
+        onContactClick={() => setShowContactModal(true)}
+      />
 
       {/* ═══ Contact Modal ═══ */}
       <ContactModal
