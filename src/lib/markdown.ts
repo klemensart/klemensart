@@ -80,15 +80,19 @@ function processWarningBoxes(rawHtml: string): string {
 }
 
 function processBlockquotes(rawHtml: string): string {
-  // TÜM blockquote'lar → inline-quote
   return rawHtml.replace(
     /<blockquote>([\s\S]*?)<\/blockquote>/g,
     (_, inner) => {
-      const withAttribution = inner.replace(
+      // [poem] marker → .poem class
+      const isPoem = inner.includes("[poem]");
+      const cleaned = isPoem ? inner.replace(/\[poem\]\s*(<br\s*\/?>)?/g, "") : inner;
+
+      const withAttribution = cleaned.replace(
         /(<p>)(.{10,}?)\s+—\s+(.+?)(<\/p>)/g,
         '$1$2<span class="quote-attribution">— $3</span>$4'
       );
-      return `<blockquote class="inline-quote">${withAttribution.replace(/["""'']/g, "")}</blockquote>`;
+      const cls = isPoem ? "inline-quote poem" : "inline-quote";
+      return `<blockquote class="${cls}">${withAttribution.replace(/["""'']/g, "")}</blockquote>`;
     }
   );
 }

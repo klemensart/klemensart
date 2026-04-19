@@ -112,24 +112,9 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
           </>
         )}
 
-        {/* Back link — mobile'da gizli (navbar + browser back yeterli) */}
-        {!readingMode && (
-          <div className={`hidden lg:block max-w-2xl mx-auto px-6 ${meta.image ? "mt-8 mb-10" : "mb-10"}`}>
-            <Link
-              href="/icerikler"
-              className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${darkMode ? "text-[#f5f0eb]/40 hover:text-[#FF6D60]" : "text-warm-900/35 hover:text-coral"}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M19 12H5M12 5l-7 7 7 7" />
-              </svg>
-              Tüm Yazılara Dön
-            </Link>
-          </div>
-        )}
-
         {/* Article header */}
         <header
-          className={`mx-auto px-6 mb-12 ${meta.image ? "mt-6 lg:mt-0" : ""}`}
+          className={`mx-auto px-6 mb-12 ${meta.image ? "mt-6 lg:mt-8" : ""}`}
           style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
           {/* Category badge — overlay açıkken lg:'de gizle (overlay içinde var) */}

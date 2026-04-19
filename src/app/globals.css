@@ -172,49 +172,58 @@ html {
   margin-bottom: 0.6rem;
 }
 
-/* ── Yazı içi alıntı (pull-quote stili) ── */
+/* ── Yazı içi alıntı — default (sol border, sola hizalı) ── */
 .prose-klemens .inline-quote {
   position: relative;
   border: none;
+  border-left: 2px solid #e8e0d8;
   background: none;
   border-radius: 0;
-  padding: 2.5rem 2rem;
-  margin: 3rem auto;
-  text-align: center;
+  padding: 0 0 0 1.5rem;
+  margin: 2rem 0;
+  text-align: left;
+  font-family: var(--font-newsreader), Georgia, serif;
   font-style: italic;
-  font-size: 1.125rem;
-  line-height: 1.85;
+  font-size: 1.05em;
+  line-height: 1.6;
   color: #78716c;
-  max-width: 480px;
 }
 .prose-klemens .inline-quote::before,
 .prose-klemens .inline-quote::after {
-  content: "";
-  display: block;
-  width: 40px;
-  height: 2px;
-  background: #FF6D60;
-  margin: 0 auto;
-}
-.prose-klemens .inline-quote::before {
-  margin-bottom: 2rem;
-}
-.prose-klemens .inline-quote::after {
-  margin-top: 2rem;
+  display: none;
 }
 .prose-klemens .inline-quote p {
+  margin-bottom: 0.5em;
+}
+.prose-klemens .inline-quote p:last-child {
   margin-bottom: 0;
 }
 .prose-klemens .inline-quote .quote-attribution {
   display: block;
-  text-align: center;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.85em;
+  font-weight: 500;
   font-style: normal;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #FF6D60;
-  margin-top: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #a39e99;
+  margin-top: 0.75rem;
+}
+
+/* ── Şiir alıntısı (centered, bordersız) ── */
+.prose-klemens .inline-quote.poem {
+  border-left: none;
+  padding: 0;
+  margin: 3rem auto;
+  text-align: center;
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: #2C2319;
+  max-width: 480px;
+  white-space: pre-line;
+}
+.prose-klemens .inline-quote.poem .quote-attribution {
+  color: #a39e99;
+  margin-top: 1.25rem;
 }
 .prose-klemens img {
   max-width: 100%;
