@@ -453,14 +453,14 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
           {/* Back link */}
           <a
             href="/atolyeler"
-            className="absolute top-6 left-6 z-10 inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+            className="absolute top-20 left-6 z-10 inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
           >
             <ChevronLeftIcon className="w-4 h-4" />
             Tüm Atölyeler
           </a>
 
-          {/* Top-left badges */}
-          <div className="absolute top-6 right-6 z-10 flex items-center gap-2">
+          {/* Top-right badges */}
+          <div className="absolute top-20 right-6 z-10 flex items-center gap-2">
             {event.event_date && <DateBadge date={event.event_date} size="lg" />}
             <span
               className="px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm"
@@ -672,9 +672,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
       {/* ─── Sticky Bottom Bar ────────────────── */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ${
-          stickyVisible ? "translate-y-0" : "translate-y-full"
-        }`}
+        className="fixed bottom-0 left-0 right-0 z-40"
       >
         <div className="border-t shadow-[0_-4px_20px_rgba(0,0,0,0.08)]" style={{ background: "white", borderColor: B.light }}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
