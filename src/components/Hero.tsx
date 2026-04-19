@@ -23,15 +23,14 @@ export default function Hero() {
 
           {/* Headline */}
           <h1 className="fade-up-1 text-5xl sm:text-6xl lg:text-[4.5rem] font-bold leading-[1.08] tracking-tight text-warm-900">
-            Kendinizi<br />
-            <span className="text-coral">sanatla</span><br />
-            keşfedin.
+            Türkiye&apos;nin<br />
+            <span className="text-coral">kültür</span><br />
+            rehberi.
           </h1>
 
           {/* Subtitle */}
           <p className="fade-up-2 mt-8 text-lg sm:text-xl text-warm-900/60 max-w-2xl leading-relaxed">
-            Zoom atölyelerinden kültür testlerine, tematik e-bültenlerden felsefi sohbetlere —
-            sanat tarihini kendi hikayenizi anlamak için bir araç olarak kullanın.
+            Etkinlik takviminden sanat tarihi yazılarına, atölye ve workshop&apos;lardan interaktif kültür haritasına. Kültür-sanat dünyasını tek yerden keşfedin.
           </p>
 
           {/* CTAs */}

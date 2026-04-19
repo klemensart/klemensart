@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase";
+import EtkinlikAjandaView from "./EtkinlikAjandaView";
 
 type EventRow = {
   id: string;
@@ -290,7 +292,11 @@ function EventCard({ e }: { e: EventRow }) {
 }
 
 export default function EtkinliklerClient() {
+  const searchParams = useSearchParams();
   const [filter, setFilter] = useState<Filter>("Tümü");
+  const [viewMode, setViewMode] = useState<"grid" | "table">(
+    searchParams.get("view") === "table" ? "table" : "grid"
+  );
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -364,9 +370,38 @@ export default function EtkinliklerClient() {
           </div>
         </section>
 
-        {/* ── Grid ── */}
+        {/* ── Toggle + Grid/Ajanda ── */}
         <section className="px-6 pb-28">
           <div className="max-w-6xl mx-auto">
+            {/* View toggle */}
+            <div className="flex justify-end mb-4">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                  title="Kart görünümü"
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="1" width="7" height="7" rx="1" />
+                    <rect x="10" y="1" width="7" height="7" rx="1" />
+                    <rect x="1" y="10" width="7" height="7" rx="1" />
+                    <rect x="10" y="10" width="7" height="7" rx="1" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                  title="Ajanda görünümü"
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <line x1="2" y1="4" x2="16" y2="4" />
+                    <line x1="2" y1="9" x2="16" y2="9" />
+                    <line x1="2" y1="14" x2="16" y2="14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
             {loading ? (
               <div className="flex justify-center py-20">
                 <div className="w-5 h-5 border-2 border-coral border-t-transparent rounded-full animate-spin" />
@@ -375,12 +410,14 @@ export default function EtkinliklerClient() {
               <div className="text-center py-20 text-warm-900/30">
                 <p className="text-base">Bu kategoride yaklaşan etkinlik bulunmuyor.</p>
               </div>
-            ) : (
+            ) : viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {events.map((e) => (
                   <EventCard key={e.id} e={e} />
                 ))}
               </div>
+            ) : (
+              <EtkinlikAjandaView events={events} />
             )}
           </div>
         </section>
