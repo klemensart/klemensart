@@ -77,20 +77,6 @@ export default function ArticleAuthorCard({
                   {author.short_bio}
                 </p>
               )}
-
-              {/* Sosyal medya */}
-              {author.instagram && (
-                <div className="flex items-center gap-3 mt-3">
-                  <a
-                    href={`https://instagram.com/${author.instagram.replace("@", "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-xs ${textMuted} hover:text-coral transition`}
-                  >
-                    @{author.instagram.replace("@", "")}
-                  </a>
-                </div>
-              )}
             </div>
           </div>
 
