@@ -26,7 +26,7 @@ const playfair = Playfair_Display({
 const newsreader = Newsreader({
   subsets: ["latin", "latin-ext"],
   variable: "--font-newsreader",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   style: ["normal", "italic"],
   display: "swap",
 });

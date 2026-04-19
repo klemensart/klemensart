@@ -86,7 +86,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
                           </span>
                         </div>
                       )}
-                      <h1 className="font-newsreader text-white font-semibold text-3xl md:text-5xl lg:text-6xl leading-[1.15] tracking-tight mb-4 max-w-4xl">
+                      <h1 className="font-newsreader text-white font-extrabold text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tighter mb-4 max-w-4xl" style={{ fontVariationSettings: '"opsz" 36' }}>
                         {meta.title}
                       </h1>
                       {meta.description && (
@@ -141,11 +141,12 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
 
           {/* Title — overlay açıkken lg:'de gizle (overlay içinde var) */}
           <h1
-            className={`font-newsreader font-semibold tracking-tight mb-8 ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"} ${meta.hero_overlay_enabled ? "lg:hidden" : ""}`}
+            className={`font-newsreader font-extrabold tracking-tighter mb-8 ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"} ${meta.hero_overlay_enabled ? "lg:hidden" : ""}`}
             style={{
               fontSize: "clamp(1.9rem, 4vw, 2.75rem)",
-              lineHeight: 1.15,
-              letterSpacing: "-0.01em",
+              lineHeight: 1.1,
+              letterSpacing: "-0.03em",
+              fontVariationSettings: '"opsz" 36',
             }}
           >
             {meta.title}
