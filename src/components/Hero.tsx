@@ -39,16 +39,16 @@ export default function Hero() {
               href="/atolyeler"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-coral text-white font-semibold rounded-full hover:opacity-90 hover:shadow-lg hover:shadow-coral/20 active:scale-95 transition-all duration-200"
             >
-              Keşfetmeye Başla
+              Atölyeleri İncele
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </a>
             <a
-              href="#manifesto"
+              href="/etkinlikler"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-warm-900 font-semibold rounded-full border border-warm-200 hover:border-warm-900/30 hover:shadow-md transition-all duration-200"
             >
-              Biz Kimiz?
+              Ajanda
             </a>
           </div>
         </div>

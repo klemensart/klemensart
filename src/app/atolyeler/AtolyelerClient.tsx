@@ -31,6 +31,7 @@ type MarketplaceEvent = {
   organizer_phone: string | null;
   organizer_email: string | null;
   organizer_url: string | null;
+  organizer_logo_url: string | null;
 };
 
 type SingleVideo = {
@@ -175,7 +176,7 @@ export default function AtolyelerClient() {
       const supabase = createClient();
       let query = supabase
         .from("marketplace_events")
-        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url")
+        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url")
         .eq("status", "active");
 
       if (city) query = query.eq("city", city);
@@ -339,7 +340,7 @@ export default function AtolyelerClient() {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[16/9]" />
               ))}
@@ -349,9 +350,9 @@ export default function AtolyelerClient() {
               <p className="text-warm-900/40 text-lg">Bu kriterlere uygun atölye bulunamadı.</p>
             </div>
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sorted.map((e) => (
-                <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%]" : ""}>
+                <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%] pointer-events-none" : ""}>
                   <PazaryeriCard
                     slug={e.slug}
                     title={e.title}
@@ -365,6 +366,8 @@ export default function AtolyelerClient() {
                     href={e.detail_slug ? `/atolyeler/${e.detail_slug}` : `/atolyeler/${e.slug}`}
                     badge={e.is_klemens ? "Klemens" : undefined}
                     duration_note={e.duration_note}
+                    organizer_name={e.organizer_name}
+                    organizer_logo_url={e.organizer_logo_url}
                   />
                 </div>
               ))}
@@ -482,7 +485,7 @@ export default function AtolyelerClient() {
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sorted.map((e) => (
-                <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%]" : ""}>
+                <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%] pointer-events-none" : ""}>
                   <PazaryeriCard
                     slug={e.slug}
                     title={e.title}
@@ -496,6 +499,8 @@ export default function AtolyelerClient() {
                     href={e.detail_slug ? `/atolyeler/${e.detail_slug}` : `/atolyeler/${e.slug}`}
                     badge={e.is_klemens ? "Klemens" : undefined}
                     duration_note={e.duration_note}
+                    organizer_name={e.organizer_name}
+                    organizer_logo_url={e.organizer_logo_url}
                   />
                 </div>
               ))}

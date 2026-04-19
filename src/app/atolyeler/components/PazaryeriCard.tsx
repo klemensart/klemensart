@@ -14,6 +14,8 @@ type Props = {
   href?: string;
   badge?: string;
   duration_note?: string | null;
+  organizer_name?: string;
+  organizer_logo_url?: string | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -37,7 +39,7 @@ function formatPrice(price: number): string {
 }
 
 export default function PazaryeriCard({
-  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note,
+  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url,
 }: Props) {
   const linkHref = href ?? `/atolyeler/${slug}`;
   const isOnline = city === "Online";
@@ -87,35 +89,55 @@ export default function PazaryeriCard({
           </div>
         )}
 
-        {/* Bottom — title + location & price */}
+        {/* Organizer avatar — right side, above gradient */}
+        {organizer_logo_url && (
+          <div className="absolute right-4 bottom-16">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={organizer_logo_url}
+              alt={organizer_name ?? ""}
+              className="w-14 h-14 rounded-full object-cover border-2 border-white/30 shadow-lg"
+            />
+          </div>
+        )}
+
+        {/* Bottom — title + organizer + location & price */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="text-base font-bold text-white line-clamp-2 mb-1 group-hover:text-coral transition-colors">
             {title}
           </h3>
           <div className="flex items-center justify-between">
-            <p className="flex items-center gap-1 text-xs text-white/70">
-              {isOnline ? (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="23 7 16 12 23 17 23 7" />
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                  </svg>
-                  Online · Zoom
-                </>
-              ) : (
-                <>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  {district ? `${district}, ${city}` : city}
-                </>
+            <div className="flex items-center gap-2 min-w-0">
+              {organizer_name && (
+                <span className="text-xs font-medium text-white/80 truncate">{organizer_name}</span>
               )}
-            </p>
+              {organizer_name && (
+                <span className="text-white/30 text-xs">·</span>
+              )}
+              <p className="flex items-center gap-1 text-xs text-white/60 flex-shrink-0">
+                {isOnline ? (
+                  <>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="23 7 16 12 23 17 23 7" />
+                      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                    </svg>
+                    Online
+                  </>
+                ) : (
+                  <>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    {district ? `${district}, ${city}` : city}
+                  </>
+                )}
+              </p>
+            </div>
             {price === 0 ? (
-              <span className="text-xs font-semibold text-emerald-400">Ücretsiz</span>
+              <span className="text-xs font-semibold text-emerald-400 flex-shrink-0">Ücretsiz</span>
             ) : (
-              <span className="text-sm font-bold text-white">{formatPrice(price)}</span>
+              <span className="text-sm font-bold text-white flex-shrink-0">{formatPrice(price)}</span>
             )}
           </div>
         </div>
