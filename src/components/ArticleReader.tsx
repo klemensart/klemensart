@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -25,6 +25,21 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
   const encodedUrl = encodeURIComponent(shareUrl);
   const shareText = encodeURIComponent(meta.title);
   const [copied, setCopied] = useState(false);
+
+  // Akıllı drop cap: sadece harfle başlayan ilk paragraflarda
+  useEffect(() => {
+    const proseDiv = document.querySelector(".prose-klemens");
+    if (!proseDiv) return;
+    const firstP = proseDiv.querySelector(":scope > p:first-child");
+    if (!firstP) return;
+    const text = firstP.textContent?.trim() || "";
+    const firstChar = text[0];
+    if (firstChar && /^[a-zA-ZçğıöşüÇĞIİÖŞÜâîûÂÎÛ]$/.test(firstChar)) {
+      firstP.classList.add("drop-cap-enabled");
+    } else {
+      firstP.classList.remove("drop-cap-enabled");
+    }
+  }, [contentHtml, readingMode]);
 
   return (
     <div

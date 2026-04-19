@@ -93,8 +93,8 @@ html {
 .prose-klemens p {
   margin-bottom: 1.1em;
 }
-/* ── Drop cap: ilk paragrafın ilk harfi ── */
-.prose-klemens > p:first-child::first-letter {
+/* ── Drop cap: sadece harfle başlayan ilk paragraflarda ── */
+.prose-klemens > p.drop-cap-enabled:first-child::first-letter {
   float: left;
   font-size: 4.5em;
   line-height: 0.9;
@@ -104,7 +104,7 @@ html {
   color: var(--brand-dark, #2C2319);
 }
 @media (max-width: 768px) {
-  .prose-klemens > p:first-child::first-letter {
+  .prose-klemens > p.drop-cap-enabled:first-child::first-letter {
     font-size: 3.5em;
   }
 }
