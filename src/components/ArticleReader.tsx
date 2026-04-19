@@ -165,7 +165,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
 
           <div
             className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
-            style={{ fontSize: readingMode ? "21px" : "18px", transition: "font-size 0.35s ease" }}
+            style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </article>
