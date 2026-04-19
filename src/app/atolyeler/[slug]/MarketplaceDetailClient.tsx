@@ -88,6 +88,23 @@ function UsersIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
+function UserIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
 function ExternalLinkIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -382,11 +399,9 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
                 {/* Düzenleyen satırı */}
                 {isKlemens ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-warm-100 flex items-center justify-center shrink-0">
-                      <span className="text-brand-warm font-bold text-xs">K</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-3">
+                    <UserIcon className="w-5 h-5 text-brand-warm shrink-0 mt-0.5" />
+                    <div>
                       <div className="text-xs text-brand-warm">Düzenleyen</div>
                       <div className="text-sm font-medium text-warm-900">Klemens</div>
                     </div>
@@ -394,19 +409,15 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
                 ) : host && (
                   <Link
                     href={`/egitmenler/${host.slug}`}
-                    className="flex items-center gap-3 -mx-2 px-2 py-2 rounded-lg hover:bg-warm-100 transition group"
+                    className="flex items-start gap-3 -mx-2 px-2 py-2 rounded-lg hover:bg-warm-100 transition group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-warm-100 flex items-center justify-center shrink-0 overflow-hidden">
-                      {host.avatar_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={host.avatar_url} alt={host.name} className="w-full h-full object-cover rounded-lg" />
-                      ) : (
-                        <span className="text-brand-warm font-bold text-xs">{getInitials(host.name)}</span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-brand-warm">Düzenleyen</div>
-                      <div className="text-sm font-medium text-warm-900 truncate group-hover:text-coral transition">{host.name}</div>
+                    <UserIcon className="w-5 h-5 text-brand-warm shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="text-xs text-brand-warm">Düzenleyen</div>
+                        <div className="text-sm font-medium text-warm-900 truncate group-hover:text-coral transition">{host.name}</div>
+                      </div>
+                      <ChevronRightIcon className="w-4 h-4 text-brand-warm group-hover:text-coral group-hover:translate-x-0.5 transition shrink-0" />
                     </div>
                   </Link>
                 )}
