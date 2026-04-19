@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ArticleLikeButton from "@/components/ArticleLikeButton";
 import ArticleNewsletterCTA from "@/components/ArticleNewsletterCTA";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
 import ArticleAuthorByline from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorByline";
@@ -135,6 +134,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
               authorEmail={meta.authorEmail}
               date={meta.date}
               readTime={meta.readTime}
+              slug={meta.slug}
               darkMode={darkMode}
             />
 
@@ -247,17 +247,14 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
           </div>
         </div>
 
-        {/* Like & Share */}
+        {/* Share */}
         <div
           className="mx-auto px-6 mb-16"
           style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <p className={`text-xs font-semibold tracking-widest uppercase ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
-              Paylaş
-            </p>
-            <ArticleLikeButton slug={meta.slug} darkMode={darkMode} />
-          </div>
+          <p className={`text-xs font-semibold tracking-widest uppercase mb-4 ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
+            Paylaş
+          </p>
           <div className="flex items-center gap-3">
             {/* WhatsApp */}
             <a

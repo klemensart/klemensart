@@ -3,7 +3,6 @@ import { categories } from "@/lib/icerikler";
 import { categoryStyles } from "@/lib/category-styles";
 import { ArrowRightIcon } from "@/lib/icons";
 import { getAllArticlesMetadata } from "@/lib/markdown";
-import { createAdminClient } from "@/lib/supabase-admin";
 import ArticleCard from "@/components/ArticleCard";
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -41,31 +40,10 @@ const categoryIcons: Record<string, React.ReactNode> = {
 export default async function IceriklerSection() {
   const allArticles = await getAllArticlesMetadata();
 
-  // Beğeni sayılarını çek
-  let likeCounts: Record<string, number> = {};
-  try {
-    const admin = createAdminClient();
-    const { data } = await admin
-      .from("article_likes")
-      .select("article_slug");
-    if (data) {
-      for (const row of data) {
-        likeCounts[row.article_slug] = (likeCounts[row.article_slug] || 0) + 1;
-      }
-    }
-  } catch {
-    // Beğeni verisi yoksa son yazıları göster
-  }
-
-  // Popüler yazıları sırala: beğeni sayısına göre, eşitse tarihe göre
-  const hasLikes = Object.keys(likeCounts).length > 0;
-  const sorted = [...allArticles].sort((a, b) => {
-    const la = likeCounts[a.slug] || 0;
-    const lb = likeCounts[b.slug] || 0;
-    if (la !== lb) return lb - la;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
-  const featured = hasLikes ? sorted.slice(0, 3) : allArticles.slice(0, 3);
+  // En yeni yazıları tarihe göre sırala
+  const featured = [...allArticles]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
 
   return (
     <section id="icerikler" className="py-24 px-6 bg-warm-50">
@@ -120,7 +98,7 @@ export default async function IceriklerSection() {
         {/* Featured articles */}
         <div>
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-bold text-warm-900">{hasLikes ? "En Çok Beğenilen Yazılar" : "Son Yazılar"}</h3>
+            <h3 className="text-2xl font-bold text-warm-900">Son Yazılar</h3>
             <Link
               href="/icerikler"
               className="text-sm font-semibold text-warm-900/40 hover:text-coral flex items-center gap-1.5 transition-colors"
@@ -131,7 +109,7 @@ export default async function IceriklerSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {featured.map((article, i) => (
-              <ArticleCard key={article.slug} article={article} priority={i < 3} likeCount={likeCounts[article.slug] || 0} />
+              <ArticleCard key={article.slug} article={article} priority={i < 3} />
             ))}
           </div>
         </div>

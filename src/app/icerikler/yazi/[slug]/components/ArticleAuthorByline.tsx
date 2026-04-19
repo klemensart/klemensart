@@ -1,4 +1,10 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase";
+import { BookmarkIcon, BookmarkSolidIcon } from "@/lib/icons";
 import type { PersonSummary } from "@/types/people";
 
 function formatDate(dateStr: string) {
@@ -25,6 +31,71 @@ function MailIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
+function BookmarkButton({ slug, darkMode }: { slug: string; darkMode: boolean }) {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id ?? null);
+      if (user) {
+        fetch(`/api/articles/bookmark?slug=${encodeURIComponent(slug)}`)
+          .then((r) => (r.ok ? r.json() : { bookmarked: false }))
+          .then((d) => setIsBookmarked(d.bookmarked));
+      }
+    });
+  }, [slug]);
+
+  const handleBookmark = async () => {
+    if (!userId) {
+      router.push("/club/giris");
+      return;
+    }
+
+    setIsLoading(true);
+    const prev = isBookmarked;
+    setIsBookmarked(!prev);
+
+    try {
+      const res = await fetch("/api/articles/bookmark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setIsBookmarked(data.bookmarked);
+    } catch {
+      setIsBookmarked(prev);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const iconHover = darkMode
+    ? "text-[#f5f0eb]/40 hover:text-coral"
+    : "text-brand-warm hover:text-coral";
+
+  return (
+    <button
+      onClick={handleBookmark}
+      disabled={isLoading}
+      className={`${iconHover} transition disabled:opacity-50`}
+      aria-label={isBookmarked ? "Kayıttan çıkar" : "Daha sonra okumak için kaydet"}
+      title={isBookmarked ? "Kayıttan çıkar" : "Kaydet"}
+    >
+      {isBookmarked ? (
+        <BookmarkSolidIcon size={16} className="text-coral" />
+      ) : (
+        <BookmarkIcon size={16} />
+      )}
+    </button>
+  );
+}
+
 export default function ArticleAuthorByline({
   authorPerson,
   authorName,
@@ -32,6 +103,7 @@ export default function ArticleAuthorByline({
   authorEmail,
   date,
   readTime,
+  slug,
   darkMode,
 }: {
   authorPerson?: PersonSummary | null;
@@ -40,6 +112,7 @@ export default function ArticleAuthorByline({
   authorEmail?: string;
   date: string;
   readTime: string;
+  slug: string;
   darkMode: boolean;
 }) {
   const textMuted = darkMode ? "text-[#f5f0eb]/40" : "text-brand-warm";
@@ -50,7 +123,6 @@ export default function ArticleAuthorByline({
   // author_person varsa — people tablosundan zengin veri
   if (authorPerson) {
     const ig = authorPerson.instagram;
-    // PersonSummary'de email yok, fallback olarak authorEmail kullan
     const email = authorEmail;
     const hasSocial = ig || email;
 
@@ -97,6 +169,8 @@ export default function ArticleAuthorByline({
             </div>
           </>
         )}
+        <span className={dotColor}>·</span>
+        <BookmarkButton slug={slug} darkMode={darkMode} />
       </div>
     );
   }
@@ -106,9 +180,12 @@ export default function ArticleAuthorByline({
     <div className="flex flex-wrap items-center gap-4">
       <div className="flex items-center gap-4">
         <div>
-          <p className={`text-sm font-semibold ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}>
-            {authorName}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className={`text-sm font-semibold ${darkMode ? "text-[#f5f0eb]" : "text-warm-900"}`}>
+              {authorName}
+            </p>
+            <BookmarkButton slug={slug} darkMode={darkMode} />
+          </div>
           {(authorIg || authorEmail) && (
             <p className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
               {authorIg && (

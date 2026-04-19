@@ -9,7 +9,7 @@ import {
   PlayIcon, LockIcon, ClockIcon, CalendarIcon, ChevronDownIcon,
   FilmIcon, BookIcon, ChartIcon, HeartIcon, SettingsIcon,
   VideoIcon, ArrowRightIcon, LogoutIcon, CloseIcon, DownloadIcon,
-  MapPinIcon,
+  MapPinIcon, BookmarkIcon,
 } from "@/lib/icons";
 import { getRank, getNextRank, RANKS } from "@/lib/harita-gamification";
 import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
@@ -336,11 +336,11 @@ function LocaSkeleton() {
 }
 
 /* ─── Tabs ─── */
-type TabId = "loca" | "tests" | "favorites" | "discoveries" | "settings";
+type TabId = "loca" | "tests" | "bookmarks" | "discoveries" | "settings";
 const TABS: { id: TabId; label: string; icon: (active: boolean) => React.ReactElement }[] = [
   { id: "loca",        label: "Loca",           icon: (a) => <FilmIcon     size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
   { id: "tests",       label: "Test Geçmişi",   icon: (a) => <ChartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
-  { id: "favorites",   label: "Favori Yazılar", icon: (a) => <HeartIcon    size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
+  { id: "bookmarks",   label: "Kaydedilenler",  icon: (a) => <BookmarkIcon size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
   { id: "discoveries", label: "Keşiflerim",     icon: (a) => <MapPinIcon   size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
   { id: "settings",    label: "Hesap",          icon: (a) => <SettingsIcon size={16} className={a ? "text-coral" : "text-brand-warm"} /> },
 ];
@@ -386,10 +386,10 @@ export default function ProfilPage() {
   type UserCoupon = { code: string; discount_percent: number; workshop_slug: string; workshop_title: string; workshop_id: string; price: number; expires_at: string };
   const [coupons, setCoupons] = useState<UserCoupon[]>([]);
 
-  // Favori Yazılar data
-  type FavArticle = { slug: string; title: string; category: string; description: string; date: string; liked_at: string };
-  const [favArticles, setFavArticles] = useState<FavArticle[]>([]);
-  const [favLoading, setFavLoading] = useState(false);
+  // Kaydedilenler data
+  type SavedArticle = { slug: string; title: string; category: string; description: string; date: string; saved_at: string };
+  const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
+  const [savedLoading, setSavedLoading] = useState(false);
 
   /* ─── Auth ─── */
   useEffect(() => {
@@ -557,29 +557,29 @@ export default function ProfilPage() {
     if (user && activeTab === "tests") fetchQuizResults();
   }, [user, activeTab, fetchQuizResults]);
 
-  /* ─── Fetch Favorites ─── */
-  const fetchFavorites = useCallback(async () => {
+  /* ─── Fetch Bookmarks ─── */
+  const fetchBookmarks = useCallback(async () => {
     if (!user) return;
-    setFavLoading(true);
+    setSavedLoading(true);
     try {
       const sb = createClient();
-      const { data: likes } = await sb
-        .from("article_likes")
+      const { data: bookmarks } = await sb
+        .from("article_bookmarks")
         .select("article_slug, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (likes && likes.length > 0) {
-        const slugs = likes.map((l) => l.article_slug);
+      if (bookmarks && bookmarks.length > 0) {
+        const slugs = bookmarks.map((b) => b.article_slug);
         const { data: articles } = await sb
           .from("articles")
           .select("slug, title, category, description, date")
           .in("slug", slugs);
 
         const articleMap = new Map((articles ?? []).map((a) => [a.slug, a]));
-        const merged: FavArticle[] = likes
-          .map((l) => {
-            const a = articleMap.get(l.article_slug);
+        const merged: SavedArticle[] = bookmarks
+          .map((b) => {
+            const a = articleMap.get(b.article_slug);
             if (!a) return null;
             return {
               slug: a.slug,
@@ -587,21 +587,21 @@ export default function ProfilPage() {
               category: a.category ?? "",
               description: a.description ?? "",
               date: a.date ?? "",
-              liked_at: l.created_at,
+              saved_at: b.created_at,
             };
           })
-          .filter((x): x is FavArticle => x !== null);
-        setFavArticles(merged);
+          .filter((x): x is SavedArticle => x !== null);
+        setSavedArticles(merged);
       } else {
-        setFavArticles([]);
+        setSavedArticles([]);
       }
     } catch { /* ignore */ }
-    setFavLoading(false);
+    setSavedLoading(false);
   }, [user]);
 
   useEffect(() => {
-    if (user && activeTab === "favorites") fetchFavorites();
-  }, [user, activeTab, fetchFavorites]);
+    if (user && activeTab === "bookmarks") fetchBookmarks();
+  }, [user, activeTab, fetchBookmarks]);
 
   /* ─── Sign out ─── */
   const handleSignOut = async () => {
@@ -1085,18 +1085,18 @@ export default function ProfilPage() {
             </div>
           )}
 
-          {/* ══ FAVORİ YAZILAR ══ */}
-          {activeTab === "favorites" && (
+          {/* ══ KAYDEDİLENLER ══ */}
+          {activeTab === "bookmarks" && (
             <div>
-              {favLoading ? (
+              {savedLoading ? (
                 <div className="text-center py-12">
                   <div className="w-8 h-8 rounded-full border-2 border-coral border-t-transparent animate-spin mx-auto" />
                 </div>
-              ) : favArticles.length === 0 ? (
+              ) : savedArticles.length === 0 ? (
                 <div className="text-center py-[60px] text-brand-warm">
-                  <HeartIcon size={48} className="text-brand-light mx-auto" />
-                  <p className="text-[15px] font-semibold text-brand-dark mt-4">Henüz favori yazın yok</p>
-                  <p className="text-[13px]">Yazıların altındaki kalp ikonuna tıklayarak favorilerine ekleyebilirsin.</p>
+                  <BookmarkIcon size={48} className="text-brand-light mx-auto" />
+                  <p className="text-[15px] font-semibold text-brand-dark mt-4">Henüz hiçbir yazı kaydetmedin</p>
+                  <p className="text-[13px] max-w-xs mx-auto">Yazı sayfalarındaki yazar bilgisinin yanında bulunan bookmark ikonuna tıklayarak daha sonra okumak için kaydedebilirsin.</p>
                   <Link
                     href="/icerikler"
                     className="inline-flex items-center gap-2 mt-5 px-6 py-2.5 rounded-full border border-coral text-coral text-sm font-semibold hover:bg-coral hover:text-white transition-all"
@@ -1106,13 +1106,12 @@ export default function ProfilPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {favArticles.map((a) => (
-                    <Link
+                  {savedArticles.map((a) => (
+                    <div
                       key={a.slug}
-                      href={`/icerikler/yazi/${a.slug}`}
                       className="group flex items-start gap-4 p-4 rounded-xl border border-brand-light hover:border-coral/30 hover:shadow-sm transition-all"
                     >
-                      <div className="flex-1 min-w-0">
+                      <Link href={`/icerikler/yazi/${a.slug}`} className="flex-1 min-w-0">
                         <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-coral/10 text-coral mb-1.5">
                           {a.category}
                         </span>
@@ -1125,9 +1124,29 @@ export default function ProfilPage() {
                         <p className="text-[11px] text-brand-warm/60 mt-1.5">
                           {a.date && new Date(a.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
-                      </div>
-                      <HeartIcon size={16} className="text-coral flex-shrink-0 mt-1" />
-                    </Link>
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          const prev = [...savedArticles];
+                          setSavedArticles((s) => s.filter((x) => x.slug !== a.slug));
+                          try {
+                            const res = await fetch("/api/articles/bookmark", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ slug: a.slug }),
+                            });
+                            if (!res.ok) throw new Error();
+                          } catch {
+                            setSavedArticles(prev);
+                          }
+                        }}
+                        className="text-brand-warm hover:text-coral transition flex-shrink-0 mt-1"
+                        aria-label="Kayıttan kaldır"
+                        title="Kayıttan kaldır"
+                      >
+                        <CloseIcon size={14} />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
