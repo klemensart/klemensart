@@ -102,7 +102,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
             {meta.cover_caption && (
               <div
                 className="mx-auto px-6 mt-2"
-                style={{ maxWidth: "640px" }}
+                style={{ maxWidth: "720px" }}
               >
                 <p className={`text-xs italic leading-relaxed ${darkMode ? "text-[#f5f0eb]/40" : "text-brand-warm"}`}>
                   {meta.cover_caption}
@@ -115,7 +115,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Article header */}
         <header
           className={`mx-auto px-6 mb-12 ${meta.image ? "mt-6 lg:mt-8" : ""}`}
-          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "720px", transition: "max-width 0.35s ease" }}
         >
           {/* Category badge — overlay açıkken lg:'de gizle (overlay içinde var) */}
           <div className={`mb-6 ${meta.hero_overlay_enabled ? "lg:hidden" : ""}`}>
@@ -202,7 +202,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Article body */}
         <article
           className="mx-auto px-6 mb-16"
-          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "720px", transition: "max-width 0.35s ease" }}
         >
           {/* Spot / Lead paragraph — overlay açıkken lg:'de gizle */}
           {meta.description && (
@@ -241,7 +241,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Tags */}
         <div
           className="mx-auto px-6 mb-10"
-          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "720px", transition: "max-width 0.35s ease" }}
         >
           <div className={`h-px mb-8 ${darkMode ? "bg-[#f5f0eb]/10" : "bg-warm-200"}`} />
           <div className="flex flex-wrap gap-2">
@@ -263,7 +263,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Share */}
         <div
           className="mx-auto px-6 mb-16"
-          style={{ maxWidth: readingMode ? "600px" : "640px", transition: "max-width 0.35s ease" }}
+          style={{ maxWidth: readingMode ? "600px" : "720px", transition: "max-width 0.35s ease" }}
         >
           <p className={`text-xs font-semibold tracking-widest uppercase mb-4 ${darkMode ? "text-[#f5f0eb]/30" : "text-warm-900/30"}`}>
             Paylaş

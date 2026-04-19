@@ -40,7 +40,7 @@ export default function ArticleAuthorCard({
   return (
     <aside
       className="mx-auto px-6"
-      style={{ maxWidth: "640px" }}
+      style={{ maxWidth: "720px" }}
     >
       <div className={`mt-16 pt-12 border-t ${borderColor}`}>
         <div className={`rounded-2xl ${bgCard} p-8`}>
