@@ -336,6 +336,7 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
     category: data.category ?? "",
     tags: data.tags ?? [],
     image: data.image ?? "",
+    cover_caption: data.cover_caption ?? null,
     readTime,
     slug: data.slug,
     author_id: data.author_id ?? null,

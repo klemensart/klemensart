@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ArticleLikeButton from "@/components/ArticleLikeButton";
@@ -56,9 +57,39 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
 
       <main className={readingMode ? "pt-16" : "pt-28"} style={{ transition: "padding-top 0.35s ease" }}>
 
+        {/* Cover image — full-bleed */}
+        {meta.image && !readingMode && (
+          <>
+            <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
+              <Image
+                src={meta.image}
+                alt={meta.title}
+                fill
+                priority
+                className="object-cover"
+                sizes="100vw"
+                {...(meta.image.includes("sgabkrzzzszfqrtgkord")
+                  ? {}
+                  : { unoptimized: true }
+                )}
+              />
+            </div>
+            {meta.cover_caption && (
+              <div
+                className="mx-auto px-6 mt-2"
+                style={{ maxWidth: "640px" }}
+              >
+                <p className={`text-xs italic leading-relaxed ${darkMode ? "text-[#f5f0eb]/40" : "text-brand-warm"}`}>
+                  {meta.cover_caption}
+                </p>
+              </div>
+            )}
+          </>
+        )}
+
         {/* Back link */}
         {!readingMode && (
-          <div className="max-w-2xl mx-auto px-6 mb-10">
+          <div className={`max-w-2xl mx-auto px-6 ${meta.image ? "mt-8 mb-10" : "mb-10"}`}>
             <Link
               href="/icerikler"
               className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${darkMode ? "text-[#f5f0eb]/40 hover:text-[#FF6D60]" : "text-warm-900/35 hover:text-coral"}`}
