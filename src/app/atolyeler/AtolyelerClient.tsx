@@ -137,7 +137,6 @@ export default function AtolyelerClient() {
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
-  const [gridCols, setGridCols] = useState<2 | 3>(2);
   const [allEvents, setAllEvents] = useState<MarketplaceEvent[]>([]);
   const [singles, setSingles] = useState<SingleVideo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -312,32 +311,17 @@ export default function AtolyelerClient() {
               {loading ? "Yükleniyor…" : `${activeCount} aktif atölye${pastCount > 0 ? ` · ${pastCount} geçmiş` : ""}`}
             </p>
             <div className="flex items-center gap-1">
-              {/* 2-sütun grid */}
+              {/* Grid ikonu */}
               <button
-                onClick={() => { setViewMode("grid"); setGridCols(2); }}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" && gridCols === 2 ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                title="2 sütun"
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                title="Kart görünümü"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="1" y="1" width="7" height="7" rx="1" />
                   <rect x="10" y="1" width="7" height="7" rx="1" />
                   <rect x="1" y="10" width="7" height="7" rx="1" />
                   <rect x="10" y="10" width="7" height="7" rx="1" />
-                </svg>
-              </button>
-              {/* 3-sütun grid */}
-              <button
-                onClick={() => { setViewMode("grid"); setGridCols(3); }}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" && gridCols === 3 ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                title="3 sütun"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="1" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="6.8" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="12.7" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="1" y="10" width="4.3" height="7" rx="0.5" />
-                  <rect x="6.8" y="10" width="4.3" height="7" rx="0.5" />
-                  <rect x="12.7" y="10" width="4.3" height="7" rx="0.5" />
                 </svg>
               </button>
               {/* Tablo/Liste ikonu */}
@@ -356,7 +340,7 @@ export default function AtolyelerClient() {
           </div>
 
           {loading ? (
-            <div className={`grid grid-cols-1 ${gridCols === 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"} gap-6`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[16/9]" />
               ))}
@@ -366,7 +350,7 @@ export default function AtolyelerClient() {
               <p className="text-warm-900/40 text-lg">Bu kriterlere uygun atölye bulunamadı.</p>
             </div>
           ) : viewMode === "grid" ? (
-            <div className={`grid grid-cols-1 ${gridCols === 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"} gap-6`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sorted.map((e) => (
                 <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%] pointer-events-none" : ""}>
                   <PazaryeriCard
@@ -463,32 +447,17 @@ export default function AtolyelerClient() {
               {loading ? "Yükleniyor…" : `${activeCount} aktif atölye${pastCount > 0 ? ` · ${pastCount} geçmiş` : ""}`}
             </p>
             <div className="flex items-center gap-1">
-              {/* 2-sütun grid */}
+              {/* Grid ikonu */}
               <button
-                onClick={() => { setViewMode("grid"); setGridCols(2); }}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" && gridCols === 2 ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                title="2 sütun"
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                title="Kart görünümü"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="1" y="1" width="7" height="7" rx="1" />
                   <rect x="10" y="1" width="7" height="7" rx="1" />
                   <rect x="1" y="10" width="7" height="7" rx="1" />
                   <rect x="10" y="10" width="7" height="7" rx="1" />
-                </svg>
-              </button>
-              {/* 3-sütun grid */}
-              <button
-                onClick={() => { setViewMode("grid"); setGridCols(3); }}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" && gridCols === 3 ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                title="3 sütun"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="1" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="6.8" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="12.7" y="1" width="4.3" height="7" rx="0.5" />
-                  <rect x="1" y="10" width="4.3" height="7" rx="0.5" />
-                  <rect x="6.8" y="10" width="4.3" height="7" rx="0.5" />
-                  <rect x="12.7" y="10" width="4.3" height="7" rx="0.5" />
                 </svg>
               </button>
               <button
@@ -506,7 +475,7 @@ export default function AtolyelerClient() {
           </div>
 
           {loading ? (
-            <div className={`grid grid-cols-1 ${gridCols === 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"} gap-6`}>
+            <div className={"grid grid-cols-1 md:grid-cols-2 gap-6"}>
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="bg-warm-100 rounded-2xl animate-pulse aspect-[16/9]" />
               ))}
@@ -516,7 +485,7 @@ export default function AtolyelerClient() {
               <p className="text-warm-900/40 text-lg">Bu kriterlere uygun atölye bulunamadı.</p>
             </div>
           ) : viewMode === "grid" ? (
-            <div className={`grid grid-cols-1 ${gridCols === 3 ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"} gap-6`}>
+            <div className={"grid grid-cols-1 md:grid-cols-2 gap-6"}>
               {sorted.map((e) => (
                 <div key={e.id} className={isPast(e.event_date) ? "opacity-50 grayscale-[30%] pointer-events-none" : ""}>
                   <PazaryeriCard

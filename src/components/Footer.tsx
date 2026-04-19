@@ -32,8 +32,7 @@ export default function Footer() {
           <div className="sm:col-span-2">
             <p className="text-xl font-bold text-white mb-4">klemens</p>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs">
-              Sanat tarihini araç olarak kullanan, insani ve sıcak bir kültür ekosistemi.
-              Kendinizi keşfetmek için en güzel kapı.
+              Her eserin ardında bir hikaye, her hikayede sen varsın.
             </p>
             <div className="flex gap-3 mt-7">
               {socials.map((s) => (
