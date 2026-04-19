@@ -59,7 +59,7 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {/* Cover image — full-bleed (overlay veya hibrit) */}
         {meta.image && !readingMode && (
           <>
-            <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
+            <div className="relative w-full h-[380px] sm:h-[60vh] md:h-[70vh] overflow-hidden">
               <Image
                 src={meta.image}
                 alt={meta.title}
