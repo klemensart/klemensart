@@ -101,7 +101,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Tekrar hoş geldiniz! Aboneliğiniz yeniden aktif." });
     }
 
-    return NextResponse.json({ message: "Zaten abonesiniz!" });
+    return NextResponse.json(
+      {
+        error: "already_subscribed",
+        message: "Bu e-posta zaten abonemiz. Tercihlerini güncellemek için e-postandaki linki kullan.",
+      },
+      { status: 409 },
+    );
   }
 
   const { data: inserted, error } = await admin
