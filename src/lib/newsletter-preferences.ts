@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase-admin";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.com";
+import { getEmailBaseUrl } from "@/lib/email-urls";
 
 export type Subscriber = {
   id: string;
@@ -54,5 +53,5 @@ export async function updateSubscriberPreferences(
 }
 
 export function buildPreferenceUrl(token: string): string {
-  return `${BASE_URL}/bulten/tercih?token=${token}`;
+  return `${getEmailBaseUrl()}/bulten/tercih?token=${token}`;
 }

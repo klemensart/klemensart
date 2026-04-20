@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ArticleNewsletterCTA from "@/components/ArticleNewsletterCTA";
 import NewsletterFormAeon from "@/components/NewsletterFormAeon";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
 import ArticleAuthorByline from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorByline";
@@ -240,11 +239,16 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
             const midpoint = getHtmlMidpoint(contentHtml);
             if (midpoint === -1) {
               return (
-                <div
-                  className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
-                  style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
-                  dangerouslySetInnerHTML={{ __html: contentHtml }}
-                />
+                <>
+                  <div
+                    className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
+                    style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
+                    dangerouslySetInnerHTML={{ __html: contentHtml }}
+                  />
+                  <div className="mt-12">
+                    <NewsletterFormAeon source="article-end" compact />
+                  </div>
+                </>
               );
             }
             const firstHalf = contentHtml.slice(0, midpoint);
@@ -378,9 +382,6 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
             </button>
           </div>
         </div>
-
-        {/* Newsletter CTA */}
-        {!readingMode && <ArticleNewsletterCTA darkMode={darkMode} />}
 
         {/* Related articles */}
         {!readingMode && relatedArticles.length > 0 && (

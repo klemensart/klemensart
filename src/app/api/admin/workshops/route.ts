@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
 import { ID_TO_SLUG } from "@/lib/atolyeler-config";
+import { getEmailBaseUrl } from "@/lib/email-urls";
 
 export async function GET() {
   const userClient = await createServerSupabaseClient();
@@ -26,7 +27,7 @@ export async function GET() {
     );
   }
 
-  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.com";
+  const BASE_URL = getEmailBaseUrl();
 
   const workshops = (data ?? []).map((w) => ({
     ...w,

@@ -1,6 +1,7 @@
 import { sendThankYouEmail } from "@/lib/send-thank-you";
+import { getEmailBaseUrl } from "@/lib/email-urls";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.com";
+const BASE_URL = getEmailBaseUrl();
 const ADMIN_EMAIL =
   process.env.ADMIN_NOTIFICATION_EMAIL || "kerem.hun@klemensart.com";
 
