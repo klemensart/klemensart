@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { subject, htmlContent, mode, testEmail, excludeInactive, skipAlreadySent, template, templateProps, workshopId, segmentId } = await req.json();
+  const { subject, htmlContent, mode, testEmail, excludeInactive, skipAlreadySent, template, templateProps, workshopId, segmentId, newsletter_type } = await req.json();
 
   // Determine email HTML and subject based on mode
   let emailHtml: string;
@@ -105,16 +105,28 @@ export async function POST(req: NextRequest) {
 
   // ── All mode ──
   if (mode === "all") {
-    // Supabase max_rows=1000 limiti — sayfalama ile tüm aboneleri çek
+    // Supabase max_rows=1000 limiti — sayfalama ile aboneleri çek
+    // newsletter_type: 'weekly' | 'thematic' | 'both' | undefined
     const subs: { email: string }[] = [];
     let page = 0;
     const pageSize = 1000;
     while (true) {
-      const { data: batch, error: dbError } = await admin
+      let query = admin
         .from("subscribers")
         .select("email")
-        .eq("is_active", true)
-        .range(page * pageSize, (page + 1) * pageSize - 1);
+        .eq("is_active", true);
+
+      if (newsletter_type === "weekly") {
+        query = query.eq("weekly_subscribed", true);
+      } else if (newsletter_type === "thematic") {
+        query = query.eq("thematic_subscribed", true);
+      }
+      // 'both' veya undefined → mevcut davranış (tüm aktif aboneler)
+
+      const { data: batch, error: dbError } = await query.range(
+        page * pageSize,
+        (page + 1) * pageSize - 1,
+      );
       if (dbError) {
         return NextResponse.json(
           { error: `Veritabanı hatası: ${dbError.message}` },

@@ -17,11 +17,23 @@ const BODRUM_PDF_URL =
 const TUZ_BULTEN_CAMPAIGN_ID = "09a4a679-6086-46c2-871f-70350442b02d";
 
 export async function POST(req: NextRequest) {
-  const { email, name, source } = await req.json();
+  const { email, name, source, weekly, thematic } = await req.json();
 
   if (!email || typeof email !== "string" || !EMAIL_RE.test(email.trim())) {
     return NextResponse.json(
       { error: "Geçerli bir e-posta adresi girin." },
+      { status: 400 }
+    );
+  }
+
+  // Newsletter tercihleri (default: ikisi de true — geriye uyumluluk)
+  const weeklyPref = weekly !== undefined ? Boolean(weekly) : true;
+  const thematicPref = thematic !== undefined ? Boolean(thematic) : true;
+
+  // En az birini seçmeli (açıkça false gönderilmişse)
+  if (weekly !== undefined && thematic !== undefined && !weeklyPref && !thematicPref) {
+    return NextResponse.json(
+      { error: "En az bir bülten seçmelisin." },
       { status: 400 }
     );
   }
@@ -35,17 +47,19 @@ export async function POST(req: NextRequest) {
   // Check if already subscribed
   const { data: existing } = await admin
     .from("subscribers")
-    .select("id, is_active")
+    .select("id, is_active, preference_token")
     .eq("email", trimmedEmail)
     .maybeSingle();
 
   if (existing) {
     if (!existing.is_active) {
-      // Reactivate
+      // Reactivate with new preferences
       await admin
         .from("subscribers")
         .update({
           is_active: true,
+          weekly_subscribed: weeklyPref,
+          thematic_subscribed: thematicPref,
           ...(isMuzede1Saat && { source: "muzede1saat" }),
           ...(isBodrumRehber && { source: "bodrum-muze-rehberi" }),
         })
@@ -90,14 +104,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Zaten abonesiniz!" });
   }
 
-  const { error } = await admin
+  const { data: inserted, error } = await admin
     .from("subscribers")
     .insert({
       email: trimmedEmail,
       name: name?.trim() || null,
+      weekly_subscribed: weeklyPref,
+      thematic_subscribed: thematicPref,
       ...(isMuzede1Saat && { source: "muzede1saat" }),
       ...(isBodrumRehber && { source: "bodrum-muze-rehberi" }),
-    });
+    })
+    .select("preference_token")
+    .single();
 
   if (error) {
     return NextResponse.json(
@@ -106,23 +124,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const token = inserted?.preference_token || null;
+
   if (isMuzede1Saat) {
     sendMuzede1SaatEmail(trimmedEmail, name?.trim());
-    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: PDF_URL });
+    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: PDF_URL, preference_token: token });
   }
 
   if (isBodrumRehber) {
     sendBodrumMuzeEmail(trimmedEmail, name?.trim());
-    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: BODRUM_PDF_URL });
+    return NextResponse.json({ message: "Abone oldunuz!", pdfUrl: BODRUM_PDF_URL, preference_token: token });
   }
 
   if (isTuzBulten) {
     sendTuzBultenEmail(admin, trimmedEmail);
-    return NextResponse.json({ message: "Abone oldunuz! Tuz Bülteni e-postanıza gönderildi." });
+    return NextResponse.json({ message: "Abone oldunuz! Tuz Bülteni e-postanıza gönderildi.", preference_token: token });
   }
 
   sendBultenTesekkurEmail(trimmedEmail, name?.trim());
-  return NextResponse.json({ message: "Abone oldunuz!" });
+  return NextResponse.json({ message: "Abone oldunuz!", preference_token: token });
 }
 
 function sendBultenTesekkurEmail(email: string, name?: string | null) {

@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   const emailHtml = await render(entry.component(templateProps));
   const emailSubject = `Haftalık Kültür Sanat Bülteni`;
 
-  // 4. Tüm aktif aboneleri çek (Supabase max_rows=1000 limiti — sayfalama gerekli)
+  // 4. Haftalık bültene abone aktif kullanıcıları çek (sayfalama gerekli)
   const subs: { email: string }[] = [];
   let page = 0;
   const pageSize = 1000;
@@ -92,6 +92,7 @@ export async function GET(req: NextRequest) {
       .from("subscribers")
       .select("email")
       .eq("is_active", true)
+      .eq("weekly_subscribed", true)
       .range(page * pageSize, (page + 1) * pageSize - 1);
     if (!batch || batch.length === 0) break;
     subs.push(...batch);
