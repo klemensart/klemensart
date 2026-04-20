@@ -263,8 +263,8 @@ const nextConfig: NextConfig = {
       // ═══════════════════════════════════════════════════════
       // 7. YASAL SAYFALAR
       // ═══════════════════════════════════════════════════════
-      { source: "/gizlilik-ve-guvenlik", destination: "/", permanent: true },
-      { source: "/satis-sozlesmesi", destination: "/", permanent: true },
+      { source: "/gizlilik-ve-guvenlik", destination: "/kvkk", permanent: true },
+      { source: "/satis-sozlesmesi", destination: "/mesafeli-satis", permanent: true },
       { source: "/iptal-ve-iade-kosullari", destination: "/iade-ve-iptal", permanent: true },
 
       // ═══════════════════════════════════════════════════════

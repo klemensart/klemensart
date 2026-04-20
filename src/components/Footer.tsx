@@ -9,13 +9,15 @@ const kesfetLinks = [
   { label: "Etkinlikler",        href: "/etkinlikler" },
 ];
 const kurumLinks = [
-  { label: "Hakkımızda",              href: "/hakkimizda" },
-  { label: "SSS",                     href: "/sss" },
-  { label: "İletişim",                href: "mailto:info@klemensart.com" },
-  { label: "Gizlilik Politikası",     href: "/kvkk" },
-  { label: "İade ve İptal",           href: "/iade-ve-iptal" },
-  { label: "Düzenleyici Koşulları",   href: "/duzenleyici-kosullari" },
-  { label: "KVKK (Düzenleyici)",      href: "/kvkk-duzenleyici" },
+  { label: "Hakkımızda",                  href: "/hakkimizda" },
+  { label: "SSS",                         href: "/sss" },
+  { label: "İletişim",                    href: "mailto:info@klemensart.com" },
+  { label: "KVKK Aydınlatma Metni",       href: "/kvkk" },
+  { label: "Mesafeli Satış Sözleşmesi",   href: "/mesafeli-satis" },
+  { label: "İade ve İptal",               href: "/iade-ve-iptal" },
+  { label: "Kullanım Koşulları",          href: "/kullanim-kosullari" },
+  { label: "Düzenleyici Koşulları",        href: "/duzenleyici-kosullari" },
+  { label: "Düzenleyici Aydınlatma Metni", href: "/kvkk-duzenleyici" },
 ];
 
 const socials = [
