@@ -368,9 +368,9 @@ export default function AtolyelerClient() {
           {/* CTA — Başvuru */}
           <AtolyeBasvuruCTA />
 
-          {/* Yasal dipnot */}
-          <div className="py-8 px-6 max-w-3xl mx-auto text-center">
-            <p className="text-xs text-warm-900/30 leading-relaxed">
+          {/* Yasal dipnot — desktop: sade paragraf */}
+          <div className="py-10 px-6 max-w-3xl mx-auto text-center">
+            <p className="text-sm text-warm-900/30 leading-relaxed">
               Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
               Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
               tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
@@ -519,14 +519,17 @@ export default function AtolyelerClient() {
         {/* CTA — Başvuru */}
         <AtolyeBasvuruCTA />
 
-        {/* Yasal dipnot */}
-        <div className="py-8 px-6 max-w-3xl mx-auto text-center">
-          <p className="text-xs text-warm-900/30 leading-relaxed">
-            Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
-            Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
-            tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
-            düzenleyicisinin sorumluluğundadır.
-          </p>
+        {/* Yasal dipnot — mobile: mercan kutu */}
+        <div className="px-6 pb-6">
+          <div className="bg-coral/5 border border-coral/10 rounded-xl px-4 py-3 flex gap-3 items-start">
+            <span className="text-coral/40 text-base flex-shrink-0 mt-0.5">&#9432;</span>
+            <p className="text-[11px] text-warm-900/40 leading-relaxed">
+              Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
+              Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
+              tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
+              düzenleyicisinin sorumluluğundadır.
+            </p>
+          </div>
         </div>
 
         <Footer />
