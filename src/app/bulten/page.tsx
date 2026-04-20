@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { createAdminClient } from "@/lib/supabase-admin";
 import BultenClient from "./BultenClient";
 
 export const metadata: Metadata = {
@@ -32,14 +31,6 @@ export const metadata: Metadata = {
 };
 
 export default async function BultenPage() {
-  const supabase = createAdminClient();
-
-  // Aktif abone sayısı
-  const { count: subscriberCount } = await supabase
-    .from("subscribers")
-    .select("id", { count: "exact", head: true })
-    .eq("is_active", true);
-
   const webPageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -84,7 +75,7 @@ export default async function BultenPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Suspense>
-        <BultenClient subscriberCount={subscriberCount ?? 0} />
+        <BultenClient />
       </Suspense>
     </>
   );
