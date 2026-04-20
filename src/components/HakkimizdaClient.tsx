@@ -815,9 +815,14 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
             <h2 className="text-4xl md:text-5xl font-bold text-warm-900 leading-tight mb-6">
               Sanat, bir araç.<br />Siz, asıl mesele.
             </h2>
-            <p className="text-warm-900/55 text-lg leading-relaxed">
-              Sanatı hayatın merkezine koymak için buradayız. Tek bir doğru yorum yoktur — her bakış açısı bu ağa yeni bir boyut katar.
-            </p>
+            <div className="space-y-6">
+              <p className="text-warm-900/55 text-lg leading-relaxed">
+                Klemens, sanat tarihini bilgi aktarımı için değil, kişisel keşif için bir araç olarak kullanır. Sinema, felsefe ve psikoloji prizmasından geçen her içerik, sizi akademik kaygılardan uzak bir anlam yolculuğuna davet eder.
+              </p>
+              <p className="text-warm-900/55 text-lg leading-relaxed">
+                Burada &quot;doğru cevabı bilmek&quot; değil, kendi sorunuzu bulmak önemlidir. Eserler, dönemler, akımlar — hepsi yalnızca daha iyi sorular sorabilmeniz için birer basamak. Tek bir doğru yorum yoktur; her bakış açısı bu ağa yeni bir boyut katar.
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">

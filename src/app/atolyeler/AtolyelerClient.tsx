@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
+import AtolyeBasvuruCTA from "@/components/AtolyeBasvuruCTA";
 import { createClient } from "@/lib/supabase";
 import PazaryeriCard from "./components/PazaryeriCard";
 import AjandaView from "./components/AjandaView";
@@ -380,20 +381,7 @@ export default function AtolyelerClient() {
           )}
 
           {/* CTA — Başvuru */}
-          <div className="mt-20 py-16 text-center">
-            <h2 className="font-serif text-xl md:text-2xl text-warm-900 mb-3">
-              Atölyenizi Klemens&apos;te duyurmak ister misiniz?
-            </h2>
-            <p className="text-sm text-warm-900/50 max-w-lg mx-auto mb-6 leading-relaxed">
-              Klemens, deneyimli eğitmenlerin atölyelerini meraklı bir topluluğa taşır. Başvurunuzu inceleyip size dönüyoruz.
-            </p>
-            <a
-              href="/atolye-basvuru"
-              className="inline-block px-6 py-2.5 text-sm font-medium border border-warm-900/20 text-warm-900/70 rounded-full hover:border-warm-900/40 hover:text-warm-900 transition-colors"
-            >
-              Başvuru Formu &rarr;
-            </a>
-          </div>
+          <AtolyeBasvuruCTA />
 
           {/* İçerik paneli altında footer bilgisi */}
           <div className="mt-16 pb-8 border-t border-warm-200 pt-8">
@@ -534,20 +522,7 @@ export default function AtolyelerClient() {
         </section>
 
         {/* CTA — Başvuru */}
-        <div className="py-16 text-center">
-          <h2 className="font-serif text-xl text-warm-900 mb-3">
-            Atölyenizi Klemens&apos;te duyurmak ister misiniz?
-          </h2>
-          <p className="text-sm text-warm-900/50 max-w-lg mx-auto mb-6 leading-relaxed px-4">
-            Klemens, deneyimli eğitmenlerin atölyelerini meraklı bir topluluğa taşır. Başvurunuzu inceleyip size dönüyoruz.
-          </p>
-          <a
-            href="/atolye-basvuru"
-            className="inline-block px-6 py-2.5 text-sm font-medium border border-warm-900/20 text-warm-900/70 rounded-full hover:border-warm-900/40 hover:text-warm-900 transition-colors"
-          >
-            Başvuru Formu &rarr;
-          </a>
-        </div>
+        <AtolyeBasvuruCTA />
 
         <Footer />
       </main>
