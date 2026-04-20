@@ -6,6 +6,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ArticleNewsletterCTA from "@/components/ArticleNewsletterCTA";
+import NewsletterFormAeon from "@/components/NewsletterFormAeon";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
 import ArticleAuthorByline from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorByline";
 import ArticleAuthorCard from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorCard";
@@ -14,6 +15,19 @@ import type { OtherArticle } from "@/app/icerikler/yazi/[slug]/components/Articl
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+/** Find the HTML split point at ~50% of closing </p> tags (minimum 4 paragraphs required) */
+function getHtmlMidpoint(html: string): number {
+  const closingTagRegex = /<\/p>/gi;
+  const positions: number[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = closingTagRegex.exec(html)) !== null) {
+    positions.push(match.index + match[0].length);
+  }
+  if (positions.length < 4) return -1;
+  const midIndex = Math.floor(positions.length / 2);
+  return positions[midIndex];
 }
 
 export default function ArticleReader({ article, relatedArticles = [], authorOtherArticles = [] }: { article: ParsedArticle; relatedArticles?: ArticleMeta[]; authorOtherArticles?: OtherArticle[] }) {
@@ -222,11 +236,37 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
             </p>
           )}
 
-          <div
-            className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
-            style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
+          {(() => {
+            const midpoint = getHtmlMidpoint(contentHtml);
+            if (midpoint === -1) {
+              return (
+                <div
+                  className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
+                  style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
+                  dangerouslySetInnerHTML={{ __html: contentHtml }}
+                />
+              );
+            }
+            const firstHalf = contentHtml.slice(0, midpoint);
+            const secondHalf = contentHtml.slice(midpoint);
+            return (
+              <>
+                <div
+                  className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
+                  style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
+                  dangerouslySetInnerHTML={{ __html: firstHalf }}
+                />
+                <div className="my-10">
+                  <NewsletterFormAeon source="article-inline" compact />
+                </div>
+                <div
+                  className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
+                  style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
+                  dangerouslySetInnerHTML={{ __html: secondHalf }}
+                />
+              </>
+            );
+          })()}
         </article>
 
         {/* Author Card */}

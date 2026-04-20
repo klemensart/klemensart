@@ -5,6 +5,7 @@ import { render } from "@react-email/render";
 import { templateRegistry } from "@/lib/email-templates";
 import { campaignWeekSlug } from "@/lib/bulten-helpers";
 import { sendBatchWithRetry } from "@/lib/resend-batch";
+import { buildPreferenceUrl } from "@/lib/newsletter-preferences";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 function isAuthorized(req: NextRequest) {
@@ -84,13 +85,13 @@ export async function GET(req: NextRequest) {
   const emailSubject = `Haftalık Kültür Sanat Bülteni`;
 
   // 4. Haftalık bültene abone aktif kullanıcıları çek (sayfalama gerekli)
-  const subs: { email: string }[] = [];
+  const subs: { email: string; preference_token: string }[] = [];
   let page = 0;
   const pageSize = 1000;
   while (true) {
     const { data: batch } = await admin
       .from("subscribers")
-      .select("email")
+      .select("email, preference_token")
       .eq("is_active", true)
       .eq("weekly_subscribed", true)
       .range(page * pageSize, (page + 1) * pageSize - 1);
@@ -107,12 +108,18 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const emails = subs.map((s) => ({
-    from: FROM,
-    to: s.email,
-    subject: emailSubject,
-    html: emailHtml,
-  }));
+  // Personalize each email with subscriber's preference URL
+  const UNSUB_PLACEHOLDER = "https://klemensart.com/abonelik-iptal";
+  const emails = subs.map((s) => {
+    const prefUrl = buildPreferenceUrl(s.preference_token);
+    const personalizedHtml = emailHtml.replace(UNSUB_PLACEHOLDER, prefUrl);
+    return {
+      from: FROM,
+      to: s.email,
+      subject: emailSubject,
+      html: personalizedHtml,
+    };
+  });
 
   const { totalSent, totalFailed, errors: batchErrors } = await sendBatchWithRetry(
     resend,

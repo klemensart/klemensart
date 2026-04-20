@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { Webhook } from "svix";
 
 type ResendEvent = {
   type: "email.opened" | "email.clicked" | "email.bounced" | "email.delivered" | string;
@@ -46,16 +47,41 @@ async function updateLog(
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+
+  // Verify signature with svix if secret is configured
   if (webhookSecret) {
     const svixId = req.headers.get("svix-id");
     const svixTimestamp = req.headers.get("svix-timestamp");
     const svixSignature = req.headers.get("svix-signature");
+
     if (!svixId || !svixTimestamp || !svixSignature) {
-      return NextResponse.json({ error: "Missing headers" }, { status: 401 });
+      return NextResponse.json({ error: "Missing webhook headers" }, { status: 401 });
+    }
+
+    const body = await req.text();
+
+    try {
+      const wh = new Webhook(webhookSecret);
+      wh.verify(body, {
+        "svix-id": svixId,
+        "svix-timestamp": svixTimestamp,
+        "svix-signature": svixSignature,
+      });
+
+      // Parse verified body
+      const event: ResendEvent = JSON.parse(body);
+      return handleEvent(event);
+    } catch {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
   }
 
+  // No secret configured — accept without verification (development)
   const event: ResendEvent = await req.json();
+  return handleEvent(event);
+}
+
+async function handleEvent(event: ResendEvent) {
   const admin = createAdminClient();
   const emailId = event.data?.email_id;
   const to = event.data?.to?.[0];

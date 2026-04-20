@@ -16,10 +16,11 @@ import * as React from "react";
 
 type Props = {
   preview?: string;
+  preferenceUrl?: string;
   children: React.ReactNode;
 };
 
-export function KlemensLayout({ preview, children }: Props) {
+export function KlemensLayout({ preview, preferenceUrl, children }: Props) {
   return (
     <Html lang="tr">
       <Head>
@@ -85,9 +86,15 @@ export function KlemensLayout({ preview, children }: Props) {
             <Text style={footerLegal}>
               Bu e-postayı klemensart.com üzerinden abone olduğunuz için alıyorsunuz.
               <br />
-              <Link href="https://klemensart.com/abonelik-iptal" style={unsubLink}>
-                Abonelikten çıkmak için tıklayın
-              </Link>
+              {preferenceUrl ? (
+                <Link href={preferenceUrl} style={unsubLink}>
+                  Bülten tercihlerini yönet
+                </Link>
+              ) : (
+                <Link href="https://klemensart.com/abonelik-iptal" style={unsubLink}>
+                  Abonelikten çıkmak için tıklayın
+                </Link>
+              )}
             </Text>
           </Section>
         </Container>
