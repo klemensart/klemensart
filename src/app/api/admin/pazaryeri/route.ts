@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const [eventsRes, activeCount, draftCount, archivedCount] = await Promise.all([
     admin
       .from("marketplace_events")
-      .select("*")
+      .select("*, host:people!host_id(id, name)")
       .eq("status", status)
       .order("event_date", { ascending: true }),
     admin.from("marketplace_events").select("id", { count: "exact", head: true }).eq("status", "active"),

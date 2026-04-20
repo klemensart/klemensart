@@ -35,6 +35,8 @@ type MarketplaceEvent = {
   max_participants: number | null;
   is_featured: boolean;
   status: string;
+  host_id: string | null;
+  host: { id: string; name: string } | null;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -142,6 +144,7 @@ export default function AdminPazaryeriPage() {
             <thead>
               <tr className="border-b border-warm-100 text-warm-900/40 text-xs uppercase tracking-wide">
                 <th className="text-left px-5 py-3 font-semibold">Başlık</th>
+                <th className="text-left px-5 py-3 font-semibold hidden md:table-cell">Düzenleyen</th>
                 <th className="text-left px-5 py-3 font-semibold">Şehir</th>
                 <th className="text-left px-5 py-3 font-semibold">Kategori</th>
                 <th className="text-left px-5 py-3 font-semibold">Tarih</th>
@@ -159,6 +162,15 @@ export default function AdminPazaryeriPage() {
                       )}
                       <span className="font-medium text-warm-900">{e.title}</span>
                     </div>
+                  </td>
+                  <td className="px-5 py-3 hidden md:table-cell max-w-[140px] truncate">
+                    {e.host ? (
+                      <span className="text-warm-900">{e.host.name}</span>
+                    ) : e.host_id ? (
+                      <span className="text-warm-900/30">—</span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-coral/10 text-coral text-[10px] font-bold rounded uppercase">Klemens</span>
+                    )}
                   </td>
                   <td className="px-5 py-3 text-warm-900/60">{e.district ? `${e.district}, ${e.city}` : e.city}</td>
                   <td className="px-5 py-3">
