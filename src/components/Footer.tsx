@@ -1,12 +1,13 @@
 import { InstagramIcon, TwitterIcon, LinkedInIcon, YouTubeIcon } from "@/lib/icons";
 
 const kesfetLinks = [
-  { label: "Atölyeler",          href: "/atolyeler" },
-  { label: "Testler ve Oyunlar", href: "#" },
-  { label: "Kültür Haritası",    href: "/harita" },
-  { label: "E-bülten",           href: "/bulten" },
-  { label: "İçerikler",          href: "#" },
-  { label: "Etkinlikler",        href: "/etkinlikler" },
+  { label: "Atölyeler",              href: "/atolyeler" },
+  { label: "Testler ve Oyunlar",     href: "#" },
+  { label: "Kültür Haritası",        href: "/harita" },
+  { label: "E-bülten",              href: "/bulten" },
+  { label: "İçerikler",             href: "#" },
+  { label: "Etkinlikler",           href: "/etkinlikler" },
+  { label: "Düzenleyici Olmak İçin", href: "/atolye-basvuru" },
 ];
 const kurumLinks = [
   { label: "Hakkımızda",                  href: "/hakkimizda" },
