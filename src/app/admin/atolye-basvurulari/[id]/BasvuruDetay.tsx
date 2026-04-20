@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { normalizePhoneForWhatsApp } from "@/lib/phone";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -475,7 +476,9 @@ function StatusBadge({ status, large }: { status: string; large?: boolean }) {
 
 function ContactLink({ channel, detail }: { channel: string; detail: string }) {
   if (channel === "whatsapp") {
-    const waLink = `https://wa.me/90${detail.replace(/\D/g, "").replace(/^0/, "")}`;
+    const normalized = normalizePhoneForWhatsApp(detail);
+    if (!normalized) return <span className="text-sm text-warm-900/50">{detail}</span>;
+    const waLink = `https://wa.me/${normalized}`;
     return (
       <a href={waLink} target="_blank" rel="noopener noreferrer" className="text-coral text-sm hover:underline">
         {detail}

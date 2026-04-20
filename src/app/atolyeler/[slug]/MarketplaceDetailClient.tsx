@@ -10,6 +10,7 @@ import DisclaimerNote from "./components/DisclaimerNote";
 import AtolyeFAQ from "./components/AtolyeFAQ";
 import StickyActionBar from "./components/StickyActionBar";
 import { formatTurkeyDateTime, formatDateRange, formatTurkeyTime } from "@/lib/dates";
+import { normalizePhoneForWhatsApp } from "@/lib/phone";
 
 /* ─── Constants ──────────────────────────────────── */
 
@@ -180,7 +181,7 @@ function ContactModal({
 
   if (!open) return null;
 
-  const waPhone = organizerPhone?.replace(/\D/g, "");
+  const waPhone = normalizePhoneForWhatsApp(organizerPhone);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
