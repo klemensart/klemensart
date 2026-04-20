@@ -245,22 +245,39 @@ export default function AtolyeBasvuruClient() {
           >
             Atölye Düzenleyici Başvurusu
           </h1>
+
+          <div className="bg-warm-100 border-l-4 border-coral p-5 md:p-6 rounded-r-lg mb-6 md:mb-8">
+            <h3 className="text-xs font-semibold text-warm-900 mb-2 uppercase tracking-wide">
+              Bu form ne için?
+            </h3>
+            <p className="text-warm-900/70 text-sm leading-relaxed">
+              Klemens, sanat tarihi ve kültür alanında atölye düzenleyen kişileri meraklı
+              bir kitleyle buluşturan bir keşif platformudur. Başvurunuz kabul edilirse
+              atölyeniz Klemens&apos;in atölyeler sayfasında yer alır; buradan gelen
+              katılımcılar size (WhatsApp, e-posta veya kendi sayfanız üzerinden) doğrudan
+              ulaşır. Klemens ödeme, kayıt veya iletişime aracılık etmez; tüm süreç
+              sizinle katılımcı arasındadır.
+            </p>
+          </div>
+
           <p className="text-warm-900/50 text-sm md:text-base leading-relaxed max-w-lg">
-            Klemens küratörlü bir platformdur. Atölyenizi Platform&apos;da paylaşmak için
-            aşağıdaki formu doldurmanız yeterli. Başvurunuzu en geç 15 iş günü içinde
-            değerlendirip sonucu e-posta ile bildiriyoruz.
+            Başvurunuzu en geç 15 iş günü içinde değerlendiriyor ve sonucunu e-posta
+            ile bildiriyoruz.
           </p>
         </div>
 
         {/* Progress */}
         <div className="flex items-center gap-3 mb-8">
-          <StepDot active={step >= 1} label="1" />
+          <div className="flex items-center gap-2">
+            <StepDot active={step >= 1} label="1" />
+            <span className="text-xs text-warm-900/40 hidden sm:block">Kişisel Bilgiler</span>
+          </div>
           <div className={`flex-1 h-0.5 ${step >= 2 ? "bg-coral" : "bg-warm-200"} transition-colors`} />
-          <StepDot active={step >= 2} label="2" />
-          <span className="ml-3 text-xs text-warm-900/40 hidden sm:block">
-            {step === 1 ? "Kişisel Bilgiler" : "Atölye Detayları"}
-          </span>
-          <span className="ml-3 text-xs text-warm-900/40 sm:hidden">{step}/2</span>
+          <div className="flex items-center gap-2">
+            <StepDot active={step >= 2} label="2" />
+            <span className="text-xs text-warm-900/40 hidden sm:block">Atölye Detayları</span>
+          </div>
+          <span className="text-xs text-warm-900/40 sm:hidden ml-auto">{step}/2</span>
         </div>
 
         {/* Form card */}
@@ -397,42 +414,46 @@ export default function AtolyeBasvuruClient() {
                 />
               </Field>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Field label="Müşteri İletişim Kanalı" required>
-                  <select
-                    value={form.contact_channel}
-                    onChange={(e) => set("contact_channel", e.target.value as ContactChannel)}
-                    className={inputClass()}
-                  >
-                    <option value="whatsapp">WhatsApp</option>
-                    <option value="email">E-posta</option>
-                    <option value="website">Web Sitesi</option>
-                    <option value="other">Diğer</option>
-                  </select>
-                </Field>
-
-                <Field
-                  label={CHANNEL_LABELS[form.contact_channel]}
-                  required
-                  error={errors.contact_channel_detail}
+              <Field label="Müşteri İletişim Kanalı" required>
+                <select
+                  value={form.contact_channel}
+                  onChange={(e) => set("contact_channel", e.target.value as ContactChannel)}
+                  className={inputClass()}
                 >
-                  <input
-                    type="text"
-                    value={form.contact_channel_detail}
-                    onChange={(e) => set("contact_channel_detail", e.target.value)}
-                    placeholder={
-                      form.contact_channel === "whatsapp"
-                        ? "0532 123 45 67"
-                        : form.contact_channel === "email"
-                          ? "ornek@email.com"
-                          : form.contact_channel === "website"
-                            ? "https://orneksite.com"
-                            : "İletişim bilginiz"
-                    }
-                    className={inputClass(errors.contact_channel_detail)}
-                  />
-                </Field>
-              </div>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="email">E-posta</option>
+                  <option value="website">Web Sitesi</option>
+                  <option value="other">Diğer</option>
+                </select>
+              </Field>
+
+              <p className="text-sm text-warm-900/50 italic leading-relaxed -mt-2">
+                Bu kanal, atölyenize katılmak isteyen kişilerin sizinle iletişime geçeceği
+                adres olacaktır. WhatsApp numaranızı, ödeme sayfası (Biletini Al, PayTR,
+                Eventbrite vb.) linkinizi veya tercih ettiğiniz başka bir kanalı yazabilirsiniz.
+              </p>
+
+              <Field
+                label={CHANNEL_LABELS[form.contact_channel]}
+                required
+                error={errors.contact_channel_detail}
+              >
+                <input
+                  type="text"
+                  value={form.contact_channel_detail}
+                  onChange={(e) => set("contact_channel_detail", e.target.value)}
+                  placeholder={
+                    form.contact_channel === "whatsapp"
+                      ? "0532 123 45 67"
+                      : form.contact_channel === "email"
+                        ? "ornek@email.com"
+                        : form.contact_channel === "website"
+                          ? "https://orneksite.com"
+                          : "İletişim bilginiz"
+                  }
+                  className={inputClass(errors.contact_channel_detail)}
+                />
+              </Field>
 
               {/* Terms checkbox */}
               <div>
