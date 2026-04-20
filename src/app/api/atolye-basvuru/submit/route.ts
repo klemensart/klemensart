@@ -97,21 +97,27 @@ export async function POST(req: NextRequest) {
 
     const admin = createAdminClient();
 
-    // 4. Aynı email ile son 24 saatte başvuru var mı?
+    // 4. Aynı email + aynı başlık ile son 24 saatte başvuru var mı?
     const twentyFourHoursAgo = new Date(
       Date.now() - 24 * 60 * 60 * 1000,
     ).toISOString();
-    const { count } = await admin
+    const normalizedTopic = data.topic.trim().toLowerCase();
+    const { data: duplicates } = await admin
       .from("marketplace_applications")
-      .select("id", { count: "exact", head: true })
+      .select("id, workshop_topic")
       .eq("applicant_email", data.email.trim().toLowerCase())
       .gte("created_at", twentyFourHoursAgo);
 
-    if ((count ?? 0) > 0) {
+    const hasDuplicate = (duplicates ?? []).some(
+      (row) => row.workshop_topic.trim().toLowerCase() === normalizedTopic,
+    );
+
+    if (hasDuplicate) {
       return NextResponse.json(
         {
           error:
-            "Zaten bir başvurunuz bulunuyor. En kısa sürede dönüş yapılacaktır.",
+            "Bu atölye için zaten başvurunuz var. En kısa sürede değerlendireceğiz. Farklı bir atölye önermek isterseniz başlığı değiştirip tekrar gönderebilirsiniz.",
+          duplicate: true,
         },
         { status: 429 },
       );
