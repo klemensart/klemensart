@@ -205,25 +205,10 @@ export default function AtolyelerClient() {
           Atölyeler
         </h1>
         <p style={{ color: B.warm, fontSize: 15, maxWidth: 480, margin: "0 auto", lineHeight: 1.7 }}>
-          Online ve yüz yüze atölyeleri keşfet, hemen kaydol.
+          Deneyimli eğitmenlerle çalışmaya başlayın.
         </p>
       </section>
 
-      {/* ═══ Platform bilgi şeridi ═══ */}
-      <div
-        style={{ background: B.cream }}
-        className="max-w-7xl mx-auto px-6 pb-4"
-      >
-        <div className="bg-coral/5 border border-coral/10 rounded-xl px-4 py-3 flex gap-3 items-start">
-          <span className="text-coral/40 text-base flex-shrink-0 mt-0.5">&#9432;</span>
-          <p className="text-[11px] sm:text-xs text-warm-900/40 leading-relaxed">
-            Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
-            Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
-            tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
-            düzenleyicisinin sorumluluğundadır.
-          </p>
-        </div>
-      </div>
 
       {/* ═══ Dual-pane layout — iki bağımsız scroll paneli ═══ */}
       <div
@@ -383,6 +368,16 @@ export default function AtolyelerClient() {
           {/* CTA — Başvuru */}
           <AtolyeBasvuruCTA />
 
+          {/* Yasal dipnot */}
+          <div className="py-8 px-6 max-w-3xl mx-auto text-center">
+            <p className="text-xs text-warm-900/30 leading-relaxed">
+              Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
+              Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
+              tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
+              düzenleyicisinin sorumluluğundadır.
+            </p>
+          </div>
+
           {/* İçerik paneli altında footer bilgisi */}
           <div className="mt-16 pb-8 border-t border-warm-200 pt-8">
             <Footer />
@@ -523,6 +518,16 @@ export default function AtolyelerClient() {
 
         {/* CTA — Başvuru */}
         <AtolyeBasvuruCTA />
+
+        {/* Yasal dipnot */}
+        <div className="py-8 px-6 max-w-3xl mx-auto text-center">
+          <p className="text-xs text-warm-900/30 leading-relaxed">
+            Klemens, kültür ve sanat alanındaki atölyeleri bir araya getiren bir platformdur.
+            Bazı atölyeler Klemens tarafından düzenlenmekte, bazıları ise bağımsız eğitmenler
+            tarafından sunulmaktadır. Her etkinliğin yürütülmesi, ödemesi ve iadesi
+            düzenleyicisinin sorumluluğundadır.
+          </p>
+        </div>
 
         <Footer />
       </main>
