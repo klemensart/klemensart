@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { MarketplaceEvent } from "@/types/marketplace";
 import HostCard from "./components/HostCard";
 import DisclaimerNote from "./components/DisclaimerNote";
 import AtolyeFAQ from "./components/AtolyeFAQ";
 import StickyActionBar from "./components/StickyActionBar";
+import { formatTurkeyDateTime, formatDateRange, formatTurkeyTime } from "@/lib/dates";
 
 /* ─── Constants ──────────────────────────────────── */
 
@@ -25,15 +28,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   sinema: "Sinema",
 };
 
-function fmtFullDate(iso: string) {
-  return new Date(iso).toLocaleDateString("tr-TR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function fmtFullDate(iso: string, endDate?: string | null) {
+  const range = formatDateRange(iso, endDate);
+  const time = formatTurkeyTime(iso);
+  return `${range}, ${time}`;
 }
 
 function fmtPrice(price: number) {
@@ -361,7 +359,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
                   {event.event_date && (
                     <div className="flex items-center gap-3">
                       <CalendarIcon className="w-4 h-4 text-brand-warm flex-shrink-0" />
-                      <span>{fmtFullDate(event.event_date)}</span>
+                      <span>{fmtFullDate(event.event_date, event.end_date)}</span>
                     </div>
                   )}
                   {event.duration_note && (
@@ -471,10 +469,28 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
               {event.description && (
                 <>
                   <h2 className="text-xl font-bold text-warm-900 mb-4">Atölye Hakkında</h2>
-                  <div
-                    className="prose prose-sm max-w-none mb-8 text-warm-900/70 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: event.description }}
-                  />
+                  <div className="mb-8 text-sm text-warm-900/70 leading-relaxed atolye-description">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                        strong: ({ children }) => <strong className="font-semibold text-warm-900">{children}</strong>,
+                        em: ({ children }) => <em className="italic">{children}</em>,
+                        h1: ({ children }) => <h3 className="text-lg font-bold text-warm-900 mt-6 mb-2">{children}</h3>,
+                        h2: ({ children }) => <h3 className="text-base font-bold text-warm-900 mt-5 mb-2">{children}</h3>,
+                        h3: ({ children }) => <h4 className="text-sm font-semibold text-warm-900 mt-4 mb-1.5">{children}</h4>,
+                        ul: ({ children }) => <ul className="list-disc pl-5 mb-3 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-5 mb-3 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li>{children}</li>,
+                        a: ({ href, children }) => (
+                          <a href={href} className="text-coral hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>
+                        ),
+                        hr: () => <hr className="my-4 border-warm-200" />,
+                      }}
+                    >
+                      {event.description}
+                    </ReactMarkdown>
+                  </div>
                 </>
               )}
 

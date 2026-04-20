@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 
 type Tab = "active" | "draft" | "archived";
 
@@ -42,8 +43,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   dans: "Dans", tiyatro: "Tiyatro", diger: "Diğer",
 };
 
-const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS).map(([v, l]) => ({ value: v, label: l }));
-
 function fmt(iso: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("tr-TR", {
@@ -51,24 +50,11 @@ function fmt(iso: string | null) {
   });
 }
 
-const EMPTY_FORM = {
-  title: "", description: "", short_description: "", category: "resim", city: "Ankara",
-  district: "", venue_name: "", venue_address: "", organizer_name: "", organizer_url: "",
-  organizer_phone: "", organizer_email: "", organizer_logo_url: "", price: 0,
-  price_options_json: "", event_date: "", end_date: "", event_time_note: "", duration_note: "",
-  recurring: false, recurring_note: "", image_url: "", gallery_urls_text: "",
-  max_participants: "", is_featured: false, status: "active",
-};
-
 export default function AdminPazaryeriPage() {
   const [tab, setTab] = useState<Tab>("active");
   const [events, setEvents] = useState<MarketplaceEvent[]>([]);
   const [counts, setCounts] = useState({ active: 0, draft: 0, archived: 0 });
   const [fetching, setFetching] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
 
   const fetchData = useCallback(async (status: Tab) => {
     setFetching(true);
@@ -83,95 +69,6 @@ export default function AdminPazaryeriPage() {
   }, []);
 
   useEffect(() => { fetchData(tab); }, [tab, fetchData]);
-
-  function openNew() {
-    setEditingId(null);
-    setForm(EMPTY_FORM);
-    setModalOpen(true);
-  }
-
-  function openEdit(e: MarketplaceEvent) {
-    setEditingId(e.id);
-    setForm({
-      title: e.title,
-      description: e.description ?? "",
-      short_description: e.short_description ?? "",
-      category: e.category,
-      city: e.city,
-      district: e.district ?? "",
-      venue_name: e.venue_name ?? "",
-      venue_address: e.venue_address ?? "",
-      organizer_name: e.organizer_name,
-      organizer_url: e.organizer_url ?? "",
-      organizer_phone: e.organizer_phone ?? "",
-      organizer_email: e.organizer_email ?? "",
-      organizer_logo_url: e.organizer_logo_url ?? "",
-      price: e.price,
-      price_options_json: e.price_options ? JSON.stringify(e.price_options, null, 2) : "",
-      event_date: e.event_date ? e.event_date.slice(0, 16) : "",
-      end_date: e.end_date ? e.end_date.slice(0, 16) : "",
-      event_time_note: e.event_time_note ?? "",
-      duration_note: e.duration_note ?? "",
-      recurring: e.recurring,
-      recurring_note: e.recurring_note ?? "",
-      image_url: e.image_url ?? "",
-      gallery_urls_text: e.gallery_urls ? e.gallery_urls.join("\n") : "",
-      max_participants: e.max_participants ? String(e.max_participants) : "",
-      is_featured: e.is_featured,
-      status: e.status,
-    });
-    setModalOpen(true);
-  }
-
-  async function handleSubmit() {
-    setSubmitting(true);
-    const payload: Record<string, unknown> = {
-      title: form.title,
-      description: form.description || null,
-      short_description: form.short_description || null,
-      category: form.category,
-      city: form.city,
-      district: form.district || null,
-      venue_name: form.venue_name || null,
-      venue_address: form.venue_address || null,
-      organizer_name: form.organizer_name,
-      organizer_url: form.organizer_url || null,
-      organizer_phone: form.organizer_phone || null,
-      organizer_email: form.organizer_email || null,
-      organizer_logo_url: form.organizer_logo_url || null,
-      price: Number(form.price) || 0,
-      price_options: form.price_options_json ? JSON.parse(form.price_options_json) : null,
-      event_date: form.event_date ? new Date(form.event_date).toISOString() : null,
-      end_date: form.end_date ? new Date(form.end_date).toISOString() : null,
-      event_time_note: form.event_time_note || null,
-      duration_note: form.duration_note || null,
-      recurring: form.recurring,
-      recurring_note: form.recurring_note || null,
-      image_url: form.image_url || null,
-      gallery_urls: form.gallery_urls_text ? form.gallery_urls_text.split("\n").filter(Boolean) : null,
-      max_participants: form.max_participants ? Number(form.max_participants) : null,
-      is_featured: form.is_featured,
-      status: form.status,
-    };
-
-    if (editingId) {
-      payload.id = editingId;
-      await fetch("/api/admin/pazaryeri", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } else {
-      await fetch("/api/admin/pazaryeri", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    }
-    setSubmitting(false);
-    setModalOpen(false);
-    fetchData(tab);
-  }
 
   async function archiveEvent(id: string) {
     await fetch("/api/admin/pazaryeri", {
@@ -188,39 +85,6 @@ export default function AdminPazaryeriPage() {
     { key: "archived", label: "Arşiv" },
   ];
 
-  function field(label: string, name: keyof typeof form, type: string = "text", opts?: { textarea?: boolean; required?: boolean }) {
-    const val = form[name];
-    const commonCn = "w-full text-sm bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 focus:outline-none focus:border-coral/50";
-    return (
-      <div>
-        <label className="block text-xs font-semibold text-warm-900/50 mb-1">{label}</label>
-        {opts?.textarea ? (
-          <textarea
-            value={val as string}
-            onChange={(e) => setForm((p) => ({ ...p, [name]: e.target.value }))}
-            rows={3}
-            className={commonCn + " resize-none"}
-          />
-        ) : type === "checkbox" ? (
-          <input
-            type="checkbox"
-            checked={val as boolean}
-            onChange={(e) => setForm((p) => ({ ...p, [name]: e.target.checked }))}
-            className="w-4 h-4 accent-coral"
-          />
-        ) : (
-          <input
-            type={type}
-            value={val as string | number}
-            onChange={(e) => setForm((p) => ({ ...p, [name]: type === "number" ? Number(e.target.value) : e.target.value }))}
-            required={opts?.required}
-            className={commonCn}
-          />
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="p-8">
       {/* Header */}
@@ -229,12 +93,16 @@ export default function AdminPazaryeriPage() {
           <p className="text-xs text-warm-900/40 mb-1">Admin Paneli</p>
           <h1 className="text-2xl font-bold text-warm-900">Pazaryeri Yönetimi</h1>
         </div>
-        <button
-          onClick={openNew}
-          className="px-4 py-2 bg-coral text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+        <Link
+          href="/admin/pazaryeri/yeni"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-coral text-white text-sm font-semibold rounded-xl hover:bg-coral/90 transition-colors"
         >
-          + Yeni Ekle
-        </button>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Yeni Atölye
+        </Link>
       </div>
 
       {/* Tabs */}
@@ -308,12 +176,12 @@ export default function AdminPazaryeriPage() {
                   </td>
                   <td className="px-5 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => openEdit(e)}
+                      <Link
+                        href={`/admin/pazaryeri/${e.id}`}
                         className="px-3 py-1.5 bg-warm-100 hover:bg-warm-200 text-warm-900/60 text-xs font-semibold rounded-lg transition-colors"
                       >
                         Düzenle
-                      </button>
+                      </Link>
                       {tab !== "archived" && (
                         <button
                           onClick={() => archiveEvent(e.id)}
@@ -331,135 +199,6 @@ export default function AdminPazaryeriPage() {
         </div>
       )}
 
-      {/* Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-warm-100 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-warm-900">
-                {editingId ? "Etkinliği Düzenle" : "Yeni Etkinlik Ekle"}
-              </h2>
-              <button onClick={() => setModalOpen(false)} className="text-warm-900/30 hover:text-warm-900 text-xl">&times;</button>
-            </div>
-
-            <div className="px-6 py-5 space-y-4">
-              {field("Başlık *", "title", "text", { required: true })}
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-warm-900/50 mb-1">Kategori</label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
-                    className="w-full text-sm bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 focus:outline-none focus:border-coral/50"
-                  >
-                    {CATEGORY_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-warm-900/50 mb-1">Şehir</label>
-                  <select
-                    value={form.city}
-                    onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
-                    className="w-full text-sm bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 focus:outline-none focus:border-coral/50"
-                  >
-                    <option value="Ankara">Ankara</option>
-                    <option value="İstanbul">İstanbul</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {field("İlçe", "district")}
-                {field("Mekân Adı", "venue_name")}
-              </div>
-              {field("Mekân Adresi", "venue_address")}
-              {field("Kısa Açıklama", "short_description")}
-              {field("Açıklama", "description", "text", { textarea: true })}
-
-              <div className="grid grid-cols-2 gap-4">
-                {field("Etkinlik Tarihi *", "event_date", "datetime-local", { required: true })}
-                {field("Bitiş Tarihi", "end_date", "datetime-local")}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {field("Süre Notu", "duration_note")}
-                {field("Saat Notu", "event_time_note")}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {field("Düzenleyici Adı *", "organizer_name", "text", { required: true })}
-                {field("Düzenleyici URL", "organizer_url", "url")}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {field("Düzenleyici Telefon", "organizer_phone", "tel")}
-                {field("Düzenleyici E-posta", "organizer_email", "email")}
-              </div>
-              {field("Düzenleyici Logo URL", "organizer_logo_url", "url")}
-
-              <div className="grid grid-cols-3 gap-4">
-                {field("Fiyat (TL)", "price", "number")}
-                {field("Maks. Katılımcı", "max_participants", "number")}
-                <div>
-                  <label className="block text-xs font-semibold text-warm-900/50 mb-1">Durum</label>
-                  <select
-                    value={form.status}
-                    onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
-                    className="w-full text-sm bg-warm-50 border border-warm-200 rounded-xl px-3 py-2 focus:outline-none focus:border-coral/50"
-                  >
-                    <option value="active">Aktif</option>
-                    <option value="draft">Taslak</option>
-                    <option value="archived">Arşivlenmiş</option>
-                  </select>
-                </div>
-              </div>
-
-              {field("Fiyat Seçenekleri (JSON)", "price_options_json", "text", { textarea: true })}
-              {field("Görsel URL", "image_url", "url")}
-              {field("Galeri URL'leri (her satıra bir URL)", "gallery_urls_text", "text", { textarea: true })}
-
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 text-sm text-warm-900/70">
-                  <input
-                    type="checkbox"
-                    checked={form.is_featured}
-                    onChange={(e) => setForm((p) => ({ ...p, is_featured: e.target.checked }))}
-                    className="w-4 h-4 accent-coral"
-                  />
-                  Öne Çıkan
-                </label>
-                <label className="flex items-center gap-2 text-sm text-warm-900/70">
-                  <input
-                    type="checkbox"
-                    checked={form.recurring}
-                    onChange={(e) => setForm((p) => ({ ...p, recurring: e.target.checked }))}
-                    className="w-4 h-4 accent-coral"
-                  />
-                  Tekrarlayan
-                </label>
-              </div>
-              {form.recurring && field("Tekrarlama Notu", "recurring_note")}
-            </div>
-
-            <div className="px-6 py-4 border-t border-warm-100 flex justify-end gap-3 sticky bottom-0 bg-white">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-5 py-2.5 text-sm font-semibold text-warm-900/50 hover:text-warm-900 transition-colors"
-              >
-                İptal
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={submitting || !form.title || !form.organizer_name}
-                className="px-6 py-2.5 bg-coral text-white text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
-              >
-                {submitting ? "Kaydediliyor..." : editingId ? "Güncelle" : "Ekle"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

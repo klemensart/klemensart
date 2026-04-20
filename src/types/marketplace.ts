@@ -50,6 +50,7 @@ export type MarketplaceEventCard = Pick<
   | "price"
   | "image_url"
   | "event_date"
+  | "end_date"
   | "is_featured"
   | "is_klemens"
   | "detail_slug"

@@ -151,7 +151,7 @@ export default function AtolyelerClient() {
       const supabase = createClient();
       let query = supabase
         .from("marketplace_events")
-        .select("id, slug, title, category, city, district, price, image_url, event_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url, host_id, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
+        .select("id, slug, title, category, city, district, price, image_url, event_date, end_date, is_featured, is_klemens, detail_slug, duration_note, organizer_name, organizer_logo_url, short_description, venue_name, venue_address, organizer_phone, organizer_email, organizer_url, host_id, host:people!marketplace_events_host_id_fkey(id, slug, name, avatar_url, short_bio, instagram, expertise)")
         .eq("status", "active");
 
       if (city) query = query.eq("city", city);
@@ -346,6 +346,7 @@ export default function AtolyelerClient() {
                     price={e.price}
                     image_url={e.image_url}
                     event_date={e.event_date}
+                    end_date={e.end_date}
                     is_featured={e.is_featured}
                     href={e.detail_slug ? `/atolyeler/${e.detail_slug}` : `/atolyeler/${e.slug}`}
                     badge={e.is_klemens ? "Klemens" : undefined}
@@ -482,6 +483,7 @@ export default function AtolyelerClient() {
                     price={e.price}
                     image_url={e.image_url}
                     event_date={e.event_date}
+                    end_date={e.end_date}
                     is_featured={e.is_featured}
                     href={e.detail_slug ? `/atolyeler/${e.detail_slug}` : `/atolyeler/${e.slug}`}
                     badge={e.is_klemens ? "Klemens" : undefined}

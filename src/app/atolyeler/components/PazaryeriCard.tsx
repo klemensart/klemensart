@@ -10,6 +10,7 @@ type Props = {
   price: number;
   image_url: string | null;
   event_date: string | null;
+  end_date?: string | null;
   is_featured: boolean;
   href?: string;
   badge?: string;
@@ -41,7 +42,7 @@ function formatPrice(price: number): string {
 }
 
 export default function PazaryeriCard({
-  slug, title, category, city, district, price, image_url, event_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url, instructor_name, host_slug,
+  slug, title, category, city, district, price, image_url, event_date, end_date, is_featured, href, badge, duration_note, organizer_name, organizer_logo_url, instructor_name, host_slug,
 }: Props) {
   const linkHref = href ?? `/atolyeler/${slug}`;
   const isOnline = city === "Online";
@@ -87,7 +88,7 @@ export default function PazaryeriCard({
         {/* Top right — date badge */}
         {event_date && (
           <div className="absolute top-3 right-3">
-            <DateBadge date={event_date} />
+            <DateBadge date={event_date} endDate={end_date} />
           </div>
         )}
 
