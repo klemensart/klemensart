@@ -58,7 +58,6 @@ const CHANNEL_LABELS: Record<string, string> = {
 export default function BasvuruDetay({ application }: { application: Application }) {
   const router = useRouter();
   const [app, setApp] = useState(application);
-  const [selectedStatus, setSelectedStatus] = useState(app.status);
   const [adminNote, setAdminNote] = useState(app.admin_note || "");
   const [sendEmail, setSendEmail] = useState(true);
   const [loading, setLoading] = useState<string | null>(null);
@@ -70,10 +69,8 @@ export default function BasvuruDetay({ application }: { application: Application
     if (t) setTimeout(() => setToast(null), 4000);
   }
 
-  async function handleUpdate(overrideStatus?: string) {
-    const status = overrideStatus || selectedStatus;
-    const action = overrideStatus || "save";
-    setLoading(action);
+  async function handleUpdate(status: string) {
+    setLoading(status);
 
     // Uyarı: Zaten onaylı/reddedilmiş başvuruda tekrar onay/red
     if (
@@ -97,7 +94,7 @@ export default function BasvuruDetay({ application }: { application: Application
         body: JSON.stringify({
           status,
           admin_note: adminNote || undefined,
-          send_email: sendEmail,
+          send_email: status === "reviewing" ? false : sendEmail,
         }),
       });
 
@@ -117,17 +114,16 @@ export default function BasvuruDetay({ application }: { application: Application
             : prev.reviewed_at,
         updated_at: new Date().toISOString(),
       }));
-      setSelectedStatus(status);
 
       const emailSent =
-        sendEmail && (status === "approved" || status === "rejected");
+        status !== "reviewing" && sendEmail && (status === "approved" || status === "rejected");
       showToast({
         message:
           status === "approved"
             ? "Başvuru onaylandı"
             : status === "rejected"
               ? "Başvuru reddedildi"
-              : "Değişiklikler kaydedildi",
+              : "İnceleniyor olarak işaretlendi",
         type: "success",
         sub: emailSent ? "Email başvurana iletildi" : undefined,
       });
@@ -331,23 +327,6 @@ export default function BasvuruDetay({ application }: { application: Application
 
           {/* Actions Card */}
           <div className="bg-white border border-warm-200 rounded-xl p-5 space-y-5">
-            {/* Status dropdown */}
-            <div>
-              <label className="block text-xs font-semibold text-warm-900/50 uppercase tracking-wide mb-2">
-                Durum Değiştir
-              </label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-warm-200 text-sm text-warm-900 focus:outline-none focus:ring-2 focus:ring-coral/20 focus:border-coral"
-              >
-                <option value="pending">Beklemede</option>
-                <option value="reviewing">İnceleniyor</option>
-                <option value="approved">Onaylı</option>
-                <option value="rejected">Reddedildi</option>
-              </select>
-            </div>
-
             {/* Admin Note */}
             <div>
               <label className="block text-xs font-semibold text-warm-900/50 uppercase tracking-wide mb-2">
@@ -380,29 +359,38 @@ export default function BasvuruDetay({ application }: { application: Application
             </label>
 
             {/* Action buttons */}
-            <div className="pt-3 border-t border-warm-100 space-y-2.5">
-              <button
-                onClick={() => handleUpdate()}
-                disabled={loading !== null}
-                className="w-full px-4 py-2.5 rounded-lg bg-warm-600 text-white text-sm font-semibold hover:bg-warm-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading === "save" ? "Kaydediliyor..." : "Kaydet"}
-              </button>
+            <div className="pt-3 border-t border-warm-100 space-y-3">
               <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <button
+                    onClick={() => handleUpdate("approved")}
+                    disabled={loading !== null}
+                    className="w-full px-4 py-2.5 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading === "approved" ? "..." : "Onayla"}
+                  </button>
+                  <p className="text-[11px] text-warm-900/35 mt-1.5 italic">Başvuru onaylanır ve email gider</p>
+                </div>
+                <div>
+                  <button
+                    onClick={() => handleUpdate("rejected")}
+                    disabled={loading !== null}
+                    className="w-full px-4 py-2.5 rounded-lg border border-red-500 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading === "rejected" ? "..." : "Reddet"}
+                  </button>
+                  <p className="text-[11px] text-warm-900/35 mt-1.5 italic">Red emaili gider</p>
+                </div>
+              </div>
+              <div>
                 <button
-                  onClick={() => handleUpdate("approved")}
+                  onClick={() => handleUpdate("reviewing")}
                   disabled={loading !== null}
-                  className="px-4 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 rounded-lg border border-warm-300 text-warm-700 text-sm font-medium hover:bg-warm-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading === "approved" ? "..." : "Onayla"}
+                  {loading === "reviewing" ? "..." : "İnceleniyor Olarak İşaretle"}
                 </button>
-                <button
-                  onClick={() => handleUpdate("rejected")}
-                  disabled={loading !== null}
-                  className="px-4 py-2.5 rounded-lg border-2 border-red-300 text-red-700 text-sm font-semibold hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading === "rejected" ? "..." : "Reddet"}
-                </button>
+                <p className="text-[11px] text-warm-900/35 mt-1.5 italic">Karar vermeden beklemek için (email gitmez)</p>
               </div>
             </div>
           </div>
