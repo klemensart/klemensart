@@ -978,12 +978,9 @@ export default function BultenGonderPage() {
 
   const handleSendAll = async () => {
     try {
-      const res = await fetch("/api/admin/subscribers");
+      const res = await fetch("/api/admin/subscribers/count");
       const data = await res.json();
-      const activeCount =
-        data.subscribers?.filter((s: { is_active: boolean }) => s.is_active)
-          .length ?? 0;
-      setSubscriberCount(activeCount);
+      setSubscriberCount(data.active ?? null);
     } catch {
       setSubscriberCount(null);
     }
