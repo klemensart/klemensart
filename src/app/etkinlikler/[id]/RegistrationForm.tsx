@@ -142,7 +142,6 @@ export default function RegistrationForm({ eventId, eventTitle, eventDate, event
             placeholder="Ad Soyad"
             className={inputCls}
             required
-            readOnly={!!userId}
           />
         </div>
 
@@ -157,7 +156,6 @@ export default function RegistrationForm({ eventId, eventTitle, eventDate, event
             placeholder="ornek@email.com"
             className={inputCls}
             required
-            readOnly={!!userId}
           />
         </div>
 
