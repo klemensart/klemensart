@@ -2,8 +2,6 @@ import Link from "next/link";
 import { categories } from "@/lib/icerikler";
 import { categoryStyles } from "@/lib/category-styles";
 import { ArrowRightIcon } from "@/lib/icons";
-import { getAllArticlesMetadata } from "@/lib/markdown";
-import ArticleCard from "@/components/ArticleCard";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   "odak": (
@@ -37,14 +35,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
   ),
 };
 
-export default async function IceriklerSection() {
-  const allArticles = await getAllArticlesMetadata();
-
-  // En yeni yazıları tarihe göre sırala
-  const featured = [...allArticles]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
-
+export default function IceriklerSection() {
   return (
     <section id="icerikler" className="py-24 px-6 bg-warm-50">
       <div className="max-w-6xl mx-auto">
@@ -93,25 +84,6 @@ export default async function IceriklerSection() {
               </Link>
             );
           })}
-        </div>
-
-        {/* Featured articles */}
-        <div>
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-bold text-warm-900">Son Yazılar</h3>
-            <Link
-              href="/icerikler"
-              className="text-sm font-semibold text-warm-900/40 hover:text-coral flex items-center gap-1.5 transition-colors"
-            >
-              Tümünü gör <ArrowRightIcon />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {featured.map((article, i) => (
-              <ArticleCard key={article.slug} article={article} priority={i < 3} />
-            ))}
-          </div>
         </div>
 
         {/* CTA */}
