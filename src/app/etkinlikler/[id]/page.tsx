@@ -29,10 +29,26 @@ type Props = { params: Promise<{ id: string }> };
 
 async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = createAdminClient();
+  const cols = "id,title,description,ai_comment,event_type,venue,address,event_date,end_date,source_url,source_name,price_info,image_url,is_klemens_event,registration_enabled,slug";
+
+  // UUID formatında mı kontrol et
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+  if (isUuid) {
+    const { data, error } = await supabase
+      .from("events")
+      .select(cols)
+      .eq("id", id)
+      .eq("status", "approved")
+      .maybeSingle();
+    if (!error && data) return data as EventRow;
+  }
+
+  // Slug ile dene
   const { data, error } = await supabase
     .from("events")
-    .select("id,title,description,ai_comment,event_type,venue,address,event_date,end_date,source_url,source_name,price_info,image_url,is_klemens_event,registration_enabled,slug")
-    .eq("id", id)
+    .select(cols)
+    .eq("slug", id)
     .eq("status", "approved")
     .maybeSingle();
 
