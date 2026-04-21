@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Düzenleyici Koşulları | Klemens",
   description:
     "Klemens marketplace'inde atölye listelemek isteyen düzenleyiciler için koşullar.",
+  keywords: ["düzenleyici koşulları", "atölye listeleme", "klemens eğitmen sözleşme"],
   alternates: { canonical: "/duzenleyici-kosullari" },
   openGraph: {
     title: "Düzenleyici Koşulları — Klemens",

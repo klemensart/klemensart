@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Mesafeli Satış Sözleşmesi",
   description:
     "Klemens üzerinden satın alınan canlı atölye, seminer ve dijital içerik hizmetlerine ilişkin mesafeli satış koşulları.",
+  keywords: ["mesafeli satış sözleşmesi", "online atölye satın alma", "klemens ödeme koşulları"],
   alternates: { canonical: "/mesafeli-satis" },
   openGraph: {
     title: "Mesafeli Satış Sözleşmesi — Klemens",

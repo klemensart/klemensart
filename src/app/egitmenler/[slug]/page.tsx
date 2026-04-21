@@ -62,6 +62,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       person.short_bio ||
       `${person.name}'nın Klemens'te düzenlediği atölyeleri keşfet.`,
+    keywords: [
+      person.name,
+      "atölye eğitmeni",
+      "klemens eğitmen",
+      ...(person.short_bio ? ["sanat atölyesi ankara"] : []),
+    ],
+    alternates: { canonical: `/egitmenler/${slug}` },
     openGraph: person.avatar_url
       ? { images: [{ url: person.avatar_url }] }
       : undefined,

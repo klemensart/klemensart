@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni",
   description:
     "Klemens Art kişisel verilerin korunması ve işlenmesine ilişkin aydınlatma metni.",
+  keywords: ["kvkk", "kişisel veri", "aydınlatma metni", "klemens gizlilik"],
   alternates: { canonical: "/kvkk" },
   openGraph: {
     title: "KVKK Aydınlatma Metni — Klemens",

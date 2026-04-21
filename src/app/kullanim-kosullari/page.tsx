@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Kullanım Koşulları | Klemens",
   description:
     "Klemens platformunun kullanımına ilişkin koşullar ve kullanıcı yükümlülükleri.",
+  keywords: ["kullanım koşulları", "klemens platform kuralları", "üyelik şartları"],
   alternates: { canonical: "/kullanim-kosullari" },
   openGraph: {
     title: "Kullanım Koşulları — Klemens",

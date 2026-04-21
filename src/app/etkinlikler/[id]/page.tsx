@@ -51,6 +51,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: event.title,
     description,
+    keywords: [
+      event.title,
+      event.event_type ?? "etkinlik",
+      event.venue ?? "ankara",
+      "kültür sanat etkinlik",
+    ],
     alternates: { canonical: `/etkinlikler/${id}` },
     openGraph: {
       title: event.title,
