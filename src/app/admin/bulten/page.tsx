@@ -1357,7 +1357,7 @@ export default function BultenGonderPage() {
 
                       // Simple fields
                       const sf = field as FieldDef;
-                      const isImageField = sf.key.toLowerCase().includes("imageurl") || sf.key.toLowerCase().includes("image_url");
+                      const isImageField = sf.key.toLowerCase().includes("imageurl") || sf.key.toLowerCase().includes("image_url") || sf.key.toLowerCase().includes("posterurl");
                       return (
                         <div key={sf.key}>
                           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
