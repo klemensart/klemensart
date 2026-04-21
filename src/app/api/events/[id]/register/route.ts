@@ -75,7 +75,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json({ error: insertErr.message }, { status: 500 });
   }
 
-  // Onay maili — fire-and-forget
+  // Onay maili — await ile gönder (serverless timeout'u önlemek için)
   const eventSlug = event.slug || event.id;
   const cancelUrl = `https://klemensart.com/etkinlikler/${eventSlug}/kayit-iptal?token=${reg.confirmation_token}`;
   const eventUrl = `https://klemensart.com/etkinlikler/${event.slug || event.id}`;
@@ -101,13 +101,13 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       })
     );
 
-    sendThankYouEmail({
+    await sendThankYouEmail({
       to: emailLower,
       subject: `${event.title} — Kaydınız alındı`,
       html,
-    }).catch((err) => console.error("[register] Mail gönderilemedi:", err));
+    });
   } catch (err) {
-    console.error("[register] Mail render hatası:", err);
+    console.error("[register] Mail hatası:", err);
   }
 
   return NextResponse.json({ success: true, registrationId: reg.id });

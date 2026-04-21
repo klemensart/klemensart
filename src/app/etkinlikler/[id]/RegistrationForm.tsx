@@ -106,7 +106,7 @@ export default function RegistrationForm({ eventId, eventTitle, eventDate, event
           {eventVenue && <p>{eventVenue}</p>}
         </div>
         <p className="text-sm text-emerald-600">
-          Onay maili gönderildi. Spam/gereksiz kutunuzu da kontrol edin.
+          Etkinlik günü görüşmek üzere!
         </p>
       </div>
     );
