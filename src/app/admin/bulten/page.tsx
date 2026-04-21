@@ -417,6 +417,14 @@ export default function BultenGonderPage() {
   const [selectedSegmentId, setSelectedSegmentId] = useState("");
   const [showSegmentConfirm, setShowSegmentConfirm] = useState(false);
 
+  // SeminerDuyuru — etkinlik seçimi
+  type KlemensEvent = {
+    id: string; title: string; slug: string | null; event_date: string | null;
+    venue: string | null; price_info: string | null; image_url: string | null;
+  };
+  const [klemensEvents, setKlemensEvents] = useState<KlemensEvent[]>([]);
+  const [selectedKlemensEventId, setSelectedKlemensEventId] = useState("");
+
   // AI Kitle Tahmincisi
   type AiVariant = { segmentId: string; label: string; count: number; subject: string; body: string; error?: string };
   const [aiTopic, setAiTopic] = useState("");
@@ -728,6 +736,53 @@ export default function BultenGonderPage() {
         // silently fail auto-populate
       }
     }
+
+    // SeminerDuyuru: Klemens etkinliklerini fetch et
+    if (tmpl.name === "SeminerDuyuru") {
+      setSelectedKlemensEventId("");
+      try {
+        const res = await fetch("/api/admin/events?status=approved");
+        const data = await res.json();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const events = ((data.events ?? []) as any[])
+          .filter((e) => e.is_klemens_event && e.registration_enabled) as KlemensEvent[];
+        setKlemensEvents(events);
+      } catch {
+        // silently fail
+      }
+    }
+  };
+
+  // ── SeminerDuyuru: etkinlik seçildiğinde prefill ──
+  const selectKlemensEvent = (eventId: string) => {
+    setSelectedKlemensEventId(eventId);
+    if (!eventId) return;
+    const ev = klemensEvents.find((e) => e.id === eventId);
+    if (!ev) return;
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://klemensart.com";
+    const ctaUrl = `${siteUrl}/etkinlikler/${ev.slug || ev.id}`;
+
+    // Tarih format
+    let eventDate = "";
+    let eventTime = "";
+    if (ev.event_date) {
+      const d = new Date(ev.event_date);
+      eventDate = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" });
+      eventTime = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    setTemplateProps((prev) => ({
+      ...prev,
+      eventTitle: ev.title || prev.eventTitle,
+      ctaUrl,
+      eventDate: eventDate || prev.eventDate,
+      eventTime: eventTime || prev.eventTime,
+      eventVenue: ev.venue || prev.eventVenue,
+      price: ev.price_info || prev.price,
+      posterUrl: ev.image_url || prev.posterUrl,
+    }));
+    setTemplateSubject(`${ev.title} — ${eventDate}`);
   };
 
   // ── Update a simple prop ──
@@ -1298,6 +1353,28 @@ export default function BultenGonderPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* ── Left: Dynamic Form ── */}
                 <div>
+                  {/* SeminerDuyuru: etkinlik seçimi */}
+                  {selectedTemplate.name === "SeminerDuyuru" && klemensEvents.length > 0 && (
+                    <div className="mb-4">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                        Etkinlik Seç (opsiyonel)
+                      </label>
+                      <select
+                        value={selectedKlemensEventId}
+                        onChange={(e) => selectKlemensEvent(e.target.value)}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#FF6D60] bg-white"
+                      >
+                        <option value="">— Manuel doldur —</option>
+                        {klemensEvents.map((ev) => (
+                          <option key={ev.id} value={ev.id}>
+                            {ev.title}{ev.event_date ? ` — ${new Date(ev.event_date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}` : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-400 mt-1">Seçince alanlar otomatik dolar, üzerine yazabilirsiniz.</p>
+                    </div>
+                  )}
+
                   {/* Subject override */}
                   <input
                     type="text"
