@@ -335,18 +335,38 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
   return (
     <main className="min-h-screen bg-warm-50">
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="pt-32 pb-20 px-6 bg-white">
+      {/* ── Manifesto (hero) ─────────────────────────────────────────────── */}
+      <section className="pt-32 pb-20 px-6 bg-warm-100">
         <div className="max-w-6xl mx-auto">
-          <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4 fade-up">
-            Hakkımızda
-          </p>
-          <h1 className="text-5xl md:text-7xl font-bold text-warm-900 leading-tight mb-6 fade-up-1">
-            Kolektif<br />Bilinç
-          </h1>
-          <p className="text-lg md:text-xl text-warm-900/55 max-w-lg leading-relaxed fade-up-2">
-            Klemens, tek bir zihin değil — birbirine bağlı düşüncelerin, merakların ve tutkuların ağıdır.
-          </p>
+          <div className="max-w-2xl">
+            <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4">
+              Manifestomuz
+            </p>
+            <h1 className="text-4xl md:text-5xl font-bold text-warm-900 leading-tight mb-6">
+              Sanat, bir araç.<br />Siz, asıl mesele.
+            </h1>
+            <div className="space-y-6">
+              <p className="text-warm-900/55 text-lg leading-relaxed">
+                Klemens, sanat tarihini bilgi aktarımı için değil, kişisel keşif için bir araç olarak kullanır. Sinema, felsefe ve psikoloji prizmasından geçen her içerik, sizi akademik kaygılardan uzak bir anlam yolculuğuna davet eder.
+              </p>
+              <p className="text-warm-900/55 text-lg leading-relaxed">
+                Burada &quot;doğru cevabı bilmek&quot; değil, kendi sorunuzu bulmak önemlidir. Eserler, dönemler, akımlar — hepsi yalnızca daha iyi sorular sorabilmeniz için birer basamak. Tek bir doğru yorum yoktur; her bakış açısı bu ağa yeni bir boyut katar.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 mt-16">
+            {[
+              { stat: "200+", label: "Atölye Mezunu" },
+              { stat: "12",   label: "Aktif Program"  },
+              { stat: "5K+",  label: "Bülten Okuru"   },
+            ].map(({ stat, label }) => (
+              <div key={label} className="flex flex-col">
+                <span className="text-5xl font-bold text-warm-900 mb-2">{stat}</span>
+                <span className="text-sm text-warm-900/50 font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -805,40 +825,6 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
         </section>
       )}
 
-      {/* ── Manifesto + stats ─────────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-warm-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="max-w-2xl mb-16">
-            <p className="text-coral text-sm font-semibold tracking-widest uppercase mb-4">
-              Manifestomuz
-            </p>
-            <h2 className="text-4xl md:text-5xl font-bold text-warm-900 leading-tight mb-6">
-              Sanat, bir araç.<br />Siz, asıl mesele.
-            </h2>
-            <div className="space-y-6">
-              <p className="text-warm-900/55 text-lg leading-relaxed">
-                Klemens, sanat tarihini bilgi aktarımı için değil, kişisel keşif için bir araç olarak kullanır. Sinema, felsefe ve psikoloji prizmasından geçen her içerik, sizi akademik kaygılardan uzak bir anlam yolculuğuna davet eder.
-              </p>
-              <p className="text-warm-900/55 text-lg leading-relaxed">
-                Burada &quot;doğru cevabı bilmek&quot; değil, kendi sorunuzu bulmak önemlidir. Eserler, dönemler, akımlar — hepsi yalnızca daha iyi sorular sorabilmeniz için birer basamak. Tek bir doğru yorum yoktur; her bakış açısı bu ağa yeni bir boyut katar.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
-            {[
-              { stat: "200+", label: "Atölye Mezunu" },
-              { stat: "12",   label: "Aktif Program"  },
-              { stat: "5K+",  label: "Bülten Okuru"   },
-            ].map(({ stat, label }) => (
-              <div key={label} className="flex flex-col">
-                <span className="text-5xl font-bold text-warm-900 mb-2">{stat}</span>
-                <span className="text-sm text-warm-900/50 font-medium">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── SSS (FAQ) ──────────────────────────────────────────────────────── */}
       <section className="py-20 px-6 bg-[#FFFBF7]">
