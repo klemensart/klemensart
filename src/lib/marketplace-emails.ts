@@ -159,21 +159,41 @@ export async function sendApplicationApprovedEmail(
     <div style="padding:24px 32px;font-size:14px;line-height:1.8;color:#3d3833;">
       <p style="margin:0 0 16px;">Merhaba ${esc(app.applicant_name)},</p>
 
-      <p style="margin:0 0 16px;">Tebrikler! <strong>"${esc(app.workshop_topic)}"</strong> başlıklı atölye başvurunuz Klemens küratörlük ekibi tarafından onaylandı.</p>
+      <p style="margin:0 0 16px;"><strong>"${esc(app.workshop_topic)}"</strong> başlıklı atölye başvurunuzu inceledik ve Klemens'te yer almasını uygun bulduk.</p>
 
-      <p style="margin:0 0 8px;">Sonraki adımlar:</p>
-      <ol style="margin:0 0 16px;padding-left:20px;color:#3d3833;">
-        <li style="margin-bottom:8px;">Klemens ekibi sizinle iletişime geçerek atölye detaylarını (tarih, konum, kontenjan vb.) netleştirecek.</li>
-        <li style="margin-bottom:8px;">Atölye sayfanız platformda yayına alınacak ve tanıtım sürecine başlanacak.</li>
-        <li>Düzenleyici paneline erişim bilgileriniz ayrıca iletilecek.</li>
-      </ol>
+      <p style="margin:0 0 16px;">Atölye sayfanızı yayına almak için aşağıdaki materyalleri bu maile yanıt olarak göndermeniz yeterli olacak.</p>
+
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#FF6D60;margin:24px 0 12px;font-weight:700;">Zorunlu Materyaller</h3>
+
+      <p style="margin:0 0 12px;"><strong>1. Atölye kapak görseli</strong><br>
+      <span style="color:#6b6560;">Atölyenin atmosferini, malzemeleri veya bitmiş ürünleri gösteren yatay format, yüksek çözünürlüklü bir fotoğraf (en az 1200&times;800 px, JPEG veya PNG). Bu görsel hem web sayfasında hem de e-bülten duyurusunda kullanılacak.</span></p>
+
+      <p style="margin:0 0 12px;"><strong>2. Profil fotoğrafınız</strong><br>
+      <span style="color:#6b6560;">Düzenleyen kartında görünmek üzere kare format bir fotoğraf (en az 600&times;600 px).</span></p>
+
+      <p style="margin:0 0 12px;"><strong>3. Kısa biyografi</strong><br>
+      <span style="color:#6b6560;">2-4 cümle ile kendinizi tanıtın. Eğitim, deneyim ve neden bu atölyeleri düzenlediğinize dair kısa bir not yeterli.</span></p>
+
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:24px 0 12px;font-weight:700;">Opsiyonel Materyaller</h3>
+
+      <p style="margin:0 0 12px;"><strong>4. Süreç fotoğrafları</strong><br>
+      <span style="color:#6b6560;">Atölye sırasında çekilmiş 2-3 fotoğraf — çalışma anları, malzemeler, bitmiş ürün örnekleri olabilir.</span></p>
+
+      <p style="margin:0 0 12px;"><strong>5. Mekân fotoğrafı</strong><br>
+      <span style="color:#6b6560;">Atölyenin yapıldığı stüdyo/mekânın atmosferini gösteren bir görsel.</span></p>
+
+      <p style="margin:0 0 12px;"><strong>6. Detaylı bio</strong><br>
+      <span style="color:#6b6560;">Eğitim, sertifikalar, sergiler, daha önce düzenlenen atölyeler gibi bilgiler. Atölye sayfasının altında "Düzenleyen Hakkında" bölümünde gösterilebilir.</span></p>
+
+      <div style="border-top:1px solid #f0ebe6;margin:24px 0 16px;padding-top:16px;">
+        <p style="margin:0 0 16px;color:#6b6560;">Materyaller elimize ulaştıktan sonra atölye sayfanızı 2-3 iş günü içinde yayına alıyoruz.</p>
+        <p style="margin:0 0 16px;">Sorularınız için doğrudan bu maile yanıt verebilirsiniz.</p>
+      </div>
 
       <p style="margin:0 0 16px;">Platformumuzda atölye düzenleyicilerini bağlayan koşulları henüz incelemediyseniz:</p>
       <p style="margin:0 0 24px;"><a href="${BASE_URL}/duzenleyici-kosullari" style="color:#FF6D60;font-weight:600;text-decoration:none;">Düzenleyici Koşulları →</a></p>
 
-      <p style="margin:0 0 4px;">Sorularınız için: <a href="mailto:info@klemensart.com" style="color:#FF6D60;font-weight:600;text-decoration:none;">info@klemensart.com</a></p>
-
-      <p style="margin:24px 0 0;color:#8C857E;">Saygılarımızla,<br><strong style="color:#2D2926;">Klemens</strong></p>
+      <p style="margin:24px 0 0;color:#8C857E;">Sevgilerle,<br><strong style="color:#2D2926;">Klemens Ekibi</strong></p>
     </div>
     <div style="padding:16px 32px;background:#faf8f5;border-top:1px solid #f0ebe6;">
       <p style="margin:0;font-size:12px;color:#8C857E;font-style:italic;">Bu e-posta, başvurunuzun onaylanması üzerine otomatik olarak gönderilmiştir.</p>
