@@ -79,3 +79,66 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
+// ── POST: Yeni Klemens etkinliği oluştur ─────────────────────────────────────
+export async function POST(req: NextRequest) {
+  const userClient = await createServerSupabaseClient();
+  const { data: { user } } = await userClient.auth.getUser();
+  if (!user || !(await isAdmin(user.id))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+  const {
+    title, description, event_type, venue, address,
+    event_date, end_date, image_url, price_info, slug,
+    capacity, registration_enabled, registration_deadline,
+    contact_email, ai_comment,
+  } = body as Record<string, unknown>;
+
+  if (!title || !event_date) {
+    return NextResponse.json({ error: "title ve event_date zorunlu" }, { status: 400 });
+  }
+
+  const admin = createAdminClient();
+
+  // slug benzersizlik kontrolü
+  if (slug) {
+    const { data: existing } = await admin
+      .from("events")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (existing) {
+      return NextResponse.json({ error: "Bu slug zaten kullanılıyor" }, { status: 409 });
+    }
+  }
+
+  const { data, error } = await admin.from("events").insert({
+    title,
+    description: description ?? null,
+    ai_comment: ai_comment ?? null,
+    event_type: event_type ?? null,
+    venue: venue ?? null,
+    address: address ?? null,
+    event_date,
+    end_date: end_date ?? null,
+    image_url: image_url ?? null,
+    price_info: price_info ?? null,
+    slug: slug ?? null,
+    capacity: capacity ?? null,
+    registration_enabled: registration_enabled ?? false,
+    registration_deadline: registration_deadline ?? null,
+    contact_email: contact_email ?? null,
+    is_klemens_event: true,
+    status: "approved",
+    source_name: "Klemens",
+    source_url: slug ? `/etkinlikler/${slug}` : null,
+  }).select("id,slug").single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, event: data });
+}

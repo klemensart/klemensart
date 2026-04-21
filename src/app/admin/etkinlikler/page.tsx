@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 
 type Tab = "pending" | "approved" | "rejected";
 
@@ -19,6 +20,7 @@ type EventRow = {
   price_info: string | null;
   status: string;
   is_klemens_event: boolean;
+  registration_enabled: boolean;
   created_at: string;
   verified_at: string | null;
   verification_note: string | null;
@@ -130,19 +132,27 @@ export default function AdminEtkinliklerPage() {
           <p className="text-xs text-warm-900/40 mb-1">Admin Paneli</p>
           <h1 className="text-2xl font-bold text-warm-900">Etkinlik Yönetimi</h1>
         </div>
-        <div className="flex flex-col items-end">
-          <button
-            onClick={runScraper}
-            disabled={scraperRunning}
-            className="px-4 py-2 bg-coral text-white text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
-          >
-            {scraperRunning ? (
-              <span className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Çalışıyor...
-              </span>
-            ) : "Scraper'ı Çalıştır"}
-          </button>
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex gap-2">
+            <Link
+              href="/admin/etkinlikler/yeni"
+              className="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+            >
+              + Yeni Etkinlik
+            </Link>
+            <button
+              onClick={runScraper}
+              disabled={scraperRunning}
+              className="px-4 py-2 bg-coral text-white text-sm font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {scraperRunning ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Çalışıyor...
+                </span>
+              ) : "Scraper'ı Çalıştır"}
+            </button>
+          </div>
           {scraperResult && (
             <p className="text-xs text-warm-900/50 mt-1">{scraperResult}</p>
           )}
@@ -202,6 +212,14 @@ export default function AdminEtkinliklerPage() {
                       <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">
                         Klemens Etkinliği
                       </span>
+                    )}
+                    {e.is_klemens_event && e.registration_enabled && (
+                      <Link
+                        href={`/admin/etkinlikler/${e.id}/kayitlar`}
+                        className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full hover:bg-blue-100 transition-colors"
+                      >
+                        Kayıtlar →
+                      </Link>
                     )}
                     {e.verification_note && (
                       <span

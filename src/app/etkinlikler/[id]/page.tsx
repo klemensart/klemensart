@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase-admin";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import RegistrationForm from "./RegistrationForm";
 
 type EventRow = {
   id: string;
@@ -20,6 +21,8 @@ type EventRow = {
   price_info: string | null;
   image_url: string | null;
   is_klemens_event: boolean;
+  registration_enabled: boolean;
+  slug: string | null;
 };
 
 type Props = { params: Promise<{ id: string }> };
@@ -28,7 +31,7 @@ async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id,title,description,ai_comment,event_type,venue,address,event_date,end_date,source_url,source_name,price_info,image_url,is_klemens_event")
+    .select("id,title,description,ai_comment,event_type,venue,address,event_date,end_date,source_url,source_name,price_info,image_url,is_klemens_event,registration_enabled,slug")
     .eq("id", id)
     .eq("status", "approved")
     .maybeSingle();
@@ -266,14 +269,14 @@ export default async function EtkinlikDetayPage({ params }: Props) {
 
           {/* CTA */}
           <div className="flex gap-3 flex-wrap">
-            {event.is_klemens_event ? (
-              <Link
-                href="/atolyeler"
-                className="px-6 py-3 bg-coral text-white text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
-              >
-                Kayıt Ol
-              </Link>
-            ) : event.source_url ? (
+            {event.is_klemens_event && event.registration_enabled ? (
+              <RegistrationForm
+                eventId={event.id}
+                eventTitle={event.title}
+                eventDate={event.event_date}
+                eventVenue={event.venue}
+              />
+            ) : event.is_klemens_event && !event.registration_enabled ? null : event.source_url ? (
               <a
                 href={event.source_url}
                 target="_blank"
