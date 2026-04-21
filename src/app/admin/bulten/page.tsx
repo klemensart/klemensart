@@ -281,7 +281,7 @@ const TEMPLATES: TemplateConfig[] = [
 <p>Akademik bir ders değil bu. Bir arada düşünmek, soru sormak, yüksek sesle merak etmek için bir buluşma.</p>
 
 <p>Yer sınırlı, bu yüzden kayıt almamız gerekiyor. Aşağıdaki butona tıklayıp katılacağınızı belirtirseniz hazırlık yapabiliriz.</p>`,
-      ctaUrl: "https://klemensart.com/etkinlikler",
+      ctaUrl: "https://klemensart.com/etkinlikler/firca-kimin-elinde",
       ctaText: "Katılmak İstiyorum",
       signatureName: "Kerem Hun",
       signatureTitle: "Klemens",
