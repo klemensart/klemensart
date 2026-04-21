@@ -50,7 +50,7 @@ const TEAM: TeamMember[] = [
     initials: "KH",
     role: "Kurucu & Kreatif Direktör",
     size: "large",
-    quote: "Sanat tarihi bir amaç değil, kendinizi keşfetmek için bir araç.",
+    quote: "Sanat, insan kişiliğinin ortaya çıkışının yaratıcı göstergesidir.",
     mail: "kerem.hun@klemensart.com",
     photo: "/images/ekip/kerem-hun.jpg",
     svgX: 500, svgY: 100,
