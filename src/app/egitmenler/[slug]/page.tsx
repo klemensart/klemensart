@@ -47,6 +47,36 @@ function formatPrice(p: number) {
   return p.toLocaleString("tr-TR") + " TL";
 }
 
+function buildPersonSchema(person: { name: string; slug: string; avatar_url: string | null; short_bio: string | null; bio: string | null; expertise: string[]; instagram: string | null; twitter: string | null; linkedin: string | null; website: string | null }) {
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: person.name,
+    url: `https://klemensart.com/egitmenler/${person.slug}`,
+    worksFor: {
+      "@type": "Organization",
+      name: "Klemens",
+      url: "https://klemensart.com",
+    },
+  };
+
+  if (person.avatar_url) schema.image = person.avatar_url;
+
+  const desc = person.short_bio || person.bio;
+  if (desc) schema.description = desc.length > 250 ? desc.slice(0, 247) + "..." : desc;
+
+  if (person.expertise.length > 0) schema.knowsAbout = person.expertise;
+
+  const sameAs: string[] = [];
+  if (person.instagram) sameAs.push(`https://instagram.com/${person.instagram.replace(/^@/, "")}`);
+  if (person.twitter) sameAs.push(`https://x.com/${person.twitter.replace(/^@/, "")}`);
+  if (person.linkedin) sameAs.push(person.linkedin.startsWith("http") ? person.linkedin : `https://linkedin.com/in/${person.linkedin}`);
+  if (person.website) sameAs.push(person.website.startsWith("http") ? person.website : `https://${person.website}`);
+  if (sameAs.length > 0) schema.sameAs = sameAs;
+
+  return schema;
+}
+
 export async function generateStaticParams() {
   const hosts = await getHosts();
   return hosts.filter((h) => h.slug !== "klemens").map((h) => ({ slug: h.slug }));
@@ -92,8 +122,14 @@ export default async function EgitmenDetayPage({ params }: Props) {
 
   const allEvents = [...upcoming, ...past];
 
+  const personSchema = buildPersonSchema(person);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
       <Navbar solid />
 
       <main className="bg-cream min-h-screen">
