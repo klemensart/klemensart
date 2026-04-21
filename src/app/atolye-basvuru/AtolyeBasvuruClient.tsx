@@ -12,12 +12,14 @@ type FormData = {
   name: string;
   email: string;
   phone: string;
+  whatsapp_number: string;
   website: string;
   topic: string;
   description: string;
   duration: string;
   price: string;
   audience: string;
+  proposed_dates: string;
   contact_channel: ContactChannel;
   contact_channel_detail: string;
   terms_accepted: boolean;
@@ -28,12 +30,14 @@ const EMPTY_FORM: FormData = {
   name: "",
   email: "",
   phone: "",
+  whatsapp_number: "",
   website: "",
   topic: "",
   description: "",
   duration: "",
   price: "",
   audience: "",
+  proposed_dates: "",
   contact_channel: "whatsapp",
   contact_channel_detail: "",
   terms_accepted: false,
@@ -117,6 +121,7 @@ export default function AtolyeBasvuruClient() {
     if (!form.name.trim() || form.name.trim().length < 2) e.name = "Ad en az 2 karakter olmalı";
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Geçerli bir e-posta adresi girin";
     if (!form.phone.trim() || form.phone.trim().length < 10) e.phone = "Telefon numarası en az 10 karakter olmalı";
+    if (!form.whatsapp_number.trim() || form.whatsapp_number.trim().length < 10) e.whatsapp_number = "WhatsApp numarası en az 10 karakter olmalı";
     if (form.website.trim() && !/^https?:\/\/.+/.test(form.website.trim())) e.website = "Geçerli bir URL girin (https://...)";
     setErrors(e);
     if (Object.keys(e).length) scrollToFirstError();
@@ -130,6 +135,7 @@ export default function AtolyeBasvuruClient() {
     if (form.description.trim().length > 2000) e.description = "Açıklama en fazla 2000 karakter olabilir";
     if (!form.duration.trim() || form.duration.trim().length < 2) e.duration = "Süre bilgisi gerekli";
     if (!form.price.trim()) e.price = "Ücret bilgisi gerekli";
+    if (!form.proposed_dates.trim() || form.proposed_dates.trim().length < 5) e.proposed_dates = "Lütfen en az bir tarih/zaman aralığı belirtin";
     if (!form.contact_channel_detail.trim() || form.contact_channel_detail.trim().length < 3) e.contact_channel_detail = "İletişim detayı en az 3 karakter olmalı";
     if (!form.terms_accepted) e.terms_accepted = "Koşulları kabul etmeniz gerekli";
     setErrors(e);
@@ -317,6 +323,19 @@ export default function AtolyeBasvuruClient() {
                 />
               </Field>
 
+              <Field label="WhatsApp Numarası" required error={errors.whatsapp_number}>
+                <input
+                  type="tel"
+                  value={form.whatsapp_number}
+                  onChange={(e) => set("whatsapp_number", e.target.value)}
+                  placeholder="0532 123 45 67"
+                  className={inputClass(errors.whatsapp_number)}
+                />
+                <p className="text-xs text-warm-900/40 mt-1">
+                  Onay sürecinde sizinle bu numara üzerinden iletişime geçeceğiz.
+                </p>
+              </Field>
+
               <Field label="Web siteniz veya sosyal medya (opsiyonel)" error={errors.website}>
                 <input
                   type="url"
@@ -412,6 +431,19 @@ export default function AtolyeBasvuruClient() {
                   rows={3}
                   className={`${inputClass()} resize-none`}
                 />
+              </Field>
+
+              <Field label="Önerilen Tarihler" required error={errors.proposed_dates}>
+                <textarea
+                  value={form.proposed_dates}
+                  onChange={(e) => set("proposed_dates", e.target.value)}
+                  placeholder={"Örn:\n• 10 Mayıs Cumartesi, 14:00–17:00\n• 17 Mayıs Cumartesi, 14:00–17:00\n• Hafta içi akşam 19:00 sonrası da uygun"}
+                  rows={3}
+                  className={`${inputClass(errors.proposed_dates)} resize-none`}
+                />
+                <p className="text-xs text-warm-900/40 mt-1">
+                  Birden fazla tarih/saat önerisi yazabilirsiniz. Kesin tarih, onay sonrasında birlikte belirlenecek.
+                </p>
               </Field>
 
               <Field label="Müşteri İletişim Kanalı" required>

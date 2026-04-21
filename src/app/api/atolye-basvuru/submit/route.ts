@@ -25,6 +25,8 @@ const applicationSchema = z.object({
   duration: z.string().min(2, "Süre bilgisi en az 2 karakter olmalı"),
   price: z.string().min(1, "Ücret bilgisi gerekli"),
   audience: z.string().optional().or(z.literal("")),
+  whatsapp_number: z.string().min(10, "WhatsApp numarası en az 10 karakter olmalı"),
+  proposed_dates: z.string().min(5, "Lütfen en az bir tarih/zaman aralığı belirtin"),
   contact_channel: z.enum(["whatsapp", "email", "website", "other"], {
     error: "Geçersiz iletişim kanalı",
   }),
@@ -138,6 +140,8 @@ export async function POST(req: NextRequest) {
         target_audience: data.audience?.trim() || null,
         contact_channel: data.contact_channel,
         contact_channel_detail: data.contact_channel_detail.trim(),
+        whatsapp_number: data.whatsapp_number.trim(),
+        proposed_dates: data.proposed_dates.trim(),
         terms_accepted: true,
         ip_address: ip,
         user_agent: userAgent,

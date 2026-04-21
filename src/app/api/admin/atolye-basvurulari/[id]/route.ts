@@ -111,6 +111,8 @@ export async function PATCH(
       applicant_name: existing.applicant_name,
       applicant_email: existing.applicant_email,
       workshop_topic: existing.workshop_topic,
+      whatsapp_number: existing.whatsapp_number ?? null,
+      proposed_dates: existing.proposed_dates ?? null,
     };
 
     if (status === "approved") {

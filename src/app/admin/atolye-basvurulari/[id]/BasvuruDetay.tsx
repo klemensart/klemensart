@@ -23,6 +23,8 @@ type Application = {
   target_audience: string | null;
   contact_channel: string;
   contact_channel_detail: string;
+  whatsapp_number: string | null;
+  proposed_dates: string | null;
   terms_accepted: boolean;
   ip_address: string | null;
   user_agent: string | null;
@@ -254,6 +256,30 @@ export default function BasvuruDetay({ application }: { application: Application
                 </span>
               }
             />
+            {app.whatsapp_number && (
+              <InfoRow
+                label="WhatsApp"
+                value={
+                  (() => {
+                    const normalized = normalizePhoneForWhatsApp(app.whatsapp_number);
+                    if (!normalized) return <span className="text-sm text-warm-900/70">{app.whatsapp_number}</span>;
+                    return (
+                      <a href={`https://wa.me/${normalized}`} target="_blank" rel="noopener noreferrer" className="text-coral text-sm hover:underline">
+                        {app.whatsapp_number}
+                      </a>
+                    );
+                  })()
+                }
+              />
+            )}
+            {app.proposed_dates && (
+              <InfoRow
+                label="Önerilen Tarihler"
+                value={
+                  <span className="text-sm text-warm-900/80 whitespace-pre-line">{app.proposed_dates}</span>
+                }
+              />
+            )}
           </Card>
 
           {/* Açıklama */}

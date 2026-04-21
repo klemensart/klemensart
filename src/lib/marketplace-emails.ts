@@ -141,6 +141,8 @@ type StatusEmailData = {
   applicant_name: string;
   applicant_email: string;
   workshop_topic: string;
+  whatsapp_number?: string | null;
+  proposed_dates?: string | null;
 };
 
 export async function sendApplicationApprovedEmail(
@@ -184,6 +186,13 @@ export async function sendApplicationApprovedEmail(
 
       <p style="margin:0 0 12px;"><strong>6. Detaylı bio</strong><br>
       <span style="color:#6b6560;">Eğitim, sertifikalar, sergiler, daha önce düzenlenen atölyeler gibi bilgiler. Atölye sayfasının altında "Düzenleyen Hakkında" bölümünde gösterilebilir.</span></p>
+
+      ${app.whatsapp_number || app.proposed_dates ? `
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#FF6D60;margin:24px 0 12px;font-weight:700;">Başvuru Bilgileriniz</h3>
+      ${app.whatsapp_number ? `<p style="margin:0 0 8px;"><strong>WhatsApp:</strong> ${esc(app.whatsapp_number)}</p>` : ""}
+      ${app.proposed_dates ? `<p style="margin:0 0 8px;"><strong>Önerilen Tarihler:</strong><br><span style="white-space:pre-line;">${esc(app.proposed_dates)}</span></p>` : ""}
+      <p style="margin:8px 0 0;color:#6b6560;font-size:13px;">Kesin tarih ve detaylar, materyalleriniz ulaştıktan sonra WhatsApp üzerinden birlikte belirlenecektir.</p>
+      ` : ""}
 
       <div style="border-top:1px solid #f0ebe6;margin:24px 0 16px;padding-top:16px;">
         <p style="margin:0 0 16px;color:#6b6560;">Materyaller elimize ulaştıktan sonra atölye sayfanızı 2-3 iş günü içinde yayına alıyoruz.</p>
