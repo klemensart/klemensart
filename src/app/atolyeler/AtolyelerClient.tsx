@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
-import AnnouncementBar from "@/components/AnnouncementBar";
+import AnnouncementBarClient from "@/components/AnnouncementBarClient";
 import Footer from "@/components/Footer";
 import AtolyeBasvuruCTA from "@/components/AtolyeBasvuruCTA";
 import { createClient } from "@/lib/supabase";
@@ -188,7 +188,7 @@ export default function AtolyelerClient() {
 
   return (
     <>
-      <AnnouncementBar page="atolyeler" />
+      <AnnouncementBarClient page="atolyeler" />
       <Navbar />
 
       {/* ═══ Hero ═══ */}

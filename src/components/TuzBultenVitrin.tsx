@@ -27,6 +27,8 @@ export default function TuzBultenVitrin() {
                   width={480}
                   height={510}
                   className="block"
+                  priority
+                  quality={75}
                 />
               </a>
             </div>
