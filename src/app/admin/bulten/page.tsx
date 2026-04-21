@@ -239,6 +239,55 @@ const TEMPLATES: TemplateConfig[] = [
       name: "",
     },
   },
+  {
+    name: "SeminerDuyuru",
+    label: "Seminer Duyuru",
+    description: "Klemens seminer/söyleşi duyuru e-postası",
+    icon: "🎤",
+    defaultSubject: "Fırça Kimin Elinde? — 25 Nisan Cumartesi",
+    fields: [
+      { key: "eventTitle", label: "Etkinlik Başlığı", type: "text" },
+      { key: "eventSubtitle", label: "Alt Başlık (opsiyonel)", type: "text" },
+      { key: "posterUrl", label: "Afiş Görseli URL", type: "url" },
+      { key: "eventDate", label: "Tarih", type: "text" },
+      { key: "eventTime", label: "Saat", type: "text" },
+      { key: "eventVenue", label: "Mekan", type: "text" },
+      { key: "speakerName", label: "Konuşmacı", type: "text" },
+      { key: "price", label: "Fiyat Bilgisi", type: "text" },
+      { key: "introText", label: "Ana Metin (HTML)", type: "textarea" },
+      { key: "ctaUrl", label: "Kayıt Butonu URL", type: "url" },
+      { key: "ctaText", label: "Buton Metni", type: "text" },
+      { key: "signatureName", label: "İmza — Ad", type: "text" },
+      { key: "signatureTitle", label: "İmza — Unvan", type: "text" },
+      { key: "previewText", label: "Preview Satırı (inbox özeti)", type: "text" },
+    ],
+    defaults: {
+      eventTitle: "Fırça Kimin Elinde?",
+      eventSubtitle: "Yaratıcı Zihin Nasıl Düşünür?",
+      posterUrl: "",
+      eventDate: "25 Nisan Cumartesi",
+      eventTime: "14.30",
+      eventVenue: "Hâl Galeri — Esat, Ankara (Ankara Büyükşehir Belediyesi)",
+      speakerName: "Kerem Hun",
+      price: "Katılım ücretsiz",
+      introText: `<p>Bu cumartesi Ankara'dasanız, sizi küçük bir sohbete davet etmek istiyorum.</p>
+
+<p>Hâl Galeri'de, sanatın belki de en çok sorulan ama en az cevaplanan sorularından birinin peşine düşeceğiz:</p>
+
+<p class="question"><em>Yaratıcı zihin nasıl düşünür?</em></p>
+
+<p>Leonardo'dan Georgia O'Keeffe'e, Caravaggio'dan bugünün çağdaş sanatçılarına, sanat tarihinde büyük kırılmalar yaratan isimlerin sadece eserlerine değil, o eserleri mümkün kılan yaratıcı düşünce biçimlerine bakacağız. Çünkü bir sanatçıyı gerçekten anlamak, onun ne yaptığını değil <em>nasıl düşündüğünü</em> anlamaktan geçiyor.</p>
+
+<p>Akademik bir ders değil bu. Bir arada düşünmek, soru sormak, yüksek sesle merak etmek için bir buluşma.</p>
+
+<p>Yer sınırlı, bu yüzden kayıt almamız gerekiyor. Aşağıdaki butona tıklayıp katılacağınızı belirtirseniz hazırlık yapabiliriz.</p>`,
+      ctaUrl: "https://klemensart.com/etkinlikler",
+      ctaText: "Katılmak İstiyorum",
+      signatureName: "Kerem Hun",
+      signatureTitle: "Klemens",
+      previewText: "Yaratıcı zihin nasıl düşünür? Leonardo'dan O'Keeffe'e uzanan bir sohbet. 25 Nisan, Hâl Galeri.",
+    },
+  },
 ];
 
 /* ── Editor CSS ── */
