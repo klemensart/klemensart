@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-admin";
-import { render } from "@react-email/components";
+import { render } from "@react-email/render";
 import KayitOnay from "@/emails/KayitOnay";
 import { sendThankYouEmail } from "@/lib/send-thank-you";
 
