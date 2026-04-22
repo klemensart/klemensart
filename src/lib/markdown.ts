@@ -174,9 +174,9 @@ function audioPlayer(src: string, caption?: string): string {
 }
 
 function processAudioEmbeds(rawHtml: string): string {
-  // <audio src="..." caption="..."></audio> or <audio src="...">caption text</audio>
+  // <ses src="..." caption="..."></ses> — custom tag (not <audio> to avoid TipTap HTML parsing)
   return rawHtml.replace(
-    /<audio\s+src="([^"]*)"(?:\s+caption="([^"]*)")?>([\s\S]*?)<\/audio>/g,
+    /<ses\s+src="([^"]*)"(?:\s+caption="([^"]*)")?>([\s\S]*?)<\/ses>/g,
     (_, src, captionAttr, innerText) => {
       const caption = captionAttr || innerText?.trim() || "";
       return audioPlayer(src, caption);

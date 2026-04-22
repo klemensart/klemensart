@@ -426,7 +426,7 @@ function InsertMenu({
           if (url) {
             const caption = prompt("Açıklama (opsiyonel):") || "";
             editor.chain().focus().insertContent(
-              `<audio src="${url}" caption="${caption}"></audio>`
+              `<ses src="${url}" caption="${caption}"></ses>`
             ).run();
           }
         }
@@ -485,7 +485,7 @@ function InsertMenu({
           if (url) {
             const caption = prompt("Ses açıklaması (opsiyonel):") || "";
             editor.chain().focus().insertContent(
-              `<audio src="${url}" caption="${caption}"></audio>`
+              `<ses src="${url}" caption="${caption}"></ses>`
             ).run();
           }
         }}
