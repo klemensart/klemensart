@@ -345,28 +345,21 @@ html {
   padding: 0.05em 0.15em;
 }
 
-/* Image figure reset */
+/* Image figure — grid layout: caption genişliği = görsel genişliği */
 .prose-klemens figure {
-  margin: 0 0 0.5rem;
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 0.5rem;
   padding: 0;
 }
 
 /* Figure genişlik sınıfları — aspect ratio'ya göre */
-.prose-klemens figure.figure-square,
-.prose-klemens figure.figure-portrait {
-  margin-left: auto;
-  margin-right: auto;
-}
 .prose-klemens figure.figure-square {
   max-width: 75%;
 }
 .prose-klemens figure.figure-portrait {
   max-width: 58%;
-}
-.prose-klemens figure.figure-square img,
-.prose-klemens figure.figure-portrait img {
-  margin-left: auto;
-  margin-right: auto;
 }
 @media (max-width: 768px) {
   .prose-klemens figure.figure-square,
@@ -377,6 +370,7 @@ html {
 
 /* Image captions: editorial stil */
 .prose-klemens figcaption {
+  contain: inline-size;
   font-family: var(--font-newsreader), serif;
   font-style: italic;
   font-size: 15px;
