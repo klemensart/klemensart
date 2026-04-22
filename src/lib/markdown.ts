@@ -3,20 +3,13 @@ import html from "remark-html";
 import remarkGfm from "remark-gfm";
 import sharp from "sharp";
 import { createAdminClient } from "./supabase-admin";
+import { extractYouTubeId } from "./video";
 
 export type { ArticleMeta, ParsedArticle } from "@/types/article";
+export { extractYouTubeId } from "./video";
 import type { ArticleMeta, ParsedArticle } from "@/types/article";
 
 /* ──────────────── markdown processing helpers ──────────────── */
-
-function extractYouTubeId(url: string): string | null {
-  const m =
-    url.match(/[?&]v=([\w-]+)/) ??
-    url.match(/youtu\.be\/([\w-]+)/) ??
-    url.match(/youtube\.com\/embed\/([\w-]+)/) ??
-    url.match(/youtube\.com\/shorts\/([\w-]+)/);
-  return m ? m[1] : null;
-}
 
 /** Optimize inline images: Next.js image optimization + responsive srcset + lazy load */
 function optimizeImages(rawHtml: string): string {
@@ -129,7 +122,7 @@ function extractDurakBlocks(mdContent: string): string {
 }
 
 function youtubeIframe(id: string): string {
-  return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+  return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
 }
 
 function processYouTubeEmbeds(rawHtml: string): string {
@@ -389,6 +382,8 @@ export async function getArticleBySlug(slug: string): Promise<ParsedArticle | nu
     tags: data.tags ?? [],
     image: data.image ?? "",
     cover_caption: data.cover_caption ?? null,
+    cover_video_url: data.cover_video_url ?? null,
+    cover_video_duration: data.cover_video_duration ?? null,
     hero_overlay_enabled: data.hero_overlay_enabled ?? false,
     readTime,
     slug: data.slug,

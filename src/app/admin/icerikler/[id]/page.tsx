@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import TiptapEditor from "@/components/admin/TiptapEditor";
+import { detectVideoProvider } from "@/lib/video";
 import { useAdminRole, useAdminUser } from "@/components/admin/AdminRoleContext";
 import type { Suggestion } from "@/lib/tiptap-suggestions";
 
@@ -43,6 +44,9 @@ type Form = {
   category: string;
   tags: string;
   image: string;
+  cover_caption: string;
+  cover_video_url: string;
+  cover_video_duration: number | null;
   description: string;
   content: string;
   status: string;
@@ -59,6 +63,9 @@ const EMPTY: Form = {
   category: "Kültür & Sanat",
   tags: "",
   image: "",
+  cover_caption: "",
+  cover_video_url: "",
+  cover_video_duration: null,
   description: "",
   content: "",
   status: "draft",
@@ -141,6 +148,9 @@ export default function AdminArticleEditPage() {
           category: article.category ?? "Kültür & Sanat",
           tags: (article.tags ?? []).join(", "),
           image: article.image ?? "",
+          cover_caption: article.cover_caption ?? "",
+          cover_video_url: article.cover_video_url ?? "",
+          cover_video_duration: article.cover_video_duration ?? null,
           description: article.description ?? "",
           content: article.content ?? "",
           status: article.status ?? "draft",
@@ -259,6 +269,9 @@ export default function AdminArticleEditPage() {
         category: form.category,
         tags,
         image: form.image,
+        cover_caption: form.cover_caption,
+        cover_video_url: form.cover_video_url,
+        cover_video_duration: form.cover_video_duration,
         description: form.description,
         content: form.content,
         status: status ?? form.status,
@@ -501,6 +514,66 @@ export default function AdminArticleEditPage() {
               />
             </div>
           )}
+        </div>
+
+        {/* Cover caption */}
+        <div>
+          <label className="block text-xs font-medium text-warm-900/50 mb-1.5">
+            Kapak Alt Yazısı (opsiyonel)
+          </label>
+          <input
+            type="text"
+            value={form.cover_caption}
+            onChange={(e) => set("cover_caption", e.target.value)}
+            placeholder="Kapak görseli altındaki açıklama..."
+            className={inputCls}
+          />
+        </div>
+
+        {/* Cover Video */}
+        <div className="space-y-3 border-t border-warm-100 pt-4">
+          <div>
+            <label className="block text-xs font-medium text-warm-900/50 mb-0.5">
+              Kapak Videosu (opsiyonel)
+            </label>
+            <p className="text-[11px] text-warm-900/30 mb-2">
+              YouTube veya Vimeo URL&apos;si ekle — kapak görselinin üzerine play butonu gelir. Tıklayanlar videoyu inline izler.
+            </p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-warm-900/50 mb-1.5">
+              Video URL
+            </label>
+            <input
+              type="url"
+              value={form.cover_video_url}
+              onChange={(e) => set("cover_video_url", e.target.value)}
+              placeholder="https://youtube.com/watch?v=... veya https://vimeo.com/..."
+              className={inputCls}
+            />
+            {form.cover_video_url && (
+              <p className="mt-1 text-xs text-warm-900/40">
+                Tespit edilen: {detectVideoProvider(form.cover_video_url) ?? "desteklenmeyen URL"}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-warm-900/50 mb-1.5">
+              Süre (dakika)
+            </label>
+            <input
+              type="number"
+              value={form.cover_video_duration ?? ""}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  cover_video_duration: e.target.value ? parseInt(e.target.value) : null,
+                }))
+              }
+              placeholder="örn: 15"
+              className={inputCls + " w-32"}
+            />
+          </div>
         </div>
 
         {/* Description */}

@@ -12,6 +12,8 @@ export type ArticleMeta = {
   tags: string[];
   image: string;
   cover_caption?: string | null;
+  cover_video_url?: string | null;
+  cover_video_duration?: number | null;
   hero_overlay_enabled?: boolean;
   readTime: string;
   slug: string;

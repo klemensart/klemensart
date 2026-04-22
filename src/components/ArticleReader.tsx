@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NewsletterFormAeon from "@/components/NewsletterFormAeon";
 import type { ParsedArticle, ArticleMeta } from "@/lib/markdown";
+import { detectVideoProvider, getVideoEmbedUrl } from "@/lib/video";
 import ArticleAuthorByline from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorByline";
 import ArticleAuthorCard from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorCard";
 import type { OtherArticle } from "@/app/icerikler/yazi/[slug]/components/ArticleAuthorCard";
@@ -33,6 +34,10 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
   const { meta, contentHtml } = article;
   const [darkMode, setDarkMode] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const hasVideo = Boolean(meta.cover_video_url && detectVideoProvider(meta.cover_video_url));
+  const embedUrl = hasVideo ? getVideoEmbedUrl(meta.cover_video_url!) : null;
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const encodedUrl = encodeURIComponent(shareUrl);
@@ -73,42 +78,75 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
         {meta.image && !readingMode && (
           <>
             <div className="relative w-full h-[260px] sm:h-[60vh] lg:h-[70vh] overflow-hidden">
-              <Image
-                src={meta.image}
-                alt={meta.title}
-                fill
-                priority
-                className="object-cover"
-                sizes="100vw"
-                {...(meta.image.includes("sgabkrzzzszfqrtgkord")
-                  ? {}
-                  : { unoptimized: true }
-                )}
-              />
-
-              {/* Aeon stili overlay — toggle açık + lg: ekran */}
-              {meta.hero_overlay_enabled && (
+              {isPlaying && embedUrl ? (
+                <iframe
+                  src={embedUrl}
+                  className="absolute inset-0 w-full h-full"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
                 <>
-                  <div className="hidden lg:block absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent" />
-                  <div className="hidden lg:block absolute inset-x-0 bottom-0 px-6 lg:pb-16">
-                    <div className="max-w-[1100px] mx-auto">
-                      {meta.category && (
-                        <div className="mb-4">
-                          <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] md:text-xs font-medium">
-                            {meta.category}
-                          </span>
+                  <Image
+                    src={meta.image}
+                    alt={meta.title}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="100vw"
+                    {...(meta.image.includes("sgabkrzzzszfqrtgkord")
+                      ? {}
+                      : { unoptimized: true }
+                    )}
+                  />
+
+                  {/* Aeon stili overlay — toggle açık + lg: ekran */}
+                  {meta.hero_overlay_enabled && !hasVideo && (
+                    <>
+                      <div className="hidden lg:block absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent" />
+                      <div className="hidden lg:block absolute inset-x-0 bottom-0 px-6 lg:pb-16">
+                        <div className="max-w-[1100px] mx-auto">
+                          {meta.category && (
+                            <div className="mb-4">
+                              <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] md:text-xs font-medium">
+                                {meta.category}
+                              </span>
+                            </div>
+                          )}
+                          <h1 className="font-newsreader text-white font-extrabold text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tighter mb-4 max-w-4xl" style={{ fontVariationSettings: '"opsz" 36' }}>
+                            {meta.title}
+                          </h1>
+                          {meta.description && (
+                            <p className="text-white/90 text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl">
+                              {meta.description}
+                            </p>
+                          )}
                         </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Video play overlay */}
+                  {hasVideo && (
+                    <button
+                      onClick={() => setIsPlaying(true)}
+                      className="absolute inset-0 flex flex-col items-center justify-center group cursor-pointer bg-black/10 hover:bg-black/20 transition-colors"
+                      aria-label="Videoyu oynat"
+                    >
+                      <svg
+                        viewBox="0 0 80 80"
+                        className="w-20 h-20 text-white drop-shadow-lg transition-transform group-hover:scale-105"
+                      >
+                        <circle cx="40" cy="40" r="38" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <polygon points="32,25 32,55 58,40" fill="currentColor" />
+                      </svg>
+                      {meta.cover_video_duration != null && meta.cover_video_duration > 0 && (
+                        <span className="mt-3 text-white text-sm tracking-wider uppercase drop-shadow">
+                          {meta.cover_video_duration} dakika
+                        </span>
                       )}
-                      <h1 className="font-newsreader text-white font-extrabold text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tighter mb-4 max-w-4xl" style={{ fontVariationSettings: '"opsz" 36' }}>
-                        {meta.title}
-                      </h1>
-                      {meta.description && (
-                        <p className="text-white/90 text-base md:text-lg lg:text-xl leading-relaxed max-w-2xl">
-                          {meta.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                    </button>
+                  )}
                 </>
               )}
             </div>
