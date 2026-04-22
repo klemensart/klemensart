@@ -1,6 +1,7 @@
 import { remark } from "remark";
 import html from "remark-html";
 import remarkGfm from "remark-gfm";
+import sharp from "sharp";
 import { createAdminClient } from "./supabase-admin";
 
 export type { ArticleMeta, ParsedArticle } from "@/types/article";
@@ -261,6 +262,52 @@ function processInternalLinks(
   return result;
 }
 
+/** Server-side figure classification: probe image dimensions and add layout class */
+async function classifyFigures(htmlContent: string): Promise<string> {
+  const figurePattern = /<figure><img\s[^>]*?src="([^"]*)"[^>]*>/g;
+  const matches = [...htmlContent.matchAll(figurePattern)];
+  if (matches.length === 0) return htmlContent;
+
+  // Probe all image dimensions in parallel
+  const probes = matches.map(async (m) => {
+    let url = m[1];
+    // Decode /_next/image proxy URL to get original
+    const proxyMatch = url.match(/\/_next\/image\?url=([^&]+)/);
+    if (proxyMatch) url = decodeURIComponent(proxyMatch[1]);
+
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) return null;
+      const buffer = Buffer.from(await res.arrayBuffer());
+      const meta = await sharp(buffer).metadata();
+      if (!meta.width || !meta.height) return null;
+      const ratio = meta.width / meta.height;
+      if (ratio < 0.8) return "figure-portrait";
+      if (ratio <= 1.3) return "figure-square";
+      return "figure-landscape";
+    } catch {
+      return null;
+    }
+  });
+
+  const classes = await Promise.all(probes);
+
+  // Replace each <figure> with <figure class="..."> in order
+  let result = htmlContent;
+  for (const cls of classes) {
+    if (cls) {
+      result = result.replace("<figure>", `<figure class="${cls}">`);
+    } else {
+      // Skip this figure — leave it as-is (replace with itself to advance)
+      result = result.replace("<figure>", "<figure data-skip>");
+    }
+  }
+  // Clean up skip markers
+  result = result.replace(/ data-skip>/g, ">");
+
+  return result;
+}
+
 /** Markdown content → processed HTML (tüm özel bloklar dahil) */
 export async function markdownToHtml(content: string): Promise<string> {
   // 1. Pre-process: extract custom blocks before remark runs
@@ -284,6 +331,7 @@ export async function markdownToHtml(content: string): Promise<string> {
   // 4. Post-process pipeline
   contentHtml = processImageCaptions(contentHtml);
   contentHtml = optimizeImages(contentHtml);
+  contentHtml = await classifyFigures(contentHtml);
   contentHtml = processWarningBoxes(contentHtml);
   contentHtml = processYouTubeEmbeds(processBlockquotes(contentHtml));
   contentHtml = processKaynakca(contentHtml);

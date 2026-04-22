@@ -385,6 +385,10 @@ html {
 .prose-klemens figcaption em {
   font-style: normal;
 }
+/* Boş figcaption'ı gizle (coral çizgi çıkmasın) */
+.prose-klemens figcaption:empty {
+  display: none;
+}
 /* coral short rule */
 .prose-klemens figcaption::before {
   content: "";
