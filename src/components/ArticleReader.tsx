@@ -54,6 +54,37 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
     }
   }, [contentHtml, readingMode]);
 
+  // Görsel aspect ratio algılama: dikey/kare görselleri daralt
+  useEffect(() => {
+    const proseDivs = document.querySelectorAll(".prose-klemens");
+    const figures: HTMLElement[] = [];
+    proseDivs.forEach((div) => {
+      div.querySelectorAll("figure").forEach((fig) => figures.push(fig as HTMLElement));
+    });
+
+    function classifyFigure(fig: HTMLElement, img: HTMLImageElement) {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      fig.classList.remove("figure-landscape", "figure-square", "figure-portrait");
+      if (ratio < 0.8) {
+        fig.classList.add("figure-portrait");
+      } else if (ratio <= 1.3) {
+        fig.classList.add("figure-square");
+      } else {
+        fig.classList.add("figure-landscape");
+      }
+    }
+
+    figures.forEach((fig) => {
+      const img = fig.querySelector("img");
+      if (!img) return;
+      if (img.complete && img.naturalWidth > 0) {
+        classifyFigure(fig, img);
+      } else {
+        img.addEventListener("load", () => classifyFigure(fig, img), { once: true });
+      }
+    });
+  }, [contentHtml, readingMode]);
+
   return (
     <div
       style={{ transition: "background-color 0.4s ease, color 0.4s ease" }}

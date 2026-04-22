@@ -5,6 +5,8 @@ import { categories, getCategoryBySlug } from "@/lib/icerikler";
 import { categoryStyles } from "@/lib/category-styles";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import ArticleCard from "@/components/ArticleCard";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const revalidate = 60;
 
@@ -56,6 +58,8 @@ export default async function CategoryPage({
   const style = categoryStyles[slug] ?? categoryStyles["odak"];
 
   return (
+    <>
+    <Navbar />
     <main className="min-h-screen bg-warm-50">
 
       {/* Category hero */}
@@ -138,5 +142,7 @@ export default async function CategoryPage({
       </section>
 
     </main>
+    <Footer />
+    </>
   );
 }

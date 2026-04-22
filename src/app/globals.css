@@ -351,16 +351,49 @@ html {
   padding: 0;
 }
 
-/* Image captions: only explicit figcaption elements */
+/* Figure genişlik sınıfları — aspect ratio'ya göre */
+.prose-klemens figure.figure-square {
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose-klemens figure.figure-portrait {
+  max-width: 58%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 768px) {
+  .prose-klemens figure.figure-square,
+  .prose-klemens figure.figure-portrait {
+    max-width: 100%;
+  }
+}
+
+/* Image captions: editorial stil */
 .prose-klemens figcaption {
-  text-align: left;
-  font-size: 0.8rem;
+  font-family: var(--font-newsreader), serif;
   font-style: italic;
-  font-weight: 400;
-  line-height: 1.6;
-  color: #8a8279;
-  margin-top: 0.5rem;
-  margin-bottom: 2rem;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #8C857E;
+  letter-spacing: 0.01em;
+  margin-top: 12px;
+  margin-bottom: 36px;
+  text-align: center;
+}
+/* italic içinde düz eser adı */
+.prose-klemens figcaption em {
+  font-style: normal;
+}
+/* coral short rule */
+.prose-klemens figcaption::before {
+  content: "";
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  background: #FF6D60;
+  vertical-align: middle;
+  margin-right: 12px;
 }
 .prose-klemens figcaption strong {
   font-weight: 400;

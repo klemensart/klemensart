@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import IceriklerClient from "@/components/IceriklerClient";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const revalidate = 60;
 
@@ -73,6 +75,8 @@ export default async function IceriklerPage() {
   };
 
   return (
+    <>
+    <Navbar />
     <main className="min-h-screen bg-warm-50">
       <script
         type="application/ld+json"
@@ -104,5 +108,7 @@ export default async function IceriklerPage() {
       </Suspense>
 
     </main>
+    <Footer />
+    </>
   );
 }
