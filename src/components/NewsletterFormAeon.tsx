@@ -4,17 +4,14 @@ import { useState } from "react";
 
 interface Props {
   source?: string;
-  compact?: boolean;
-  className?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function NewsletterFormAeon({
-  source = "homepage",
-  compact: _compact = false,
-  className = "",
-}: Props) {
+const CONTAINER_CLS =
+  "-mx-6 px-6 py-6 sm:mx-auto sm:max-w-2xl sm:px-9 sm:py-8 sm:rounded-lg bg-[#F5EBE0]";
+
+export default function NewsletterFormAeon({ source = "homepage" }: Props) {
   const [email, setEmail] = useState("");
   const [weekly, setWeekly] = useState(true);
   const [thematic, setThematic] = useState(false);
@@ -97,7 +94,7 @@ export default function NewsletterFormAeon({
   // ── Success state ──
   if (success) {
     return (
-      <div className={`max-w-2xl mx-auto rounded-lg px-6 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
+      <div className={CONTAINER_CLS}>
         <div className="flex flex-col items-center text-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-coral/10">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2.5" strokeLinecap="round">
@@ -122,7 +119,7 @@ export default function NewsletterFormAeon({
 
   // ── Form state ──
   return (
-    <div className={`max-w-2xl mx-auto rounded-lg px-6 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
+    <div className={CONTAINER_CLS}>
       {/* Heading */}
       <h3
         className="font-semibold text-warm-900 text-2xl leading-tight mb-1.5"
@@ -136,7 +133,7 @@ export default function NewsletterFormAeon({
 
       <form onSubmit={handleSubmit}>
         {/* Email + button — stacked on mobile, horizontal on sm+ */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="email"
             value={email}
@@ -193,7 +190,7 @@ export default function NewsletterFormAeon({
         {alreadySubscribed && (
           <div className="mt-3 p-4 bg-white border border-[#E5DDD5] rounded-md">
             <p className="text-warm-900 font-semibold text-sm mb-1">Bu e-posta zaten abonemiz.</p>
-            <p className="text-sm mb-3" style={{ color: "#8C857E" }}>
+            <p className="text-sm mb-3 text-[#8C857E]">
               Tercihlerini güncellemek için sana özel linki e-postana gönderebiliriz.
             </p>
             <button
@@ -205,7 +202,7 @@ export default function NewsletterFormAeon({
               {isResending ? "Gönderiliyor..." : "Tercih linki gönder"}
             </button>
             {resendMsg && (
-              <p className="mt-2 text-sm" style={{ color: "#8C857E" }}>{resendMsg}</p>
+              <p className="mt-2 text-sm text-[#8C857E]">{resendMsg}</p>
             )}
           </div>
         )}

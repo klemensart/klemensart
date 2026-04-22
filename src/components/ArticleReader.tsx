@@ -283,8 +283,8 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
                     style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
                     dangerouslySetInnerHTML={{ __html: contentHtml }}
                   />
-                  <div className="mt-12 -mx-6 sm:mx-0">
-                    <NewsletterFormAeon source="article-end" compact />
+                  <div className="mt-12">
+                    <NewsletterFormAeon source="article-end" />
                   </div>
                 </>
               );
@@ -298,8 +298,8 @@ export default function ArticleReader({ article, relatedArticles = [], authorOth
                   style={{ fontSize: readingMode ? "21px" : "19px", transition: "font-size 0.35s ease" }}
                   dangerouslySetInnerHTML={{ __html: firstHalf }}
                 />
-                <div className="my-10 -mx-6 sm:mx-0">
-                  <NewsletterFormAeon source="article-inline" compact />
+                <div className="my-10">
+                  <NewsletterFormAeon source="article-inline" />
                 </div>
                 <div
                   className={`prose-klemens ${darkMode ? "text-[#f5f0eb]/85" : "text-warm-900/80"}`}
