@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import AtolyeForm from "../AtolyeForm";
+import AtolyeSosyalMedyaSection from "@/components/admin/AtolyeSosyalMedyaSection";
 
 export default function DuzenleAtolyePage() {
   const params = useParams<{ id: string }>();
@@ -78,6 +79,9 @@ export default function DuzenleAtolyePage() {
       </div>
 
       <AtolyeForm mode="edit" initialData={eventData} />
+
+      {/* Sosyal medya görselleri */}
+      <AtolyeSosyalMedyaSection atolyeId={params.id} />
     </div>
   );
 }

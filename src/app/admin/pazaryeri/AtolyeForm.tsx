@@ -409,6 +409,19 @@ export default function AtolyeForm({ initialData, mode }: Props) {
         return;
       }
 
+      // Fire-and-forget: otomatik sosyal medya görseli üret
+      const savedId =
+        mode === "edit" && initialData?.id
+          ? initialData.id
+          : (await res.json()).event?.id;
+      if (savedId) {
+        fetch("/api/admin/designs/auto-atolye-card", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ atolyeId: savedId }),
+        }).catch(() => {});
+      }
+
       setDirty(false);
       router.push("/admin/pazaryeri");
       router.refresh();

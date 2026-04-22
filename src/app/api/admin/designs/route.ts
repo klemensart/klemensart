@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const userClient = await createServerSupabaseClient();
   const {
     data: { user },
@@ -13,10 +13,19 @@ export async function GET() {
   }
 
   const admin = createAdminClient();
-  const { data, error } = await admin
+  const { searchParams } = new URL(req.url);
+  const linkedEntityId = searchParams.get("linked_entity_id");
+
+  let query = admin
     .from("designs")
     .select("id, name, platform, width, height, thumbnail_url, is_template, updated_at, created_at")
     .order("updated_at", { ascending: false });
+
+  if (linkedEntityId) {
+    query = query.eq("linked_entity_id", linkedEntityId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
