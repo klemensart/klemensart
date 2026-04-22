@@ -97,7 +97,7 @@ export default function NewsletterFormAeon({
   // ── Success state ──
   if (success) {
     return (
-      <div className={`max-w-2xl mx-auto rounded-lg px-5 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
+      <div className={`max-w-2xl mx-auto rounded-lg px-6 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
         <div className="flex flex-col items-center text-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-coral/10">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6D60" strokeWidth="2.5" strokeLinecap="round">
@@ -122,7 +122,7 @@ export default function NewsletterFormAeon({
 
   // ── Form state ──
   return (
-    <div className={`max-w-2xl mx-auto rounded-lg px-5 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
+    <div className={`max-w-2xl mx-auto rounded-lg px-6 py-6 sm:px-9 sm:py-8 bg-[#F5EBE0] ${className}`}>
       {/* Heading */}
       <h3
         className="font-semibold text-warm-900 text-2xl leading-tight mb-1.5"
