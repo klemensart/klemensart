@@ -410,7 +410,9 @@ function InsertMenu({
       action: () => {
         const url = prompt("Spotify URL girin:");
         if (url) {
-          editor.chain().focus().insertContent(`<spotify>${url}</spotify>`).run();
+          editor.chain().focus()
+            .insertContent({ type: "paragraph", content: [{ type: "text", text: url }] })
+            .run();
         }
         setOpen(false);
       },
@@ -424,9 +426,10 @@ function InsertMenu({
         } else {
           const url = prompt("Ses dosyası URL'si girin:");
           if (url) {
-            const caption = prompt("Açıklama (opsiyonel):") || "";
-            const tag = caption ? `<ses>${url}|${caption}</ses>` : `<ses>${url}</ses>`;
-            editor.chain().focus().insertContent(tag).run();
+            const caption = prompt("Açıklama (opsiyonel):") || "Ses dosyası";
+            editor.chain().focus()
+              .insertContent({ type: "paragraph", content: [{ type: "text", text: `[${caption}](${url})` }] })
+              .run();
           }
         }
         setOpen(false);
@@ -482,9 +485,10 @@ function InsertMenu({
           if (!file || !onAudioUpload) return;
           const url = await onAudioUpload(file);
           if (url) {
-            const caption = prompt("Ses açıklaması (opsiyonel):") || "";
-            const tag = caption ? `<ses>${url}|${caption}</ses>` : `<ses>${url}</ses>`;
-            editor.chain().focus().insertContent(tag).run();
+            const caption = prompt("Ses açıklaması (opsiyonel):") || "Ses dosyası";
+            editor.chain().focus()
+              .insertContent({ type: "paragraph", content: [{ type: "text", text: `[${caption}](${url})` }] })
+              .run();
           }
         }}
       />

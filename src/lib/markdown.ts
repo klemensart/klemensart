@@ -137,8 +137,8 @@ function spotifyIframe(type: string, id: string): string {
 }
 
 function processSpotifyEmbeds(rawHtml: string): string {
-  // 1. <spotify>URL</spotify> custom tag
-  let result = rawHtml.replace(/<spotify>([\s\S]*?)<\/spotify>/g, (_, url) => {
+  // 1. Backward compat: <spotify>URL</spotify> (+ TipTap escaped variant)
+  let result = rawHtml.replace(/<spotify>([\s\S]*?)(?:<\/spotify>|&lt;\/spotify&gt;)/g, (_, url) => {
     const info = extractSpotifyInfo(url.trim());
     return info ? spotifyIframe(info.type, info.id) : "";
   });
@@ -161,6 +161,28 @@ function processSpotifyEmbeds(rawHtml: string): string {
     }
   );
 
+  // 4. Spotify <a> at end of a <p> (after text) → keep text, add embed after
+  result = result.replace(
+    /(<p>(?:(?!<\/p>).)*?)\s*<a [^>]*href="([^"]*open\.spotify\.com[^"]*)"[^>]*>[^<]*<\/a>\s*(<\/p>)/g,
+    (match, before, url, after) => {
+      const info = extractSpotifyInfo(url);
+      if (!info) return match;
+      const cleanBefore = before.replace(/\s*(<br\s*\/?>)?\s*$/, "");
+      return `${cleanBefore}${after}\n${spotifyIframe(info.type, info.id)}`;
+    }
+  );
+
+  // 5. Bare Spotify URL at end of a <p> → keep text, add embed after
+  result = result.replace(
+    /(<p>(?:(?!<\/p>).)*?)\s*(https?:\/\/open\.spotify\.com\/[^\s<]+)\s*(<\/p>)/g,
+    (match, before, url, after) => {
+      const info = extractSpotifyInfo(url);
+      if (!info) return match;
+      const cleanBefore = before.replace(/\s*(<br\s*\/?>)?\s*$/, "");
+      return `${cleanBefore}${after}\n${spotifyIframe(info.type, info.id)}`;
+    }
+  );
+
   return result;
 }
 
@@ -173,11 +195,15 @@ function audioPlayer(src: string, caption?: string): string {
   return `<figure class="audio-embed my-6"><audio controls preload="metadata" src="${src}"></audio>${cap}</figure>`;
 }
 
+function isAudioUrl(url: string): boolean {
+  return url.includes("/article-audio/") ||
+    /\.(mp3|wav|ogg|m4a|aac)(\?|$)/i.test(url);
+}
+
 function processAudioEmbeds(rawHtml: string): string {
-  // <ses>URL</ses> or <ses>URL|caption text</ses>
-  // Inner text only — no attributes (TipTap strips unknown element attrs)
-  return rawHtml.replace(
-    /<ses>([\s\S]*?)<\/ses>/g,
+  // 1. Backward compat: <ses>URL</ses> or <ses>URL|caption</ses> (+ escaped variant)
+  let result = rawHtml.replace(
+    /<ses>([\s\S]*?)(?:<\/ses>|&lt;\/ses&gt;)/g,
     (_, inner) => {
       const text = inner.trim();
       const pipeIdx = text.indexOf("|");
@@ -187,6 +213,26 @@ function processAudioEmbeds(rawHtml: string): string {
       return audioPlayer(src, caption);
     }
   );
+
+  // 2. Audio <a> links alone in a <p> → player (link text = caption)
+  result = result.replace(
+    /<p>\s*<a [^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>\s*<\/p>/g,
+    (match, url, linkText) => {
+      if (!isAudioUrl(url)) return match;
+      return audioPlayer(url, linkText.trim() || "");
+    }
+  );
+
+  // 3. Bare audio URLs alone in a <p> → player (no caption)
+  result = result.replace(
+    /<p>\s*(https?:\/\/[^\s<]+)\s*<\/p>/g,
+    (match, url) => {
+      if (!isAudioUrl(url)) return match;
+      return audioPlayer(url);
+    }
+  );
+
+  return result;
 }
 
 function processYouTubeEmbeds(rawHtml: string): string {
