@@ -125,6 +125,65 @@ function youtubeIframe(id: string): string {
   return `<div class="youtube-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
 }
 
+/* ── Spotify embed ── */
+
+function extractSpotifyInfo(url: string): { type: string; id: string } | null {
+  const m = url.match(/open\.spotify\.com\/(track|episode|playlist|album|show)\/([a-zA-Z0-9]+)/);
+  return m ? { type: m[1], id: m[2] } : null;
+}
+
+function spotifyIframe(type: string, id: string): string {
+  return `<div class="spotify-embed my-6"><iframe src="https://open.spotify.com/embed/${type}/${id}?theme=0" width="100%" height="152" frameborder="0" loading="lazy" allow="clipboard-write; encrypted-media; fullscreen"></iframe></div>`;
+}
+
+function processSpotifyEmbeds(rawHtml: string): string {
+  // 1. <spotify>URL</spotify> custom tag
+  let result = rawHtml.replace(/<spotify>([\s\S]*?)<\/spotify>/g, (_, url) => {
+    const info = extractSpotifyInfo(url.trim());
+    return info ? spotifyIframe(info.type, info.id) : "";
+  });
+
+  // 2. Spotify <a> links alone in a <p> → embed
+  result = result.replace(
+    /<p>\s*<a [^>]*href="([^"]*open\.spotify\.com[^"]*)"[^>]*>[^<]*<\/a>\s*<\/p>/g,
+    (match, url) => {
+      const info = extractSpotifyInfo(url);
+      return info ? spotifyIframe(info.type, info.id) : match;
+    }
+  );
+
+  // 3. Bare Spotify URLs alone in a <p> → embed
+  result = result.replace(
+    /<p>\s*(https?:\/\/open\.spotify\.com\/[^\s<]+)\s*<\/p>/g,
+    (match, url) => {
+      const info = extractSpotifyInfo(url);
+      return info ? spotifyIframe(info.type, info.id) : match;
+    }
+  );
+
+  return result;
+}
+
+/* ── Audio embed ── */
+
+function audioPlayer(src: string, caption?: string): string {
+  const cap = caption?.trim()
+    ? `<figcaption><span class="caption-rule"></span><em>${caption.trim()}</em></figcaption>`
+    : "";
+  return `<figure class="audio-embed my-6"><audio controls preload="metadata" src="${src}"></audio>${cap}</figure>`;
+}
+
+function processAudioEmbeds(rawHtml: string): string {
+  // <audio src="..." caption="..."></audio> or <audio src="...">caption text</audio>
+  return rawHtml.replace(
+    /<audio\s+src="([^"]*)"(?:\s+caption="([^"]*)")?>([\s\S]*?)<\/audio>/g,
+    (_, src, captionAttr, innerText) => {
+      const caption = captionAttr || innerText?.trim() || "";
+      return audioPlayer(src, caption);
+    }
+  );
+}
+
 function processYouTubeEmbeds(rawHtml: string): string {
   // 1. <youtube>URL</youtube> custom tag
   let result = rawHtml.replace(/<youtube>([\s\S]*?)<\/youtube>/g, (_, url) => {
@@ -327,6 +386,8 @@ export async function markdownToHtml(content: string): Promise<string> {
   contentHtml = await classifyFigures(contentHtml);
   contentHtml = processWarningBoxes(contentHtml);
   contentHtml = processYouTubeEmbeds(processBlockquotes(contentHtml));
+  contentHtml = processSpotifyEmbeds(contentHtml);
+  contentHtml = processAudioEmbeds(contentHtml);
   contentHtml = processKaynakca(contentHtml);
 
   return contentHtml;

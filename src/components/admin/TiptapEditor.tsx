@@ -19,6 +19,7 @@ type Props = {
   content: string;
   onChange: (markdown: string) => void;
   onUploadImage: (file: File) => Promise<string | null>;
+  onUploadAudio?: (file: File) => Promise<string | null>;
   uploading?: boolean;
   placeholder?: string;
   /* Suggestion system */
@@ -269,6 +270,20 @@ const I = {
       <line x1="8" y1="7" x2="16" y2="7" /><line x1="8" y1="11" x2="13" y2="11" />
     </svg>
   ),
+  spotify: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 15c2-1 4.5-1.2 8 .5" />
+      <path d="M7 12.5c2.5-1.2 6-1.5 10 .5" />
+      <path d="M6 10c3-1.5 7.5-1.8 12 .5" />
+    </svg>
+  ),
+  audio: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+    </svg>
+  ),
   plus: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
       <line x1="12" y1="5" x2="12" y2="19" />
@@ -317,12 +332,15 @@ function TSep() {
 function InsertMenu({
   editor,
   onImageClick,
+  onAudioUpload,
   uploading,
 }: {
   editor: Editor;
   onImageClick: () => void;
+  onAudioUpload?: (file: File) => Promise<string | null>;
   uploading?: boolean;
 }) {
+  const audioFileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -386,6 +404,35 @@ function InsertMenu({
         setOpen(false);
       },
     },
+    {
+      label: "Spotify",
+      icon: I.spotify,
+      action: () => {
+        const url = prompt("Spotify URL girin:");
+        if (url) {
+          editor.chain().focus().insertContent(`<spotify>${url}</spotify>`).run();
+        }
+        setOpen(false);
+      },
+    },
+    {
+      label: "Ses Dosyası",
+      icon: I.audio,
+      action: () => {
+        if (onAudioUpload) {
+          audioFileRef.current?.click();
+        } else {
+          const url = prompt("Ses dosyası URL'si girin:");
+          if (url) {
+            const caption = prompt("Açıklama (opsiyonel):") || "";
+            editor.chain().focus().insertContent(
+              `<audio src="${url}" caption="${caption}"></audio>`
+            ).run();
+          }
+        }
+        setOpen(false);
+      },
+    },
   ];
 
   return (
@@ -424,6 +471,25 @@ function InsertMenu({
           )}
         </div>
       )}
+      {/* Hidden audio file input */}
+      <input
+        ref={audioFileRef}
+        type="file"
+        accept="audio/*"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (!file || !onAudioUpload) return;
+          const url = await onAudioUpload(file);
+          if (url) {
+            const caption = prompt("Ses açıklaması (opsiyonel):") || "";
+            editor.chain().focus().insertContent(
+              `<audio src="${url}" caption="${caption}"></audio>`
+            ).run();
+          }
+        }}
+      />
     </div>
   );
 }
@@ -679,6 +745,7 @@ export default function TiptapEditor({
   content,
   onChange,
   onUploadImage,
+  onUploadAudio,
   uploading,
   placeholder,
   articleId,
@@ -1443,6 +1510,7 @@ export default function TiptapEditor({
       <InsertMenu
         editor={editor}
         onImageClick={() => fileRef.current?.click()}
+        onAudioUpload={onUploadAudio}
         uploading={uploading || optimizing}
       />
 

@@ -451,3 +451,42 @@ html {
   height: 100%;
   border: none;
 }
+
+/* Spotify embed */
+.spotify-embed iframe {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: none;
+}
+
+/* Audio embed */
+.audio-embed {
+  background: #F5EBE0;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.audio-embed audio {
+  width: 100%;
+  height: 40px;
+  border-radius: 999px;
+}
+.audio-embed audio::-webkit-media-controls-panel {
+  background: #F5EBE0;
+}
+.audio-embed figcaption {
+  margin-top: 10px;
+  font-family: var(--font-newsreader), serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #8C857E;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.audio-embed .caption-rule {
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  background: #FF6D60;
+  flex-shrink: 0;
+}

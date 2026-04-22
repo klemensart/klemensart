@@ -212,6 +212,35 @@ export default function AdminArticleEditPage() {
     return result.url;
   };
 
+  /* ── Audio upload handler for TipTap ── */
+  const handleEditorAudioUpload = async (
+    file: File
+  ): Promise<string | null> => {
+    if (file.size > 20 * 1024 * 1024) {
+      setMsg("Hata: Ses dosyası 20MB'dan büyük olamaz");
+      return null;
+    }
+    setUploading(true);
+    setMsg("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("slug", form.slug.trim() || "genel");
+      const res = await fetch("/api/admin/upload/audio", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        setMsg(`Hata: ${json.error ?? "Yükleme hatası"}`);
+        return null;
+      }
+      return json.url;
+    } catch {
+      setMsg("Hata: Ses dosyası yüklenemedi");
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   /* ── Cover image upload ── */
   const handleCoverUpload = async (file: File) => {
     if (!isImageFile(file)) {
@@ -638,6 +667,7 @@ export default function AdminArticleEditPage() {
               content={form.content}
               onChange={(md) => set("content", md)}
               onUploadImage={handleEditorImageUpload}
+              onUploadAudio={handleEditorAudioUpload}
               uploading={uploading}
               placeholder="Yazı içeriğini yazın... Görsel yapıştırabilir veya sürükleyebilirsiniz."
               articleId={isNew ? undefined : id}

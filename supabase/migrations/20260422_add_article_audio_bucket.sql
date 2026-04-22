@@ -1,0 +1,15 @@
+-- article-audio bucket — Supabase Dashboard'dan oluşturulmalı:
+-- Storage > New Bucket > article-audio > Public
+-- Max file size: 20MB
+-- Allowed MIME: audio/mpeg, audio/wav, audio/ogg, audio/mp4, audio/aac, audio/webm
+--
+-- RLS policy (marketplace-images ile aynı pattern):
+-- INSERT: authenticated users (admin check app-level'da yapılıyor)
+-- SELECT: public (herkes dinleyebilir)
+--
+-- Dashboard adımları:
+-- 1. Supabase Dashboard > Storage > New Bucket
+-- 2. Name: article-audio
+-- 3. Public bucket: ON
+-- 4. File size limit: 20MB
+-- 5. Allowed MIME types: audio/mpeg, audio/wav, audio/ogg, audio/mp4
