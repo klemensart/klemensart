@@ -59,7 +59,7 @@ const ResizableImage = TiptapImage.extend({
         ) {
           state.write(
             "![" + state.esc(node.attrs.alt || "") + "](" +
-            (node.attrs.src || "").replace(/[()]/g, "\\$&") +
+            (node.attrs.src || "").replace(/ /g, "%20").replace(/[()]/g, "\\$&") +
             (node.attrs.title ? ' "' + node.attrs.title.replace(/"/g, '\\"') + '"' : "") +
             ")"
           );

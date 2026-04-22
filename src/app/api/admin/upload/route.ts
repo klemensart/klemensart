@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
-  const slug = (formData.get("slug") as string) || "genel";
+  const rawSlug = (formData.get("slug") as string) || "genel";
+  const slug = rawSlug.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "genel";
   const bucket = (formData.get("bucket") as string) || "article-images";
 
   if (!file) {

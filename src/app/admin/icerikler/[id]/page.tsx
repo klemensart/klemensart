@@ -193,7 +193,7 @@ export default function AdminArticleEditPage() {
     }
     setUploading(true);
     setMsg("");
-    const result = await uploadFile(file, form.slug || "genel");
+    const result = await uploadFile(file, form.slug.trim() || "genel");
     setUploading(false);
     if ("error" in result) {
       setMsg(`Hata: ${result.error}`);
@@ -214,7 +214,7 @@ export default function AdminArticleEditPage() {
     }
     setUploadingCover(true);
     setMsg("");
-    const result = await uploadFile(file, form.slug || "genel");
+    const result = await uploadFile(file, form.slug.trim() || "genel");
     if ("error" in result) {
       setMsg(`Hata: ${result.error}`);
     } else {
