@@ -174,11 +174,16 @@ function audioPlayer(src: string, caption?: string): string {
 }
 
 function processAudioEmbeds(rawHtml: string): string {
-  // <ses src="..." caption="..."></ses> — custom tag (not <audio> to avoid TipTap HTML parsing)
+  // <ses>URL</ses> or <ses>URL|caption text</ses>
+  // Inner text only — no attributes (TipTap strips unknown element attrs)
   return rawHtml.replace(
-    /<ses\s+src="([^"]*)"(?:\s+caption="([^"]*)")?>([\s\S]*?)<\/ses>/g,
-    (_, src, captionAttr, innerText) => {
-      const caption = captionAttr || innerText?.trim() || "";
+    /<ses>([\s\S]*?)<\/ses>/g,
+    (_, inner) => {
+      const text = inner.trim();
+      const pipeIdx = text.indexOf("|");
+      const src = pipeIdx > -1 ? text.slice(0, pipeIdx).trim() : text;
+      const caption = pipeIdx > -1 ? text.slice(pipeIdx + 1).trim() : "";
+      if (!src) return "";
       return audioPlayer(src, caption);
     }
   );

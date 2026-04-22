@@ -425,9 +425,8 @@ function InsertMenu({
           const url = prompt("Ses dosyası URL'si girin:");
           if (url) {
             const caption = prompt("Açıklama (opsiyonel):") || "";
-            editor.chain().focus().insertContent(
-              `<ses src="${url}" caption="${caption}"></ses>`
-            ).run();
+            const tag = caption ? `<ses>${url}|${caption}</ses>` : `<ses>${url}</ses>`;
+            editor.chain().focus().insertContent(tag).run();
           }
         }
         setOpen(false);
@@ -484,9 +483,8 @@ function InsertMenu({
           const url = await onAudioUpload(file);
           if (url) {
             const caption = prompt("Ses açıklaması (opsiyonel):") || "";
-            editor.chain().focus().insertContent(
-              `<ses src="${url}" caption="${caption}"></ses>`
-            ).run();
+            const tag = caption ? `<ses>${url}|${caption}</ses>` : `<ses>${url}</ses>`;
+            editor.chain().focus().insertContent(tag).run();
           }
         }}
       />
