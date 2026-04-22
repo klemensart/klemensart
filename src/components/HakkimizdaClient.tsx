@@ -783,40 +783,45 @@ export default function HakkimizdaClient({ articles }: { articles: ArticleMeta[]
             <p className="text-warm-900/45 text-sm mb-10 max-w-lg">
               Farklı disiplinlerden gelen yazarlarımız, Klemens&apos;in kolektif sesini oluşturur.
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch">
               {WRITERS.map((writer) => (
                 <button
                   key={writer.id}
                   onClick={() => setSelectedId(writer.id)}
-                  className="text-left rounded-2xl bg-white border border-warm-100 p-4 hover:border-warm-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98]"
+                  className="h-full rounded-2xl bg-white border border-warm-100 p-4 hover:border-warm-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98]"
                 >
-                  <div className="flex flex-col items-center text-center gap-3">
-                    {writer.photo ? (
-                      <Image
-                        src={writer.photo}
-                        alt={writer.name}
-                        width={56}
-                        height={56}
-                        className="rounded-full object-cover"
-                        style={{ width: 56, height: 56 }}
-                      />
-                    ) : (
-                      <div
-                        className="rounded-full flex items-center justify-center text-white font-bold"
-                        style={{ width: 56, height: 56, fontSize: 14, background: "#2C2319" }}
-                      >
-                        {writer.initials}
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-bold text-warm-900 text-sm leading-tight">{writer.name}</p>
-                      <p className="text-[11px] text-warm-900/45 mt-1">{writer.role}</p>
+                  <div className="flex flex-col items-center text-center h-full">
+                    {/* Avatar — üst */}
+                    <div className="mb-3">
+                      {writer.photo ? (
+                        <Image
+                          src={writer.photo}
+                          alt={writer.name}
+                          width={56}
+                          height={56}
+                          className="rounded-full object-cover"
+                          style={{ width: 56, height: 56 }}
+                        />
+                      ) : (
+                        <div
+                          className="rounded-full flex items-center justify-center text-white font-bold"
+                          style={{ width: 56, height: 56, fontSize: 14, background: "#2C2319" }}
+                        >
+                          {writer.initials}
+                        </div>
+                      )}
                     </div>
-                    {writer.quote && (
-                      <p className="text-[11px] text-warm-900/40 italic leading-relaxed line-clamp-2">
-                        &ldquo;{writer.quote}&rdquo;
-                      </p>
-                    )}
+                    {/* İsim + rol — sabit pozisyon */}
+                    <p className="font-bold text-warm-900 text-sm leading-tight">{writer.name}</p>
+                    <p className="text-[11px] text-warm-900/45 mt-1">{writer.role}</p>
+                    {/* Alıntı — en alta, yoksa boşluk korunur */}
+                    <div className="mt-auto pt-3 min-h-[48px] flex items-end">
+                      {writer.quote ? (
+                        <p className="text-[11px] text-warm-900/40 italic leading-relaxed line-clamp-2">
+                          &ldquo;{writer.quote}&rdquo;
+                        </p>
+                      ) : null}
+                    </div>
                   </div>
                 </button>
               ))}
