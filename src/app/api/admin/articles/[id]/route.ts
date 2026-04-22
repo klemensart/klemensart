@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin, getAdminRole } from "@/lib/admin-check";
@@ -49,11 +50,25 @@ export async function PUT(
   const admin = createAdminClient();
   const body = await req.json();
 
+  const authorName = (body.author ?? "").trim();
+
+  // Auto-resolve author_id from people table if not already set
+  let authorId: string | null = body.author_id ?? null;
+  if (!authorId && authorName) {
+    const { data: person } = await admin
+      .from("people")
+      .select("id")
+      .eq("name", authorName)
+      .maybeSingle();
+    if (person) authorId = person.id;
+  }
+
   const row = {
     slug: (body.slug ?? "").trim(),
-    title: body.title,
+    title: (body.title ?? "").trim(),
     description: body.description ?? "",
-    author: body.author ?? "",
+    author: authorName,
+    author_id: authorId,
     author_ig: body.author_ig || null,
     author_email: body.author_email || null,
     date: body.date || null,
@@ -76,6 +91,10 @@ export async function PUT(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // On-demand revalidation for pages that list articles
+  revalidatePath("/hakkimizda");
+  revalidatePath("/icerikler");
 
   // Yazı published ise news_items'a da senkronize et
   if (row.status === "published" && row.slug) {

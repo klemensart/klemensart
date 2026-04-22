@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getAllArticlesMetadata } from "@/lib/markdown";
 import HakkimizdaClient from "@/components/HakkimizdaClient";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Hakkımızda",
   description:

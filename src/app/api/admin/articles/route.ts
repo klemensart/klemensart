@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/admin-check";
@@ -65,11 +66,25 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const authorName = (body.author ?? "").trim();
+
+  // Auto-resolve author_id from people table
+  let authorId: string | null = null;
+  if (authorName) {
+    const { data: person } = await admin
+      .from("people")
+      .select("id")
+      .eq("name", authorName)
+      .maybeSingle();
+    if (person) authorId = person.id;
+  }
+
   const row = {
     slug: (body.slug ?? "").trim(),
-    title: body.title,
+    title: (body.title ?? "").trim(),
     description: body.description ?? "",
-    author: body.author ?? "",
+    author: authorName,
+    author_id: authorId,
     author_ig: body.author_ig || null,
     author_email: body.author_email || null,
     date: body.date || null,
@@ -93,6 +108,9 @@ export async function POST(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  revalidatePath("/hakkimizda");
+  revalidatePath("/icerikler");
 
   // Otomatik Instagram Story tasarımı oluştur
   try {
