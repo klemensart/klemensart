@@ -50,7 +50,7 @@ export async function PUT(
   const body = await req.json();
 
   const row = {
-    slug: body.slug,
+    slug: (body.slug ?? "").trim(),
     title: body.title,
     description: body.description ?? "",
     author: body.author ?? "",

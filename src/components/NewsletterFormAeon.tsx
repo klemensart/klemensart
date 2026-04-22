@@ -98,8 +98,8 @@ export default function NewsletterFormAeon({
   if (success) {
     return (
       <div
-        className={`mx-auto rounded-lg ${className}`}
-        style={{ maxWidth: 640, backgroundColor: "#F5EBE0", padding: "32px 36px" }}
+        className={`mx-auto rounded-lg px-5 py-6 sm:px-9 sm:py-8 ${className}`}
+        style={{ maxWidth: 640, backgroundColor: "#F5EBE0" }}
       >
         <div className="flex flex-col items-center text-center gap-3">
           <div
@@ -129,8 +129,8 @@ export default function NewsletterFormAeon({
   // ── Form state ──
   return (
     <div
-      className={`mx-auto rounded-lg ${className}`}
-      style={{ maxWidth: 640, backgroundColor: "#F5EBE0", padding: "32px 36px" }}
+      className={`mx-auto rounded-lg px-5 py-6 sm:px-9 sm:py-8 ${className}`}
+      style={{ maxWidth: 640, backgroundColor: "#F5EBE0" }}
     >
       {/* Heading */}
       <h3
@@ -152,7 +152,7 @@ export default function NewsletterFormAeon({
             onChange={(e) => { setEmail(e.target.value); setAlreadySubscribed(false); setError(null); }}
             placeholder="E-posta adresin"
             disabled={isSubmitting}
-            className="flex-1 h-11 px-4 border border-[#E5DDD5] rounded-md bg-white text-sm text-warm-900 placeholder:text-warm-900/35 focus:outline-none focus:border-coral transition-colors disabled:opacity-50"
+            className="flex-1 h-11 px-4 border border-[#E5DDD5] rounded-md bg-white text-sm text-warm-900 placeholder:text-warm-900/35 focus:outline-none focus:border-coral focus:ring-2 focus:ring-coral/20 transition-colors disabled:opacity-50"
           />
           <button
             type="submit"

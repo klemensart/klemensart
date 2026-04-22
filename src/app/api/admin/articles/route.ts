@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   }
 
   const row = {
-    slug: body.slug,
+    slug: (body.slug ?? "").trim(),
     title: body.title,
     description: body.description ?? "",
     author: body.author ?? "",
