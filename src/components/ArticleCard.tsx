@@ -57,6 +57,22 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
         <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold bg-black/30 backdrop-blur-sm text-white/90 border border-white/15">
           {article.category}
         </span>
+
+        {/* Video play overlay */}
+        {article.cover_video_url && (
+          <div className="absolute bottom-3 right-3 pointer-events-none flex items-center gap-2">
+            {article.cover_video_duration != null && (
+              <span className="text-xs text-white font-medium bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                {article.cover_video_duration} dk
+              </span>
+            )}
+            <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/80 flex items-center justify-center transition-transform group-hover:scale-110">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="currentColor">
+                <polygon points="8,5 8,19 19,12" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── İçerik alanı ── */}
