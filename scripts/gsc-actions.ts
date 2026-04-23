@@ -28,7 +28,6 @@ async function main() {
   console.log("\n=== SITEMAP SUBMIT ===");
   const sitemapsToSubmit = [
     "https://klemensart.com/sitemap.xml",
-    "https://klemensart.com/news-sitemap.xml",
   ];
 
   for (const url of sitemapsToSubmit) {
