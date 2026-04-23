@@ -352,6 +352,15 @@ export default function EtkinliklerClient({ initialEvents }: { initialEvents: Ev
           )}
         </div>
       </section>
+
+      {/* Crawlable event links — visually hidden, ensures URLs appear in HTML */}
+      <nav className="sr-only" aria-label="Tüm etkinlikler">
+        {initialEvents.map((e) => (
+          <a key={`seo-${e.id}`} href={e.is_klemens_event ? "/atolyeler" : `/etkinlikler/${e.id}`}>
+            {e.title}
+          </a>
+        ))}
+      </nav>
     </main>
   );
 }
