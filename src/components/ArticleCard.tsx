@@ -30,7 +30,7 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
   const hasImage = article.image && article.image.trim() !== "";
 
   return (
-    <article className="group flex flex-col rounded-3xl bg-white border border-warm-100 overflow-hidden hover:border-warm-200 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/[0.07] transition-all duration-300">
+    <article className="group relative flex flex-col rounded-3xl bg-white border border-warm-100 overflow-hidden hover:border-warm-200 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-warm-900/[0.07] transition-all duration-300 cursor-pointer">
 
       {/* ── Görsel alanı ── */}
       <div className="relative h-[200px] overflow-hidden flex-shrink-0">
@@ -77,9 +77,14 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
 
       {/* ── İçerik alanı ── */}
       <div className="flex flex-col flex-1 p-6">
-        {/* Başlık */}
+        {/* Başlık — stretched link ile tüm kartı kaplar */}
         <h3 className="text-base font-bold text-warm-900 leading-snug mb-2.5 line-clamp-2 group-hover:text-coral transition-colors duration-200">
-          {article.title}
+          <Link
+            href={`/icerikler/yazi/${article.slug}`}
+            className="before:content-[''] before:absolute before:inset-0 before:z-0"
+          >
+            {article.title}
+          </Link>
         </h3>
 
         {/* Özet */}
@@ -90,19 +95,19 @@ export default function ArticleCard({ article, priority = false }: { article: Ar
         {/* Footer */}
         <div className="mt-5 pt-4 border-t border-warm-100 flex items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 text-xs font-medium flex-wrap">
-            <span className="text-warm-900/70 font-semibold">{article.author}</span>
+            {article.author_person?.slug ? (
+              <Link
+                href={`/yazarlar/${article.author_person.slug}`}
+                className="relative z-10 text-warm-900/70 font-semibold hover:text-coral transition-colors"
+              >
+                {article.author}
+              </Link>
+            ) : (
+              <span className="text-warm-900/70 font-semibold">{article.author}</span>
+            )}
             <span className="text-warm-900/25">·</span>
             <span className="text-warm-900/35">{article.date}</span>
           </div>
-          <Link
-            href={`/icerikler/yazi/${article.slug}`}
-            className="flex items-center gap-1 text-xs font-semibold text-coral hover:gap-2 transition-all duration-150"
-          >
-            Devamını Oku
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
         </div>
       </div>
 
