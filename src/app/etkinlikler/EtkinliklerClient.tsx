@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import EventList from "@/components/EventList";
 import { TYPE_LABELS, TYPE_COLORS } from "@/components/EventList";
-import { createClient } from "@/lib/supabase";
 import type { EventRow } from "@/types/event";
 
 const TYPE_GRADIENTS: Record<string, string> = {
@@ -122,7 +119,6 @@ function EventTypeIcon({ type }: { type: string }) {
 type Filter = "Tümü" | "Atölyeler" | "Sergi" | "Konser" | "Sahne Sanatları" | "Söyleşi & Panel" | "Festival";
 const FILTERS: Filter[] = ["Tümü", "Atölyeler", "Sergi", "Konser", "Sahne Sanatları", "Söyleşi & Panel", "Festival"];
 
-// Birden fazla event_type'ı kapsayan filtreler
 const FILTER_TO_TYPES: Partial<Record<Filter, string[]>> = {
   Sergi: ["sergi"],
   Konser: ["konser"],
@@ -250,7 +246,7 @@ function EventCard({ e }: { e: EventRow }) {
   );
 }
 
-export default function EtkinliklerClient() {
+export default function EtkinliklerClient({ initialEvents }: { initialEvents: EventRow[] }) {
   const [filter, setFilter] = useState<Filter>("Tümü");
   const [viewMode, setViewMode] = useState<"grid" | "table">(() => {
     if (typeof window !== "undefined") {
@@ -258,132 +254,104 @@ export default function EtkinliklerClient() {
     }
     return "table";
   });
-  const [events, setEvents] = useState<EventRow[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      const supabase = createClient();
-
-      const now = new Date().toISOString();
-      let q = supabase
-        .from("events")
-        .select("id,title,description,ai_comment,event_type,venue,address,event_date,source_url,source_name,price_info,is_klemens_event,image_url")
-        .eq("status", "approved")
-        .gte("event_date", now)
-        .order("event_date", { ascending: true });
-
-      if (filter === "Atölyeler") {
-        q = q.eq("is_klemens_event", true);
-      } else if (filter !== "Tümü") {
-        const types = FILTER_TO_TYPES[filter];
-        if (types) q = q.in("event_type", types);
-      }
-
-      const { data } = await q;
-      setEvents((data ?? []) as EventRow[]);
-      setLoading(false);
-    };
-    load();
-  }, [filter]);
+  const events = filter === "Tümü"
+    ? initialEvents
+    : filter === "Atölyeler"
+      ? initialEvents.filter((e) => e.is_klemens_event)
+      : initialEvents.filter((e) => {
+          const types = FILTER_TO_TYPES[filter];
+          return types ? types.includes(e.event_type ?? "") : true;
+        });
 
   return (
-    <>
-      <Navbar />
-      <main className="bg-warm-50 min-h-screen">
+    <main className="bg-warm-50 min-h-screen">
 
-        {/* ── Hero ── */}
-        <section className="pt-32 pb-14 px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-5">Ankara Kültür-Sanat Takvimi</p>
-            <h1
-              className="text-5xl sm:text-6xl font-bold leading-tight text-warm-900 mb-5"
-              style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
-            >
-              Ankara Kültür &amp; Sanat<br />Takvimi
-            </h1>
-            <p
-              className="text-warm-900/45 text-lg leading-relaxed italic"
-              style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
-            >
-              Başkentin nabzını tutan etkinlik rehberiniz — sergiden konsere, tiyatrodan festivale...
-            </p>
-          </div>
-        </section>
+      {/* ── Hero ── */}
+      <section className="pt-32 pb-14 px-6 text-center">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-coral text-xs font-semibold tracking-[0.2em] uppercase mb-5">Ankara Kültür-Sanat Takvimi</p>
+          <h1
+            className="text-5xl sm:text-6xl font-bold leading-tight text-warm-900 mb-5"
+            style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
+          >
+            Ankara Kültür &amp; Sanat<br />Takvimi
+          </h1>
+          <p
+            className="text-warm-900/45 text-lg leading-relaxed italic"
+            style={{ fontFamily: "var(--font-playfair), 'Playfair Display', Georgia, serif" }}
+          >
+            Başkentin nabzını tutan etkinlik rehberiniz — sergiden konsere, tiyatrodan festivale...
+          </p>
+        </div>
+      </section>
 
-        {/* ── Filters ── */}
-        <section className="px-6 pb-10">
-          <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-2">
-            {FILTERS.map((f) => (
+      {/* ── Filters ── */}
+      <section className="px-6 pb-10">
+        <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
+                filter === f
+                  ? "bg-coral border-coral text-white shadow-sm shadow-coral/20"
+                  : "bg-white border-warm-200 text-warm-900/55 hover:border-warm-300 hover:text-warm-900"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Toggle + Grid/Ajanda ── */}
+      <section className="px-6 pb-28">
+        <div className="max-w-6xl mx-auto">
+          {/* View toggle */}
+          <div className="flex justify-end mb-4">
+            <div className="flex items-center gap-1">
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                  filter === f
-                    ? "bg-coral border-coral text-white shadow-sm shadow-coral/20"
-                    : "bg-white border-warm-200 text-warm-900/55 hover:border-warm-300 hover:text-warm-900"
-                }`}
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                title="Kart görünümü"
               >
-                {f}
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="1" width="7" height="7" rx="1" />
+                  <rect x="10" y="1" width="7" height="7" rx="1" />
+                  <rect x="1" y="10" width="7" height="7" rx="1" />
+                  <rect x="10" y="10" width="7" height="7" rx="1" />
+                </svg>
               </button>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Toggle + Grid/Ajanda ── */}
-        <section className="px-6 pb-28">
-          <div className="max-w-6xl mx-auto">
-            {/* View toggle */}
-            <div className="flex justify-end mb-4">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                  title="Kart görünümü"
-                >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="1" y="1" width="7" height="7" rx="1" />
-                    <rect x="10" y="1" width="7" height="7" rx="1" />
-                    <rect x="1" y="10" width="7" height="7" rx="1" />
-                    <rect x="10" y="10" width="7" height="7" rx="1" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setViewMode("table")}
-                  className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
-                  title="Ajanda görünümü"
-                >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                    <line x1="2" y1="4" x2="16" y2="4" />
-                    <line x1="2" y1="9" x2="16" y2="9" />
-                    <line x1="2" y1="14" x2="16" y2="14" />
-                  </svg>
-                </button>
-              </div>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "table" ? "text-coral" : "text-warm-900/30 hover:text-warm-900/60"}`}
+                title="Ajanda görünümü"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <line x1="2" y1="4" x2="16" y2="4" />
+                  <line x1="2" y1="9" x2="16" y2="9" />
+                  <line x1="2" y1="14" x2="16" y2="14" />
+                </svg>
+              </button>
             </div>
-
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-5 h-5 border-2 border-coral border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : events.length === 0 ? (
-              <div className="text-center py-20 text-warm-900/30">
-                <p className="text-base">Bu kategoride yaklaşan etkinlik bulunmuyor.</p>
-              </div>
-            ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {events.map((e) => (
-                  <EventCard key={e.id} e={e} />
-                ))}
-              </div>
-            ) : (
-              <EventList events={events} />
-            )}
           </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+
+          {events.length === 0 ? (
+            <div className="text-center py-20 text-warm-900/30">
+              <p className="text-base">Bu kategoride yaklaşan etkinlik bulunmuyor.</p>
+            </div>
+          ) : viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {events.map((e) => (
+                <EventCard key={e.id} e={e} />
+              ))}
+            </div>
+          ) : (
+            <EventList events={events} />
+          )}
+        </div>
+      </section>
+    </main>
   );
 }
