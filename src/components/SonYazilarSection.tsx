@@ -6,10 +6,10 @@ import ArticleCard from "@/components/ArticleCard";
 export default async function SonYazilarSection() {
   const allArticles = await getAllArticlesMetadata();
 
-  // Tarihe göre sıralı son 3 yazı
+  // Tarihe göre sıralı son 8 yazı
   const latest = [...allArticles]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
+    .slice(0, 8);
 
   if (latest.length === 0) return null;
 
@@ -31,12 +31,12 @@ export default async function SonYazilarSection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {latest.map((article, i) => (
             <ArticleCard
               key={article.slug}
               article={article}
-              priority={i === 0}
+              priority={i < 4}
             />
           ))}
         </div>
