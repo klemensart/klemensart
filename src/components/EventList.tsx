@@ -228,9 +228,9 @@ function EventRowItem({
         {/* Etkinlik */}
         <td className="py-3 px-3 border-b border-warm-100 transition-colors group-hover:bg-warm-50">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-warm-900 group-hover:text-coral transition-colors">
+            <a href={href} className="font-semibold text-warm-900 group-hover:text-coral transition-colors no-underline" onClick={(ev) => ev.preventDefault()}>
               {e.title}
-            </span>
+            </a>
             {e.is_klemens_event && (
               <span className="flex-shrink-0 px-1.5 py-0.5 text-[9px] font-bold rounded-full uppercase tracking-wide bg-emerald-500 text-white">
                 Klemens

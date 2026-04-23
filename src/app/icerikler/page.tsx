@@ -1,7 +1,7 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getAllArticlesMetadata } from "@/lib/markdown";
-import IceriklerClient from "@/components/IceriklerClient";
+import IceriklerFilter from "@/components/IceriklerFilter";
+import ArticleCard from "@/components/ArticleCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -38,8 +38,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function IceriklerPage() {
+type Props = {
+  searchParams: Promise<{ kategori?: string }>;
+};
+
+export default async function IceriklerPage({ searchParams }: Props) {
+  const { kategori } = await searchParams;
   const articles = await getAllArticlesMetadata();
+
+  const filteredArticles = kategori
+    ? articles.filter((a) => a.category === kategori)
+    : articles;
 
   const collectionJsonLd = {
     "@context": "https://schema.org",
@@ -102,10 +111,25 @@ export default async function IceriklerPage() {
         </div>
       </section>
 
-      {/* Filtre + grid — client component, searchParams ile çalışır */}
-      <Suspense fallback={<div className="bg-white h-20" />}>
-        <IceriklerClient articles={articles} />
-      </Suspense>
+      {/* Filtre pills — client component, Link href ile */}
+      <IceriklerFilter aktifKategori={kategori ?? ""} />
+
+      {/* Articles grid — server rendered */}
+      <section className="py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          {filteredArticles.length === 0 ? (
+            <p className="text-warm-900/40 text-sm text-center py-16">
+              Bu kategoride henüz yazı bulunmuyor.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredArticles.map((article, i) => (
+                <ArticleCard key={article.slug} article={article} priority={i < 3} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
     </main>
     <Footer />

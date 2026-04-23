@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase-admin";
+import type { EventRow } from "@/types/event";
 import EtkinliklerClient from "./EtkinliklerClient";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Ankara Kültür & Sanat Takvimi",
@@ -37,13 +42,14 @@ export const metadata: Metadata = {
 export default async function EtkinliklerPage() {
   const supabase = createAdminClient();
   const now = new Date().toISOString();
-  const { data: events } = await supabase
+  const { data } = await supabase
     .from("events")
-    .select("id, title, event_date, venue, address, image_url, source_name")
+    .select("id,title,description,ai_comment,event_type,venue,address,event_date,source_url,source_name,price_info,is_klemens_event,image_url")
     .eq("status", "approved")
     .gte("event_date", now)
-    .order("event_date", { ascending: true })
-    .limit(20);
+    .order("event_date", { ascending: true });
+
+  const events = (data ?? []) as EventRow[];
 
   const collectionJsonLd = {
     "@context": "https://schema.org",
@@ -59,8 +65,8 @@ export default async function EtkinliklerPage() {
     },
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: (events ?? []).length,
-      itemListElement: (events ?? []).map((e, i) => ({
+      numberOfItems: events.length,
+      itemListElement: events.map((e, i) => ({
         "@type": "ListItem",
         position: i + 1,
         item: {
@@ -108,7 +114,9 @@ export default async function EtkinliklerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <EtkinliklerClient />
+      <Navbar />
+      <EtkinliklerClient initialEvents={events} />
+      <Footer />
     </>
   );
 }
