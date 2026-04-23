@@ -56,29 +56,44 @@ async function getEvent(id: string): Promise<EventRow | null> {
   return data as EventRow;
 }
 
+function fmtShortDate(iso: string | null) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const event = await getEvent(id);
   if (!event) return { title: "Etkinlik Bulunamadı" };
 
-  const description = event.description
-    ? event.description.slice(0, 160)
-    : event.ai_comment
-      ? event.ai_comment.slice(0, 160)
-      : `${event.title} — ${event.venue ?? "Ankara"}`;
+  const typeLabel = TYPE_LABELS[event.event_type ?? ""] ?? "";
+  const datePart = fmtShortDate(event.event_date);
+  const venuePart = event.venue ?? "Ankara";
+
+  // SEO title: "Etkinlik Adı — Mekan | Tarih — Klemens"
+  const seoTitle = [event.title, venuePart, datePart].filter(Boolean).join(" — ");
+
+  // Description: olay açıklaması veya zengin fallback
+  const rawDesc = event.description || event.ai_comment || "";
+  const description = rawDesc
+    ? rawDesc.slice(0, 155) + (rawDesc.length > 155 ? "…" : "")
+    : [typeLabel, `"${event.title}"`, venuePart && `${venuePart}'da`, datePart, event.price_info].filter(Boolean).join(" · ");
 
   return {
-    title: event.title,
+    title: seoTitle,
     description,
     keywords: [
       event.title,
-      event.event_type ?? "etkinlik",
-      event.venue ?? "ankara",
+      typeLabel || "etkinlik",
+      venuePart,
+      "ankara etkinlik",
       "kültür sanat etkinlik",
-    ],
+      datePart ? `${typeLabel || "etkinlik"} ${datePart}` : "",
+    ].filter(Boolean),
     alternates: { canonical: `/etkinlikler/${id}` },
     openGraph: {
-      title: event.title,
+      title: seoTitle,
       description,
       ...(event.image_url && {
         images: [{ url: event.image_url, width: 1200, height: 630 }],
@@ -86,7 +101,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: event.title,
+      title: seoTitle,
       description,
       ...(event.image_url && { images: [event.image_url] }),
     },
