@@ -54,7 +54,7 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const allArticles = await getAllArticlesMetadata();
-  const filtered = allArticles; // tüm makaleler — ileride kategoriye göre filtrelenecek
+  const filtered = allArticles.filter((a) => a.category === category.title);
   const style = categoryStyles[slug] ?? categoryStyles["odak"];
 
   return (
