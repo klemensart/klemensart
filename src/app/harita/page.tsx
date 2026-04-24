@@ -752,7 +752,7 @@ export default function HaritaPage() {
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
-    return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+    return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" });
   };
 
   const getRelativeLabel = (d: string | null): { text: string; color: string } | null => {

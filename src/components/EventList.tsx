@@ -40,10 +40,11 @@ export const TYPE_COLORS: Record<string, string> = {
 function fmtDate(iso: string | null) {
   if (!iso) return { num: "—", month: "—", time: "" };
   const d = new Date(iso);
+  const tz = "Europe/Istanbul";
   return {
-    num: d.toLocaleDateString("tr-TR", { day: "numeric" }),
-    month: d.toLocaleDateString("tr-TR", { month: "short" }).toUpperCase(),
-    time: d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }),
+    num: d.toLocaleDateString("tr-TR", { day: "numeric", timeZone: tz }),
+    month: d.toLocaleDateString("tr-TR", { month: "short", timeZone: tz }).toUpperCase(),
+    time: d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: tz }),
   };
 }
 

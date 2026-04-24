@@ -59,7 +59,7 @@ async function getEvent(id: string): Promise<EventRow | null> {
 function fmtShortDate(iso: string | null) {
   if (!iso) return null;
   const d = new Date(iso);
-  return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Istanbul" });
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -146,6 +146,7 @@ function fmtFullDate(iso: string | null) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Istanbul",
   });
 }
 

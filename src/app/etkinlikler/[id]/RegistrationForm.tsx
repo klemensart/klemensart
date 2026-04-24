@@ -86,7 +86,7 @@ export default function RegistrationForm({ eventId, eventTitle, eventDate, event
     const fmtDate = eventDate
       ? new Date(eventDate).toLocaleDateString("tr-TR", {
           weekday: "long", day: "numeric", month: "long", year: "numeric",
-          hour: "2-digit", minute: "2-digit",
+          hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul",
         })
       : null;
 

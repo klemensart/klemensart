@@ -548,12 +548,12 @@ export default function BultenGonderPage() {
 
     const formatDate = (iso: string) => {
       const d = new Date(iso);
-      const gun = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long" });
+      const gun = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", weekday: "long", timeZone: "Europe/Istanbul" });
       return gun;
     };
     const formatTime = (iso: string) => {
       const d = new Date(iso);
-      return d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) + " (TSİ)";
+      return d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }) + " (TSİ)";
     };
 
     // Map of template field keys → workshop data
@@ -768,8 +768,8 @@ export default function BultenGonderPage() {
     let eventTime = "";
     if (ev.event_date) {
       const d = new Date(ev.event_date);
-      eventDate = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" });
-      eventTime = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+      eventDate = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long", timeZone: "Europe/Istanbul" });
+      eventTime = d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" });
     }
 
     setTemplateProps((prev) => ({

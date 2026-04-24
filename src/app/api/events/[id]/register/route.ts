@@ -83,7 +83,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const fmtDate = event.event_date
     ? new Date(event.event_date).toLocaleDateString("tr-TR", {
         weekday: "long", day: "numeric", month: "long", year: "numeric",
-        hour: "2-digit", minute: "2-digit",
+        hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul",
       })
     : "";
 
