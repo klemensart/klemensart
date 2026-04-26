@@ -320,7 +320,7 @@ export default function SinemaKlubuPage() {
                   letterSpacing: "0.02em",
                 }}
               >
-                26 Nisan 2026, Pazar — 20:30
+                17 Mayıs 2026, Pazar — 20:30
               </p>
 
               <p
