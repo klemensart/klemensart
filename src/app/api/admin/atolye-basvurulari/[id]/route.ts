@@ -90,6 +90,14 @@ export async function PATCH(
     updatePayload.reviewed_by = user.id;
   }
 
+  // Onay sırasında upload token üret (henüz yoksa)
+  if (status === "approved" && !existing.upload_token) {
+    updatePayload.upload_token = crypto.randomUUID();
+    updatePayload.upload_token_expires_at = new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+  }
+
   if (admin_note !== undefined) {
     updatePayload.admin_note = admin_note;
   }
@@ -116,7 +124,8 @@ export async function PATCH(
     };
 
     if (status === "approved") {
-      sendApplicationApprovedEmail(emailData).catch((err) =>
+      const uploadToken = (updatePayload.upload_token as string) || existing.upload_token;
+      sendApplicationApprovedEmail(emailData, uploadToken ?? undefined).catch((err) =>
         console.error("[admin/atolye-basvurulari] Onay email hatası:", err),
       );
     } else {

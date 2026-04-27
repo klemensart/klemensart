@@ -147,7 +147,9 @@ type StatusEmailData = {
 
 export async function sendApplicationApprovedEmail(
   app: StatusEmailData,
+  uploadToken?: string,
 ): Promise<void> {
+  const uploadUrl = uploadToken ? `${BASE_URL}/duzenleyici/${uploadToken}` : null;
   const html = `
 <!DOCTYPE html>
 <html lang="tr">
@@ -163,35 +165,37 @@ export async function sendApplicationApprovedEmail(
 
       <p style="margin:0 0 16px;"><strong>"${esc(app.workshop_topic)}"</strong> başlıklı atölye başvurunuzu inceledik ve Klemens'te yer almasını uygun bulduk.</p>
 
-      <p style="margin:0 0 16px;">Atölye sayfanızı yayına almak için aşağıdaki materyalleri bu maile yanıt olarak göndermeniz yeterli olacak.</p>
+      ${uploadUrl ? `
+      <p style="margin:0 0 16px;">Atölye sayfanızı yayına almak için materyallerinizi aşağıdaki bağlantıdan yükleyebilirsiniz:</p>
 
-      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#FF6D60;margin:24px 0 12px;font-weight:700;">Zorunlu Materyaller</h3>
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${uploadUrl}" style="display:inline-block;background:#FF6D60;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;">Materyalleri Yükle &rarr;</a>
+      </div>
 
-      <p style="margin:0 0 12px;"><strong>1. Atölye kapak görseli</strong><br>
-      <span style="color:#6b6560;">Atölyenin atmosferini, malzemeleri veya bitmiş ürünleri gösteren yatay format, yüksek çözünürlüklü bir fotoğraf (en az 1200&times;800 px, JPEG veya PNG). Bu görsel hem web sayfasında hem de e-bülten duyurusunda kullanılacak.</span></p>
+      <p style="margin:0 0 24px;color:#6b6560;font-size:13px;text-align:center;">Bu bağlantı 30 gün geçerlidir.</p>
+      ` : `
+      <p style="margin:0 0 16px;">Atölye sayfanızı yayına almak için materyallerinizi (kapak görseli, profil fotoğrafı, biyografi) <a href="mailto:info@klemensart.com" style="color:#FF6D60;font-weight:600;text-decoration:none;">info@klemensart.com</a> adresine gönderebilirsiniz.</p>
+      `}
 
-      <p style="margin:0 0 12px;"><strong>2. Profil fotoğrafınız</strong><br>
-      <span style="color:#6b6560;">Düzenleyen kartında görünmek üzere kare format bir fotoğraf (en az 600&times;600 px).</span></p>
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#FF6D60;margin:24px 0 12px;font-weight:700;">Neler Yüklemeniz Gerekiyor?</h3>
 
-      <p style="margin:0 0 12px;"><strong>3. Kısa biyografi</strong><br>
-      <span style="color:#6b6560;">2-4 cümle ile kendinizi tanıtın. Eğitim, deneyim ve neden bu atölyeleri düzenlediğinize dair kısa bir not yeterli.</span></p>
+      <p style="margin:0 0 12px;"><strong>1. Atölye kapak görseli</strong> <span style="color:#FF6D60;font-size:12px;">(zorunlu)</span><br>
+      <span style="color:#6b6560;">Yatay format, en az 1200&times;800 px, JPEG veya PNG.</span></p>
 
-      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:24px 0 12px;font-weight:700;">Opsiyonel Materyaller</h3>
+      <p style="margin:0 0 12px;"><strong>2. Profil fotoğrafınız</strong> <span style="color:#FF6D60;font-size:12px;">(zorunlu)</span><br>
+      <span style="color:#6b6560;">Kare format, en az 600&times;600 px.</span></p>
 
-      <p style="margin:0 0 12px;"><strong>4. Süreç fotoğrafları</strong><br>
-      <span style="color:#6b6560;">Atölye sırasında çekilmiş 2-3 fotoğraf — çalışma anları, malzemeler, bitmiş ürün örnekleri olabilir.</span></p>
+      <p style="margin:0 0 12px;"><strong>3. Kısa biyografi</strong> <span style="color:#FF6D60;font-size:12px;">(zorunlu)</span><br>
+      <span style="color:#6b6560;">2-4 cümle ile kendinizi tanıtın.</span></p>
 
-      <p style="margin:0 0 12px;"><strong>5. Mekân fotoğrafı</strong><br>
-      <span style="color:#6b6560;">Atölyenin yapıldığı stüdyo/mekânın atmosferini gösteren bir görsel.</span></p>
-
-      <p style="margin:0 0 12px;"><strong>6. Detaylı bio</strong><br>
-      <span style="color:#6b6560;">Eğitim, sertifikalar, sergiler, daha önce düzenlenen atölyeler gibi bilgiler. Atölye sayfasının altında "Düzenleyen Hakkında" bölümünde gösterilebilir.</span></p>
+      <p style="margin:0 0 12px;"><strong>4. Süreç fotoğrafları, mekân görseli, detaylı bio</strong> <span style="color:#8C857E;font-size:12px;">(opsiyonel)</span><br>
+      <span style="color:#6b6560;">Atölye sırasından kareler, stüdyo/mekân görseli ve detaylı özgeçmişiniz.</span></p>
 
       ${app.whatsapp_number || app.proposed_dates ? `
       <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#FF6D60;margin:24px 0 12px;font-weight:700;">Başvuru Bilgileriniz</h3>
       ${app.whatsapp_number ? `<p style="margin:0 0 8px;"><strong>WhatsApp:</strong> ${esc(app.whatsapp_number)}</p>` : ""}
       ${app.proposed_dates ? `<p style="margin:0 0 8px;"><strong>Önerilen Tarihler:</strong><br><span style="white-space:pre-line;">${esc(app.proposed_dates)}</span></p>` : ""}
-      <p style="margin:8px 0 0;color:#6b6560;font-size:13px;">Kesin tarih ve detaylar, materyalleriniz ulaştıktan sonra WhatsApp üzerinden birlikte belirlenecektir.</p>
+      <p style="margin:8px 0 0;color:#6b6560;font-size:13px;">Kesin tarih ve detaylar, materyalleriniz ulaştıktan sonra birlikte belirlenecektir.</p>
       ` : ""}
 
       <div style="border-top:1px solid #f0ebe6;margin:24px 0 16px;padding-top:16px;">
