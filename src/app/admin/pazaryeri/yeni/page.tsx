@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import AtolyeForm from "../AtolyeForm";
 
@@ -17,7 +18,9 @@ export default function YeniAtolyePage() {
 
       <h1 className="text-2xl font-bold text-warm-900 mb-8">Yeni Atölye</h1>
 
-      <AtolyeForm mode="create" />
+      <Suspense>
+        <AtolyeForm mode="create" />
+      </Suspense>
     </div>
   );
 }

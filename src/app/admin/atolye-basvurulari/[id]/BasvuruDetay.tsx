@@ -420,6 +420,28 @@ export default function BasvuruDetay({ application }: { application: Application
                 <p className="text-[11px] text-warm-900/35 mt-1.5 italic">Karar vermeden beklemek için (email gitmez)</p>
               </div>
             </div>
+
+            {/* Atölye Oluştur */}
+            <div className="pt-4 border-t border-warm-100">
+              <button
+                onClick={() =>
+                  router.push(`/admin/pazaryeri/yeni?from_application=${app.id}`)
+                }
+                disabled={app.status !== "approved"}
+                className={`w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  app.status === "approved"
+                    ? "bg-coral text-white hover:bg-coral/90"
+                    : "bg-warm-100 text-warm-900/30 cursor-not-allowed"
+                }`}
+              >
+                Atölye Oluştur &rarr;
+              </button>
+              <p className="text-[11px] text-warm-900/35 mt-1.5 italic">
+                {app.status === "approved"
+                  ? "Başvuru bilgileriyle yeni atölye formu açılır"
+                  : "Önce başvuruyu onaylayın"}
+              </p>
+            </div>
           </div>
 
           {/* Danger zone */}

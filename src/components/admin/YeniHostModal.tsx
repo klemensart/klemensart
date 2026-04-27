@@ -7,9 +7,10 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onSuccess: (person: any) => void;
+  initialData?: any;
 };
 
-export default function YeniHostModal({ open, onClose, onSuccess }: Props) {
+export default function YeniHostModal({ open, onClose, onSuccess, initialData }: Props) {
   // Body scroll lock
   useEffect(() => {
     if (open) {
@@ -46,7 +47,7 @@ export default function YeniHostModal({ open, onClose, onSuccess }: Props) {
 
         {/* Form */}
         <div className="px-6 py-5">
-          <HostForm isModal onSuccess={onSuccess} />
+          <HostForm isModal onSuccess={onSuccess} initialData={initialData} />
         </div>
       </div>
     </div>

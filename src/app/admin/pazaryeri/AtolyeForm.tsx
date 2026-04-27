@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import AtolyeCardPreview from "@/components/admin/AtolyeCardPreview";
 import YeniHostModal from "@/components/admin/YeniHostModal";
@@ -28,6 +28,7 @@ type HostOption = {
   name: string;
   avatar_url: string | null;
   workshop_count: number;
+  email: string | null;
 };
 
 type FormData = {
@@ -136,6 +137,9 @@ function slugify(text: string): string {
 
 export default function AtolyeForm({ initialData, mode }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [prefillBanner, setPrefillBanner] = useState<{ name: string; hostFound: boolean } | null>(null);
+  const [hostModalInitial, setHostModalInitial] = useState<any>(null);
   const [form, setForm] = useState<FormData>(() => {
     if (initialData) {
       return {
@@ -197,8 +201,83 @@ export default function AtolyeForm({ initialData, mode }: Props) {
         name: p.name,
         avatar_url: p.avatar_url,
         workshop_count: p.workshop_count ?? 0,
+        email: p.email || null,
       }))));
   }, []);
+
+  // ─── Prefill from application ─────────────────────────────────────────────
+  const prefillRan = useRef(false);
+  useEffect(() => {
+    if (prefillRan.current || mode === "edit") return;
+    const applicationId = searchParams.get("from_application");
+    if (!applicationId || hosts.length === 0) return;
+    prefillRan.current = true;
+
+    fetch(`/api/admin/atolye-basvurulari/${applicationId}`)
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((app) => {
+        // Parse price: "500 TL" → 50000 kuruş, "1.500" → 150000
+        let price = 0;
+        const priceMatch = app.workshop_price?.match(/[\d.,]+/);
+        if (priceMatch) {
+          const cleaned = priceMatch[0].replace(/\./g, "").replace(",", ".");
+          price = Math.round(parseFloat(cleaned) * 100);
+        }
+
+        setForm((prev) => ({
+          ...prev,
+          title: app.workshop_topic || prev.title,
+          slug: slugify(app.workshop_topic || ""),
+          description: app.workshop_description || prev.description,
+          organizer_name: app.applicant_name || prev.organizer_name,
+          organizer_email: app.applicant_email || prev.organizer_email,
+          organizer_phone: app.applicant_phone || prev.organizer_phone,
+          organizer_url: app.applicant_website || prev.organizer_url,
+          duration_note: app.workshop_duration || prev.duration_note,
+          event_time_note: app.proposed_dates
+            ? `Düzenleyici önerisi: ${app.proposed_dates}`
+            : prev.event_time_note,
+          price,
+        }));
+
+        // Slug check
+        const newSlug = slugify(app.workshop_topic || "");
+        if (newSlug) checkSlug(newSlug);
+
+        // Host matching by email
+        const matchedHost = app.applicant_email
+          ? hosts.find((h) => h.email && h.email.toLowerCase() === app.applicant_email.toLowerCase())
+          : null;
+
+        if (matchedHost) {
+          handleHostChange(matchedHost.id);
+          setPrefillBanner({ name: app.applicant_name, hostFound: true });
+        } else {
+          // Prepare initial data for YeniHostModal
+          const isInstagram = app.applicant_website?.includes("instagram");
+          let instagramHandle: string | null = null;
+          if (isInstagram && app.applicant_website) {
+            const match = app.applicant_website.match(/instagram\.com\/([^/?]+)/);
+            instagramHandle = match ? match[1].replace(/^@/, "") : null;
+          }
+          setHostModalInitial({
+            name: app.applicant_name || "",
+            slug: "",
+            email: app.applicant_email || null,
+            metadata: { phone: app.applicant_phone || app.whatsapp_number || null },
+            instagram: instagramHandle,
+            website: isInstagram ? null : app.applicant_website || null,
+          });
+          setHostModalOpen(true);
+          setPrefillBanner({ name: app.applicant_name, hostFound: false });
+        }
+
+        // Clean URL
+        router.replace("/admin/pazaryeri/yeni", { scroll: false });
+      })
+      .catch(() => { /* silently ignore if application fetch fails */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hosts, searchParams, mode]);
 
   // ─── Unsaved changes warning ─────────────────────────────────────────────
   useEffect(() => {
@@ -459,6 +538,28 @@ export default function AtolyeForm({ initialData, mode }: Props) {
       <div className="flex gap-8">
         {/* ─── LEFT: FORM ─────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 space-y-8">
+          {prefillBanner && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-xl flex items-start justify-between gap-3">
+              <div>
+                <p className="font-medium">&check; {prefillBanner.name} başvurusundan bilgiler yüklendi.</p>
+                <p className="text-xs text-emerald-700 mt-0.5">
+                  Görsel, kategori, şehir ve tarihi tamamlayın.
+                  {" "}(Host bulundu: {prefillBanner.hostFound ? "Evet" : "Hayır"})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPrefillBanner(null)}
+                className="flex-shrink-0 text-emerald-500 hover:text-emerald-700 mt-0.5"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {errors.form && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
               {errors.form}
@@ -994,17 +1095,20 @@ export default function AtolyeForm({ initialData, mode }: Props) {
       {/* Host Modal */}
       <YeniHostModal
         open={hostModalOpen}
-        onClose={() => setHostModalOpen(false)}
+        onClose={() => { setHostModalOpen(false); setHostModalInitial(null); }}
+        initialData={hostModalInitial}
         onSuccess={(person) => {
           const newHost: HostOption = {
             id: person.id,
             name: person.name,
             avatar_url: person.avatar_url,
             workshop_count: 0,
+            email: person.email || null,
           };
           setHosts((prev) => [...prev, newHost]);
           handleHostChange(person.id);
           setHostModalOpen(false);
+          setHostModalInitial(null);
         }}
       />
     </>

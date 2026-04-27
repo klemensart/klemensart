@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import AtolyeForm from "../AtolyeForm";
@@ -78,7 +78,9 @@ export default function DuzenleAtolyePage() {
         )}
       </div>
 
-      <AtolyeForm mode="edit" initialData={eventData} />
+      <Suspense>
+        <AtolyeForm mode="edit" initialData={eventData} />
+      </Suspense>
 
       {/* Sosyal medya görselleri */}
       <AtolyeSosyalMedyaSection atolyeId={params.id} />
