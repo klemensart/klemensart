@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -358,12 +358,21 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
                 {/* Bilgi satırları */}
                 <div className="space-y-3 text-sm text-warm-900/70">
                   {event.event_date && (
-                    <div className="flex items-center gap-3">
-                      <CalendarIcon className="w-4 h-4 text-brand-warm flex-shrink-0" />
-                      <span>{fmtFullDate(event.event_date, event.end_date)}</span>
+                    <div className="flex items-start gap-3">
+                      <CalendarIcon className="w-4 h-4 text-brand-warm flex-shrink-0 mt-0.5" />
+                      <div>
+                        {event.recurring && event.event_time_note ? (
+                          <span>{event.event_time_note}</span>
+                        ) : (
+                          <span>{fmtFullDate(event.event_date, event.end_date)}</span>
+                        )}
+                        {event.duration_note && (
+                          <span className="block text-xs text-brand-warm mt-0.5">{event.duration_note}</span>
+                        )}
+                      </div>
                     </div>
                   )}
-                  {event.duration_note && (
+                  {!event.recurring && event.duration_note && !event.event_date && (
                     <div className="flex items-center gap-3">
                       <ClockIcon className="w-4 h-4 text-brand-warm flex-shrink-0" />
                       <span>{event.duration_note}</span>
@@ -497,17 +506,7 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
 
               {/* Galeri */}
               {event.gallery_urls && event.gallery_urls.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-warm-900 mb-3">Galeri</h3>
-                  <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 scrollbar-hide">
-                    {event.gallery_urls.map((url, i) => (
-                      <div key={i} className="flex-shrink-0 snap-start w-72 h-48 rounded-xl overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt={`${event.title} galeri ${i + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <GalleryCarousel images={event.gallery_urls} title={event.title} />
               )}
             </div>
 
@@ -541,5 +540,127 @@ export default function MarketplaceDetailClient({ event }: { event: MarketplaceE
         organizerPhone={event.organizer_phone}
       />
     </>
+  );
+}
+
+/* ─── Gallery Carousel ────────────────────────────── */
+
+function GalleryCarousel({ images, title }: { images: string[]; title: string }) {
+  const [idx, setIdx] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  const len = images.length;
+
+  const prev = useCallback(() => setIdx((i) => (i - 1 + len) % len), [len]);
+  const next = useCallback(() => setIdx((i) => (i + 1) % len), [len]);
+
+  return (
+    <div className="mb-8">
+      <h3 className="text-lg font-semibold text-warm-900 mb-3">Galeri</h3>
+
+      {/* Main image */}
+      <div className="relative group rounded-xl overflow-hidden bg-warm-100">
+        <button onClick={() => setLightbox(true)} className="block w-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={images[idx]}
+            alt={`${title} galeri ${idx + 1}`}
+            className="w-full h-72 sm:h-96 object-cover cursor-zoom-in transition-transform duration-300"
+          />
+        </button>
+
+        {len > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-warm-900 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-white"
+              aria-label="Önceki"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-warm-900 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-white"
+              aria-label="Sonraki"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </>
+        )}
+
+        {/* Counter */}
+        {len > 1 && (
+          <span className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+            {idx + 1} / {len}
+          </span>
+        )}
+      </div>
+
+      {/* Thumbnails */}
+      {len > 1 && (
+        <div className="flex gap-2 mt-3">
+          {images.map((url, i) => (
+            <button
+              key={i}
+              onClick={() => setIdx(i)}
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                i === idx ? "border-coral ring-1 ring-coral/30" : "border-transparent opacity-60 hover:opacity-100"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt={`${title} ${i + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLightbox(false)}
+        >
+          <button
+            onClick={() => setLightbox(false)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+            aria-label="Kapat"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+
+          {len > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prev(); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                aria-label="Önceki"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); next(); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                aria-label="Sonraki"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </>
+          )}
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={images[idx]}
+            alt={`${title} galeri ${idx + 1}`}
+            className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {len > 1 && (
+            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 text-white text-sm px-3 py-1 rounded-full">
+              {idx + 1} / {len}
+            </span>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
