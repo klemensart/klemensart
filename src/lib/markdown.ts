@@ -411,10 +411,90 @@ async function classifyFigures(htmlContent: string): Promise<string> {
   return result;
 }
 
+/**
+ * Extract GFM footnotes before remark (remark-html doesn't render them).
+ * Returns cleaned content with reference tokens + definitions map.
+ */
+function extractFootnotes(md: string): {
+  content: string;
+  definitions: Map<string, string>;
+} {
+  // Fix any escaped brackets from tiptap-markdown
+  let clean = md.replace(/\\\[(\^[^\]\\]+)\\\]/g, "[$1]");
+  clean = clean.replace(/\\\[(\^[^\]\\]+)\]/g, "[$1]");
+  clean = clean.replace(/\[(\^[^\]\\]+)\\\]/g, "[$1]");
+
+  const definitions = new Map<string, string>();
+
+  // Extract definitions: [^id]: text (single-line)
+  const defRegex = /^\[\^([^\]]+)\]:\s*(.+)$/gm;
+  let match;
+  while ((match = defRegex.exec(clean)) !== null) {
+    definitions.set(match[1], match[2].trim());
+  }
+
+  if (definitions.size === 0) return { content: clean, definitions };
+
+  // Remove definition lines
+  let content = clean.replace(/^\[\^([^\]]+)\]:\s*.+$/gm, "");
+
+  // Replace inline references [^id] with tokens (not colons — those are definitions)
+  for (const id of definitions.keys()) {
+    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    content = content.replace(
+      new RegExp(`\\[\\^${escaped}\\](?!:)`, "g"),
+      `%%FNREF:${id}%%`,
+    );
+  }
+
+  return { content: content.trim(), definitions };
+}
+
+/** Replace footnote tokens with HTML and append footnotes section. */
+async function injectFootnotesHtml(
+  contentHtml: string,
+  definitions: Map<string, string>,
+): Promise<string> {
+  if (definitions.size === 0) return contentHtml;
+
+  let result = contentHtml;
+
+  // Replace reference tokens with superscript links
+  for (const id of definitions.keys()) {
+    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    result = result.replace(
+      new RegExp(`%%FNREF:${escaped}%%`, "g"),
+      `<sup><a href="#fn-${id}" id="fnref-${id}">${id}</a></sup>`,
+    );
+  }
+
+  // Build footnotes section
+  let section = '<section class="footnotes"><hr><ol>';
+  for (const [id, text] of definitions) {
+    // Process definition text through remark for inline markdown (links, bold, etc.)
+    const processed = await remark()
+      .use(remarkGfm)
+      .use(html, { sanitize: false })
+      .process(text);
+    const defHtml = processed
+      .toString()
+      .replace(/^<p>/, "")
+      .replace(/<\/p>\s*$/, "")
+      .trim();
+    section += `<li id="fn-${id}"><p>${defHtml} <a href="#fnref-${id}" class="footnote-backref">↩</a></p></li>`;
+  }
+  section += "</ol></section>";
+
+  return result + section;
+}
+
 /** Markdown content → processed HTML (tüm özel bloklar dahil) */
 export async function markdownToHtml(content: string): Promise<string> {
+  // 0. Extract footnotes before remark (remark-html can't render them)
+  const { content: withoutFootnotes, definitions } = extractFootnotes(content);
+
   // 1. Pre-process: extract custom blocks before remark runs
-  const { content: withOneriTokens, blocks: oneriBlocks } = extractOneriBlocks(content);
+  const { content: withOneriTokens, blocks: oneriBlocks } = extractOneriBlocks(withoutFootnotes);
   const mdWithDurak = extractDurakBlocks(withOneriTokens);
 
   // 2. Run remark on pre-processed content
@@ -440,6 +520,9 @@ export async function markdownToHtml(content: string): Promise<string> {
   contentHtml = processSpotifyEmbeds(contentHtml);
   contentHtml = processAudioEmbeds(contentHtml);
   contentHtml = processKaynakca(contentHtml);
+
+  // 5. Inject footnotes HTML
+  contentHtml = await injectFootnotesHtml(contentHtml, definitions);
 
   return contentHtml;
 }

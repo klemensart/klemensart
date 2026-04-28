@@ -19,6 +19,10 @@ type FormData = {
   duration: string;
   price: string;
   audience: string;
+  city: string;
+  district: string;
+  venue_name: string;
+  venue_address: string;
   proposed_dates: string;
   contact_channel: ContactChannel;
   contact_channel_detail: string;
@@ -37,6 +41,10 @@ const EMPTY_FORM: FormData = {
   duration: "",
   price: "",
   audience: "",
+  city: "",
+  district: "",
+  venue_name: "",
+  venue_address: "",
   proposed_dates: "",
   contact_channel: "whatsapp",
   contact_channel_detail: "",
@@ -135,6 +143,7 @@ export default function AtolyeBasvuruClient() {
     if (form.description.trim().length > 2000) e.description = "Açıklama en fazla 2000 karakter olabilir";
     if (!form.duration.trim() || form.duration.trim().length < 2) e.duration = "Süre bilgisi gerekli";
     if (!form.price.trim()) e.price = "Ücret bilgisi gerekli";
+    if (!form.city.trim() || form.city.trim().length < 2) e.city = "Şehir zorunlu";
     if (!form.proposed_dates.trim() || form.proposed_dates.trim().length < 5) e.proposed_dates = "Lütfen en az bir tarih/zaman aralığı belirtin";
     if (!form.contact_channel_detail.trim() || form.contact_channel_detail.trim().length < 3) e.contact_channel_detail = "İletişim detayı en az 3 karakter olmalı";
     if (!form.terms_accepted) e.terms_accepted = "Koşulları kabul etmeniz gerekli";
@@ -429,6 +438,48 @@ export default function AtolyeBasvuruClient() {
                   onChange={(e) => set("audience", e.target.value)}
                   placeholder="Hangi katılımcılar için uygun? Önkoşul var mı?"
                   rows={3}
+                  className={`${inputClass()} resize-none`}
+                />
+              </Field>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Field label="Şehir" required error={errors.city}>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) => set("city", e.target.value)}
+                    placeholder="Örn: İstanbul"
+                    className={inputClass(errors.city)}
+                  />
+                </Field>
+
+                <Field label="İlçe (opsiyonel)">
+                  <input
+                    type="text"
+                    value={form.district}
+                    onChange={(e) => set("district", e.target.value)}
+                    placeholder="Örn: Kadıköy"
+                    className={inputClass()}
+                  />
+                </Field>
+              </div>
+
+              <Field label="Mekan Adı (opsiyonel)">
+                <input
+                  type="text"
+                  value={form.venue_name}
+                  onChange={(e) => set("venue_name", e.target.value)}
+                  placeholder="Örn: Atölye Studio Adı"
+                  className={inputClass()}
+                />
+              </Field>
+
+              <Field label="Mekan Adresi (opsiyonel)">
+                <textarea
+                  value={form.venue_address}
+                  onChange={(e) => set("venue_address", e.target.value)}
+                  placeholder="Örn: Cinnah Caddesi No:35/9, Çankaya"
+                  rows={2}
                   className={`${inputClass()} resize-none`}
                 />
               </Field>

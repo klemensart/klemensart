@@ -178,6 +178,8 @@ export async function POST(
   const detailedBio = (formData.get("detailed_bio") as string)?.trim() ?? "";
   const city = (formData.get("city") as string)?.trim() ?? "";
   const district = (formData.get("district") as string)?.trim() ?? "";
+  const venueName = (formData.get("venue_name") as string)?.trim() ?? "";
+  const venueAddress = (formData.get("venue_address") as string)?.trim() ?? "";
   const maxParticipantsStr = (formData.get("max_participants") as string)?.trim() ?? "";
   const proposedDatesFinal = (formData.get("proposed_dates_final") as string)?.trim() ?? "";
 
@@ -321,6 +323,8 @@ export async function POST(
         detailed_bio: detailedBio || null,
         city,
         district: district || null,
+        venue_name: venueName || null,
+        venue_address: venueAddress || null,
         max_participants: maxParticipants,
         proposed_dates_final: proposedDatesFinal,
         materials_submitted_at: new Date().toISOString(),

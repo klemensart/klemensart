@@ -237,6 +237,10 @@ export default function AtolyeForm({ initialData, mode }: Props) {
           event_time_note: app.proposed_dates
             ? `Düzenleyici önerisi: ${app.proposed_dates}`
             : prev.event_time_note,
+          city: app.city || prev.city,
+          district: app.district || prev.district,
+          venue_name: app.venue_name || prev.venue_name,
+          venue_address: app.venue_address || prev.venue_address,
           price,
         }));
 

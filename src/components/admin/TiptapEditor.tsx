@@ -1008,7 +1008,11 @@ export default function TiptapEditor({
         return;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const md = (editor.storage as any).markdown.getMarkdown() as string;
+      let md = (editor.storage as any).markdown.getMarkdown() as string;
+      // tiptap-markdown escapes brackets, which breaks GFM footnote syntax
+      md = md.replace(/\\\[(\^[^\]\\]+)\\\]/g, "[$1]");
+      md = md.replace(/\\\[(\^[^\]\\]+)\]/g, "[$1]");
+      md = md.replace(/\[(\^[^\]\\]+)\\\]/g, "[$1]");
       lastMdRef.current = md;
       onChange(md);
     },

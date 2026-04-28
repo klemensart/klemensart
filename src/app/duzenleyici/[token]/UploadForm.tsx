@@ -90,6 +90,8 @@ export default function UploadForm({ application, token }: Props) {
   const [detailedBio, setDetailedBio] = useState("");
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
+  const [venueName, setVenueName] = useState("");
+  const [venueAddress, setVenueAddress] = useState("");
   const [maxParticipants, setMaxParticipants] = useState("");
   const [proposedDatesFinal, setProposedDatesFinal] = useState("");
 
@@ -259,6 +261,8 @@ export default function UploadForm({ application, token }: Props) {
 
       if (detailedBio.trim()) fd.append("detailed_bio", detailedBio.trim());
       if (district.trim()) fd.append("district", district.trim());
+      if (venueName.trim()) fd.append("venue_name", venueName.trim());
+      if (venueAddress.trim()) fd.append("venue_address", venueAddress.trim());
       if (venue) fd.append("venue", venue.file);
       for (const g of gallery) {
         if (!g.error) fd.append("gallery", g.file);
@@ -436,6 +440,31 @@ export default function UploadForm({ application, token }: Props) {
                 disabled={submitting}
               />
             </div>
+          </div>
+
+          {/* Mekan Adı */}
+          <div>
+            <label className={labelCn}>Mekan Adı</label>
+            <input
+              type="text"
+              value={venueName}
+              onChange={(e) => setVenueName(e.target.value)}
+              className={inputCn}
+              placeholder="Örn: İkbal Özpınar Atölyesi"
+              disabled={submitting}
+            />
+          </div>
+
+          {/* Mekan Adresi */}
+          <div>
+            <label className={labelCn}>Mekan Adresi</label>
+            <textarea
+              value={venueAddress}
+              onChange={(e) => setVenueAddress(e.target.value)}
+              className={`${inputCn} min-h-[60px] resize-y`}
+              placeholder="Örn: Cinnah Caddesi No:35/9, Çankaya"
+              disabled={submitting}
+            />
           </div>
 
           {/* Kontenjan */}
