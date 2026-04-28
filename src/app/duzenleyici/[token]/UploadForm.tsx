@@ -404,6 +404,8 @@ export default function UploadForm({ application, token }: Props) {
             <div className="flex justify-between mt-1">
               {errors.bio ? (
                 <p className={errorCn}>{errors.bio}</p>
+              ) : bio.length > 0 && bio.length < 100 ? (
+                <p className="text-xs text-amber-600">En az 100 karakter gerekli ({100 - bio.length} karakter kaldı)</p>
               ) : (
                 <span />
               )}
