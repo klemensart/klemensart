@@ -270,6 +270,7 @@ export default function AtolyeForm({ initialData, mode }: Props) {
           setHostModalInitial({
             name: app.applicant_name || "",
             slug: "",
+            avatar_url: app.profile_url || null,
             email: app.applicant_email || null,
             metadata: { phone: app.applicant_phone || app.whatsapp_number || null },
             instagram: instagramHandle,
