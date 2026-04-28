@@ -375,27 +375,77 @@ export async function POST(
 
     // ── Admin'e bildirim emaili ──────────────────────────────────────────
 
+    const galleryHtml = galleryUrls.length > 0
+      ? galleryUrls.map((url, i) =>
+          `<a href="${url}" style="display:inline-block;margin:0 8px 8px 0;"><img src="${url}" alt="Galeri ${i + 1}" style="width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #e8e0d8;" /></a>`
+        ).join("")
+      : '<span style="color:#8C857E;">Yüklenmedi</span>';
+
     sendThankYouEmail({
       to: "info@klemensart.com",
-      subject: `Materyaller Yüklendi — ${application.applicant_name}`,
+      subject: `Materyaller Yüklendi — ${application.applicant_name} / ${application.workshop_topic}`,
       html: `
 <!DOCTYPE html>
 <html lang="tr">
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f9f7f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <div style="max-width:560px;margin:32px auto;background:#fff;border-radius:12px;border:1px solid #e8e0d8;overflow:hidden;">
+  <div style="max-width:640px;margin:32px auto;background:#fff;border-radius:12px;border:1px solid #e8e0d8;overflow:hidden;">
     <div style="padding:28px 32px 20px;border-bottom:1px solid #f0ebe6;">
       <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#FF6D60;font-weight:700;">Materyal Bildirimi</p>
       <h1 style="margin:0;font-size:20px;font-weight:800;color:#2D2926;">Materyaller Yüklendi</h1>
     </div>
     <div style="padding:24px 32px;font-size:14px;line-height:1.7;color:#3d3833;">
-      <p style="margin:0 0 16px;"><strong>${esc(application.applicant_name)}</strong>, <strong>"${esc(application.workshop_topic)}"</strong> atölyesi için materyallerini yükledi.</p>
-      <p style="margin:0 0 8px;"><strong>Şehir:</strong> ${esc(city)}${district ? ` / ${esc(district)}` : ""}</p>
-      <p style="margin:0 0 8px;"><strong>Kontenjan:</strong> ${maxParticipants} kişi</p>
-      <p style="margin:0 0 8px;"><strong>Tarih:</strong> ${esc(proposedDatesFinal)}</p>
-      <p style="margin:0 0 8px;"><strong>Galeri:</strong> ${galleryUrls.length} görsel</p>
-      <div style="border-top:1px solid #f0ebe6;padding-top:16px;margin-top:16px;">
-        <a href="${baseUrl}/admin/atolye-basvurulari/${appId}" style="display:inline-block;background:#FF6D60;color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:13px;">Başvuruyu İncele</a>
+      <p style="margin:0 0 20px;"><strong>${esc(application.applicant_name)}</strong>, <strong>"${esc(application.workshop_topic)}"</strong> atölyesi için materyallerini yükledi.</p>
+
+      <!-- Düzenleyici -->
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Düzenleyici</h2>
+      <table style="width:100%;margin:0 0 20px;" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="width:80px;vertical-align:top;padding:0 12px 0 0;">
+            <img src="${profileUrl}" alt="Profil" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #f0ebe6;" />
+          </td>
+          <td style="vertical-align:top;">
+            <p style="margin:0 0 4px;font-weight:700;color:#2D2926;">${esc(application.applicant_name)}</p>
+            <p style="margin:0 0 4px;font-size:13px;color:#6b6560;">${esc(application.applicant_email)}</p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Biyografi -->
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Kısa Biyografi</h2>
+      <div style="background:#faf8f5;border:1px solid #f0ebe6;border-radius:8px;padding:12px 16px;margin:0 0 20px;font-size:13px;line-height:1.7;white-space:pre-line;">${esc(bio)}</div>
+
+      ${detailedBio ? `
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Detaylı Biyografi</h2>
+      <div style="background:#faf8f5;border:1px solid #f0ebe6;border-radius:8px;padding:12px 16px;margin:0 0 20px;font-size:13px;line-height:1.7;white-space:pre-line;">${esc(detailedBio)}</div>
+      ` : ""}
+
+      <!-- Mekan & Tarih -->
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Mekan & Tarih Bilgileri</h2>
+      <table style="width:100%;margin:0 0 20px;font-size:13px;" cellpadding="4" cellspacing="0">
+        <tr><td style="color:#8C857E;width:110px;vertical-align:top;">Şehir / İlçe</td><td style="font-weight:600;">${esc(city)}${district ? ` / ${esc(district)}` : ""}</td></tr>
+        ${venueName ? `<tr><td style="color:#8C857E;vertical-align:top;">Mekan Adı</td><td style="font-weight:600;">${esc(venueName)}</td></tr>` : ""}
+        ${venueAddress ? `<tr><td style="color:#8C857E;vertical-align:top;">Mekan Adresi</td><td style="font-weight:600;">${esc(venueAddress)}</td></tr>` : ""}
+        <tr><td style="color:#8C857E;vertical-align:top;">Kontenjan</td><td style="font-weight:600;">${maxParticipants} kişi</td></tr>
+        <tr><td style="color:#8C857E;vertical-align:top;">Tarih</td><td style="font-weight:600;white-space:pre-line;">${esc(proposedDatesFinal)}</td></tr>
+      </table>
+
+      <!-- Görseller -->
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Kapak Görseli</h2>
+      <p style="margin:0 0 20px;"><a href="${coverUrl}"><img src="${coverUrl}" alt="Kapak" style="width:100%;max-width:500px;border-radius:10px;border:1px solid #e8e0d8;" /></a></p>
+
+      ${venueUrl ? `
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Mekan Görseli</h2>
+      <p style="margin:0 0 20px;"><a href="${venueUrl}"><img src="${venueUrl}" alt="Mekan" style="width:200px;height:150px;object-fit:cover;border-radius:8px;border:1px solid #e8e0d8;" /></a></p>
+      ` : ""}
+
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#8C857E;margin:0 0 10px;font-weight:600;">Galeri (${galleryUrls.length} görsel)</h2>
+      <p style="margin:0 0 20px;">${galleryHtml}</p>
+
+      <!-- CTA -->
+      <div style="border-top:1px solid #f0ebe6;padding-top:16px;margin-top:8px;">
+        <a href="${baseUrl}/admin/pazaryeri/yeni?basvuru=${appId}" style="display:inline-block;background:#FF6D60;color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:13px;">Atölye Oluştur &rarr;</a>
+        <a href="${baseUrl}/admin/atolye-basvurulari/${appId}" style="display:inline-block;background:#f0ebe6;color:#3d3833;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:13px;margin-left:8px;">Başvuruyu İncele</a>
       </div>
     </div>
   </div>
