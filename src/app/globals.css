@@ -414,6 +414,7 @@ html {
 }
 .prose-klemens .footnotes ol {
   padding-left: 1.25rem;
+  list-style-type: decimal;
 }
 .prose-klemens .footnotes li {
   margin-bottom: 0.5rem;

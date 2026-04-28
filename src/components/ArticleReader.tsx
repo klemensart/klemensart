@@ -19,10 +19,14 @@ function formatDate(dateStr: string) {
 
 /** Find the HTML split point at ~50% of closing </p> tags (minimum 4 paragraphs required) */
 function getHtmlMidpoint(html: string): number {
+  // Exclude footnotes section from paragraph counting
+  const footnotesIdx = html.indexOf('<section class="footnotes">');
+  const countable = footnotesIdx > -1 ? html.slice(0, footnotesIdx) : html;
+
   const closingTagRegex = /<\/p>/gi;
   const positions: number[] = [];
   let match: RegExpExecArray | null;
-  while ((match = closingTagRegex.exec(html)) !== null) {
+  while ((match = closingTagRegex.exec(countable)) !== null) {
     positions.push(match.index + match[0].length);
   }
   if (positions.length < 4) return -1;
