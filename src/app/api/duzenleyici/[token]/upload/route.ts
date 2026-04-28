@@ -340,9 +340,41 @@ export async function POST(
       );
     }
 
-    // ── Admin'e bildirim emaili ──────────────────────────────────────────
+    // ── Düzenleyiciye onay emaili ────────────────────────────────────────
 
     const baseUrl = getEmailBaseUrl();
+    sendThankYouEmail({
+      to: application.applicant_email,
+      subject: `Materyalleriniz Alındı — Klemens Marketplace`,
+      html: `
+<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f9f7f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:560px;margin:32px auto;background:#fff;border-radius:12px;border:1px solid #e8e0d8;overflow:hidden;">
+    <div style="padding:28px 32px 20px;border-bottom:1px solid #f0ebe6;">
+      <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#FF6D60;font-weight:700;">Klemens Marketplace</p>
+      <h1 style="margin:0;font-size:20px;font-weight:800;color:#2D2926;">Materyalleriniz Alındı</h1>
+    </div>
+    <div style="padding:24px 32px;font-size:14px;line-height:1.8;color:#3d3833;">
+      <p style="margin:0 0 16px;">Merhaba ${esc(application.applicant_name)},</p>
+      <p style="margin:0 0 16px;"><strong>"${esc(application.workshop_topic)}"</strong> atölyesi için gönderdiğiniz materyaller tarafımıza ulaştı. Teşekkür ederiz!</p>
+      <p style="margin:0 0 16px;">Atölye sayfanızı <strong>1-2 iş günü</strong> içinde yayına alacağız ve size e-posta ile haber vereceğiz.</p>
+      <p style="margin:0 0 4px;">Sorularınız için doğrudan bu maile yanıt verebilir veya <a href="mailto:info@klemensart.com" style="color:#FF6D60;font-weight:600;text-decoration:none;">info@klemensart.com</a> adresinden bize ulaşabilirsiniz.</p>
+      <p style="margin:24px 0 0;color:#8C857E;">Sevgilerle,<br><strong style="color:#2D2926;">Klemens Ekibi</strong></p>
+    </div>
+    <div style="padding:16px 32px;background:#faf8f5;border-top:1px solid #f0ebe6;">
+      <p style="margin:0;font-size:12px;color:#8C857E;font-style:italic;">Bu e-posta, materyallerinizin alınması üzerine otomatik olarak gönderilmiştir.</p>
+    </div>
+  </div>
+</body>
+</html>`.trim(),
+    }).catch((err) =>
+      console.error("[duzenleyici/upload] Düzenleyici onay email hatası:", err),
+    );
+
+    // ── Admin'e bildirim emaili ──────────────────────────────────────────
+
     sendThankYouEmail({
       to: "info@klemensart.com",
       subject: `Materyaller Yüklendi — ${application.applicant_name}`,
