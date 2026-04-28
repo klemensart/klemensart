@@ -241,6 +241,9 @@ export default function AtolyeForm({ initialData, mode }: Props) {
           district: app.district || prev.district,
           venue_name: app.venue_name || prev.venue_name,
           venue_address: app.venue_address || prev.venue_address,
+          image_url: app.cover_url || prev.image_url,
+          organizer_logo_url: app.profile_url || prev.organizer_logo_url,
+          gallery_urls: app.gallery_urls?.length ? app.gallery_urls : prev.gallery_urls,
           price,
         }));
 
@@ -992,6 +995,61 @@ export default function AtolyeForm({ initialData, mode }: Props) {
                 className={inputCn}
                 placeholder="https://..."
               />
+            </div>
+
+            {/* Galeri Görselleri */}
+            <div className="border-t border-warm-100 pt-5">
+              <h3 className="text-sm font-semibold text-warm-900/70 mb-3">Galeri Görselleri</h3>
+              {form.gallery_urls.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {form.gallery_urls.map((url, i) => (
+                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-warm-200 group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Galeri ${i + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => update("gallery_urls", form.gallery_urls.filter((_, j) => j !== i))}
+                        className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  placeholder="Görsel URL'si yapıştır ve Ekle'ye bas"
+                  className={inputCn + " flex-1"}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const val = (e.target as HTMLInputElement).value.trim();
+                      if (val) {
+                        update("gallery_urls", [...form.gallery_urls, val]);
+                        (e.target as HTMLInputElement).value = "";
+                      }
+                    }
+                  }}
+                  id="gallery-url-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById("gallery-url-input") as HTMLInputElement;
+                    const val = input?.value.trim();
+                    if (val) {
+                      update("gallery_urls", [...form.gallery_urls, val]);
+                      input.value = "";
+                    }
+                  }}
+                  className="px-4 py-2 text-xs font-semibold text-coral border border-coral/30 rounded-lg hover:bg-coral/5 transition-colors"
+                >
+                  Ekle
+                </button>
+              </div>
+              <p className="text-xs text-warm-900/30 mt-1">Süreç fotoğrafları, mekân görseli vb. URL olarak ekleyin</p>
             </div>
           </section>
 
