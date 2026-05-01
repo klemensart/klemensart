@@ -56,12 +56,16 @@ const ResizableImage = TiptapImage.extend({
       markdown: {
         serialize(
           state: { write: (s: string) => void; esc: (s: string) => string; closeBlock: (n: unknown) => void },
-          node: { attrs: { alt?: string; src?: string; title?: string } },
+          node: { attrs: { alt?: string; src?: string; title?: string; "data-size"?: string } },
         ) {
+          const size = node.attrs["data-size"];
+          const sizeTag = size && size !== "large" ? ` {:size=${size}}` : "";
+          const titleBase = (node.attrs.title || "").replace(/\s*\{:size=\w+\}/, "");
+          const title = titleBase + sizeTag;
           state.write(
             "![" + state.esc(node.attrs.alt || "") + "](" +
             (node.attrs.src || "").replace(/ /g, "%20").replace(/[()]/g, "\\$&") +
-            (node.attrs.title ? ' "' + node.attrs.title.replace(/"/g, '\\"') + '"' : "") +
+            (title ? ' "' + title.replace(/"/g, '\\"') + '"' : "") +
             ")"
           );
           state.closeBlock(node);
@@ -1001,6 +1005,29 @@ export default function TiptapEditor({
       SuggestionExtension,
     ],
     content,
+    onCreate: ({ editor: ed }) => {
+      // Extract {:size=xxx} tags from image titles and set data-size attribute
+      const tr = ed.state.tr;
+      let modified = false;
+      ed.state.doc.descendants((node, pos) => {
+        if (node.type.name === "image" && node.attrs.title) {
+          const match = node.attrs.title.match(/\s*\{:size=(\w+)\}/);
+          if (match) {
+            const size = match[1];
+            const cleanTitle = node.attrs.title.replace(/\s*\{:size=\w+\}/, "").trim();
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              title: cleanTitle,
+              "data-size": size,
+            });
+            modified = true;
+          }
+        }
+      });
+      if (modified) {
+        ed.view.dispatch(tr);
+      }
+    },
     onUpdate: ({ editor }) => {
       // Skip the onUpdate triggered by external setContent (prevents round-trip data loss)
       if (suppressUpdateRef.current) {
@@ -1071,6 +1098,29 @@ export default function TiptapEditor({
       suppressUpdateRef.current = true;
       editor.commands.setContent(content);
       lastMdRef.current = content;
+
+      // Extract {:size=xxx} tags from image titles after setContent
+      const tr = editor.state.tr;
+      let modified = false;
+      editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === "image" && node.attrs.title) {
+          const match = node.attrs.title.match(/\s*\{:size=(\w+)\}/);
+          if (match) {
+            const size = match[1];
+            const cleanTitle = node.attrs.title.replace(/\s*\{:size=\w+\}/, "").trim();
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              title: cleanTitle,
+              "data-size": size,
+            });
+            modified = true;
+          }
+        }
+      });
+      if (modified) {
+        suppressUpdateRef.current = true;
+        editor.view.dispatch(tr);
+      }
     }
   }, [content, editor]);
 

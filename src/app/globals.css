@@ -354,16 +354,12 @@ html {
   padding: 0;
 }
 
-/* Figure genişlik sınıfları — aspect ratio'ya göre */
-.prose-klemens figure.figure-square {
-  max-width: 75%;
-}
-.prose-klemens figure.figure-portrait {
-  max-width: 58%;
-}
+/* Figure genişlik sınıfları — editör boyut seçimine göre */
+.prose-klemens figure.figure-size-small { max-width: 33%; }
+.prose-klemens figure.figure-size-medium { max-width: 66%; }
 @media (max-width: 768px) {
-  .prose-klemens figure.figure-square,
-  .prose-klemens figure.figure-portrait {
+  .prose-klemens figure.figure-size-small,
+  .prose-klemens figure.figure-size-medium {
     max-width: 100%;
   }
 }
