@@ -345,13 +345,15 @@ html {
   padding: 0.05em 0.15em;
 }
 
-/* Image figure — grid layout: caption genişliği = görsel genişliği */
+/* Image figure — full-width grid, caption = konteyner genişliği */
 .prose-klemens figure {
   display: grid;
-  width: fit-content;
   max-width: 100%;
   margin: 0 auto 0.5rem;
   padding: 0;
+}
+.prose-klemens figure img {
+  width: 100%;
 }
 
 /* Figure genişlik sınıfları — editör boyut seçimine göre */
