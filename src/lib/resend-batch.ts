@@ -19,7 +19,8 @@ const RETRY_DELAY_MS = 2000;
 
 /**
  * Resend batch gönderimini retry + hata loglama ile yapar.
- * Başarısız batch'leri 1 kez tekrar dener, hâlâ başarısızsa loglar.
+ * Başarısız batch'leri 1 kez tekrar dener, hâlâ başarısızsa
+ * tek tek (individual) göndermeye düşer — hiçbir mail kaybolmaz.
  */
 export async function sendBatchWithRetry(
   resend: Resend,
@@ -49,13 +50,31 @@ export async function sendBatchWithRetry(
     }
 
     if (result.error) {
-      // Retry sonrası da başarısız — logla
-      totalFailed += batch.length;
-      errors.push(`Batch ${batchIndex}: ${result.error.message}`);
-      console.error(
-        `[Resend Batch] Batch ${batchIndex} retry sonrası da başarısız (${batch.length} mail):`,
-        result.error.message,
+      // Batch retry da başarısız — tek tek gönder (fallback)
+      console.warn(
+        `[Resend Batch] Batch ${batchIndex} retry da başarısız, tek tek gönderiliyor (${batch.length} mail)...`,
       );
+
+      for (const email of batch) {
+        try {
+          await new Promise((r) => setTimeout(r, 200)); // rate limit koruması
+          const single = await resend.emails.send(email);
+          if (single.error) {
+            totalFailed++;
+            errors.push(`${email.to}: ${single.error.message}`);
+          } else {
+            totalSent++;
+            await admin.from("email_logs").insert({
+              resend_email_id: single.data?.id || null,
+              subscriber_email: email.to,
+              subject: emailSubject,
+            });
+          }
+        } catch (err) {
+          totalFailed++;
+          errors.push(`${email.to}: ${err instanceof Error ? err.message : "Bilinmeyen hata"}`);
+        }
+      }
     } else {
       totalSent += batch.length;
       const ids = result.data?.data ?? [];

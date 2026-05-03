@@ -52,6 +52,57 @@ function getImageDimensions(file: File): Promise<{ width: number; height: number
   });
 }
 
+/** Canvas ile görseli sıkıştır — max 1920px, JPEG %85 kalite */
+function compressImage(file: File, maxDim = 1920, quality = 0.85): Promise<File> {
+  return new Promise((resolve, reject) => {
+    // Zaten küçükse dokunma
+    if (file.size <= 500 * 1024) {
+      resolve(file);
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      let { naturalWidth: w, naturalHeight: h } = img;
+
+      // Boyut küçültme
+      if (w > maxDim || h > maxDim) {
+        const ratio = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(file); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return; }
+          const compressed = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+          resolve(compressed);
+        },
+        "image/jpeg",
+        quality,
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Görsel sıkıştırılamadı"));
+    };
+    img.src = url;
+  });
+}
+
 async function validateImageFile(
   file: File,
   minW: number,
@@ -249,11 +300,28 @@ export default function UploadForm({ application, token }: Props) {
     setSubmitError(null);
 
     try {
+      setProgress("Görseller optimize ediliyor...");
+
+      // Görselleri sıkıştır (Vercel 4.5MB body limit)
+      const [compCover, compProfile] = await Promise.all([
+        compressImage(cover!.file),
+        compressImage(profile!.file),
+      ]);
+
+      const compVenue = venue ? await compressImage(venue.file) : null;
+
+      const compGallery: File[] = [];
+      for (const g of gallery) {
+        if (!g.error) {
+          compGallery.push(await compressImage(g.file));
+        }
+      }
+
       setProgress("Form hazırlanıyor...");
 
       const fd = new FormData();
-      fd.append("cover", cover!.file);
-      fd.append("profile", profile!.file);
+      fd.append("cover", compCover);
+      fd.append("profile", compProfile);
       fd.append("bio", bio.trim());
       fd.append("city", city.trim());
       fd.append("max_participants", maxParticipants);
@@ -263,9 +331,9 @@ export default function UploadForm({ application, token }: Props) {
       if (district.trim()) fd.append("district", district.trim());
       if (venueName.trim()) fd.append("venue_name", venueName.trim());
       if (venueAddress.trim()) fd.append("venue_address", venueAddress.trim());
-      if (venue) fd.append("venue", venue.file);
-      for (const g of gallery) {
-        if (!g.error) fd.append("gallery", g.file);
+      if (compVenue) fd.append("venue", compVenue);
+      for (const g of compGallery) {
+        fd.append("gallery", g);
       }
 
       setProgress("Materyaller yükleniyor...");
@@ -275,7 +343,19 @@ export default function UploadForm({ application, token }: Props) {
         body: fd,
       });
 
-      const data = await res.json();
+      // Non-JSON yanıt koruması (Vercel 413 hatası vb.)
+      let data: { error?: string; success?: boolean };
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(
+          res.status === 413
+            ? "Dosya boyutu çok büyük. Lütfen daha küçük görseller deneyin."
+            : `Sunucu hatası (${res.status}): ${text.slice(0, 100)}`,
+        );
+      }
 
       if (!res.ok) {
         throw new Error(data.error || "Yükleme başarısız");
