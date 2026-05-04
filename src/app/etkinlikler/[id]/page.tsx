@@ -71,14 +71,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const datePart = fmtShortDate(event.event_date);
   const venuePart = event.venue ?? "Ankara";
 
-  // SEO title: "Etkinlik Adı — Mekan | Tarih — Klemens"
-  const seoTitle = [event.title, venuePart, datePart].filter(Boolean).join(" — ");
+  // SEO title: "Etkinlik Adı | Tarih, Mekân — Klemens"
+  const titleSuffix = [datePart, venuePart].filter(Boolean).join(", ");
+  const seoTitle = titleSuffix
+    ? `${event.title} | ${titleSuffix}`
+    : event.title;
 
-  // Description: olay açıklaması veya zengin fallback
+  // Description: kısa + CTA ağırlıklı
   const rawDesc = event.description || event.ai_comment || "";
-  const description = rawDesc
-    ? rawDesc.slice(0, 155) + (rawDesc.length > 155 ? "…" : "")
-    : [typeLabel, `"${event.title}"`, venuePart && `${venuePart}'da`, datePart, event.price_info].filter(Boolean).join(" · ");
+  const descBase = rawDesc
+    ? rawDesc.slice(0, 130) + (rawDesc.length > 130 ? "…" : "")
+    : [typeLabel, `"${event.title}"`, venuePart && `${venuePart}'da`, datePart].filter(Boolean).join(" · ");
+  const description = event.price_info
+    ? `${descBase} ${event.price_info === "Ücretsiz" ? "Ücretsiz giriş." : `Bilet: ${event.price_info}`}`
+    : descBase;
 
   return {
     title: seoTitle,

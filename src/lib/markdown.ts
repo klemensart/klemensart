@@ -313,6 +313,15 @@ const STATIC_LINKS: { keyword: string; url: string }[] = [
   { keyword: "atölye", url: "/atolyeler" },
   { keyword: "etkinlik takvimi", url: "/etkinlikler" },
   { keyword: "Loca Club", url: "/club" },
+  // İç link kurtarma — crawled-not-indexed makaleler
+  { keyword: "Afrika felsefesi", url: "/icerikler/yazi/felsefe-bati-da-baslamadi-afrika-nin-kendi-gelenegi" },
+  { keyword: "Ubuntu felsefesi", url: "/icerikler/yazi/felsefe-bati-da-baslamadi-afrika-nin-kendi-gelenegi" },
+  { keyword: "Kraliçeler Vadisi", url: "/icerikler/yazi/kraliceler-vadisi-ndeki-2000-yillik-hint-i-mzasi" },
+  { keyword: "Hint sanatı", url: "/icerikler/yazi/kraliceler-vadisi-ndeki-2000-yillik-hint-i-mzasi" },
+  { keyword: "Ajanta mağaraları", url: "/icerikler/yazi/kraliceler-vadisi-ndeki-2000-yillik-hint-i-mzasi" },
+  { keyword: "Kopernik", url: "/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" },
+  { keyword: "kozmik yalnızlık", url: "/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" },
+  { keyword: "Kopernik devrimi", url: "/icerikler/yazi/kozmik-yalnizlik-kopernik-devrimi" },
 ];
 
 /**

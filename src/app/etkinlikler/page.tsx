@@ -8,9 +8,9 @@ import Footer from "@/components/Footer";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Ankara Kültür & Sanat Takvimi",
+  title: "Ankara Etkinlik Takvimi: Sergi, Konser, Tiyatro (Güncel) | Klemens",
   description:
-    "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
+    "Bu hafta Ankara'da ne var? Sergi, konser, tiyatro, söyleşi ve festival takvimi — ücretsiz etkinlikler dahil, her gün güncelleniyor.",
   keywords: [
     "Ankara kültür sanat takvimi",
     "Ankara etkinlikler",
@@ -24,17 +24,17 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/etkinlikler" },
   openGraph: {
-    title: "Ankara Kültür & Sanat Takvimi — Klemens",
+    title: "Ankara Etkinlik Takvimi: Sergi, Konser, Tiyatro (Güncel)",
     description:
-      "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
+      "Bu hafta Ankara'da ne var? Sergi, konser, tiyatro, söyleşi ve festival takvimi — ücretsiz etkinlikler dahil, her gün güncelleniyor.",
     url: "https://klemensart.com/etkinlikler",
     images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ankara Kültür & Sanat Takvimi — Klemens",
+    title: "Ankara Etkinlik Takvimi: Sergi, Konser, Tiyatro (Güncel)",
     description:
-      "Ankara'daki sergi, konser, tiyatro, söyleşi ve festival etkinliklerini keşfedin. Başkentin güncel kültür-sanat rehberi.",
+      "Bu hafta Ankara'da ne var? Sergi, konser, tiyatro, söyleşi ve festival takvimi — ücretsiz etkinlikler dahil, her gün güncelleniyor.",
     images: ["/logos/logo-wide-dark.PNG"],
   },
 };

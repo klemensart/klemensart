@@ -8,15 +8,17 @@ type TimeLeft = { days: number; hours: number; minutes: number; seconds: number 
 
 export default function CountdownTimer({ targetDate }: { targetDate?: string }) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!targetDate) return;
     const target = new Date(targetDate).getTime();
 
     const tick = () => {
       const diff = target - Date.now();
       if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setTimeLeft(null);
         return;
       }
       setTimeLeft({
@@ -32,8 +34,7 @@ export default function CountdownTimer({ targetDate }: { targetDate?: string }) 
     return () => clearInterval(id);
   }, [targetDate]);
 
-  if (!targetDate || !timeLeft) return null;
-  if (new Date(targetDate) <= new Date()) return null;
+  if (!mounted || !targetDate || !timeLeft) return null;
 
   const units = [
     { label: "gün", v: timeLeft.days },

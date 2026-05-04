@@ -8,9 +8,9 @@ import Footer from "@/components/Footer";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "İçerikler",
+  title: "Sanat Yazıları ve Kültür Analizleri | Klemens Art",
   description:
-    "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+    "Sanat tarihi, felsefe ve kültür üzerine özgün yazılar. Rönesans'tan çağdaş sanata, mitolojiden sinemaya — her hafta yeni içerik.",
   keywords: [
     "sanat yazıları",
     "kültür sanat makaleleri",
@@ -23,17 +23,17 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/icerikler" },
   openGraph: {
-    title: "İçerikler — Klemens",
+    title: "Sanat Yazıları ve Kültür Analizleri | Klemens Art",
     description:
-      "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+      "Sanat tarihi, felsefe ve kültür üzerine özgün yazılar. Rönesans'tan çağdaş sanata, mitolojiden sinemaya — her hafta yeni içerik.",
     url: "https://klemensart.com/icerikler",
     images: [{ url: "/logos/logo-wide-dark.PNG", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "İçerikler — Klemens",
+    title: "Sanat Yazıları ve Kültür Analizleri | Klemens Art",
     description:
-      "Sanat, kültür ve düşünce üzerine derinlemesine yazılar, röportajlar ve analizler.",
+      "Sanat tarihi, felsefe ve kültür üzerine özgün yazılar. Rönesans'tan çağdaş sanata, mitolojiden sinemaya — her hafta yeni içerik.",
     images: ["/logos/logo-wide-dark.PNG"],
   },
 };
