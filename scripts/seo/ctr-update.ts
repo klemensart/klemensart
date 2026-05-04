@@ -12,32 +12,51 @@ const supabase = createClient(
 );
 
 // GSC raporundan: imp>500, CTR<%2.5 olan makale sayfaları
-const updates: { slug: string; meta_description: string }[] = [
+const updates: { slug: string; description: string }[] = [
   {
-    slug: "turk-sanatinda-islamiyet-sonrasi-donem-saraydan-sokaga-evrilen-estetik",
-    meta_description:
+    slug: "turk-sanatinda-islamiyet-sonrasi-buyuk-degisim-bilinmeyenler",
+    description:
       "İslamiyet sonrası Türk sanatı nasıl dönüştü? Selçuklu'dan Osmanlı'ya, saraydan halka inen estetik yolculuğu — hat, minyatür, çini ve mimari.",
   },
   {
-    slug: "sanatlarin-tanrisi-apollonun-evi-delos-adasi",
-    meta_description:
-      "Apollon'un doğduğu kutsal ada Delos: antik tapınaklar, mozaikler ve Akdeniz'in en iyi korunmuş arkeolojik alanı. Gezi rehberi ve tarihî analiz.",
+    slug: "sanatlarin-tanrisi-apollonun-evi-delphi-tapinagi",
+    description:
+      "Apollon'un kutsal mabedi Delphi: antik tapınaklar, kehanet geleneği ve Yunan uygarlığının merkezi. Tarihî analiz ve gezi rehberi.",
   },
 ];
 
 async function main() {
-  for (const { slug, meta_description } of updates) {
+  // Önce slug'ları doğrula
+  for (const { slug, description } of updates) {
+    const { data: found } = await supabase
+      .from("articles")
+      .select("slug, description")
+      .like("slug", `%${slug.slice(0, 30)}%`);
+
+    if (!found || found.length === 0) {
+      console.error(`❌ ${slug}: Slug bulunamadı`);
+      continue;
+    }
+
+    const exact = found.find((r) => r.slug === slug);
+    if (!exact) {
+      console.log(`⚠️  Yakın eşleşmeler: ${found.map((r) => r.slug).join(", ")}`);
+      continue;
+    }
+
+    console.log(`📝 Mevcut: "${exact.description?.slice(0, 50)}…"`);
+
     const { data, error } = await supabase
       .from("articles")
-      .update({ meta_description })
+      .update({ description })
       .eq("slug", slug)
-      .select("slug, meta_description")
-      .single();
+      .select("slug, description")
+      .maybeSingle();
 
     if (error) {
       console.error(`❌ ${slug}:`, error.message);
-    } else {
-      console.log(`✅ ${data.slug} → "${data.meta_description.slice(0, 60)}…"`);
+    } else if (data) {
+      console.log(`✅ ${data.slug} → "${data.description.slice(0, 60)}…"`);
     }
   }
 }
