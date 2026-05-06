@@ -585,6 +585,124 @@ export const FINAL_QUESTIONS: WorkshopQuizItem[] = [
   },
 ];
 
+/* ── Sınav — Empresyonizm + Neo-Empresyonizm + Post-Empresyonizm (10 soru) ── */
+
+export const SINAV_QUESTIONS: WorkshopQuizItem[] = [
+  {
+    id: 501, week: 1, difficulty: "easy",
+    question: "Empresyonizm akımının adı, 1874'teki ilk grup sergisinde yer alan hangi tablodan türetilmiştir?",
+    options: [
+      { text: "Édouard Manet — Olympia", isCorrect: false },
+      { text: "Claude Monet — Impression, soleil levant (İzlenim, Gün Doğumu)", isCorrect: true },
+      { text: "Pierre-Auguste Renoir — Moulin de la Galette'de Bal", isCorrect: false },
+      { text: "Edgar Degas — Bale Sınıfı", isCorrect: false },
+    ],
+    explanation: "Eleştirmen Louis Leroy, Monet'nin tablosunun adını alaycı bir şekilde tüm gruba mal etti — ama akım bu küçümsemeyi bir onur nişanı olarak benimsedi.",
+  },
+  {
+    id: 502, week: 1, difficulty: "medium",
+    question: "Empresyonistlerin \"en plein air\" (açık havada) çalışmasını mümkün kılan en önemli teknik yenilik neydi?",
+    options: [
+      { text: "Sentetik boyaların metal tüplere konulması", isCorrect: true },
+      { text: "Akrilik boyanın icadı", isCorrect: false },
+      { text: "Hazır tuval üretiminin standartlaşması", isCorrect: false },
+      { text: "Fotoğraf makinesinin yaygınlaşması", isCorrect: false },
+    ],
+    explanation: "Tüp boya 1841'de Amerikalı ressam John Goffe Rand tarafından icat edildi. Renoir sonradan şöyle diyecekti: \"Tüp boya olmasaydı ne Cézanne olurdu, ne Monet, ne Pissarro, ne Empresyonizm.\"",
+  },
+  {
+    id: 503, week: 1, difficulty: "medium",
+    question: "Bu eserin ressamı ve uyguladığı tekniğin adı nedir?",
+    image: "/images/workshop/modern-sanat/week-1/grande-jatte.webp",
+    options: [
+      { text: "Paul Signac — Divizyonizm", isCorrect: false },
+      { text: "Georges Seurat — Puantilizm", isCorrect: true },
+      { text: "Camille Pissarro — Empresyonizm", isCorrect: false },
+      { text: "Paul Cézanne — Konstrüktivizm", isCorrect: false },
+    ],
+    explanation: "Un dimanche après-midi à l'Île de la Grande Jatte (1884-86, Art Institute of Chicago). Akademik açıdan teknik aslında \"divizyonizm\" olarak da bilinir; iki terim çoğu zaman birbirinin yerine kullanılır.",
+  },
+  {
+    id: 504, week: 1, difficulty: "medium",
+    question: "Seurat'nın erken ölümünün ardından Neo-Empresyonist akımı sürdüren ve sonradan tekniği daha gevşek, daha lekesel bir biçime taşıyan ressam kimdir?",
+    options: [
+      { text: "Paul Signac", isCorrect: true },
+      { text: "Henri-Edmond Cross", isCorrect: false },
+      { text: "Maximilien Luce", isCorrect: false },
+      { text: "Théo van Rysselberghe", isCorrect: false },
+    ],
+    explanation: "Seurat 1891'de yalnızca 31 yaşında öldü. Signac onun mirasını üstlendi; daha sonra St. Tropez'e yerleşip tekniği \"kısa renk darbeleri\"ne dönüştürdü — genç Matisse'i etkileyen ve Fovizm'in tohumunu atan da budur.",
+  },
+  {
+    id: 505, week: 1, difficulty: "medium",
+    question: "Paul Cézanne'ın Kübizmin habercisi sayılan ünlü tavsiyesi şudur: \"Doğayı şu üç biçimle ele alın...\"",
+    options: [
+      { text: "Üçgen, kare, daire", isCorrect: false },
+      { text: "Silindir, küre, koni", isCorrect: true },
+      { text: "Düzlem, çizgi, nokta", isCorrect: false },
+      { text: "Işık, gölge, yarı-gölge", isCorrect: false },
+    ],
+    explanation: "Cézanne'ın 1904'te genç ressam Émile Bernard'a yazdığı mektuptan. Picasso ve Braque'a Kübizmin yolunu açan tek cümle.",
+  },
+  {
+    id: 506, week: 1, difficulty: "medium",
+    question: "Van Gogh'un Yıldızlı Gece (La Nuit étoilée) tablosu, hangi dönemde ve nerede yapılmıştır?",
+    image: "/images/workshop/modern-sanat/week-1/starry-night.webp",
+    options: [
+      { text: "Paris dönemi, 1886", isCorrect: false },
+      { text: "Arles dönemi, 1888 (Sarı Ev)", isCorrect: false },
+      { text: "Saint-Rémy dönemi, 1889 — akıl hastanesinin penceresinden", isCorrect: true },
+      { text: "Auvers-sur-Oise dönemi, 1890", isCorrect: false },
+    ],
+    explanation: "Sahnedeki köy ve kilise hayalîdir; pencereden gerçek manzara değil, hafızadan ve hayal gücünden çizilmiştir. Bu, Van Gogh'un saf Empresyonizm'den ne kadar uzaklaştığının kanıtıdır.",
+  },
+  {
+    id: 507, week: 1, difficulty: "medium",
+    question: "Van Gogh'un Arles'ta birlikte yaşamak için Sarı Ev'e davet ettiği, ancak iki ay sonra tartışmayla sonuçlanan ve ünlü \"kulak kesme\" olayına yol açan ressam kimdir?",
+    options: [
+      { text: "Émile Bernard", isCorrect: false },
+      { text: "Henri de Toulouse-Lautrec", isCorrect: false },
+      { text: "Paul Gauguin", isCorrect: true },
+      { text: "Camille Pissarro", isCorrect: false },
+    ],
+    explanation: "Van Gogh, güneyde bir \"ressamlar topluluğu\" kurma hayaliyle 1888'de Gauguin'i Arles'a çağırdı. İki sanatçının mizaçları çatıştı; 23 Aralık 1888 gecesi tartışmanın ardından Van Gogh kulağının bir kısmını kesti. Gauguin ertesi gün Arles'ı terk etti, bir daha hiç karşılaşmadılar — ama yazışmaları ölümüne kadar sürdü.",
+  },
+  {
+    id: 508, week: 1, difficulty: "hard",
+    question: "Empresyonizm'in en sadık üyelerinden olan, sekiz Empresyonist serginin yedisine katılan ve Cézanne ile Gauguin'in de hocası sayılan, \"grubun anarşist figürü\" olarak anılan ressam kimdir?",
+    options: [
+      { text: "Édouard Manet", isCorrect: false },
+      { text: "Camille Pissarro", isCorrect: true },
+      { text: "Claude Monet", isCorrect: false },
+      { text: "Alfred Sisley", isCorrect: false },
+    ],
+    explanation: "Pissarro, Empresyonist grubun en yaşlı üyesiydi ve sergilerin tümüne katılan tek ressamdı. Hem Cézanne'a Pontoise'da resim öğretti, hem genç Gauguin'e mentörlük yaptı, hem de 1880'lerde Seurat ile Signac'ın etkisiyle bir süre Neo-Empresyonist tekniği denedi. Empresyonizm'i Post-Empresyonizm'e bağlayan canlı bir köprüdür.",
+  },
+  {
+    id: 509, week: 1, difficulty: "medium",
+    question: "Cézanne, hayatının son yirmi yılında neredeyse takıntılı biçimde aynı dağı defalarca resmetti — bir nesneyi farklı zamanlarda, farklı ışıklarda ve farklı açılardan kavrama girişimi olarak. Söz konusu dağ hangisidir?",
+    options: [
+      { text: "Mont Blanc", isCorrect: false },
+      { text: "Mont Sainte-Victoire", isCorrect: true },
+      { text: "Pic du Midi", isCorrect: false },
+      { text: "Mont Ventoux", isCorrect: false },
+    ],
+    explanation: "Cézanne'ın memleketi Aix-en-Provence yakınlarındaki bu dağı altmıştan fazla kez resmettiği bilinir. Her tablosunda biraz daha çözer, biraz daha geometrik düzlemlere indirger; en geç tarihli olanlar neredeyse soyut sayılabilir. Picasso ve Braque, Cézanne'ın bu serisini Kübizm'in doğrudan habercisi olarak gördüler.",
+  },
+  {
+    id: 510, week: 1, difficulty: "hard",
+    question: "Berthe Morisot'nun ilk Empresyonist sergisinde (1874) yer alan bu tablo, ressamın diğer Empresyonistlerden ayrıldığı bir alanın — kadınların özel mekânlarının — habercisidir. Tabloda beşikte uyuyan bebeği izleyen kadın kimdir?",
+    image: "/images/workshop/modern-sanat/week-1/the-cradle.webp",
+    options: [
+      { text: "Morisot'nun kendi kızı Julie", isCorrect: false },
+      { text: "Ressamın kız kardeşi Edma ve yeğeni Blanche", isCorrect: true },
+      { text: "Manet'nin yengesi", isCorrect: false },
+      { text: "İsimsiz bir model", isCorrect: false },
+    ],
+    explanation: "Le Berceau (1872, Musée d'Orsay). Edma, kendisi de yetenekli bir ressamdı; kız kardeşiyle birlikte yıllarca resim yaptı. Ama evlendikten sonra fırçayı bıraktı — 19. yüzyılda bir kadının ressamlığı sürdürmesi neredeyse imkânsızdı. Morisot bu tabloda kız kardeşinin yeni anneliğini resmederken aslında bir başka şeyi de resmediyor: Kendisinin sürdürebildiği, ama Edma'nın bırakmak zorunda kaldığı hayatı. Tülün ardındaki bebek neredeyse soyut bir bulanıklıkta, annenin bakışı ise keskin. Bu, Empresyonist grubun erkek üyelerinin — Monet'nin, Degas'nın, Renoir'ın — asla giremeyeceği bir mahremiyettir.",
+  },
+];
+
 /* ── Tüm sorular birleşik ── */
 
 export const ALL_QUIZ_QUESTIONS: WorkshopQuizItem[] = [
@@ -592,6 +710,7 @@ export const ALL_QUIZ_QUESTIONS: WorkshopQuizItem[] = [
   ...BLOCK_2_QUESTIONS,
   ...BLOCK_3_QUESTIONS,
   ...FINAL_QUESTIONS,
+  ...SINAV_QUESTIONS,
 ];
 
 export function getQuestionsForBlock(slug: string): WorkshopQuizItem[] {
@@ -600,6 +719,7 @@ export function getQuestionsForBlock(slug: string): WorkshopQuizItem[] {
     case "modern-sanat-blok-2-quiz": return BLOCK_2_QUESTIONS;
     case "modern-sanat-blok-3-quiz": return BLOCK_3_QUESTIONS;
     case "modern-sanat-final-quiz": return FINAL_QUESTIONS;
+    case "modern-sanat-sinav": return SINAV_QUESTIONS;
     default: return [];
   }
 }

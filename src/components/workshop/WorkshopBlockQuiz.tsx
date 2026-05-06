@@ -128,9 +128,11 @@ function PurchaseWall({ config }: { config: BlockQuizConfig }) {
 export default function WorkshopBlockQuiz({
   config,
   questions,
+  skipPurchaseCheck = false,
 }: {
   config: BlockQuizConfig;
   questions: WorkshopQuizItem[];
+  skipPurchaseCheck?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [user, setUser] = useState<User | null>(null);
@@ -144,6 +146,10 @@ export default function WorkshopBlockQuiz({
 
   // Auth + Purchase check
   useEffect(() => {
+    if (skipPurchaseCheck) {
+      setPhase("intro");
+      return;
+    }
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user: u } }) => {
       setUser(u);
@@ -158,7 +164,7 @@ export default function WorkshopBlockQuiz({
       }
       setPhase("intro");
     });
-  }, []);
+  }, [skipPurchaseCheck]);
 
   const startQuiz = useCallback(() => {
     const shuffled = shuffle(questions).slice(0, config.questionCount);
@@ -186,18 +192,17 @@ export default function WorkshopBlockQuiz({
     if (isCorrect) setScore(s => s + 1);
 
     setResults(r => [...r, { question: current, correct: isCorrect, userAnswer: text }]);
+  }
 
-    setTimeout(() => {
-      if (idx + 1 < items.length) {
-        setIdx(i => i + 1);
-        setSelected(null);
-        setAnswered(false);
-      } else {
-        setPhase("result");
-        // Save result
-        saveResult(isCorrect ? score + 1 : score);
-      }
-    }, 1500);
+  function handleNext() {
+    if (idx + 1 < items.length) {
+      setIdx(i => i + 1);
+      setSelected(null);
+      setAnswered(false);
+    } else {
+      setPhase("result");
+      saveResult(score);
+    }
   }
 
   async function saveResult(finalScore: number) {
@@ -293,6 +298,18 @@ export default function WorkshopBlockQuiz({
             style={{ background: T.bgCard, border: `1px solid ${T.border}` }}
             className="rounded-2xl p-6 mt-6"
           >
+            {/* Question image */}
+            {current.image && (
+              <div className="mb-5 rounded-xl overflow-hidden">
+                <img
+                  src={current.image}
+                  alt=""
+                  className="w-full h-auto"
+                  style={{ maxHeight: 320, objectFit: "cover" }}
+                />
+              </div>
+            )}
+
             <p style={{ color: T.text }} className="text-lg font-semibold mb-6 leading-relaxed">
               {current.question}
             </p>
@@ -339,18 +356,28 @@ export default function WorkshopBlockQuiz({
               })}
             </div>
 
-            {/* Explanation after answer */}
+            {/* Explanation after answer — stays until user clicks Next */}
             {answered && (
-              <div
-                style={{
-                  background: T.accentBg,
-                  border: `1px solid ${T.border}`,
-                  color: T.textSec,
-                }}
-                className="mt-5 p-4 rounded-xl text-sm leading-relaxed"
-              >
-                {current.explanation}
-              </div>
+              <>
+                <div
+                  style={{
+                    background: T.accentBg,
+                    border: `1px solid ${T.border}`,
+                    color: T.textSec,
+                  }}
+                  className="mt-5 p-4 rounded-xl text-sm leading-relaxed"
+                >
+                  {current.explanation}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  style={{ background: T.accent, color: T.bg }}
+                  className="w-full mt-4 py-3 rounded-xl font-semibold text-[15px] cursor-pointer hover:opacity-90 transition-opacity"
+                >
+                  {idx + 1 < items.length ? "Sonraki Soru" : "Sonuçları Gör"}
+                </button>
+              </>
             )}
           </div>
         </div>

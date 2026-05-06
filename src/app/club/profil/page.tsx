@@ -231,84 +231,106 @@ function SessionList({
         const rowOpacity = isUpcoming ? 0.7 : (hasStatus ? 1 : (s.is_published ? 1 : 0.45));
         const rowBg = isLiveSession ? "bg-[#F1F8E9]" : (canPlayVideo || isUpcoming ? "bg-cream" : "bg-transparent");
 
+        const showQuizAfter = s.session_number === 3;
+
         return (
-          <div
-            key={s.session_number}
-            onClick={() => canPlayVideo && onPlay(s.bunny_video_id!, s.title)}
-            className={`flex items-center gap-3 px-3.5 py-[11px] rounded-[10px] mb-1 ${rowBg} ${canPlayVideo ? "cursor-pointer" : "cursor-default"}`}
-            style={{ opacity: rowOpacity }}
-          >
-            {/* Icon box */}
-            <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
-              isLiveSession ? "bg-[#2E7D32]"
-                : isUpcoming ? "bg-brand-light"
-                : s.is_published ? "bg-coral" : "bg-brand-light"
-            }`}>
-              {isUpcoming
-                ? <CalendarIcon size={12} className="text-brand-warm" />
-                : isLiveSession
-                  ? <PlayIcon size={12} className="text-white" />
-                  : s.is_published ? <PlayIcon size={12} className="text-white" /> : <LockIcon size={12} className="text-brand-warm" />
-              }
-            </div>
-
-            {/* Title + subtitle */}
-            <div className="flex-1">
-              <div className="text-sm font-medium text-brand-dark flex items-center gap-1.5">
-                {s.title}
-                {isLiveSession && (
-                  <span className="w-2 h-2 rounded-full bg-[#4CAF50] inline-block shrink-0 live-pulse" />
-                )}
+          <div key={s.session_number}>
+            <div
+              onClick={() => canPlayVideo && onPlay(s.bunny_video_id!, s.title)}
+              className={`flex items-center gap-3 px-3.5 py-[11px] rounded-[10px] mb-1 ${rowBg} ${canPlayVideo ? "cursor-pointer" : "cursor-default"}`}
+              style={{ opacity: rowOpacity }}
+            >
+              {/* Icon box */}
+              <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
+                isLiveSession ? "bg-[#2E7D32]"
+                  : isUpcoming ? "bg-brand-light"
+                  : s.is_published ? "bg-coral" : "bg-brand-light"
+              }`}>
+                {isUpcoming
+                  ? <CalendarIcon size={12} className="text-brand-warm" />
+                  : isLiveSession
+                    ? <PlayIcon size={12} className="text-white" />
+                    : s.is_published ? <PlayIcon size={12} className="text-white" /> : <LockIcon size={12} className="text-brand-warm" />
+                }
               </div>
-              <div className="text-xs text-brand-warm flex items-center gap-1 mt-0.5">
-                {(isUpcoming || isLiveSession) && s.session_date ? (
-                  <>
-                    <CalendarIcon size={11} className="text-brand-warm" />{" "}
-                    {new Date(s.session_date).toLocaleString("tr-TR", {
-                      day: "numeric", month: "long", year: "numeric",
-                      hour: "2-digit", minute: "2-digit",
-                    })}
-                  </>
-                ) : (
-                  <><ClockIcon size={11} className="text-brand-warm" /> {s.duration ?? "—"}</>
-                )}
+
+              {/* Title + subtitle */}
+              <div className="flex-1">
+                <div className="text-sm font-medium text-brand-dark flex items-center gap-1.5">
+                  {s.title}
+                  {isLiveSession && (
+                    <span className="w-2 h-2 rounded-full bg-[#4CAF50] inline-block shrink-0 live-pulse" />
+                  )}
+                </div>
+                <div className="text-xs text-brand-warm flex items-center gap-1 mt-0.5">
+                  {(isUpcoming || isLiveSession) && s.session_date ? (
+                    <>
+                      <CalendarIcon size={11} className="text-brand-warm" />{" "}
+                      {new Date(s.session_date).toLocaleString("tr-TR", {
+                        day: "numeric", month: "long", year: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </>
+                  ) : (
+                    <><ClockIcon size={11} className="text-brand-warm" /> {s.duration ?? "—"}</>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Right side */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              {s.pdf_url && (isCompleted || (!hasStatus && s.is_published)) && <PdfButton url={s.pdf_url} />}
+              {/* Right side */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {s.pdf_url && (isCompleted || (!hasStatus && s.is_published)) && <PdfButton url={s.pdf_url} />}
 
-              {isLiveSession && sessionZoom ? (
-                <a
-                  href={sessionZoom}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-[#2E7D32] text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1 no-underline"
-                >
-                  Katıl <ArrowRightIcon size={11} className="text-white" />
-                </a>
-              ) : isUpcoming ? (
-                isWithinOneHour(s.session_date) && sessionZoom ? (
+                {isLiveSession && sessionZoom ? (
                   <a
                     href={sessionZoom}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-[#2E7D32] text-white rounded-lg px-3 py-[5px] text-[11px] font-semibold flex items-center gap-1 no-underline"
+                    className="bg-[#2E7D32] text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1 no-underline"
                   >
-                    Katıl <ArrowRightIcon size={10} className="text-white" />
+                    Katıl <ArrowRightIcon size={11} className="text-white" />
                   </a>
-                ) : (
+                ) : isUpcoming ? (
+                  isWithinOneHour(s.session_date) && sessionZoom ? (
+                    <a
+                      href={sessionZoom}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-[#2E7D32] text-white rounded-lg px-3 py-[5px] text-[11px] font-semibold flex items-center gap-1 no-underline"
+                    >
+                      Katıl <ArrowRightIcon size={10} className="text-white" />
+                    </a>
+                  ) : (
+                    <span className="text-[11px] text-brand-warm italic">Yakında</span>
+                  )
+                ) : (isCompleted && s.is_published && s.bunny_video_id) || (!hasStatus && s.is_published && s.bunny_video_id) ? (
+                  <span className="text-xs text-coral font-semibold flex items-center gap-1">İzle <ArrowRightIcon size={12} className="text-coral" /></span>
+                ) : !hasStatus ? (
                   <span className="text-[11px] text-brand-warm italic">Yakında</span>
-                )
-              ) : (isCompleted && s.is_published && s.bunny_video_id) || (!hasStatus && s.is_published && s.bunny_video_id) ? (
-                <span className="text-xs text-coral font-semibold flex items-center gap-1">İzle <ArrowRightIcon size={12} className="text-coral" /></span>
-              ) : !hasStatus ? (
-                <span className="text-[11px] text-brand-warm italic">Yakında</span>
-              ) : null}
+                ) : null}
+              </div>
             </div>
+
+            {/* Quiz row after session 3 */}
+            {showQuizAfter && (
+              <Link
+                href="/testler/modern-sanat-sinav"
+                className="flex items-center gap-3 px-3.5 py-[11px] rounded-[10px] mb-1 bg-[#FFF3E0] cursor-pointer no-underline"
+              >
+                <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-[#C9A84C]">
+                  <ChartIcon size={12} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-brand-dark">1. Quiz — Sınav Testi</div>
+                  <div className="text-xs text-brand-warm mt-0.5">Empresyonizm, Neo-Empresyonizm, Post-Empresyonizm</div>
+                </div>
+                <span className="text-xs text-[#C9A84C] font-semibold flex items-center gap-1">
+                  Başla <ArrowRightIcon size={12} className="text-[#C9A84C]" />
+                </span>
+              </Link>
+            )}
           </div>
         );
       })}

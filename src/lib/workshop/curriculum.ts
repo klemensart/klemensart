@@ -206,6 +206,13 @@ export const BLOCK_QUIZZES: BlockQuizConfig[] = [
     weeks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     questionCount: 15,
   },
+  {
+    slug: "modern-sanat-sinav",
+    title: "Modern Sanat Atölyesi Sınavı",
+    description: "Empresyonizm, Neo-Empresyonizm ve Post-Empresyonizm",
+    weeks: [1],
+    questionCount: 10,
+  },
 ];
 
 export function getWeek(weekNumber: number): WeekConfig | undefined {
