@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import RSSParser from "rss-parser";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { compressAndUpload } from "@/lib/compress-news-image";
 
 // ── Auth: Vercel cron header VEYA Bearer CRON_SECRET ────────────────────────
 function isAuthorized(req: NextRequest) {
@@ -238,13 +239,44 @@ export async function GET(req: NextRequest) {
     console.warn("[rss-fetch] Article sync hatası:", (e as Error).message);
   }
 
+  // 5. Büyük görselleri sıkıştır (500 KB üstü, dış kaynak)
+  let imagesCompressed = 0;
+  const TIME_BUDGET_MS = 45_000; // Vercel timeout'una karşı 45s bütçe
+  try {
+    const { data: toCompress } = await admin
+      .from("news_items")
+      .select("id, image_url")
+      .eq("status", "new")
+      .not("image_url", "is", null)
+      .neq("image_url", "")
+      .not("image_url", "like", "%supabase.co/storage%")
+      .limit(20);
+
+    if (toCompress && toCompress.length > 0) {
+      for (const item of toCompress) {
+        if (Date.now() - start > TIME_BUDGET_MS) break;
+        const newUrl = await compressAndUpload(item.image_url, item.id, admin);
+        if (newUrl) {
+          await admin
+            .from("news_items")
+            .update({ image_url: newUrl })
+            .eq("id", item.id);
+          imagesCompressed++;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("[rss-fetch] Görsel sıkıştırma hatası:", (e as Error).message);
+  }
+
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
 
   return NextResponse.json({
     success: true,
-    message: `${totalItems} haber çekildi, ${articlesSynced} yazı senkronize edildi (${successCount} kaynak başarılı, ${errorCount} hata) — ${elapsed}s`,
+    message: `${totalItems} haber çekildi, ${articlesSynced} yazı senkronize edildi, ${imagesCompressed} görsel sıkıştırıldı (${successCount} kaynak başarılı, ${errorCount} hata) — ${elapsed}s`,
     totalItems,
     articlesSynced,
+    imagesCompressed,
     successCount,
     errorCount,
     errors: errors.slice(0, 10),

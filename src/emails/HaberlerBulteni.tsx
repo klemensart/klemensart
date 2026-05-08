@@ -10,11 +10,18 @@ type NewsItem = {
   source_name?: string;
 };
 
+type SpotlightConfig = {
+  label: string;
+  subtitle: string;
+  items: NewsItem[];
+};
+
 type Props = {
   weekLabel?: string;
   editorialIntro?: string;
   newsItems?: NewsItem[];
   weekSlug?: string;
+  spotlight?: SpotlightConfig;
 };
 
 export default function HaberlerBulteni({
@@ -29,14 +36,78 @@ export default function HaberlerBulteni({
     },
   ],
   weekSlug,
+  spotlight,
 }: Props) {
+  const totalCount = newsItems.length + (spotlight?.items.length ?? 0);
+
   return (
-    <KlemensLayout preview={`${weekLabel} · ${newsItems.length} haber`}>
+    <KlemensLayout preview={`${weekLabel} · ${totalCount} haber`}>
       <Section style={content}>
         <Text style={eyebrow}>{weekLabel}</Text>
         <Text style={h1}>Haftanın Kültür Sanat Gündemi</Text>
         <Text style={pCenter}>{editorialIntro}</Text>
       </Section>
+
+      {spotlight && spotlight.items.length > 0 && (
+        <Section style={spotlightBox}>
+          {/* Badge */}
+          <Text style={spotlightBadge}>{spotlight.label}</Text>
+          <Text style={spotlightSubtitle}>{spotlight.subtitle}</Text>
+
+          {/* Hero — ilk haber */}
+          {spotlight.items[0].image_url && (
+            <Img
+              src={spotlight.items[0].image_url}
+              alt={spotlight.items[0].title}
+              width="100%"
+              style={spotlightHeroImage}
+            />
+          )}
+          <Text style={spotlightHeroTitle}>
+            {spotlight.items[0].title}
+          </Text>
+          <Text style={spotlightHeroSummary}>
+            {spotlight.items[0].summary}
+          </Text>
+          <Text style={spotlightHeroFooter}>
+            {spotlight.items[0].source_name && (
+              <span style={spotlightSourceName}>
+                {spotlight.items[0].source_name}
+              </span>
+            )}
+            {spotlight.items[0].source_name && " · "}
+            <Link href={spotlight.items[0].url} style={spotlightCoralLink}>
+              Devamını Oku &rarr;
+            </Link>
+          </Text>
+
+          {/* Kalan spotlight haberleri — kompakt liste */}
+          {spotlight.items.length > 1 && (
+            <>
+              <Hr style={spotlightDivider} />
+              {spotlight.items.slice(1).map((item, i) => (
+                <React.Fragment key={`sp-${i}`}>
+                  <Text style={spotlightListItem}>
+                    <span style={spotlightArrow}>&rarr; </span>
+                    {item.title}
+                  </Text>
+                  <Text style={spotlightListMeta}>
+                    {item.source_name && (
+                      <span style={spotlightListSource}>
+                        {item.source_name}
+                      </span>
+                    )}
+                    {item.source_name && " · "}
+                    <Link href={item.url} style={spotlightCoralLink}>
+                      Devamını Oku &rarr;
+                    </Link>
+                  </Text>
+                </React.Fragment>
+              ))}
+            </>
+          )}
+        </Section>
+      )}
 
       <Section style={content}>
         <Hr style={coralDivider} />
@@ -212,4 +283,102 @@ const quizLink: React.CSSProperties = {
 const quizDot: React.CSSProperties = {
   color: "#cccccc",
   fontSize: "13px",
+};
+
+// ── Spotlight (Koyu Kutu) Stilleri ──────────────────────────────────────────
+
+const spotlightBox: React.CSSProperties = {
+  backgroundColor: "#302B27",
+  padding: "32px",
+  borderRadius: "8px",
+  margin: "0 24px",
+};
+
+const spotlightBadge: React.CSSProperties = {
+  display: "inline-block",
+  backgroundColor: "#FF6D60",
+  color: "#ffffff",
+  fontSize: "10px",
+  fontWeight: 700,
+  letterSpacing: "2px",
+  textTransform: "uppercase" as const,
+  padding: "4px 10px",
+  borderRadius: "3px",
+  margin: "0 0 8px 0",
+};
+
+const spotlightSubtitle: React.CSSProperties = {
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontSize: "16px",
+  color: "#a09890",
+  margin: "0 0 20px 0",
+  lineHeight: "1.4",
+};
+
+const spotlightHeroImage: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  borderRadius: "8px",
+  marginBottom: "16px",
+};
+
+const spotlightHeroTitle: React.CSSProperties = {
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontSize: "20px",
+  fontWeight: 700,
+  color: "#ffffff",
+  margin: "0 0 8px 0",
+  lineHeight: "1.4",
+};
+
+const spotlightHeroSummary: React.CSSProperties = {
+  fontSize: "14px",
+  lineHeight: "1.7",
+  color: "#a09890",
+  margin: "0 0 10px 0",
+};
+
+const spotlightHeroFooter: React.CSSProperties = {
+  margin: "0",
+  lineHeight: "1.6",
+};
+
+const spotlightSourceName: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#666666",
+};
+
+const spotlightCoralLink: React.CSSProperties = {
+  color: "#FF6D60",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "13px",
+};
+
+const spotlightDivider: React.CSSProperties = {
+  border: "none",
+  borderTop: "1px solid #4a4540",
+  margin: "20px 0",
+};
+
+const spotlightListItem: React.CSSProperties = {
+  fontSize: "15px",
+  color: "#ffffff",
+  margin: "0 0 2px 0",
+  lineHeight: "1.5",
+};
+
+const spotlightArrow: React.CSSProperties = {
+  color: "#FF6D60",
+};
+
+const spotlightListMeta: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#777777",
+  margin: "0 0 14px 0",
+  lineHeight: "1.4",
+};
+
+const spotlightListSource: React.CSSProperties = {
+  color: "#777777",
 };

@@ -67,17 +67,30 @@ export async function GET(req: NextRequest) {
     .replace(/\s*Devamını oku.*$/i, "")
     .trim();
 
+  const allItems = newsItems.map((item) => ({
+    title: item.title || "",
+    summary: cleanRss(item.summary || ""),
+    url: item.url || "",
+    image_url: item.image_url || "",
+    source_name: item.source_name || "",
+  }));
+
+  // ── Bu haftaya özel: Venedik Bienali Spotlight ──────────────────────────
+  // Spotlight tamamlanınca bu bloğu sil ve allItems'ı doğrudan newsItems'a geç.
+  const SPOTLIGHT_COUNT = 5;
+  const spotlightItems = allItems.slice(0, SPOTLIGHT_COUNT);
+  const regularItems = allItems.slice(SPOTLIGHT_COUNT);
+
   const templateProps = {
     weekLabel,
     editorialIntro:
-      "Bu hafta kültür-sanat dünyasından öne çıkan gelişmeleri sizin için derledik.",
-    newsItems: newsItems.map((item) => ({
-      title: item.title || "",
-      summary: cleanRss(item.summary || ""),
-      url: item.url || "",
-      image_url: item.image_url || "",
-      source_name: item.source_name || "",
-    })),
+      "61. Venedik Bienali bu hafta kapılarını açtı — protestolar, çekilmeler ve Türkiye Pavyonu'yla sanat dünyasını sarstı. İşte öne çıkan gelişmeler.",
+    spotlight: {
+      label: "VENEDİK BİENALİ ÖZEL",
+      subtitle: "61. Bienal'den Son Gelişmeler",
+      items: spotlightItems,
+    },
+    newsItems: regularItems,
     weekSlug,
   };
 
