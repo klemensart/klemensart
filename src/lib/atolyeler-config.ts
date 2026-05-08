@@ -49,7 +49,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
     forSale: true,
     imgCover: "/images/workshops/kapsamli-sanat-tarihi-cover.webp",
     imgSquare: "/images/workshops/kapsamli-sanat-tarihi-kart.webp",
-    targetDate: "2026-05-07T20:30:00+03:00",
+    targetDate: "2026-05-21T20:30:00+03:00",
   },
 
   "leonardo-da-vinci-semineri": {

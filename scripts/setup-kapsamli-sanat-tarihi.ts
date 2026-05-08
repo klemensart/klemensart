@@ -29,7 +29,7 @@ async function main() {
     .from("workshops")
     .update({
       title: "Kapsamlı Sanat Tarihi Atölyesi",
-      next_session_date: "2026-05-07T20:30:00+03:00",
+      next_session_date: "2026-05-21T20:30:00+03:00",
       total_sessions: 10,
       is_live: true,
     })

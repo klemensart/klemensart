@@ -1506,7 +1506,7 @@ function KapsamliSanatTarihiPage({
 
         <HeroBanner
           config={config}
-          altBaslik="KLEMENS LOCA — 10 Hafta · 7 Mayıs'ta Başlıyor"
+          altBaslik="KLEMENS LOCA — 10 Hafta · 21 Mayıs'ta Başlıyor"
           baslik="Kapsamlı Sanat Tarihi"
           fiyat="6.000₺"
           workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
@@ -1517,10 +1517,10 @@ function KapsamliSanatTarihiPage({
 
         {/* Vurgulu tarih bloğu */}
         <ProminentDateBlock
-          tarih="7 Mayıs 2026"
+          tarih="21 Mayıs 2026"
           gun="Perşembe"
           saat="20:30 – 22:00"
-          ekstra="10 Hafta · Online (Zoom) · 7 Mayıs – 16 Temmuz 2026"
+          ekstra="10 Hafta · Online (Zoom) · 21 Mayıs – 30 Temmuz 2026"
         />
 
         {/* Tagline şeridi */}
@@ -1585,7 +1585,7 @@ function KapsamliSanatTarihiPage({
           {/* Bilgi */}
           <BilgiBanner>
             <p style={{ margin: "0 0 4px" }}>
-              <strong>Her Perşembe 20:30 · 7 Mayıs – 16 Temmuz 2026</strong>
+              <strong>Her Perşembe 20:30 · 21 Mayıs – 30 Temmuz 2026</strong>
             </p>
             <p style={{ margin: 0 }}>
               10 haftalık atölye Zoom üzerinden canlı. Kayıt sonrası 6 aylık tekrar izleme erişim
@@ -1671,7 +1671,7 @@ function KapsamliSanatTarihiPage({
             config={config}
             workshopSlug={slug}
             workshopTitle="Kapsamlı Sanat Tarihi Atölyesi"
-            aciklama="7 Mayıs'ta başlıyor · 10 hafta · Zoom · 6 aylık tekrar izleme"
+            aciklama="21 Mayıs'ta başlıyor · 10 hafta · Zoom · 6 aylık tekrar izleme"
             fiyatLabel="6.000₺"
             status={status}
           />
