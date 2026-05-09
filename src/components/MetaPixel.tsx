@@ -10,7 +10,7 @@ export default function MetaPixel() {
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    const check = () => setAllowed(hasConsent() === true);
+    const check = () => setAllowed(hasConsent() !== false);
     check();
     window.addEventListener("storage", check);
     window.addEventListener("consent-changed", check);
