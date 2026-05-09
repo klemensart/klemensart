@@ -64,14 +64,14 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
   /* ─── Sinema Kulübü ──────────────────────────── */
   "sinema-klubu-tekli": {
     id: "a1e2f3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a",
-    price: 40000,
+    price: 55000,
     forSale: true,
     imgCover: "",
     imgSquare: "",
   },
   "sinema-klubu-tekli-ogrenci": {
     id: "b2f3a4e5-6c7d-4e8f-9a0b-1c2d3e4f5a6b",
-    price: 15000,
+    price: 25000,
     forSale: true,
     imgCover: "",
     imgSquare: "",

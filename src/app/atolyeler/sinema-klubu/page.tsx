@@ -59,7 +59,7 @@ const PLANS = [
   {
     slug: "sinema-klubu-tekli",
     label: "Tekli Oturum",
-    price: "400 TL",
+    price: "550 TL",
     sub: "Tek buluşma",
     badge: null,
     highlight: false,
@@ -67,7 +67,7 @@ const PLANS = [
   {
     slug: "sinema-klubu-tekli-ogrenci",
     label: "Tekli Oturum — Öğrenci",
-    price: "150 TL",
+    price: "250 TL",
     sub: "Tek buluşma",
     badge: "Öğrenci",
     highlight: false,
@@ -132,7 +132,7 @@ export default function SinemaKlubuPage() {
       {
         "@type": "Offer",
         name: "Tekli Oturum",
-        price: "400",
+        price: "550",
         priceCurrency: "TRY",
       },
       {
