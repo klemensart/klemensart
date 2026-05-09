@@ -506,14 +506,16 @@ export default function SinemaKlubuPage() {
           >
             {[
               {
-                name: "Kerem Hun",
-                role: "Kurucu & Moderatör",
-                avatar: "/images/ekip/kerem-hun.jpg",
-              },
-              {
                 name: "Celil Sadık",
                 role: "Moderatör",
                 avatar: "/images/ekip/celil-sadik.jpg",
+                imgPos: "center center",
+              },
+              {
+                name: "Kerem Hun",
+                role: "Moderatör",
+                avatar: "/images/ekip/kerem-hun.jpg",
+                imgPos: "center 30%",
               },
             ].map((person) => (
               <div
@@ -543,7 +545,7 @@ export default function SinemaKlubuPage() {
                     alt={person.name}
                     width={64}
                     height={64}
-                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                    style={{ objectFit: "cover", objectPosition: person.imgPos, width: "100%", height: "100%" }}
                   />
                 </div>
                 <div>
