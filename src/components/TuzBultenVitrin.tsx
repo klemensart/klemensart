@@ -26,9 +26,10 @@ export default function TuzBultenVitrin() {
                   alt="Tuz Bülteni illüstrasyon — Delikli İlişkiler"
                   width={480}
                   height={510}
+                  sizes="(max-width: 768px) 90vw, 480px"
                   className="block"
                   priority
-                  quality={75}
+                  quality={70}
                 />
               </a>
             </div>

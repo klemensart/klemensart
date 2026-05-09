@@ -30,7 +30,7 @@ export default function GoogleAnalytics() {
   return (
     <>
       {/* Consent Mode v2 — default denied, sonra kabul edilince granted */}
-      <Script id="ga4-consent-default" strategy="beforeInteractive">
+      <Script id="ga4-consent-default" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

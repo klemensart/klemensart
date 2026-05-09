@@ -138,6 +138,9 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <link rel="preconnect" href="https://sgabkrzzzszfqrtgkord.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://sgabkrzzzszfqrtgkord.supabase.co" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} ${newsreader.variable} font-sans antialiased bg-white text-warm-900`}>
         <script

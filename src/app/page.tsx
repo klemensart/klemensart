@@ -8,8 +8,7 @@ import Hizmetler from "@/components/Hizmetler";
 import IceriklerSection from "@/components/IceriklerSection";
 import Footer from "@/components/Footer";
 import AtolyeBasvuruCTA from "@/components/AtolyeBasvuruCTA";
-
-const TuzBultenVitrin = dynamic(() => import("@/components/TuzBultenVitrin"));
+import TuzBultenVitrin from "@/components/TuzBultenVitrin";
 const HaritaBanner = dynamic(() => import("@/components/HaritaBanner"));
 const SonYazilarSection = dynamic(() => import("@/components/SonYazilarSection"));
 const LeonardoBanner = dynamic(() => import("@/components/LeonardoBanner"));
