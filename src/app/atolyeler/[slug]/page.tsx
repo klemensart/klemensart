@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: Props) {
     },
     "ronesans-okuryazarligi-2": {
       title: "Rönesans Okur-Yazarlığı",
-      description: "11 Mayıs Pazartesi başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
+      description: "18 Mayıs Pazartesi başlıyor! 8 haftada Floransa, Roma, Venedik ve Milano'nun ustalarını öğrenin. 6 ay kayıt erişimi ve PDF çalışma dokümanları dahil.",
     },
     "kapsamli-sanat-tarihi": {
       title: "Kapsamlı Sanat Tarihi Atölyesi | Klemens Art",
@@ -223,7 +223,7 @@ export default async function AtolyeDetayPage({ params }: Props) {
     "sanat-tarihinde-duygular": "Korku, haz ve öfkenin sanat tarihindeki izleri — 3 haftalık canlı Zoom atölyesi.",
     "modern-sanat-atolyesi": "Empresyonizmden Kavramsal Sanata, 10 haftada modern sanatın dili.",
     "ronesans-okuryazarligi": "8 haftada Rönesans'ın ustalarını öğrenin.",
-    "ronesans-okuryazarligi-2": "11 Mayıs Pazartesi başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
+    "ronesans-okuryazarligi-2": "18 Mayıs Pazartesi başlıyor! 8 haftada Rönesans'ın ustalarını öğrenin. 6 ay kayıt erişimi ve PDF dokümanlar dahil.",
     "kapsamli-sanat-tarihi": "Antik Yunan'dan günümüze sanat tarihinin 10 haftalık yolculuğu. 7 Mayıs Perşembe başlıyor.",
     "leonardo-da-vinci-semineri": "Rönesans'ın en büyük dehası Leonardo da Vinci'nin sanat, bilim ve mühendislik evrenine tek oturumluk yolculuk.",
   };
@@ -1256,14 +1256,14 @@ function Ronesans2Page({
   slug: string;
 }) {
   const program = [
-    { tarih: "11 Mayıs 2026 Pzt",   konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
-    { tarih: "18 Mayıs 2026 Pzt",   konu: "Floransa II — Botticelli, Michelangelo ve Medici Çevresi" },
-    { tarih: "1 Haziran 2026 Pzt",  konu: "Roma I — Vatikan, Sistine Şapeli ve Yüksek Rönesans" },
-    { tarih: "8 Haziran 2026 Pzt",  konu: "Roma II — Raphael ve Rönesans Mimarisinin Grameri" },
-    { tarih: "15 Haziran 2026 Pzt", konu: "Venedik I — Titian, Tintoretto ve Renk Felsefesi" },
-    { tarih: "22 Haziran 2026 Pzt", konu: "Venedik II — Mimari, Su ve Osmanlı Bağlantısı" },
-    { tarih: "29 Haziran 2026 Pzt", konu: "Milano & Leonardo — Sfumato, Bilim ve Sanatın Birleşimi" },
-    { tarih: "6 Temmuz 2026 Pzt",   konu: "Büyük Final — 3 Adımda Eser Okuma ve Müze Stratejisi" },
+    { tarih: "18 Mayıs 2026 Pzt",   konu: "Floransa I — Duomo, Baptistery ve Erken Rönesans'ın Doğuşu" },
+    { tarih: "25 Mayıs 2026 Pzt",   konu: "Floransa II — Botticelli, Michelangelo ve Medici Çevresi" },
+    { tarih: "8 Haziran 2026 Pzt",  konu: "Roma I — Vatikan, Sistine Şapeli ve Yüksek Rönesans" },
+    { tarih: "15 Haziran 2026 Pzt",  konu: "Roma II — Raphael ve Rönesans Mimarisinin Grameri" },
+    { tarih: "22 Haziran 2026 Pzt", konu: "Venedik I — Titian, Tintoretto ve Renk Felsefesi" },
+    { tarih: "29 Haziran 2026 Pzt", konu: "Venedik II — Mimari, Su ve Osmanlı Bağlantısı" },
+    { tarih: "6 Temmuz 2026 Pzt", konu: "Milano & Leonardo — Sfumato, Bilim ve Sanatın Birleşimi" },
+    { tarih: "13 Temmuz 2026 Pzt",   konu: "Büyük Final — 3 Adımda Eser Okuma ve Müze Stratejisi" },
   ];
 
   const aciklamaParagraflari = [
@@ -1306,10 +1306,10 @@ function Ronesans2Page({
 
         {/* Vurgulu tarih bloğu */}
         <ProminentDateBlock
-          tarih="11 Mayıs 2026"
+          tarih="18 Mayıs 2026"
           gun="Pazartesi"
           saat="20:30 – 22:00"
-          ekstra="8 Hafta · Online (Zoom) · 11 Mayıs – 6 Temmuz 2026"
+          ekstra="8 Hafta · Online (Zoom) · 18 Mayıs – 13 Temmuz 2026"
         />
 
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
@@ -1349,7 +1349,7 @@ function Ronesans2Page({
               Tüm buluşmalar kayda alınır; 6 ay boyunca erişebilirsiniz.
             </p>
             <p style={{ margin: "0 0 4px" }}>
-              Pazartesi 20:30–22:00 · 11 Mayıs – 6 Temmuz 2026 (25 Mayıs Kurban Bayramı arifesi haftası ders yoktur.)
+              Pazartesi 20:30–22:00 · 18 Mayıs – 13 Temmuz 2026 (1 Haziran Kurban Bayramı arifesi haftası ders yoktur.)
             </p>
             <p style={{ margin: 0, color: B.warm }}>
               Kontenjan sınırlı. E-arşiv fatura kesilir.
