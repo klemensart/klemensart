@@ -75,22 +75,11 @@ export async function GET(req: NextRequest) {
     source_name: item.source_name || "",
   }));
 
-  // ── Bu haftaya özel: Venedik Bienali Spotlight ──────────────────────────
-  // Spotlight tamamlanınca bu bloğu sil ve allItems'ı doğrudan newsItems'a geç.
-  const SPOTLIGHT_COUNT = 5;
-  const spotlightItems = allItems.slice(0, SPOTLIGHT_COUNT);
-  const regularItems = allItems.slice(SPOTLIGHT_COUNT);
-
   const templateProps = {
     weekLabel,
     editorialIntro:
-      "Bu hafta sanat dünyasının gözü Venedik'teydi. Biz de özel bir köşe ayırdık: İşte bültenimize yansıyan bütün gelişmeler.",
-    spotlight: {
-      label: "VENEDİK BİENALİ ÖZEL",
-      subtitle: "61. Bienal'den Son Gelişmeler",
-      items: spotlightItems,
-    },
-    newsItems: regularItems,
+      "Bu hafta kültür-sanat dünyasından öne çıkan gelişmeleri sizin için derledik.",
+    newsItems: allItems,
     weekSlug,
   };
 
