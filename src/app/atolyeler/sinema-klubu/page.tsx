@@ -3,6 +3,7 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SatinAlButton from "@/components/SatinAlButton";
+import CountdownTimer from "@/components/CountdownTimer";
 import { SLUG_TO_ATOLYE } from "@/lib/atolyeler-config";
 
 const B = {
@@ -239,6 +240,30 @@ export default function SinemaKlubuPage() {
           </div>
         </section>
 
+        {/* ═══ GERİ SAYIM ═══════════════════════════ */}
+        <div
+          style={{
+            background: B.dark,
+            padding: "20px 24px",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "#a09890",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              margin: "0 0 14px",
+            }}
+          >
+            Sonraki Buluşmaya Kalan Süre
+          </p>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CountdownTimer targetDate="2026-05-22T20:30:00+03:00" />
+          </div>
+        </div>
+
         {/* ═══ SONRAKİ BULUŞMA ═══════════════════════ */}
         <section
           style={{
@@ -320,7 +345,7 @@ export default function SinemaKlubuPage() {
                   letterSpacing: "0.02em",
                 }}
               >
-                17 Mayıs 2026, Pazar — 20:30
+                22 Mayıs 2026, Cuma — 20:30
               </p>
 
               <p
@@ -447,6 +472,102 @@ export default function SinemaKlubuPage() {
                 >
                   {item.desc}
                 </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ MODERATÖRLER ═══════════════════════════ */}
+        <section
+          style={{
+            maxWidth: 700,
+            margin: "0 auto",
+            padding: "0 24px 64px",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 26,
+              fontWeight: 800,
+              color: B.dark,
+              textAlign: "center",
+              margin: "0 0 36px",
+            }}
+          >
+            Moderatörler
+          </h2>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {[
+              {
+                name: "Kerem Hun",
+                role: "Kurucu & Moderatör",
+                avatar: "/images/ekip/kerem-hun.jpg",
+              },
+              {
+                name: "Celil Sadık",
+                role: "Moderatör",
+                avatar: "/images/ekip/celil-sadik.jpg",
+              },
+            ].map((person) => (
+              <div
+                key={person.name}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: "28px 24px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 18,
+                  boxShadow: "0 1px 8px rgba(0,0,0,0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                    border: `2px solid ${B.coral}`,
+                  }}
+                >
+                  <Image
+                    src={person.avatar}
+                    alt={person.name}
+                    width={64}
+                    height={64}
+                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                  />
+                </div>
+                <div>
+                  <h3
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 700,
+                      color: B.dark,
+                      margin: "0 0 4px",
+                    }}
+                  >
+                    {person.name}
+                  </h3>
+                  <p
+                    style={{
+                      color: B.coral,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      margin: 0,
+                    }}
+                  >
+                    {person.role}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

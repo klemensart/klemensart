@@ -38,7 +38,7 @@ export const SLUG_TO_ATOLYE: Record<string, AtolyeConfig> = {
   "ronesans-okuryazarligi-2": {
     id: "019ef1b5-08a1-4fb0-a794-34d52fa4060b",
     price: 450000,
-    forSale: false,
+    forSale: true,
     imgCover: "/images/workshops/ronesans-atolyesi-cover.webp",
     imgSquare: "/images/workshops/ronesans-atolyesi-square.webp",
     targetDate: "2026-05-11T20:30:00+03:00",
