@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
   const templateProps = {
     weekLabel,
     editorialIntro:
-      "61. Venedik Bienali bu hafta kapılarını açtı — protestolar, çekilmeler ve Türkiye Pavyonu'yla sanat dünyasını sarstı. İşte öne çıkan gelişmeler.",
+      "Bu hafta sanat dünyasının gözü Venedik'teydi. Biz de özel bir köşe ayırdık: İşte bültenimize yansıyan bütün gelişmeler.",
     spotlight: {
       label: "VENEDİK BİENALİ ÖZEL",
       subtitle: "61. Bienal'den Son Gelişmeler",
