@@ -38,7 +38,7 @@ async function fetchNextSessionDate(workshopId: string): Promise<string | null> 
       .single();
     const raw = data?.next_session_date;
     if (!raw) return null;
-    // DB may return date-only ("2026-05-11") or UTC without offset — normalise
+    // DB may return date-only ("2026-05-18") or UTC without offset — normalise
     // If already has offset (+03:00 or Z) return as-is
     if (/[+-]\d{2}:\d{2}$/.test(raw) || raw.endsWith("Z")) return raw;
     // Date-only (no T) → append default workshop time in Turkey TZ
