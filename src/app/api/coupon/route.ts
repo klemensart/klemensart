@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ valid: false, error: "Bu kodun süresi dolmuş" });
   }
 
-  if (data.workshop_slug !== workshop) {
+  if (data.workshop_slug !== "*" && data.workshop_slug !== workshop) {
     return NextResponse.json({ valid: false, error: "Bu kod bu atölye için geçerli değil" });
   }
 

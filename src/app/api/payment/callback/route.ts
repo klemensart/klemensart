@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
               .from("quiz_coupons")
               .update({ used: true, used_at: new Date().toISOString() })
               .eq("user_email", userEmail)
-              .eq("workshop_slug", workshopSlug)
+              .or(`workshop_slug.eq.${workshopSlug},workshop_slug.eq.*`)
               .eq("used", false);
           }
         }
