@@ -8,6 +8,9 @@ type Props = {
   oldDate?: string;
   newDate?: string;
   reason?: string;
+  refundNote?: string;
+  weekCount?: number;
+  detailSlug?: string;
 };
 
 export default function AtolyeErteleme({
@@ -16,6 +19,9 @@ export default function AtolyeErteleme({
   oldDate = "25 Mart 2026, Çarşamba",
   newDate = "8 Nisan 2026, Çarşamba",
   reason,
+  refundNote,
+  weekCount = 10,
+  detailSlug = "modern-sanat-atolyesi",
 }: Props) {
   return (
     <KlemensLayout preview={`${workshopTitle} — Yeni başlangıç tarihi: ${newDate}`}>
@@ -51,7 +57,7 @@ export default function AtolyeErteleme({
 
         <Text style={paragraph}>
           Atölyemiz aynı saatte (<strong style={strong}>20:30</strong>) ve aynı formatta devam edecektir.
-          10 haftalık müfredat programımız aynen geçerli olup, yalnızca başlangıç tarihi değişmiştir.
+          {weekCount} haftalık müfredat programımız aynen geçerli olup, yalnızca başlangıç tarihi değişmiştir.
         </Text>
 
         <div style={infoBox}>
@@ -60,7 +66,7 @@ export default function AtolyeErteleme({
           <Text style={infoItem}><strong style={strong}>Yeni Başlangıç:</strong> {newDate}</Text>
           <Text style={infoItem}><strong style={strong}>Saat:</strong> 20:30 (Türkiye Saati)</Text>
           <Text style={infoItem}><strong style={strong}>Platform:</strong> Zoom (canlı) + Kayıt erişimi</Text>
-          <Text style={infoItem}><strong style={strong}>Süre:</strong> 10 hafta, haftada 1 oturum</Text>
+          <Text style={infoItem}><strong style={strong}>Süre:</strong> {weekCount} hafta, haftada 1 oturum</Text>
         </div>
 
         <Text style={paragraph}>
@@ -68,7 +74,11 @@ export default function AtolyeErteleme({
           ek işlem yapmanıza gerek yoktur.
         </Text>
 
-        <KlemensButton href="https://klemensart.com/atolyeler/modern-sanat-atolyesi">
+        {refundNote && (
+          <Text style={paragraph}>{refundNote}</Text>
+        )}
+
+        <KlemensButton href={`https://klemensart.com/atolyeler/${detailSlug}`}>
           Atölye Detayları
         </KlemensButton>
 
