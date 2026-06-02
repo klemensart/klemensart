@@ -260,7 +260,7 @@ export default function SinemaKlubuPage() {
             Sonraki Buluşmaya Kalan Süre
           </p>
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <CountdownTimer targetDate="2026-05-22T20:30:00+03:00" />
+            <CountdownTimer targetDate="2026-06-05T20:30:00+03:00" />
           </div>
         </div>
 
@@ -345,7 +345,7 @@ export default function SinemaKlubuPage() {
                   letterSpacing: "0.02em",
                 }}
               >
-                22 Mayıs 2026, Cuma — 20:30
+                5 Haziran 2026, Cuma — 20:30
               </p>
 
               <p
