@@ -126,9 +126,9 @@ export default function OdemePage() {
     }
   }, [status, couponInput, couponStatus, validateCoupon]);
 
-  // Format phone: "5321234567" → "532 123 45 67"
+  // Format phone for display
   const formatPhone = (val: string) => {
-    const digits = val.replace(/\D/g, "").slice(0, 10);
+    const digits = val.replace(/\D/g, "").slice(0, 15);
     if (digits.length <= 3) return digits;
     if (digits.length <= 6) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
     if (digits.length <= 8) return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
@@ -136,17 +136,17 @@ export default function OdemePage() {
   };
 
   const handlePhoneChange = (val: string) => {
-    const digits = val.replace(/\D/g, "").slice(0, 10);
+    const digits = val.replace(/\D/g, "").slice(0, 15);
     setPhone(digits);
     setPhoneError("");
   };
 
   // Start payment
   const startPayment = useCallback(async () => {
-    // Validate phone
+    // Validate phone (7-15 digits, international numbers accepted)
     const digits = phone.replace(/\D/g, "");
-    if (digits.length !== 10 || !digits.startsWith("5")) {
-      setPhoneError("Geçerli bir telefon numarası girin (5XX XXX XX XX)");
+    if (digits.length < 7 || digits.length > 15) {
+      setPhoneError("Geçerli bir telefon numarası girin");
       return;
     }
 
@@ -160,7 +160,7 @@ export default function OdemePage() {
           amount,
           workshopTitle,
           coupon_code: validatedCoupon || undefined,
-          phone: `0${digits}`,
+          phone: digits.length === 10 && digits.startsWith("5") ? `0${digits}` : digits,
         }),
       });
 
@@ -301,28 +301,19 @@ export default function OdemePage() {
             <div style={{ fontSize: 12, color: B.warm, marginBottom: 12 }}>
               WhatsApp grubuna eklenmek için gerekli
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{
-                padding: "12px 10px", borderRadius: "10px 0 0 10px",
+            <input
+              type="tel"
+              inputMode="tel"
+              placeholder="5XX XXX XX XX veya uluslararası numara"
+              value={formatPhone(phone)}
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              style={{
+                width: "100%", padding: "12px 14px", borderRadius: 10,
                 border: `1.5px solid ${phoneError ? "#ef4444" : B.light}`,
-                borderRight: "none", fontSize: 15, color: B.warm, background: B.cream,
-              }}>
-                +90
-              </span>
-              <input
-                type="tel"
-                inputMode="numeric"
-                placeholder="5XX XXX XX XX"
-                value={formatPhone(phone)}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                style={{
-                  flex: 1, padding: "12px 14px", borderRadius: "0 10px 10px 0",
-                  border: `1.5px solid ${phoneError ? "#ef4444" : B.light}`,
-                  fontSize: 15, color: B.dark, outline: "none", background: B.cream,
-                  fontFamily: "inherit",
-                }}
-              />
-            </div>
+                fontSize: 15, color: B.dark, outline: "none", background: B.cream,
+                fontFamily: "inherit",
+              }}
+            />
             {phoneError && (
               <div style={{ fontSize: 13, color: "#ef4444", marginTop: 8, fontWeight: 500 }}>
                 {phoneError}
