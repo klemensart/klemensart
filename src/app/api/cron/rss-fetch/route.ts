@@ -80,9 +80,30 @@ const BLOCKED_KEYWORDS = [
   "fifa", "uefa", "tff",
 ];
 
+// ── Politika/Ekonomi filtresi (sadece title'da aranır) ───────────────────────
+const BLOCKED_TITLE_KEYWORDS = [
+  // Politika — partiler & kurumlar
+  "akp", "chp", "mhp", "hdp", "dem parti", "iyi parti",
+  "tbmm", "meclis", "milletvekili", "milletvekilliği",
+  // Politika — isimler
+  "erdoğan", "kılıçdaroğlu", "bahçeli", "özel", "imamoglu", "imamoğlu",
+  // Politika — genel
+  "seçim", "oy oranı", "muhalefet", "iktidar", "koalisyon",
+  "siyaset", "siyasi", "cumhurbaşkanı", "başbakan",
+  // Ekonomi
+  "enflasyon", "faiz oranı", "merkez bankası", "tcmb",
+  "borsa", "bist", "dolar kuru", "euro kuru", "döviz",
+  "sgk", "asgari ücet", "asgari ücret", "zam",
+  "kripto", "bitcoin", "ethereum",
+];
+
 function isBlockedTopic(title: string, summary: string | null): boolean {
   const text = `${title} ${summary ?? ""}`.toLocaleLowerCase("tr");
-  return BLOCKED_KEYWORDS.some((kw) => text.includes(kw));
+  if (BLOCKED_KEYWORDS.some((kw) => text.includes(kw))) return true;
+
+  // Politika/ekonomi — sadece başlıkta ara
+  const titleLower = title.toLocaleLowerCase("tr");
+  return BLOCKED_TITLE_KEYWORDS.some((kw) => titleLower.includes(kw));
 }
 
 // ── Main GET handler ────────────────────────────────────────────────────────
