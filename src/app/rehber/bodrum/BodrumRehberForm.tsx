@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
+import TurnstileWidget from "@/components/TurnstileWidget";
 
 const PDF_URL =
   "https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/bulten-hediye/muzede-1-saat-bodrum-sualti-arkeoloji-muzesi.pdf";
@@ -12,6 +13,9 @@ export default function BodrumRehberForm({ id }: { id?: string }) {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [pdfUrl, setPdfUrl] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAt = useRef(Date.now());
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -24,7 +28,13 @@ export default function BodrumRehberForm({ id }: { id?: string }) {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "bodrum-muze-rehberi" }),
+        body: JSON.stringify({
+          email,
+          source: "bodrum-muze-rehberi",
+          turnstileToken,
+          website: honeypot,
+          _ts: formLoadedAt.current,
+        }),
       });
 
       const data = await res.json();
@@ -72,6 +82,18 @@ export default function BodrumRehberForm({ id }: { id?: string }) {
 
   return (
     <form id={id} onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4">
+      {/* Honeypot */}
+      <input
+        type="text"
+        name="website"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        autoComplete="off"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+      />
+
       <input
         type="email"
         required
@@ -99,6 +121,8 @@ export default function BodrumRehberForm({ id }: { id?: string }) {
       {status === "error" && (
         <p className="text-xs text-red-500">{errorMsg}</p>
       )}
+
+      <TurnstileWidget onVerify={setTurnstileToken} />
 
       <button
         type="submit"

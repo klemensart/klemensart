@@ -5,6 +5,13 @@ import BultenTesekkur from "@/emails/BultenTesekkur";
 import Muzede1SaatTesekkur from "@/emails/Muzede1SaatTesekkur";
 import BodrumMuzeTesekkur from "@/emails/BodrumMuzeTesekkur";
 import { sendThankYouEmail } from "@/lib/send-thank-you";
+import {
+  checkHoneypot,
+  verifyTurnstile,
+  validateEmail,
+  checkRateLimit,
+  getClientIp,
+} from "@/lib/security";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,11 +24,49 @@ const BODRUM_PDF_URL =
 const TUZ_BULTEN_CAMPAIGN_ID = "09a4a679-6086-46c2-871f-70350442b02d";
 
 export async function POST(req: NextRequest) {
-  const { email, name, source, weekly, thematic } = await req.json();
+  const body = await req.json();
+  const { email, name, source, weekly, thematic, turnstileToken, _ts } = body;
+
+  // ── Layer 1: Honeypot ──
+  const honeypotResponse = checkHoneypot(body);
+  if (honeypotResponse) return honeypotResponse;
+
+  // ── Layer 2: Timing check — form filled in < 2 seconds = bot ──
+  if (typeof _ts === "number" && Date.now() - _ts < 2000) {
+    return NextResponse.json({ message: "Abone oldunuz!" }); // fake success
+  }
+
+  // ── Layer 3: Turnstile verification ──
+  const ip = getClientIp(req);
+  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json(
+      { error: "Doğrulama başarısız. Sayfayı yenileyip tekrar deneyin." },
+      { status: 400 }
+    );
+  }
+
+  // ── Layer 4: Rate limiting ──
+  const rateResult = await checkRateLimit(ip);
+  if (rateResult && !rateResult.success) {
+    return NextResponse.json(
+      { error: "Çok fazla istek gönderildi. Lütfen biraz bekleyin." },
+      { status: 429 }
+    );
+  }
 
   if (!email || typeof email !== "string" || !EMAIL_RE.test(email.trim())) {
     return NextResponse.json(
       { error: "Geçerli bir e-posta adresi girin." },
+      { status: 400 }
+    );
+  }
+
+  // ── Layer 5: Email validation (disposable/spam) ──
+  const emailCheck = validateEmail(email.trim());
+  if (!emailCheck.valid) {
+    return NextResponse.json(
+      { error: "Bu e-posta adresi kabul edilmiyor. Lütfen farklı bir adres kullanın." },
       { status: 400 }
     );
   }

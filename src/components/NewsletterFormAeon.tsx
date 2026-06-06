@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import TurnstileWidget from "./TurnstileWidget";
 
 interface Props {
   source?: string;
@@ -29,6 +30,9 @@ export default function NewsletterFormAeon({ source = "homepage" }: Props) {
   const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const formLoadedAt = useRef(Date.now());
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,7 +58,15 @@ export default function NewsletterFormAeon({ source = "homepage" }: Props) {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), weekly, thematic, source }),
+        body: JSON.stringify({
+          email: email.trim(),
+          weekly,
+          thematic,
+          source,
+          turnstileToken,
+          website: honeypot,
+          _ts: formLoadedAt.current,
+        }),
       });
 
       if (res.status === 409) {
@@ -142,6 +154,18 @@ export default function NewsletterFormAeon({ source = "homepage" }: Props) {
       </p>
 
       <form onSubmit={handleSubmit}>
+        {/* Honeypot — hidden from real users */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+        />
+
         {/* Email input */}
         <input
           type="email"
@@ -205,6 +229,9 @@ export default function NewsletterFormAeon({ source = "homepage" }: Props) {
             )}
           </div>
         )}
+
+        {/* Turnstile — invisible unless suspicious */}
+        <TurnstileWidget onVerify={setTurnstileToken} />
 
         {/* Button + Privacy link — inline horizontal */}
         <div className="flex flex-wrap items-center gap-5">
