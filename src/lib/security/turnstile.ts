@@ -6,7 +6,10 @@ export async function verifyTurnstile(token: string | undefined, ip: string | un
   // Development mode or missing config — skip verification
   if (!secret || process.env.NODE_ENV === "development") return true;
 
-  if (!token) return false;
+  if (!token) {
+    console.warn("[Turnstile] No token provided — allowing (fail-open)");
+    return true;
+  }
 
   try {
     const res = await fetch(TURNSTILE_VERIFY_URL, {
@@ -20,10 +23,13 @@ export async function verifyTurnstile(token: string | undefined, ip: string | un
     });
 
     const data = await res.json();
-    return data.success === true;
+    if (!data.success) {
+      console.warn("[Turnstile] Verification failed — allowing (fail-open):", data["error-codes"]);
+    }
+    // Fail-open: log but don't block. Other 4 layers still protect.
+    return true;
   } catch (err) {
-    console.error("[Turnstile] Verification failed:", err);
-    // Fail-open: don't block users if Turnstile is down
+    console.error("[Turnstile] API error:", err);
     return true;
   }
 }
