@@ -1,0 +1,448 @@
+<!--
+  KLEMENS ART — Pencere Bülteni #3 (TASLAK — 2026-06-13)
+  Tasarım: Tuz #2 (v2) tasarımı birebir — hero, Georgia serif başlıklar, makale ayırıcıları,
+  somon (#FF6D60) bölüm başlıkları, lacivert (#2B4A6F) vurgu kutuları. Zemin değişmiyor.
+  Bu sayıya YENİ: 3. bölüm "İlham Verenler" + Delikli İlişkiler karikatür bölümü.
+  Yayın: 16 Haziran 2026 Salı (A/B test ile).
+  Yazılar "PencereBulten" etiketinden çekildi (8 yazı). Kaynak script: scripts/pencere-bulten-yazilar.ts
+
+  ⚠️ DOLDURULACAKLAR [TODO]:
+    - Hero kapak görseli (Pencere_Yeni.png Supabase email-assets'e yüklenecek)
+    - Açılış özlü sözü + karşılama yazısı + kapanış (onay)
+    - Spotify çalma listesi linki
+    - Delikli İlişkiler karikatür görseli
+    - Hediye: müze gezme rehberi (hangi müze + PDF linki)
+    - "Biliyor muydunuz?" kutusu metni
+  ⚠️ TASLAK statüsündeki 3 yazı yayına çıkmadan linkleri 404 verir:
+    gonulden-gonule, hitchcockun-arka-penceresindeki-tanik, pencerenin-ardinda
+-->
+
+<style>
+  @media (prefers-color-scheme: dark) {
+    .km-bonbon { color: #ffffff !important; }
+  }
+  @media only screen and (max-width: 480px) {
+    .article-row td { display: block !important; width: 100% !important; padding-right: 0 !important; }
+    .article-img { margin-top: 14px !important; }
+    .article-img img { width: 100% !important; max-width: 100% !important; height: 200px !important; }
+    .hero-title { font-size: 32px !important; letter-spacing: 6px !important; }
+    .hero-sub { font-size: 11px !important; letter-spacing: 3px !important; }
+    .lead-title { font-size: 24px !important; }
+    .section-title { font-size: 26px !important; letter-spacing: 4px !important; }
+  }
+</style>
+
+<!-- ═══ HERO — full bleed kapak ═══ -->
+<div style="margin: 0 -40px 0 -40px; line-height: 0;">
+  <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/pencere-bulten-kapak.png" alt="Klemens Art — Pencere Bülteni, Sayı 03 — Haziran 2026" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0;" />
+</div>
+
+<!-- ═══ ÖZLÜ SÖZ ═══ -->
+<!-- [TODO] Özlü sözü onayla / değiştir -->
+<div style="padding: 48px 0 32px 0; text-align: center;">
+  <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-style: italic; color: #3d3833; line-height: 1.7; margin: 0; letter-spacing: 0.3px;">
+    &ldquo;Bir pencere açmak, dünyayı içeri davet etmektir.&rdquo;
+  </p>
+</div>
+
+<!-- ═══ KARŞILAMA YAZISI ═══ -->
+<!-- [TODO] Karşılama yazısını gözden geçir — taslak metin Pencere temasına uyarlandı -->
+<div style="padding: 0 0 40px 0;">
+  <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: 30px; font-weight: 700; color: #2D2926; line-height: 1.2; margin: 0 0 22px 0; letter-spacing: -0.3px;">Sevgili okuyucumuz,</h2>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.9; margin: 0 0 16px 0;">
+    Klemens Bülten&rsquo;imizin üçüncü sayısıyla karşınızdayız. Bu sayımızda içeriyle dışarıyı, görmekle görünmeyi, korunmakla açılmayı birbirine bağlayan o ince eşiğin peşindeyiz: pencerenin.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.9; margin: 0 0 16px 0;">
+    Bir pencere yalnızca duvardaki bir boşluk değildir; baktığımız yöne göre kah ışığı içeri alan, kah bizi dünyaya açan, kah dışarıdaki gürültüden koruyan bir eşiktir. Kimi zaman ardına saklanır, kimi zaman aralığından bütün bir hayatı seyrederiz. Sinemada, resimde, şiirde ve mimaride pencere; hep bu ikili haliyle, hem sınır hem geçit olarak karşımıza çıkar.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.9; margin: 0 0 16px 0;">
+    Bu sayıda Hitchcock&rsquo;un arka penceresinden Hammershøi&rsquo;nin sessiz odalarına, Louvre&rsquo;un cam piramidinden gönülden gönüle açılan o görünmez pencerelere uzanıyoruz. Sizi de kendi pencerenizin önünde bir an durup dışarıya (ve elbette içeriye) bakmaya davet ediyoruz.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #3d3833; line-height: 1.85; margin: 0 0 4px 0;">
+    Keyifli okumalar.
+  </p>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: italic; color: #8C857E; line-height: 1.6; margin: 18px 0 0 0;">
+    Klemens Bülten ekibi adına,<br>
+    <strong style="font-style: normal; color: #2D2926;">Kerem Hun</strong>
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: KARİKATÜR — Delikli İlişkiler (sabit köşe) -->
+<!-- ═══════════════════════════════════ -->
+<div style="border-top: 1px solid #d9d3cb; margin: 0 0 32px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 0 0 44px 0;">
+  <tr>
+    <td style="text-align: center;">
+      <a href="https://instagram.com/delikli.iliskiler" style="text-decoration: none; display: block;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/pencere-karikatur-delikli-iliskiler.jpg" alt="Delikli İlişkiler — Pencere temalı karikatür" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0; border-radius: 14px; margin: 0 auto;" />
+      </a>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 16px 0 0 0;">Çizen: <strong style="color: #2D2926;">Delikli İlişkiler</strong> <a href="https://instagram.com/delikli.iliskiler" style="color: #b0a99f; text-decoration: none;">(@delikli.iliskiler)</a></p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══ MÜZE REHBERİ HATIRLATMASI ═══ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 8px 0 40px 0;">
+  <tr>
+    <td style="background-color: #FFF8F5; border: 1.5px dashed #FF6D60; border-radius: 12px; padding: 20px 24px; text-align: center;">
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #FF6D60; letter-spacing: 1px; margin: 0 0 6px 0;">&#9733; &#9733; &#9733;</p>
+      <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #2D2926; line-height: 1.6; margin: 0 0 6px 0;">
+        Bu sayıda size bir <strong>hediyemiz</strong> var!
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.6; margin: 0;">
+        Aşağıda sizi bekleyen <em>Topkapı Sarayı Müzesi Gezme Rehberi</em>&rsquo;ni indirmeyi unutmayın.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══ SPOTİFY ÇALMA LİSTESİ ═══ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 0 0 48px 0;">
+  <tr>
+    <td style="background-color: #1DB954; border-radius: 14px; padding: 26px 28px; text-align: center; position: relative; overflow: hidden;">
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 10px 0;">&#9835; BU SAYININ MÜZİĞİ &#9835;</p>
+      <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 400; color: #ffffff; line-height: 1.5; margin: 0 0 18px 0;">Yazıları okurken eşlik etsin diye bu sayıya özel bir liste hazırladık.</p>
+      <a href="https://open.spotify.com/playlist/0x7RRWITmMdwpF1vdr1g3x" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #1DB954; background-color: #ffffff; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1px; text-transform: uppercase;">SPOTIFY&rsquo;DA DİNLE</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: ODAK                        -->
+<!-- ═══════════════════════════════════ -->
+
+<div style="border-top: 1px solid #d9d3cb; margin: 0 0 28px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #8C857E; letter-spacing: 2.5px; text-transform: uppercase; text-align: center; margin: 0 0 10px 0;">Bu sayının odağı</p>
+
+<h2 class="section-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 38px; font-weight: 400; font-style: italic; color: #FF6D60; text-align: center; letter-spacing: 4px; text-transform: uppercase; margin: 0 0 40px 0; line-height: 1.1;">Odak</h2>
+
+<!-- MANŞET — Gönülden Gönüle Pencere -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <a href="https://klemensart.com/icerikler/yazi/gonulden-gonule" style="text-decoration: none; display: block;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/gonulden-gonule/yxzzoe-rain-886721-1780368682448.jpg" alt="Gönülden Gönüle Pencere" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+      </a>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 20px 0 12px 0;">
+        <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; mso-padding-alt: 0; display: inline-block;">2 DK okuma</span>
+      </p>
+      <h2 class="lead-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Gönülden Gönüle Pencere</h2>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 20px 0;">
+        Pencereler, içeride olanla dışarıdaki arasındaki köprüdür. Günah çıkarma ritüelinden Rönesans sanatına, psikolojiden mimariye; bir kişiye pencere açmak, ufkunu genişletip gün ışığı almasına yardım etmektir.
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Gözde Şensoy Murt</strong></p>
+      <a href="https://klemensart.com/icerikler/yazi/gonulden-gonule" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Perspektiften Arayüze: Görme Rejimi Olarak Pencere -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">4 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Perspektiften Arayüze: Görme Rejimi Olarak Pencere</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Duvarlardaki boşluklardan bilgisayar ekranlarına uzanan pencere fikri; görmenin nasıl çerçevelendiğini ve öznenin dünyaya nasıl yerleştirildiğini yeniden düşünmeye çağırıyor.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/perspektiften-arayuze-bir-gorme-rejimi-olarak-pencere" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/perspektiften-arayuze-bir-gorme-rejimi-olarak-pencere/IMG_9987-1779355909683.jpeg" alt="Perspektiften Arayüze: Görme Rejimi Olarak Pencere" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Zeynep Aydın</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/perspektiften-arayuze-bir-gorme-rejimi-olarak-pencere" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Kör Olmadan Bakmak -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">4 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Kör Olmadan Bakmak</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Sanat, insan ile kutsal arasındaki mesafeyi ayarlayan ince bir perdedir. Ve belki de cennet, Tanrı&rsquo;nın dünyaya açtığı son penceredir.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/kor-olmadan-bakmak" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/kor-olmadan-bakmak/jamieson-gordon-07cvLApfFvU-unsplash-1781172216846.jpg" alt="Kör Olmadan Bakmak" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Didem Kazan Sol</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/kor-olmadan-bakmak" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Nuh Nebiden Kalma Bir Anlatı -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">3 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Nuh Nebiden Kalma Bir Anlatı</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    İnsan, doğa karşısında nerede durur? Poussin&rsquo;in Tufan tablosundan bugünün iklim krizine, felaketin eşiğinden bakan bir pencere.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/nuh-nebiden-kalma-bir-anlati" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Poussin%2C_Nicolas_-_L%27Hiver_ou_Le_D%C3%A9luge_-_1660-1664.jpg" alt="Nuh Nebiden Kalma Bir Anlatı — Poussin, Tufan" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Ezel Evin Altındağ</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/nuh-nebiden-kalma-bir-anlati" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ═══ BREAKOUT — BİLİYOR MUYDUNUZ? (1: Pencere vergisi) ═══ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 48px 0;">
+  <tr>
+    <td style="background-color: #f4f0ea; border-left: 4px solid #2B4A6F; padding: 22px 26px;">
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; color: #2B4A6F; letter-spacing: 2.5px; text-transform: uppercase; margin: 0 0 8px 0;">BİLİYOR MUYDUNUZ?</p>
+      <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-style: italic; color: #2D2926; line-height: 1.6; margin: 0;">
+        İngiltere&rsquo;de 1696&ndash;1851 arası bir <strong style="font-style: normal; color: #2B4A6F;">&ldquo;pencere vergisi&rdquo;</strong> vardı; evler pencere sayısına göre vergilendirildi. Vergiden kaçmak için insanlar pencerelerini ördü. O devirden kalma örülü pencereler bugün hâlâ İngiliz binalarında görülebilir.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: KÜLTÜR & SANAT              -->
+<!-- ═══════════════════════════════════ -->
+
+<div style="border-top: 1px solid #d9d3cb; margin: 60px 0 28px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #8C857E; letter-spacing: 2.5px; text-transform: uppercase; text-align: center; margin: 0 0 10px 0;">PENCERENİN TARİHTE VE SANATTA İZİ</p>
+
+<h2 class="section-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 38px; font-weight: 400; font-style: italic; color: #FF6D60; text-align: center; letter-spacing: 4px; text-transform: uppercase; margin: 0 0 40px 0; line-height: 1.1;">Kültür &amp; Sanat</h2>
+
+<!-- MANŞET — Hitchcock'un Arka Penceresi'ndeki Tanık -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <a href="https://klemensart.com/icerikler/yazi/hitchcockun-arka-penceresindeki-tanik" style="text-decoration: none; display: block;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/pencere-tanikligin-esigi/Rear-Window-3-jpg-1780239943009.webp" alt="Hitchcock'un Arka Penceresi'ndeki Tanık — Rear Window" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+      </a>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 20px 0 12px 0;">
+        <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; mso-padding-alt: 0; display: inline-block;">2 DK okuma</span>
+      </p>
+      <h2 class="lead-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Hitchcock&rsquo;un Arka Penceresi&rsquo;ndeki Tanık</h2>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 20px 0;">
+        İçeride nefes alabilmek için açtığımız pencereler, dışarıdaki çığlığı duyduğumuzda ne işe yarayacak? Hitchcock&rsquo;un <em>Arka Pencere</em>&rsquo;si üzerine bir bakış.
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Gizem Dinç</strong></p>
+      <a href="https://klemensart.com/icerikler/yazi/hitchcockun-arka-penceresindeki-tanik" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Çağın Ötesine Açılan Pencere: Louvre Piramidi -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">6 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Çağın Ötesine Açılan Pencere: Louvre Piramidi</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Yıllık 8,5&ndash;10 milyon ziyaretçisiyle dünyanın en çok ziyaret edilen müzesi Louvre&rsquo;un 1989 doğumlu cam piramidi, bu görkemli yapının tarihine açılmış bir pencere olabilir mi?
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/cagin-otesine-acilan-pencere-louvre-piramidi" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/cagin-otesine-acilan-pencere-louvre-piramidi/kapak-louvre-1780482473255.jpg" alt="Louvre Piramidi" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Hülya Utkuluer</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/cagin-otesine-acilan-pencere-louvre-piramidi" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Vilhelm Hammershøi'nin Pencereleri -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">3 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Vilhelm Hammershøi&rsquo;nin Pencereleri</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Boş odalar, sırtı dönük kadınlar ve kuzey ışığı… Hammershøi&rsquo;nin pencereleri dış dünyayı göstermekten çok, yalnızlığın, zamanın ve insanın iç dünyasının sessiz bir yansımasına dönüşür.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/vilhelm-hammershinin-pencereleri" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/vilhelm-hammershinin-pencereleri/Vilhelm-Hammersh-i-Interior-Stragegade-30-1901-1780177123321.jpg" alt="Vilhelm Hammershøi'nin Pencereleri" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Ecem Civaş</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/vilhelm-hammershinin-pencereleri" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Bir Evin İçinden Dünyaya Bakmak: Tennessee Williams -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">4 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Bir Evin İçinden Dünyaya Bakmak: Tennessee Williams Karakterlerinde Pencere</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Tennessee Williams&rsquo;ın oyunlarında pencere yalnızca mimari bir unsur değil; sıkışmışlık, özlem ve özgürlük arayışının sembolüdür. <em>Sırça Kümes</em>, <em>Arzu Tramvayı</em> ve <em>Kızgın Damdaki Kedi</em> üzerinden, pencerenin hem kaçış umudu hem ulaşılamayan bir arzu olarak modern insanın yalnızlığını nasıl yansıttığına bakıyor.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/bir-evin-icinden-dunyaya-bakmak-tennessee-williams-karakterlerinde-pencere" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/bir-evin-icinden-dunyaya-bakmak-tennessee-williams-karakterlerinde-pencere/kapak-g-rseli-1780167573163.png" alt="Tennessee Williams Karakterlerinde Pencere" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Ebru Berra Alkan</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/bir-evin-icinden-dunyaya-bakmak-tennessee-williams-karakterlerinde-pencere" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Kutsal Koza, Hane İçi Kapan -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">8 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Kutsal Koza, Hane İçi Kapan</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Bir pencere bazen yalnızca ışığı değil, toplumun kadın için çizdiği görünmez sınırları da içeri taşır. Friedrich ve Hunt&rsquo;ın eserleri üzerinden, kadının ev içi kutsallık ile kamusal dışlanma arasında nasıl konumlandırıldığına bakan bir okuma.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/kutsal-koza-hane-ici-kapan" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/kutsal-koza-hane-ici-kapan/Pieter-Janssens---The-Sweeper----1779744166284.jpg" alt="Kutsal Koza, Hane İçi Kapan" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Mehtap Kurt</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/kutsal-koza-hane-ici-kapan" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Pencerenin Ardında -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">2 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Pencerenin Ardında</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Pencere, insanı hem dışarıdan korur hem de dışarıyla bağ kurmasını sağlar. Nazım Hikmet&rsquo;in <em>Yolcu</em> oyununda istasyon pencerelerinin ardındaki üç karakterin hayatına bir yolcu girer ve bizi şu soruyla baş başa bırakır: Hava almak için açtığımız pencereyi, havayı değiştirmek için de açabilecek miyiz?
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/pencerenin-ardinda" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/pencerenin-ardinda/Do-a-1-1780426544610.jpeg" alt="Pencerenin Ardında" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Doğa Uğurel</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/pencerenin-ardinda" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ═══ BREAKOUT — BİLİYOR MUYDUNUZ? (2: Kelimenin kökeni) ═══ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 48px 0;">
+  <tr>
+    <td style="background-color: #f4f0ea; border-left: 4px solid #2B4A6F; padding: 22px 26px;">
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; color: #2B4A6F; letter-spacing: 2.5px; text-transform: uppercase; margin: 0 0 8px 0;">BİLİYOR MUYDUNUZ?</p>
+      <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-style: italic; color: #2D2926; line-height: 1.6; margin: 0;">
+        İngilizce <strong style="font-style: normal; color: #2B4A6F;">&ldquo;window&rdquo;</strong> kelimesi, Eski İskandinav dilindeki <em>vindauga</em>&rsquo;dan gelir: <em>vindr</em> (rüzgâr) + <em>auga</em> (göz) &mdash; yani &ldquo;rüzgâr gözü&rdquo;. Pencere, evin dünyaya bakan gözüdür.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: KENT & YAŞAM (yeni)         -->
+<!-- ═══════════════════════════════════ -->
+
+<div style="border-top: 1px solid #d9d3cb; margin: 60px 0 28px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #8C857E; letter-spacing: 2.5px; text-transform: uppercase; text-align: center; margin: 0 0 10px 0;">Şehre açılan pencere</p>
+
+<h2 class="section-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 38px; font-weight: 400; font-style: italic; color: #FF6D60; text-align: center; letter-spacing: 4px; text-transform: uppercase; margin: 0 0 40px 0; line-height: 1.1;">Kent &amp; Yaşam</h2>
+
+<!-- Başım Köpük Köpük Bulut, İçim Dışım Deniz ama Yer Yok -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <a href="https://klemensart.com/icerikler/yazi/basim-kopuk-kopuk-bulut-icim-disim-deniz-ama-yer-yok" style="text-decoration: none; display: block;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/basim-kopuk-kopuk-bulut-icim-disim-deniz-ama-rezervasyonum-yok/Beykoz-Yal--K-t-phanesi2-1780327261015.jpg" alt="Başım Köpük Köpük Bulut — İstanbul'un manzaralı kütüphaneleri" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+      </a>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 20px 0 12px 0;">
+        <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; mso-padding-alt: 0; display: inline-block;">5 DK okuma</span>
+      </p>
+      <h2 class="lead-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Başım Köpük Köpük Bulut, İçim Dışım Deniz ama Yer Yok</h2>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 20px 0;">
+        İstanbul yaşamak için artık fazla kalabalık. Ama &ldquo;yaşamak telaşından&rdquo; biraz feragat ederseniz, şehrin tadını çıkarabileceğiniz enfes manzaralı kütüphaneler &mdash; birer tavşan deliği &mdash; sizi bekliyor.
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Melis Terzi</strong></p>
+      <a href="https://klemensart.com/icerikler/yazi/basim-kopuk-kopuk-bulut-icim-disim-deniz-ama-yer-yok" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════ -->
+<!-- BÖLÜM: İLHAM VERENLER (yeni)       -->
+<!-- ═══════════════════════════════════ -->
+
+<div style="border-top: 1px solid #d9d3cb; margin: 60px 0 28px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #8C857E; letter-spacing: 2.5px; text-transform: uppercase; text-align: center; margin: 0 0 10px 0;">KİŞİSEL BİR PENCERE</p>
+
+<h2 class="section-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 38px; font-weight: 400; font-style: italic; color: #FF6D60; text-align: center; letter-spacing: 4px; text-transform: uppercase; margin: 0 0 40px 0; line-height: 1.1;">İlham Verenler</h2>
+
+<!-- Hoca, Gök, Yüz ve Pencerem -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <a href="https://klemensart.com/icerikler/yazi/hoca-gok-yuz-ve-pencerem" style="text-decoration: none; display: block;">
+        <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/hoca-gok-yuz-ve-pencerem/Defne_202605-1780351102636.JPG" alt="Hoca, Gök, Yüz ve Pencerem" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+      </a>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 20px 0 12px 0;">
+        <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; mso-padding-alt: 0; display: inline-block;">2 DK okuma</span>
+      </p>
+      <h2 class="lead-title" style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Hoca, Gök, Yüz ve Pencerem</h2>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 20px 0;">
+        Pencere bazen ışık için açılır, bazen ses için. Broadway&rsquo;in arka koltuğunda camına alnını dayayan çocuktan, Zekai Özger&rsquo;in &ldquo;sesin sarsın dünyayı&rdquo; dediği ana &mdash; her ikisi de hayatın içinde kalmak için.
+      </p>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Barış Arslan</strong></p>
+      <a href="https://klemensart.com/icerikler/yazi/hoca-gok-yuz-ve-pencerem" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ───── AYIRICI ───── -->
+<div style="border-top: 1px solid #ece7df; margin: 40px 0; line-height: 0; font-size: 0;">&nbsp;</div>
+
+<!-- Maviye Bir Davet -->
+<div>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 8px 0;">
+    <span style="background-color: #f4f0ea; color: #5a534c; padding: 5px 11px; border-radius: 11px; display: inline-block;">3 DK okuma</span>
+  </p>
+  <h3 style="font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #2D2926; line-height: 1.25; margin: 0 0 14px 0;">Maviye Bir Davet</h3>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #5a534c; line-height: 1.75; margin: 0 0 16px 0;">
+    Sahip olduğumuz en değerli şey, dikkatimiz. &ldquo;Mavi çiçek hep oradaydı&rdquo; diyen, ana uyanmaya çağıran bir yazı.
+  </p>
+  <a href="https://klemensart.com/icerikler/yazi/maviye-bir-davet" style="text-decoration: none; display: block; margin: 0 0 16px 0;">
+    <img src="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/article-images/maviye-bir-davet/1000027512-1780418379782.jpg" alt="Maviye Bir Davet" width="600" style="width: 100%; max-width: 600px; height: 240px; object-fit: cover; object-position: center center; display: block; border: 0; border-radius: 14px;" />
+  </a>
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #8C857E; margin: 0 0 22px 0;">Yazan: <strong style="color: #2D2926;">Defne Ege Durucu</strong></p>
+  <a href="https://klemensart.com/icerikler/yazi/maviye-bir-davet" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #FF6D60; background-color: #FFF8F5; border: 2px solid #FF6D60; text-decoration: none; padding: 11px 26px; border-radius: 26px; letter-spacing: 1.2px; text-transform: uppercase;">Devamını oku</a>
+</div>
+
+<!-- ═══ HEDİYE REHBER BANNER ═══ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 50px 0;">
+  <tr>
+    <td style="background-color: #e8f0f8; border-radius: 16px; padding: 36px 32px; text-align: center;">
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2B4A6F; letter-spacing: 2.5px; text-transform: uppercase; margin: 0 0 14px 0;">BU SAYININ HEDİYESİ</p>
+      <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 400; color: #2D2926; line-height: 1.35; margin: 0 0 12px 0;">Müzede 1 Saat:<br>Topkapı Sarayı Müzesi<br>Gezme Rehberi</h2>
+      <p style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #5a534c; line-height: 1.6; margin: 0 0 26px 0;">
+        Bu sayımıza özel hazırladığımız rehberle müzeyi keşfedin.<br>PDF formatında, ücretsiz.
+      </p>
+      <a href="https://sgabkrzzzszfqrtgkord.supabase.co/storage/v1/object/public/email-assets/bulten-hediye/muzede-1-saat-topkapi-sarayi-muzesi.pdf" style="display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; color: #ffffff; background-color: #2B4A6F; text-decoration: none; padding: 13px 34px; border-radius: 28px; letter-spacing: 1.2px; text-transform: uppercase;">REHBERİ İNDİR (PDF)</a>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══ KAPANIŞ ═══ -->
+<!-- [TODO] Kapanış cümlesini onayla -->
+<div style="border-top: 1px solid #d9d3cb; margin: 60px 0 0 0; line-height: 0; font-size: 0;">&nbsp;</div>
+<div style="padding: 36px 0 8px 0; text-align: center;">
+  <p style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #8C857E; letter-spacing: 2.5px; text-transform: uppercase; margin: 0 0 14px 0;">BİR SONRAKİ SAYIYA KADAR</p>
+  <p style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-style: italic; color: #2D2926; line-height: 1.6; margin: 0 0 28px 0;">Pencerelerinizi açık, perdelerinizi aralık bırakın; bir sonraki sayıda yeniden buluşmak üzere.</p>
+  <a href="https://klemensart.com" style="display: inline-block; font-family: Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #2D2926; background-color: #FFF8F5; border: 2px solid #2D2926; text-decoration: none; padding: 14px 42px; letter-spacing: 1.2px; border-radius: 30px; text-transform: uppercase;">TÜM İÇERİKLERİ KEŞFET</a>
+</div>
